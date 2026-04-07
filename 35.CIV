@@ -1,0 +1,563 @@
+{
+  "meta": {
+    "format": "CIV_PROJECT",
+    "schema_version": "0.1.0",
+    "project_name": "未命名工程"
+  },
+  "workspace": {
+    "基础信息": {
+      "format": "MODTOOLS54_BASIC_INFO_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "global_settings": {
+          "prefix": "SIQI",
+          "infix": 35,
+          "language": "简体中文"
+        },
+        "shared_workspace_params": {
+          "prefix": "SIQI",
+          "infix": 35,
+          "file_name": "Siqi_Leaders_0035"
+        },
+        "project_info": {
+          "civ6proj_path": "C:\\Users\\24948\\Documents\\Firaxis ModBuddy\\Civilization VI\\Siqi_Leaders_0035\\Siqi_Leaders_0035\\Siqi_Leaders_0035.civ6proj",
+          "mod_name": "明日方舟：炎 录武官",
+          "teaser": "明日方舟：炎 录武官",
+          "description": "明日方舟：炎 录武官",
+          "thanks": "",
+          "authors": "Siqi",
+          "guid": "8357d448-8834-429b-98e4-f1620e76bd9b",
+          "file_name": "Siqi_Leaders_0035",
+          "affects_saved_games": true,
+          "supports_single_player": true,
+          "supports_multiplayer": true,
+          "supports_hotseat": true,
+          "name_raw": "Siqi_Leaders_0035",
+          "teaser_raw": "Siqi_Leaders_0035",
+          "description_raw": "Siqi_Leaders_0035",
+          "localized_text_data": ""
+        },
+        "file_info": {
+          "front_end_actions": [
+            {
+              "type": "UpdateDatabase",
+              "id": "UpdateDatabase",
+              "files": [
+                "Data/Siqi_Leaders_0035_Configs.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateText",
+              "id": "UpdateText",
+              "files": [
+                "Text/Siqi_Leaders_0035_Text_CN.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateIcons",
+              "id": "UpdateIcons",
+              "files": [
+                "Icons/Siqi_Leaders_0035_Icons.xml"
+              ],
+              "load_order": 1000
+            },
+            {
+              "type": "UpdateColors",
+              "id": "UpdateColors",
+              "files": [
+                "Data/Siqi_Leaders_0035_Colors.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateArt",
+              "id": "UpdateArt",
+              "files": [
+                "(Mod Art Dependency File)"
+              ],
+              "load_order": 0
+            }
+          ],
+          "in_game_actions": [
+            {
+              "type": "UpdateColors",
+              "id": "UpdateColors",
+              "files": [
+                "Data/Siqi_Leaders_0035_Colors.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateText",
+              "id": "UpdateText",
+              "files": [
+                "Text/Siqi_Leaders_0035_Text_CN.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateIcons",
+              "id": "UpdateIcons",
+              "files": [
+                "Icons/Siqi_Leaders_0035_Icons.xml"
+              ],
+              "load_order": 1000
+            },
+            {
+              "type": "UpdateArt",
+              "id": "UpdateArt",
+              "files": [
+                "(Mod Art Dependency File)"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateDatabase",
+              "id": "UpdateDatabase",
+              "files": [
+                "Data/Siqi_Leaders_0035_Civilizations.sql",
+                "Data/Siqi_Leaders_0035_Leaders.sql",
+                "Data/Siqi_Leaders_0035_Buildings.sql",
+                "Data/Siqi_Leaders_0035_Modifiers.sql",
+                "Data/Siqi_Leaders_0035_Moments.sql"
+              ],
+              "load_order": 9999
+            },
+            {
+              "type": "AddUserInterfaces",
+              "id": "NewAction",
+              "files": [
+                "UI/Siqi_Leaders_0035_UI.xml"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "AddGameplayScripts",
+              "id": "NewAction",
+              "files": [
+                "Scripts/Siqi_Leaders_0035_Scripts.lua"
+              ],
+              "load_order": 0
+            }
+          ]
+        }
+      }
+    },
+    "文明": [],
+    "领袖": [
+      {
+        "name": "云青萍",
+        "abbr": "1",
+        "type": "LEADER_SIQI_L0035_1",
+        "leader_name": "云青萍",
+        "sex": "Male",
+        "capital_name": "大炎",
+        "civilization_type": "CIVILIZATION_OP_YAN",
+        "civilization_name": "大炎",
+        "leader_text": "云青萍，曾就任炎国录武官一职，为军队将士记录武功、编撰书籍。现经干员左乐介绍，作为司岁台编外文职暂驻罗德岛，负责辅助对岁兽代理人的观察与记录，并兼任罗德岛后勤干员。",
+        "leader_quote": "叶落土中碾作尘，却于微处寻真知。",
+        "ability_name": "学成于聚",
+        "ability_description": "城市每个人口为区域提供标准相邻加成，区域提供等同于相邻加成的其他产出（金币+100%）。巨作槽填满后自动主题化，考古博物馆+6巨作槽位。击杀其他文明的单位时，为周围城市传播宗教，每占领一个原始首都/圣城，所有贸易路线+2全部产出，该数值随着时代逐渐翻倍增长，若为异大陆贸易路线则该产出翻三倍。",
+        "select_sort_index": 0,
+        "add_diplo_background_curtain": true,
+        "icon_image_name": "ICON_LEADER_SIQI_L0035_1",
+        "foreground_image_name": "LEADER_SIQI_L0035_1_NEUTRAL",
+        "background_image_name": "LEADER_SIQI_L0035_1_BACKGROUND",
+        "diplo_foreground_image_name": "FALLBACK_NEUTRAL_SIQI_L0035_1",
+        "diplo_background_image_name": "SIQI_L0035_1_1,SIQI_L0035_1_2,SIQI_L0035_1_3",
+        "select_foreground_image_name": "PORTRAIT_LEADER_SIQI_L0035_1.png",
+        "select_background_image_name": "PORTRAIT_BACKGROUND_LEADER_SIQI_L0035_1.png",
+        "images": {
+          "icon": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单35/立绘_录武官_1.png",
+            "scale": 0.839518018754763,
+            "offset_x": -519.5712565614956,
+            "offset_y": -16.871517277842997,
+            "target_width": 256,
+            "target_height": 256,
+            "preview_max_width": 320,
+            "preview_max_height": 207,
+            "canvas_width": 207,
+            "canvas_height": 207
+          },
+          "foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单35/立绘_录武官_2.png",
+            "scale": 0.09375,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 960,
+            "target_height": 960,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 240,
+            "canvas_height": 240
+          },
+          "background": {
+            "path": "D:/文明6mod用文件夹/明日方舟可爱领袖包1/明日方舟系列·之夜魔/IMG_Gloria_Background.png",
+            "scale": 0.16326530612244897,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 1920,
+            "target_height": 960,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 320,
+            "canvas_height": 160
+          },
+          "diplo_foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单35/立绘_录武官_1.png",
+            "scale": 0.15915119363395225,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 960,
+            "target_height": 960,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 240,
+            "canvas_height": 240
+          },
+          "diplo_background": {
+            "path": "D:/文明6mod用文件夹/明日方舟可爱领袖包1/明日方舟系列之小满/IMG_Grain_Buds_Background.png",
+            "scale": 0.25,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 1960,
+            "target_height": 1600,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 294,
+            "canvas_height": 240
+          },
+          "select_foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单35/立绘_录武官_1.png",
+            "scale": 0.15915119363395225,
+            "offset_x": -53.0,
+            "offset_y": 3.0,
+            "target_width": 512,
+            "target_height": 1024,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 120,
+            "canvas_height": 240
+          },
+          "select_background": {
+            "path": "D:/文明6mod用文件夹/明日方舟可爱领袖包1/明日方舟系列之小满/IMG_Grain_Buds_Background.png",
+            "scale": 0.25,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 384,
+            "target_height": 1024,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 96,
+            "canvas_height": 240
+          }
+        },
+        "bindings": [
+          {
+            "section": "建筑",
+            "name": "司岁台",
+            "type": "BUILDING_SIQI_B0035_1",
+            "index": 0
+          }
+        ],
+        "diplomacy": []
+      }
+    ],
+    "区域": [],
+    "建筑": [
+      {
+        "name": "司岁台",
+        "abbr": "1",
+        "type": "BUILDING_SIQI_B0035_1",
+        "BuildingType": "BUILDING_SIQI_B0035_1",
+        "table_name": "Buildings",
+        "table_data": {
+          "Name": "司岁台",
+          "Description": "可存放更多[ICON_GreatWork_Landscape] 艺术巨作。如果在剧院广场区域已经有一座考古博物馆则无法修建。",
+          "Quote": "",
+          "QuoteAudio": "",
+          "PrereqTech": "",
+          "PrereqCivic": "CIVIC_HUMANISM",
+          "PrereqDistrict": "DISTRICT_THEATER",
+          "AdjacentDistrict": "",
+          "AdjacentResource": "",
+          "PurchaseYield": "YIELD_GOLD",
+          "ObsoleteEra": "",
+          "AdvisorType": "ADVISOR_CULTURE",
+          "AdjacentImprovement": "",
+          "CityAdjacentTerrain": "",
+          "TraitType": "TRAIT_BUILDING_SIQI_B0035_1",
+          "GovernmentTierRequirement": "",
+          "Cost": 290,
+          "MaxPlayerInstances": -1,
+          "MaxWorldInstances": -1,
+          "OuterDefenseHitPoints": 0,
+          "Housing": 0,
+          "Entertainment": 0,
+          "Maintenance": 2,
+          "OuterDefenseStrength": 0,
+          "CitizenSlots": 1,
+          "RegionalRange": 0,
+          "GrantFortification": 0,
+          "DefenseModifier": 0,
+          "Capital": 0,
+          "RequiresPlacement": 0,
+          "RequiresRiver": 0,
+          "Coast": 0,
+          "EnabledByReligion": 0,
+          "AllowsHolyCity": 0,
+          "MustPurchase": 0,
+          "IsWonder": 0,
+          "MustBeLake": 0,
+          "MustNotBeLake": 0,
+          "AdjacentToMountain": 0,
+          "RequiresReligion": 0,
+          "InternalOnly": 0,
+          "RequiresAdjacentRiver": 0,
+          "MustBeAdjacentLand": 0,
+          "AdjacentCapital": 0,
+          "UnlocksGovernmentPolicy": 0
+        },
+        "Name": "司岁台",
+        "Description": "可存放更多[ICON_GreatWork_Landscape] 艺术巨作。如果在剧院广场区域已经有一座考古博物馆则无法修建。",
+        "icon_image_name": "ICON_BUILDING_SIQI_B0035_1",
+        "portrait_image_name": "",
+        "images": {
+          "icon": {}
+        },
+        "buildings_xp2": {
+          "BuildingType": "BUILDING_SIQI_B0035_1",
+          "RequiredPower": 0,
+          "ResourceTypeConvertedToPower": "",
+          "PreventsFloods": 0,
+          "PreventsDrought": 0,
+          "BlocksCoastalFlooding": 0,
+          "CostMultiplierPerTile": 0,
+          "CostMultiplierPerSeaLevel": 0,
+          "Bridge": 0,
+          "CanalWonder": 0,
+          "EntertainmentBonusWithPower": 0,
+          "NuclearReactor": 0,
+          "Pillage": 1
+        },
+        "building_replaces": {
+          "CivUniqueBuildingType": "BUILDING_SIQI_B0035_1",
+          "ReplacesBuildingType": "BUILDING_MUSEUM_ART"
+        },
+        "building_prereqs": [
+          {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "PrereqBuilding": "BUILDING_AMPHITHEATER"
+          }
+        ],
+        "building_citizen_yield_changes": [],
+        "building_great_person_points": [
+          {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "GreatPersonClassType": "GREAT_PERSON_CLASS_ARTIST",
+            "PointsPerTurn": 2
+          },
+          {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "GreatPersonClassType": "GREAT_PERSON_CLASS_WRITER",
+            "PointsPerTurn": 1
+          }
+        ],
+        "building_required_features": [],
+        "building_tourism_bombs_xp2": [],
+        "building_resource_costs": [],
+        "building_valid_features": [],
+        "building_valid_terrains": [],
+        "building_yield_changes": [
+          {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "YieldType": "YIELD_CULTURE",
+            "YieldChange": 2
+          }
+        ],
+        "building_yield_changes_bonus_with_power": [],
+        "building_yield_district_copies": [],
+        "building_yields_per_era": [],
+        "building_conditions": {
+          "BuildingType": "BUILDING_SIQI_B0035_1",
+          "UnlocksFromEffect": 0
+        },
+        "building_build_charge_productions": [],
+        "building_greatworks": [
+          {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "GreatWorkSlotType": "GREATWORKSLOT_ART",
+            "NumSlots": 6,
+            "ThemingUniquePerson": 1,
+            "ThemingSameObjectType": 1,
+            "ThemingUniqueCivs": 0,
+            "ThemingSameEras": 0,
+            "ThemingYieldMultiplier": 100,
+            "ThemingTourismMultiplier": 100,
+            "NonUniquePersonYield": 1,
+            "NonUniquePersonTourism": 1,
+            "ThemingBonusDescription": "LOC_BUILDING_SIQI_B0035_1_ART_THEMING",
+            "ThemingBonusDescriptionText": "当展示来自不同艺术家相同类型的作品时，主题加成翻倍。"
+          }
+        ],
+        "subtables": {
+          "Buildings_XP2": {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "RequiredPower": 0,
+            "ResourceTypeConvertedToPower": "",
+            "PreventsFloods": 0,
+            "PreventsDrought": 0,
+            "BlocksCoastalFlooding": 0,
+            "CostMultiplierPerTile": 0,
+            "CostMultiplierPerSeaLevel": 0,
+            "Bridge": 0,
+            "CanalWonder": 0,
+            "EntertainmentBonusWithPower": 0,
+            "NuclearReactor": 0,
+            "Pillage": 1
+          },
+          "BuildingReplaces": {
+            "CivUniqueBuildingType": "BUILDING_SIQI_B0035_1",
+            "ReplacesBuildingType": "BUILDING_MUSEUM_ART"
+          },
+          "BuildingPrereqs": [
+            {
+              "BuildingType": "BUILDING_SIQI_B0035_1",
+              "PrereqBuilding": "BUILDING_AMPHITHEATER"
+            }
+          ],
+          "Building_CitizenYieldChanges": [],
+          "Building_GreatPersonPoints": [
+            {
+              "BuildingType": "BUILDING_SIQI_B0035_1",
+              "GreatPersonClassType": "GREAT_PERSON_CLASS_ARTIST",
+              "PointsPerTurn": 2
+            },
+            {
+              "BuildingType": "BUILDING_SIQI_B0035_1",
+              "GreatPersonClassType": "GREAT_PERSON_CLASS_WRITER",
+              "PointsPerTurn": 1
+            }
+          ],
+          "Building_RequiredFeatures": [],
+          "Building_TourismBombs_XP2": [],
+          "Building_ResourceCosts": [],
+          "Building_ValidFeatures": [],
+          "Building_ValidTerrains": [],
+          "Building_YieldChanges": [
+            {
+              "BuildingType": "BUILDING_SIQI_B0035_1",
+              "YieldType": "YIELD_CULTURE",
+              "YieldChange": 2
+            }
+          ],
+          "Building_YieldChangesBonusWithPower": [],
+          "Building_YieldDistrictCopies": [],
+          "Building_YieldsPerEra": [],
+          "BuildingConditions": {
+            "BuildingType": "BUILDING_SIQI_B0035_1",
+            "UnlocksFromEffect": 0
+          },
+          "Building_BuildChargeProductions": [],
+          "Building_GreatWorks": [
+            {
+              "BuildingType": "BUILDING_SIQI_B0035_1",
+              "GreatWorkSlotType": "GREATWORKSLOT_ART",
+              "NumSlots": 6,
+              "ThemingUniquePerson": 1,
+              "ThemingSameObjectType": 1,
+              "ThemingUniqueCivs": 0,
+              "ThemingSameEras": 0,
+              "ThemingYieldMultiplier": 100,
+              "ThemingTourismMultiplier": 100,
+              "NonUniquePersonYield": 1,
+              "NonUniquePersonTourism": 1,
+              "ThemingBonusDescription": "LOC_BUILDING_SIQI_B0035_1_ART_THEMING",
+              "ThemingBonusDescriptionText": "当展示来自不同艺术家相同类型的作品时，主题加成翻倍。"
+            }
+          ]
+        }
+      }
+    ],
+    "单位": [],
+    "改良设施": [],
+    "总督": [],
+    "伟人": [],
+    "政策卡": [],
+    "项目": [],
+    "信仰": [],
+    "议程": [],
+    "美术": {
+      "format": "MODTOOLS54_ART_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "alias_map": {
+          "building:BUILDING_SIQI_B0035_1:icon": "ICON_BUILDING_MUSEUM_ART"
+        },
+        "source_map": {
+          "building:BUILDING_SIQI_B0035_1": "BUILDING_MUSEUM_ART"
+        },
+        "need_map": {
+          "building:BUILDING_SIQI_B0035_1": true
+        },
+        "extra_xlp_flags": {},
+        "extra_artdef_flags": {},
+        "civs": {},
+        "moments_map": {
+          "moment:building:BUILDING_SIQI_B0035_1": {
+            "mode": "import",
+            "image": {},
+            "db_texture": "MOMENT_UNIT_CHUN_QIAN"
+          }
+        }
+      }
+    },
+    "文本": {
+      "preview_settings": {}
+    },
+    "修改器": {
+      "format": "MODTOOLS54_MODIFIER_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "prefix1": "",
+        "prefix2": "",
+        "owners": [
+          {
+            "table_name": "TraitModifiers",
+            "type_column": "TraitType",
+            "type_name": "TRAIT_LEADER_SIQI_L0035_1",
+            "display_name": "云青萍 Trait",
+            "source_key": "leader_trait:0",
+            "bound_modifier_ids": [],
+            "owner_bindings": []
+          },
+          {
+            "table_name": "BuildingModifiers",
+            "type_column": "BuildingType",
+            "type_name": "BUILDING_SIQI_B0035_1",
+            "display_name": "司岁台",
+            "source_key": "building:0",
+            "bound_modifier_ids": [],
+            "owner_bindings": []
+          },
+          {
+            "table_name": "TraitModifiers",
+            "type_column": "TraitType",
+            "type_name": "TRAIT_BUILDING_SIQI_B0035_1",
+            "display_name": "司岁台 Trait",
+            "source_key": "building_trait:0",
+            "bound_modifier_ids": [],
+            "owner_bindings": []
+          }
+        ],
+        "unit_abilities": [],
+        "modifiers": [],
+        "requirement_sets": [],
+        "requirements": []
+      }
+    }
+  }
+}

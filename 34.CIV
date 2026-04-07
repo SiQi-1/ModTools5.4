@@ -1,0 +1,835 @@
+{
+  "meta": {
+    "format": "CIV_PROJECT",
+    "schema_version": "0.1.0",
+    "project_name": "未命名工程"
+  },
+  "workspace": {
+    "基础信息": {
+      "format": "MODTOOLS54_BASIC_INFO_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "global_settings": {
+          "prefix": "SIQI",
+          "infix": 34,
+          "language": "简体中文"
+        },
+        "shared_workspace_params": {
+          "prefix": "SIQI",
+          "infix": 34,
+          "file_name": "Siqi_Leaders_0034"
+        },
+        "project_info": {
+          "civ6proj_path": "C:\\Users\\24948\\Documents\\Firaxis ModBuddy\\Civilization VI\\Siqi_Leaders_0034\\Siqi_Leaders_0034\\Siqi_Leaders_0034.civ6proj",
+          "mod_name": "中华帝国：安禄山",
+          "teaser": "中华帝国：安禄山",
+          "description": "中华帝国：安禄山",
+          "thanks": "中华帝国：安禄山",
+          "authors": "Siqi",
+          "guid": "bdabfc0b-3b7d-42a1-a2e3-8da72d127966",
+          "file_name": "Siqi_Leaders_0034",
+          "affects_saved_games": true,
+          "supports_single_player": true,
+          "supports_multiplayer": true,
+          "supports_hotseat": true,
+          "name_raw": "Siqi_Leaders_0034",
+          "teaser_raw": "Siqi_Leaders_0034",
+          "description_raw": "Siqi_Leaders_0034",
+          "localized_text_data": ""
+        },
+        "file_info": {
+          "front_end_actions": [
+            {
+              "type": "UpdateDatabase",
+              "id": "UpdateDatabase",
+              "files": [
+                "Data/Siqi_Leaders_0034_Configs.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateText",
+              "id": "UpdateText",
+              "files": [
+                "Text/Siqi_Leaders_0034_Text_CN.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateIcons",
+              "id": "UpdateIcons",
+              "files": [
+                "Icons/Siqi_Leaders_0034_Icons.xml"
+              ],
+              "load_order": 1000
+            },
+            {
+              "type": "UpdateColors",
+              "id": "UpdateColors",
+              "files": [
+                "Data/Siqi_Leaders_0034_Colors.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateArt",
+              "id": "UpdateArt",
+              "files": [
+                "(Mod Art Dependency File)"
+              ],
+              "load_order": 0
+            }
+          ],
+          "in_game_actions": [
+            {
+              "type": "AddGameplayScripts",
+              "id": "AddGameplayScripts",
+              "files": [
+                "Scripts/Siqi_Leaders_0034_Scripts.lua"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateColors",
+              "id": "UpdateColors",
+              "files": [
+                "Data/Siqi_Leaders_0034_Colors.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateText",
+              "id": "UpdateText",
+              "files": [
+                "Text/Siqi_Leaders_0034_Text_CN.sql"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateIcons",
+              "id": "UpdateIcons",
+              "files": [
+                "Icons/Siqi_Leaders_0034_Icons.xml"
+              ],
+              "load_order": 1000
+            },
+            {
+              "type": "UpdateArt",
+              "id": "UpdateArt",
+              "files": [
+                "(Mod Art Dependency File)"
+              ],
+              "load_order": 0
+            },
+            {
+              "type": "UpdateDatabase",
+              "id": "UpdateDatabase",
+              "files": [
+                "Data/Siqi_Leaders_0034_Civilizations.sql",
+                "Data/Siqi_Leaders_0034_Leaders.sql",
+                "Data/Siqi_Leaders_0034_Units.sql",
+                "Data/Siqi_Leaders_0034_UnitAbilities.sql",
+                "Data/Siqi_Leaders_0034_Modifiers.sql",
+                "Data/Siqi_Leaders_0034_Moments.sql"
+              ],
+              "load_order": 9999
+            }
+          ]
+        }
+      }
+    },
+    "文明": [],
+    "领袖": [
+      {
+        "name": "安禄山",
+        "abbr": "1",
+        "type": "LEADER_SIQI_L0034_1",
+        "leader_name": "安禄山",
+        "sex": "Male",
+        "capital_name": "洛阳",
+        "civilization_type": "CIVILIZATION_CHINA",
+        "civilization_name": "中国",
+        "leader_text": "精通六蕃语言。 开元二十年（732年），幽州节度使张守珪以其骁勇多机智，任其为捉生将，并收为养子。开元二十八年（740年），因战功任平卢兵马使、营州都督等职。后又设法取得唐玄宗李隆基、杨贵妃的信任兼任平卢、范阳、河东三节度使。 因腹大垂膝，肥胖惊人，作胡旋舞，后被赐铁券，册封柳城郡公，赠范阳大都督，后改封东平郡王。天宝十四载（755年）冬，在范阳起兵叛乱，南下攻陷洛阳，安史之乱自此爆发。至德元年（756年），自称雄武皇帝，国号燕，建元圣武。此后又发兵攻陷潼关，占领长安。至德二年（757年），次子安庆绪谋夺帝位，将其杀死，年约五十余岁。",
+        "leader_quote": "乱幽州者，必此胡也。",
+        "ability_name": "渔阳地动",
+        "ability_description": "当你宣布突袭战争时，10回合内战斗力+7，移动力+1。当你攻陷城市时，人口额外减少，该城市每建造一个区域，额外获得200金币。与处于黄金时代的文明交战时，+5战斗力。",
+        "icon_image_name": "ICON_LEADER_SIQI_L0034_1",
+        "foreground_image_name": "LEADER_SIQI_L0034_1_NEUTRAL",
+        "background_image_name": "LEADER_SIQI_L0034_1_BACKGROUND",
+        "diplo_foreground_image_name": "FALLBACK_NEUTRAL_SIQI_L0034_1",
+        "diplo_background_image_name": "SIQI_L0034_1_1,SIQI_L0034_1_2,SIQI_L0034_1_3",
+        "select_foreground_image_name": "PORTRAIT_LEADER_SIQI_L0034_1.png",
+        "select_background_image_name": "PORTRAIT_BACKGROUND_LEADER_SIQI_L0034_1.png",
+        "images": {
+          "icon": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单33/头像.png",
+            "scale": 0.80859375,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 256,
+            "target_height": 256,
+            "preview_max_width": 320,
+            "preview_max_height": 207,
+            "canvas_width": 207,
+            "canvas_height": 207
+          },
+          "foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单33/前景.png",
+            "scale": 0.25,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 960,
+            "target_height": 960,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 240,
+            "canvas_height": 240
+          },
+          "background": {},
+          "diplo_foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单33/前景.png",
+            "scale": 0.25,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 960,
+            "target_height": 960,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 240,
+            "canvas_height": 240
+          },
+          "diplo_background": {},
+          "select_foreground": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单33/前景.png",
+            "scale": 0.30250000000000016,
+            "offset_x": -149.73833000000008,
+            "offset_y": -47.224244215700054,
+            "target_width": 512,
+            "target_height": 1024,
+            "preview_max_width": 320,
+            "preview_max_height": 240,
+            "canvas_width": 120,
+            "canvas_height": 240
+          },
+          "select_background": {}
+        },
+        "bindings": [
+          {
+            "section": "单位",
+            "category_label": "单位",
+            "name": "曳落河",
+            "type": "UNIT_SIQI_U0034_1",
+            "index": 0
+          }
+        ],
+        "diplomacy": []
+      }
+    ],
+    "区域": [],
+    "建筑": [],
+    "单位": [
+      {
+        "name": "曳落河",
+        "abbr": "1",
+        "type": "UNIT_SIQI_U0034_1",
+        "UnitType": "UNIT_SIQI_U0034_1",
+        "table_name": "Units",
+        "table_data": {
+          "Name": "曳落河",
+          "Description": "安禄山特色中世纪火力支援单位，代替弩手，解锁于马镫，可使用信仰值购买。防御时-5战斗力，但是劫掠只消耗一点移动力且攻击后可以移动。处于友方领土内时，无法恢复生命值。",
+          "Domain": "DOMAIN_LAND",
+          "FormationClass": "FORMATION_CLASS_LAND_COMBAT",
+          "CostProgressionModel": "NO_COST_PROGRESSION",
+          "CostProgressionParam1": 0,
+          "PromotionClass": "PROMOTION_CLASS_RANGED",
+          "PrereqTech": "TECH_STIRRUPS",
+          "PrereqCivic": "",
+          "PrereqDistrict": "",
+          "StrategicResource": "",
+          "PurchaseYield": "YIELD_GOLD",
+          "PseudoYieldType": "",
+          "ObsoleteTech": "",
+          "ObsoleteCivic": "",
+          "MandatoryObsoleteTech": "TECH_ADVANCED_BALLISTICS",
+          "MandatoryObsoleteCivic": "",
+          "AdvisorType": "ADVISOR_CONQUEST",
+          "LeaderType": "",
+          "Flavor": "",
+          "TraitType": "TRAIT_UNIT_SIQI_U0034_1",
+          "BaseSightRange": 2,
+          "BaseMoves": 2,
+          "Combat": 30,
+          "RangedCombat": 40,
+          "Range": 2,
+          "Bombard": 0,
+          "Cost": 180,
+          "PopulationCost": 0,
+          "BuildCharges": 0,
+          "ReligiousStrength": 0,
+          "ReligionEvictPercent": 0,
+          "SpreadCharges": 0,
+          "ReligiousHealCharges": 0,
+          "InitialLevel": 1,
+          "NumRandomChoices": 0,
+          "PrereqPopulation": 0,
+          "Maintenance": 3,
+          "AirSlots": 0,
+          "AntiAirCombat": 0,
+          "ParkCharges": 0,
+          "DisasterCharges": 0,
+          "FoundCity": 0,
+          "FoundReligion": 0,
+          "MakeTradeRoute": 0,
+          "EvangelizeBelief": 0,
+          "LaunchInquisition": 0,
+          "RequiresInquisition": 0,
+          "ExtractsArtifacts": 0,
+          "CanCapture": 1,
+          "CanRetreatWhenCaptured": 0,
+          "AllowBarbarians": 0,
+          "CanTrain": 1,
+          "MustPurchase": 0,
+          "Stackable": 0,
+          "CanTargetAir": 0,
+          "ZoneOfControl": 0,
+          "Spy": 0,
+          "WMDCapable": 0,
+          "IgnoreMoves": 0,
+          "TeamVisibility": 0,
+          "EnabledByReligion": 0,
+          "TrackReligion": 0,
+          "UseMaxMeleeTrainedStrength": 0,
+          "ImmediatelyName": 0,
+          "CanEarnExperience": 1
+        },
+        "Name": "曳落河",
+        "Description": "安禄山特色中世纪火力支援单位，代替弩手，解锁于马镫，可使用信仰值购买。防御时-5战斗力，但是劫掠只消耗一点移动力且攻击后可以移动。处于友方领土内时，无法恢复生命值。",
+        "icon_image_name": "ICON_UNIT_SIQI_U0034_1",
+        "portrait_image_name": "ICON_UNIT_SIQI_U0034_1_PORTRAIT",
+        "images": {
+          "icon": {
+            "path": "D:/文明6mod用文件夹/111商单合集/AAA商单33/单位头像.png",
+            "scale": 0.9375,
+            "offset_x": 0.0,
+            "offset_y": 0.0,
+            "target_width": 256,
+            "target_height": 256
+          },
+          "portrait": {}
+        },
+        "units_mode": {
+          "UnitType": "UNIT_SIQI_U0034_1",
+          "ActionCharges": 0
+        },
+        "units_presentation": {
+          "UnitType": "UNIT_SIQI_U0034_1",
+          "UIFlagOffset": 0
+        },
+        "units_xp2": {
+          "UnitType": "UNIT_SIQI_U0034_1",
+          "ResourceMaintenanceAmount": 0,
+          "ResourceCost": 0,
+          "ResourceMaintenanceType": "",
+          "TourismBomb": 0,
+          "CanEarnExperience": 1,
+          "TourismBombPossible": 0,
+          "CanFormMilitaryFormation": 1,
+          "MajorCivOnly": 0,
+          "CanCauseDisasters": 0,
+          "CanSacrificeUnits": 0
+        },
+        "unit_replaces": {
+          "CivUniqueUnitType": "UNIT_SIQI_U0034_1",
+          "ReplacesUnitType": "UNIT_CROSSBOWMAN"
+        },
+        "unit_upgrades": {
+          "Unit": "UNIT_SIQI_U0034_1",
+          "UpgradeUnit": "UNIT_FIELD_CANNON"
+        },
+        "unit_captures": {
+          "CapturedUnitType": "UNIT_SIQI_U0034_1",
+          "BecomesUnitType": ""
+        },
+        "unit_retreats_xp1": [],
+        "unit_building_prereqs": [],
+        "unit_ai_infos": [
+          {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "AiType": "UNITAI_COMBAT"
+          },
+          {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "AiType": "UNITTYPE_LAND_COMBAT"
+          },
+          {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "AiType": "UNITTYPE_RANGED"
+          }
+        ],
+        "type_tags": [
+          {
+            "Type": "UNIT_SIQI_U0034_1",
+            "Tag": "CLASS_RANGED"
+          }
+        ],
+        "unit_ability_bindings": [
+          {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "UnitAbilityType": "ABILITY_UNIT_SIQI_U0034_1",
+            "Tag": "CLASS_UNIT_SIQI_U0034_1",
+            "AbilityName": "",
+            "AbilityDescription": "防御时-5战斗力，但是劫掠只消耗一点移动力且攻击后可以移动。处于友方领土内时，无法恢复生命值。",
+            "Enabled": 1
+          }
+        ],
+        "subtables": {
+          "Units_MODE": {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "ActionCharges": 0
+          },
+          "Units_Presentation": {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "UIFlagOffset": 0
+          },
+          "Units_XP2": {
+            "UnitType": "UNIT_SIQI_U0034_1",
+            "ResourceMaintenanceAmount": 0,
+            "ResourceCost": 0,
+            "ResourceMaintenanceType": "",
+            "TourismBomb": 0,
+            "CanEarnExperience": 1,
+            "TourismBombPossible": 0,
+            "CanFormMilitaryFormation": 1,
+            "MajorCivOnly": 0,
+            "CanCauseDisasters": 0,
+            "CanSacrificeUnits": 0
+          },
+          "UnitReplaces": {
+            "CivUniqueUnitType": "UNIT_SIQI_U0034_1",
+            "ReplacesUnitType": "UNIT_CROSSBOWMAN"
+          },
+          "UnitUpgrades": {
+            "Unit": "UNIT_SIQI_U0034_1",
+            "UpgradeUnit": "UNIT_FIELD_CANNON"
+          },
+          "UnitCaptures": {
+            "CapturedUnitType": "UNIT_SIQI_U0034_1",
+            "BecomesUnitType": ""
+          },
+          "UnitRetreats_XP1": [],
+          "Unit_BuildingPrereqs": [],
+          "UnitAiInfos": [
+            {
+              "UnitType": "UNIT_SIQI_U0034_1",
+              "AiType": "UNITAI_COMBAT"
+            },
+            {
+              "UnitType": "UNIT_SIQI_U0034_1",
+              "AiType": "UNITTYPE_LAND_COMBAT"
+            },
+            {
+              "UnitType": "UNIT_SIQI_U0034_1",
+              "AiType": "UNITTYPE_RANGED"
+            }
+          ],
+          "TypeTags": [
+            {
+              "Type": "UNIT_SIQI_U0034_1",
+              "Tag": "CLASS_RANGED"
+            }
+          ],
+          "UnitAbilityBindings": [
+            {
+              "UnitType": "UNIT_SIQI_U0034_1",
+              "UnitAbilityType": "ABILITY_UNIT_SIQI_U0034_1",
+              "Tag": "CLASS_UNIT_SIQI_U0034_1",
+              "AbilityName": "",
+              "AbilityDescription": "防御时-5战斗力，但是劫掠只消耗一点移动力且攻击后可以移动。处于友方领土内时，无法恢复生命值。",
+              "Enabled": 1
+            }
+          ]
+        }
+      }
+    ],
+    "改良设施": [],
+    "总督": [],
+    "伟人": [],
+    "政策卡": [],
+    "项目": [],
+    "信仰": [],
+    "议程": [],
+    "美术": {
+      "format": "MODTOOLS54_ART_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "alias_map": {
+          "unit:UNIT_SIQI_U0034_1:portrait": "ICON_UNIT_CROSSBOWMAN"
+        },
+        "source_map": {
+          "unit:UNIT_SIQI_U0034_1": "UNIT_SCYTHIAN_HORSE_ARCHER"
+        },
+        "need_map": {
+          "unit:UNIT_SIQI_U0034_1": true
+        },
+        "extra_xlp_flags": {},
+        "extra_artdef_flags": {},
+        "civs": {}
+      }
+    },
+    "文本": {
+      "preview_settings": {}
+    },
+    "修改器": {
+      "format": "MODTOOLS54_MODIFIER_WORKSPACE",
+      "schema_version": "1.0.0",
+      "data": {
+        "prefix1": "SIQI",
+        "prefix2": "C0034",
+        "owners": [
+          {
+            "table_name": "TraitModifiers",
+            "type_column": "TraitType",
+            "type_name": "TRAIT_LEADER_SIQI_L0034_1",
+            "display_name": "安禄山 Trait",
+            "source_key": "leader_trait:0",
+            "bound_modifier_ids": [
+              "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_COMBAT_MODIFIER_INITIATED",
+              "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_MOVEMENT_MODIFIER_INITIATED",
+              "MODIFIER_SIQI_C0034_ABILITY_1"
+            ],
+            "owner_bindings": [
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_COMBAT_MODIFIER_INITIATED",
+                "attachment_target_type": ""
+              },
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_MOVEMENT_MODIFIER_INITIATED",
+                "attachment_target_type": ""
+              },
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_ABILITY_1",
+                "attachment_target_type": ""
+              }
+            ]
+          },
+          {
+            "table_name": "TraitModifiers",
+            "type_column": "TraitType",
+            "type_name": "TRAIT_UNIT_SIQI_U0034_1",
+            "display_name": "曳落河 Trait",
+            "source_key": "unit_trait:0",
+            "bound_modifier_ids": [
+              "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_CITIES_ENABLE_UNIT_FAITH_PURCHASE_1"
+            ],
+            "owner_bindings": [
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_CITIES_ENABLE_UNIT_FAITH_PURCHASE_1",
+                "attachment_target_type": ""
+              }
+            ]
+          },
+          {
+            "table_name": "UnitAbilityModifiers",
+            "type_column": "UnitAbilityType",
+            "type_name": "ABILITY_UNIT_SIQI_U0034_1",
+            "display_name": "曳落河 Ability",
+            "source_key": "unit_ability:0:0",
+            "bound_modifier_ids": [
+              "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_N5",
+              "MODIFIER_SIQI_C0034_HEAL_PER_TURN_FRIENDLY",
+              "MODIFIER_SIQI_C0034_ADVANCED_PILLAGING_USEADVANCEDPILLAGING"
+            ],
+            "owner_bindings": [
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_N5",
+                "attachment_target_type": ""
+              },
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_HEAL_PER_TURN_FRIENDLY",
+                "attachment_target_type": ""
+              },
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_ADVANCED_PILLAGING_USEADVANCEDPILLAGING",
+                "attachment_target_type": ""
+              }
+            ]
+          },
+          {
+            "table_name": "UnitAbilityModifiers",
+            "type_column": "UnitAbilityType",
+            "type_name": "ABILITY_SIQI_A0034_1",
+            "display_name": "ABILITY_SIQI_A0034_1",
+            "source_key": "modifier_unit_ability:ABILITY_SIQI_A0034_1",
+            "bound_modifier_ids": [
+              "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_5"
+            ],
+            "owner_bindings": [
+              {
+                "modifier_id": "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_5",
+                "attachment_target_type": ""
+              }
+            ]
+          }
+        ],
+        "unit_abilities": [
+          {
+            "unit_ability_type": "ABILITY_SIQI_A0034_1",
+            "name_zh": "",
+            "description_zh": "与处于黄金时代的文明交战时，+5战斗力。",
+            "inactive": true,
+            "show_float_text_when_earned": false,
+            "permanent": true,
+            "type_tags": [
+              "CLASS_ALL_COMBAT_UNITS"
+            ]
+          }
+        ],
+        "modifiers": [
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_COMBAT_MODIFIER_INITIATED",
+            "modifier_type": "MODIFIER_PLAYER_ADD_DIPLOMATIC_COMBAT_MODIFIER",
+            "comment": "+7战斗力，发起突袭战争后",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADD_DIPLOMATIC_COMBAT_MODIFIER",
+            "collection_type": "COLLECTION_OWNER",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "Amount",
+                "value": 7.0
+              },
+              {
+                "name": "DiplomaticYieldSource",
+                "value": "SURPRISE_WAR_INITIATED"
+              },
+              {
+                "name": "TurnsActive",
+                "value": "10"
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_ADD_DIPLOMATIC_MOVEMENT_MODIFIER_INITIATED",
+            "modifier_type": "MODIFIER_PLAYER_ADD_DIPLOMATIC_MOVEMENT_MODIFIER",
+            "comment": "+1移动力，发起突袭战争后",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADD_DIPLOMATIC_MOVEMENT_MODIFIER",
+            "collection_type": "COLLECTION_OWNER",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "Amount",
+                "value": 1.0
+              },
+              {
+                "name": "DiplomaticYieldSource",
+                "value": "SURPRISE_WAR_INITIATED"
+              },
+              {
+                "name": "TurnsActive",
+                "value": "10"
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_ABILITY_1",
+            "modifier_type": "MODIFIER_PLAYER_UNITS_GRANT_ABILITY",
+            "comment": "赋予能力",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_GRANT_ABILITY",
+            "collection_type": "COLLECTION_PLAYER_UNITS",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "AbilityType",
+                "value": {
+                  "ability_type": "ABILITY_SIQI_A0034_1 | ABILITY_SIQI_A0034_1",
+                  "value": "ABILITY_SIQI_A0034_1 | ABILITY_SIQI_A0034_1",
+                  "display": "ABILITY_SIQI_A0034_1 | ABILITY_SIQI_A0034_1"
+                }
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_5",
+            "modifier_type": "MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH",
+            "comment": "+5战斗力",
+            "owner_reqset": null,
+            "subject_reqset": "REQSET_SIQI_C0034_OPPONENT_ERA_AGE_MATCHES_GOLDEN",
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER",
+            "collection_type": "COLLECTION_UNIT_COMBAT",
+            "preview_text": "对战处于黄金时代对手+{1_Amount} 战斗力",
+            "parameters": [
+              {
+                "name": "Amount",
+                "value": 5.0
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_COMBAT_STRENGTH_N5",
+            "modifier_type": "MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH",
+            "comment": "防御-5战斗力",
+            "owner_reqset": null,
+            "subject_reqset": "REQSET_SIQI_C0034_PLAYER_IS_NOT_ATTACKING",
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER",
+            "collection_type": "COLLECTION_UNIT_COMBAT",
+            "preview_text": "{1_Amount} 来自防御劣势",
+            "parameters": [
+              {
+                "name": "Amount",
+                "value": -5.0
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_HEAL_PER_TURN_FRIENDLY",
+            "modifier_type": "MODIFIER_PLAYER_UNIT_ADJUST_HEAL_PER_TURN",
+            "comment": "友方领土无法恢复",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_UNIT_HEALING_MODIFIERS",
+            "collection_type": "COLLECTION_OWNER",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "Amount",
+                "value": -20.0
+              },
+              {
+                "name": "Type",
+                "value": "FRIENDLY"
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_ADVANCED_PILLAGING_USEADVANCEDPILLAGING",
+            "modifier_type": "MODIFIER_PLAYER_UNIT_ADJUST_ADVANCED_PILLAGING",
+            "comment": "只消耗1移动力掠夺",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_UNIT_ADVANCED_PILLAGING",
+            "collection_type": "COLLECTION_OWNER",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "UseAdvancedPillaging",
+                "value": "true"
+              }
+            ]
+          },
+          {
+            "modifier_id": "MODIFIER_SIQI_C0034_MODIFIER_PLAYER_CITIES_ENABLE_UNIT_FAITH_PURCHASE_1",
+            "modifier_type": "MODIFIER_PLAYER_CITIES_ENABLE_UNIT_FAITH_PURCHASE",
+            "comment": "信仰买单位",
+            "owner_reqset": null,
+            "subject_reqset": null,
+            "run_once": false,
+            "new_only": false,
+            "permanent": false,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ENABLE_UNIT_FAITH_PURCHASE",
+            "collection_type": "COLLECTION_PLAYER_CITIES",
+            "preview_text": "",
+            "parameters": [
+              {
+                "name": "Tag",
+                "value": "CLASS_UNIT_SIQI_U0034_1"
+              }
+            ]
+          }
+        ],
+        "requirement_sets": [
+          {
+            "requirement_set_id": "REQSET_SIQI_C0034_OPPONENT_ERA_AGE_MATCHES_GOLDEN",
+            "comment": "对方黄金时代",
+            "logic": "ALL",
+            "bound_requirements": [
+              "REQ_SIQI_C0034_OPPONENT_ERA_AGE_MATCHES_GOLDEN"
+            ]
+          },
+          {
+            "requirement_set_id": "REQSET_SIQI_C0034_PLAYER_IS_NOT_ATTACKING",
+            "comment": "防御",
+            "logic": "ALL",
+            "bound_requirements": [
+              "REQ_SIQI_C0034_PLAYER_IS_NOT_ATTACKING"
+            ]
+          }
+        ],
+        "requirements": [
+          {
+            "requirement_id": "REQ_SIQI_C0034_OPPONENT_ERA_AGE_MATCHES_GOLDEN",
+            "comment": "对方黄金时代",
+            "requirement_type": "REQUIREMENT_OPPONENT_ERA_AGE_MATCHES",
+            "likeliness": 0,
+            "impact": 0,
+            "progress_weight": 1,
+            "inverse": false,
+            "reverse": false,
+            "persistent": false,
+            "triggered": false,
+            "parameters": [
+              {
+                "name": "Type",
+                "value": "GOLDEN"
+              }
+            ]
+          },
+          {
+            "requirement_id": "REQ_SIQI_C0034_PLAYER_IS_NOT_ATTACKING",
+            "comment": "防御",
+            "requirement_type": "REQUIREMENT_PLAYER_IS_ATTACKING",
+            "likeliness": 0,
+            "impact": 0,
+            "progress_weight": 1,
+            "inverse": true,
+            "reverse": false,
+            "persistent": false,
+            "triggered": false,
+            "parameters": []
+          }
+        ]
+      }
+    }
+  }
+}

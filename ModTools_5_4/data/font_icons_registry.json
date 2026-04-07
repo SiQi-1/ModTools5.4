@@ -1,0 +1,1461 @@
+{
+  "format_version": 1,
+  "sheets": [
+    {
+      "id": "FontIcons",
+      "filename": "FontIcons.dds",
+      "icon_size": 22,
+      "cols": 11,
+      "rows": 25,
+      "atlases": {
+        "ICON_ATLAS_FONT_ICON_BASELINE_4": {
+          "baseline": 4
+        },
+        "ICON_ATLAS_FONT_ICON_BASELINE_6": {
+          "baseline": 6
+        },
+        "ICON_ATLAS_FONT_ICON_BASELINE_8": {
+          "baseline": 8
+        }
+      }
+    },
+    {
+      "id": "FontIconsXP1",
+      "filename": "FontIconsXP1.dds",
+      "icon_size": 22,
+      "cols": 11,
+      "rows": 25,
+      "layout": "packed",
+      "atlases": {
+        "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_4": {
+          "baseline": 4
+        },
+        "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_5": {
+          "baseline": 5
+        },
+        "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_6": {
+          "baseline": 6
+        },
+        "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_8": {
+          "baseline": 8
+        }
+      }
+    },
+    {
+      "id": "XP1_Districts22",
+      "filename": "XP1_Districts22.dds",
+      "icon_size": 22,
+      "cols": 4,
+      "rows": 1,
+      "atlases": {
+        "ICON_ATLAS_EXPANSION1_FONT_ICON_DISTRICTS_BASELINE_4": {
+          "baseline": 4
+        }
+      }
+    },
+    {
+      "id": "Ages_18",
+      "filename": "Ages_18.dds",
+      "icon_size": 18,
+      "cols": 4,
+      "rows": 1,
+      "atlases": {
+        "ICON_ATLAS_GLORY_ICONS": {
+          "baseline": 4
+        }
+      }
+    }
+  ],
+  "icons": {
+    "Housing": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 0,
+      "sheet": "FontIcons"
+    },
+    "Amenities": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 1,
+      "sheet": "FontIcons"
+    },
+    "Citizen": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 2,
+      "sheet": "FontIcons"
+    },
+    "TradeRoute": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 3,
+      "sheet": "FontIcons"
+    },
+    "Strength": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 4,
+      "sheet": "FontIcons"
+    },
+    "Ranged": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 5,
+      "sheet": "FontIcons"
+    },
+    "Bombard": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 6,
+      "sheet": "FontIcons"
+    },
+    "Movement": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 7,
+      "sheet": "FontIcons"
+    },
+    "Charges": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 8,
+      "sheet": "FontIcons"
+    },
+    "Range": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 9,
+      "sheet": "FontIcons"
+    },
+    "Position": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 10,
+      "sheet": "FontIcons"
+    },
+    "Promotion": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 11,
+      "sheet": "FontIcons"
+    },
+    "Religion": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 12,
+      "sheet": "FontIcons"
+    },
+    "GreatPerson": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 13,
+      "sheet": "FontIcons"
+    },
+    "Fortified": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 14,
+      "sheet": "FontIcons"
+    },
+    "Fortifying": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 15,
+      "sheet": "FontIcons"
+    },
+    "Terrain": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 16,
+      "sheet": "FontIcons"
+    },
+    "Ability": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 17,
+      "sheet": "FontIcons"
+    },
+    "Damaged": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 18,
+      "sheet": "FontIcons"
+    },
+    "Government": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 19,
+      "sheet": "FontIcons"
+    },
+    "Policy": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 20,
+      "sheet": "FontIcons"
+    },
+    "Turn": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 21,
+      "sheet": "FontIcons"
+    },
+    "FoodPerTurn": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 22,
+      "sheet": "FontIcons"
+    },
+    "FoodSurplus": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 23,
+      "sheet": "FontIcons"
+    },
+    "FoodDeficit": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 24,
+      "sheet": "FontIcons"
+    },
+    "Envoy": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 25,
+      "sheet": "FontIcons"
+    },
+    "TradingPost": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 26,
+      "sheet": "FontIcons"
+    },
+    "Barbarian": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 27,
+      "sheet": "FontIcons"
+    },
+    "District": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 28,
+      "sheet": "FontIcons"
+    },
+    "Unit": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 29,
+      "sheet": "FontIcons"
+    },
+    "Buildings": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 30,
+      "sheet": "FontIcons"
+    },
+    "Formation": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 31,
+      "sheet": "FontIcons"
+    },
+    "InfluencePerTurn": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 32,
+      "sheet": "FontIcons"
+    },
+    "VisLimitedLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 33,
+      "sheet": "FontIcons"
+    },
+    "VisOpenLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 34,
+      "sheet": "FontIcons"
+    },
+    "VisSecretLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 35,
+      "sheet": "FontIcons"
+    },
+    "VisTopSecretLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 36,
+      "sheet": "FontIcons"
+    },
+    "ScienceLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 37,
+      "sheet": "FontIcons"
+    },
+    "GoldLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 38,
+      "sheet": "FontIcons"
+    },
+    "ProductionLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 39,
+      "sheet": "FontIcons"
+    },
+    "FoodLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 40,
+      "sheet": "FontIcons"
+    },
+    "CultureLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 41,
+      "sheet": "FontIcons"
+    },
+    "FaithLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 42,
+      "sheet": "FontIcons"
+    },
+    "TourismLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 43,
+      "sheet": "FontIcons"
+    },
+    "VisLimited": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 44,
+      "sheet": "FontIcons"
+    },
+    "VisOpen": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 45,
+      "sheet": "FontIcons"
+    },
+    "VisSecret": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 46,
+      "sheet": "FontIcons"
+    },
+    "VisTopSecret": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 47,
+      "sheet": "FontIcons"
+    },
+    "Science": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 48,
+      "sheet": "FontIcons"
+    },
+    "Gold": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 49,
+      "sheet": "FontIcons"
+    },
+    "Production": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 50,
+      "sheet": "FontIcons"
+    },
+    "Food": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 51,
+      "sheet": "FontIcons"
+    },
+    "Culture": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 52,
+      "sheet": "FontIcons"
+    },
+    "Faith": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 53,
+      "sheet": "FontIcons"
+    },
+    "Tourism": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 54,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_BANANAS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 55,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_CATTLE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 56,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COPPER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 57,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_CRABS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 58,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_DEER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 59,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_FISH": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 60,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_RICE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 61,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SHEEP": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 62,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_STONE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 63,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_WHEAT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 64,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_CITRUS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 65,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COCOA": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 66,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COFFEE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 67,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COTTON": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 68,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_DIAMONDS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 69,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_DYES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 70,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_FURS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 71,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_GYPSUM": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 72,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_INCENSE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 73,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_IVORY": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 74,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_JADE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 75,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_MARBLE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 76,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_MERCURY": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 77,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_PEARLS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 78,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SALT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 79,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SILK": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 80,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SILVER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 81,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SPICES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 82,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SUGAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 83,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_TEA": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 84,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_TOBACCO": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 85,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_TRUFFLES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 86,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_WHALES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 87,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_WINE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 88,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_ALUMINUM": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 89,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COAL": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 90,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_HORSES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 91,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_IRON": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 92,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_NITER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 93,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_OIL": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 94,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_URANIUM": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 95,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_ANTIQUITY_SITE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 96,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_SHIPWRECK": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 97,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_JEANS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 98,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_PERFUME": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 99,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_COSMETICS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 100,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_TOYS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 101,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_CINNAMON": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 102,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_CLOVES": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 103,
+      "sheet": "FontIcons"
+    },
+    "RESOURCE_GOLD": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 106,
+      "sheet": "FontIcons"
+    },
+    "Nuclear": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_8",
+      "index": 104,
+      "sheet": "FontIcons"
+    },
+    "ThermoNuclear": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_8",
+      "index": 105,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Portrait_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 110,
+      "sheet": "FontIcons"
+    },
+    "ThemeBonus_Active": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 110,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Writing_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 111,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Landscape_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 112,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Religious_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 113,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Sculpture_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 114,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Music_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 115,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Relic_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 116,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Ancient_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 117,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Classical_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 118,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Medieval_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 119,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Renaissance_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 120,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Industrial_Themed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 121,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Portrait": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 122,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Writing": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 123,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Landscape": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 124,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Religious": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 125,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Sculpture": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 126,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Music": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 127,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Relic": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 128,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 129,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Ancient": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 129,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Classical": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 130,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Medieval": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 131,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Renaissance": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 132,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Industrial": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 133,
+      "sheet": "FontIcons"
+    },
+    "ThemeBonus": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 134,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Portrait_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 135,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Writing_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 136,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Landscape_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 137,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Religious_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 138,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Sculpture_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 139,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Music_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 140,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Relic_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 141,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Anc_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 142,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Cla_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 132,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Med_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 133,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Ren_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 145,
+      "sheet": "FontIcons"
+    },
+    "GreatWork_Artifact_Ind_Theming": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 146,
+      "sheet": "FontIcons"
+    },
+    "GreatAdmiral": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 154,
+      "sheet": "FontIcons"
+    },
+    "GreatArtist": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 155,
+      "sheet": "FontIcons"
+    },
+    "GreatEngineer": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 156,
+      "sheet": "FontIcons"
+    },
+    "GreatGeneral": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 157,
+      "sheet": "FontIcons"
+    },
+    "GreatMerchant": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 158,
+      "sheet": "FontIcons"
+    },
+    "GreatMusician": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 159,
+      "sheet": "FontIcons"
+    },
+    "GreatProphet": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 160,
+      "sheet": "FontIcons"
+    },
+    "GreatScientist": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 161,
+      "sheet": "FontIcons"
+    },
+    "GreatWriter": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 162,
+      "sheet": "FontIcons"
+    },
+    "OnlinePip": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 165,
+      "sheet": "FontIcons"
+    },
+    "Host": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 166,
+      "sheet": "FontIcons"
+    },
+    "You": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 167,
+      "sheet": "FontIcons"
+    },
+    "Ready": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 168,
+      "sheet": "FontIcons"
+    },
+    "BulletGlow": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 169,
+      "sheet": "FontIcons"
+    },
+    "Revert": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 170,
+      "sheet": "FontIcons"
+    },
+    "Team": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 171,
+      "sheet": "FontIcons"
+    },
+    "Whisper": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 172,
+      "sheet": "FontIcons"
+    },
+    "Global": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 173,
+      "sheet": "FontIcons"
+    },
+    "AdditionalContent": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 174,
+      "sheet": "FontIcons"
+    },
+    "DownloadContent": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 175,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_CITY_CENTER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 176,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_CAMPUS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 177,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_COMMERCIAL_HUB": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 178,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_ENCAMPMENT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 179,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_HOLYSITE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 180,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_HOLY_SITE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 180,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_LAVRA": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 180,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_NEIGHBORHOOD": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 181,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_MBANZA": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 181,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_THEATER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 182,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_ACROPOLIS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 182,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_AQUEDUCT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 183,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_BATH": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 183,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_HARBOR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 184,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_ROYAL_NAVY_DOCKYARD": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 184,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_INDUSTRIAL_ZONE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 185,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_HANSA": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 185,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_SPACEPORT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 186,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_WONDER": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 187,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_ENTERTAINMENT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 188,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_STREET_CARNIVAL": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 188,
+      "sheet": "FontIcons"
+    },
+    "DISTRICT_ENTERTAINMENT_COMPLEX": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 188,
+      "sheet": "FontIcons"
+    },
+    "Corps": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 198,
+      "sheet": "FontIcons"
+    },
+    "Army": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 199,
+      "sheet": "FontIcons"
+    },
+    "Exclamation": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 200,
+      "sheet": "FontIcons"
+    },
+    "TradingPostLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 201,
+      "sheet": "FontIcons"
+    },
+    "CapitalLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 202,
+      "sheet": "FontIcons"
+    },
+    "PressureDown": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 203,
+      "sheet": "FontIcons"
+    },
+    "PressureUp": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 204,
+      "sheet": "FontIcons"
+    },
+    "PressureDownLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 205,
+      "sheet": "FontIcons"
+    },
+    "PressureUpLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 206,
+      "sheet": "FontIcons"
+    },
+    "CivicBoosted": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 207,
+      "sheet": "FontIcons"
+    },
+    "TechBoosted": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 208,
+      "sheet": "FontIcons"
+    },
+    "Capital": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 209,
+      "sheet": "FontIcons"
+    },
+    "New": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 210,
+      "sheet": "FontIcons"
+    },
+    "Bolt": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 211,
+      "sheet": "FontIcons"
+    },
+    "Bullet": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 212,
+      "sheet": "FontIcons"
+    },
+    "TradeRouteLarge": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 213,
+      "sheet": "FontIcons"
+    },
+    "LocationPip": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 214,
+      "sheet": "FontIcons"
+    },
+    "ShowMe": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 215,
+      "sheet": "FontIcons"
+    },
+    "Not": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 216,
+      "sheet": "FontIcons"
+    },
+    "Checkmark": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 217,
+      "sheet": "FontIcons"
+    },
+    "CheckSuccess": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 218,
+      "sheet": "FontIcons"
+    },
+    "CheckFail": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 219,
+      "sheet": "FontIcons"
+    },
+    "CheckmarkBlue": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 220,
+      "sheet": "FontIcons"
+    },
+    "CityStateQuest": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 221,
+      "sheet": "FontIcons"
+    },
+    "List": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 222,
+      "sheet": "FontIcons"
+    },
+    "Plus": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 223,
+      "sheet": "FontIcons"
+    },
+    "PressureHigh": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 224,
+      "sheet": "FontIcons"
+    },
+    "PressureMedium": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 225,
+      "sheet": "FontIcons"
+    },
+    "PressureLow": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 226,
+      "sheet": "FontIcons"
+    },
+    "GoingTo": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 227,
+      "sheet": "FontIcons"
+    },
+    "Therefore": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_6",
+      "index": 227,
+      "sheet": "FontIcons"
+    },
+    "PressureRight": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 229,
+      "sheet": "FontIcons"
+    },
+    "PressureLeft": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 230,
+      "sheet": "FontIcons"
+    },
+    "Bombard_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 231,
+      "sheet": "FontIcons"
+    },
+    "Charges_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 232,
+      "sheet": "FontIcons"
+    },
+    "Movement_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 233,
+      "sheet": "FontIcons"
+    },
+    "Range_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 234,
+      "sheet": "FontIcons"
+    },
+    "RangedStrength_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 235,
+      "sheet": "FontIcons"
+    },
+    "ReligionStat_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 236,
+      "sheet": "FontIcons"
+    },
+    "Strength_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 237,
+      "sheet": "FontIcons"
+    },
+    "AntiAir_Large": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 238,
+      "sheet": "FontIcons"
+    },
+    "Pillaged": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 242,
+      "sheet": "FontIcons"
+    },
+    "Razed": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 243,
+      "sheet": "FontIcons"
+    },
+    "UnderSiege": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 244,
+      "sheet": "FontIcons"
+    },
+    "Occupied": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 245,
+      "sheet": "FontIcons"
+    },
+    "HousingInsufficient": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 246,
+      "sheet": "FontIcons"
+    },
+    "AmenitiesInsufficient": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 247,
+      "sheet": "FontIcons"
+    },
+    "OPEN_BORDERS": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 253,
+      "sheet": "FontIcons"
+    },
+    "DEFENSIVE_PACT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 254,
+      "sheet": "FontIcons"
+    },
+    "MILITARY_REQUEST": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 254,
+      "sheet": "FontIcons"
+    },
+    "JOINT_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 255,
+      "sheet": "FontIcons"
+    },
+    "RESEARCH_AGREEMENT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 256,
+      "sheet": "FontIcons"
+    },
+    "ALLIANCE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 257,
+      "sheet": "FontIcons"
+    },
+    "GIFT_UNIT": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 259,
+      "sheet": "FontIcons"
+    },
+    "DENOUNCE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 260,
+      "sheet": "FontIcons"
+    },
+    "DEMAND_TRIBUTE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 260,
+      "sheet": "FontIcons"
+    },
+    "VIEW_DEMAND_TRIBUTE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 260,
+      "sheet": "FontIcons"
+    },
+    "MAKE_PEACE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 261,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_SURPRISE_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_FORMAL_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_HOLY_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_LIBERATION_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_RECONQUEST_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_PROTECTORATE_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_COLONIAL_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_TERRITORIAL_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_WAR_MINOR_CIV": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "PROPOSE_TRADE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 263,
+      "sheet": "FontIcons"
+    },
+    "VIEW_TRADE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 263,
+      "sheet": "FontIcons"
+    },
+    "USE_NUCLEAR_WEAPON": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 264,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_FRIENDSHIP": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 265,
+      "sheet": "FontIcons"
+    },
+    "GRANT_INFLUENCE_TOKEN": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 266,
+      "sheet": "FontIcons"
+    },
+    "DIPLOMATIC_DELEGATION": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 267,
+      "sheet": "FontIcons"
+    },
+    "RESIDENT_EMBASSY": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 267,
+      "sheet": "FontIcons"
+    },
+    "REQUEST_ASSISTANCE": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 268,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_GOLDEN_AGE_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_WAR_OF_RETRIBUTION": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "DECLARE_IDEOLOGICAL_WAR": {
+      "atlas": "ICON_ATLAS_FONT_ICON_BASELINE_4",
+      "index": 262,
+      "sheet": "FontIcons"
+    },
+    "Governor": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_6",
+      "index": 3,
+      "sheet": "FontIconsXP1"
+    },
+    "RESOURCE_OLIVES": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_6",
+      "index": 5,
+      "sheet": "FontIconsXP1"
+    },
+    "RESOURCE_TURTLES": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_6",
+      "index": 6,
+      "sheet": "FontIconsXP1"
+    },
+    "RESOURCE_AMBER": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_BASELINE_6",
+      "index": 7,
+      "sheet": "FontIconsXP1"
+    },
+    "DISTRICT_GOVERNMENT": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_DISTRICTS_BASELINE_4",
+      "index": 0,
+      "sheet": "XP1_Districts22"
+    },
+    "DISTRICT_WATER_ENTERTAINMENT_COMPLEX": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_DISTRICTS_BASELINE_4",
+      "index": 1,
+      "sheet": "XP1_Districts22"
+    },
+    "DISTRICT_SEOWON": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_DISTRICTS_BASELINE_4",
+      "index": 2,
+      "sheet": "XP1_Districts22"
+    },
+    "DISTRICT_IKANDA": {
+      "atlas": "ICON_ATLAS_EXPANSION1_FONT_ICON_DISTRICTS_BASELINE_4",
+      "index": 3,
+      "sheet": "XP1_Districts22"
+    },
+    "GLORY_DARK_AGE": {
+      "atlas": "ICON_ATLAS_GLORY_ICONS",
+      "index": 0,
+      "sheet": "Ages_18"
+    },
+    "GLORY_NORMAL_AGE": {
+      "atlas": "ICON_ATLAS_GLORY_ICONS",
+      "index": 1,
+      "sheet": "Ages_18"
+    },
+    "GLORY_GOLDEN_AGE": {
+      "atlas": "ICON_ATLAS_GLORY_ICONS",
+      "index": 2,
+      "sheet": "Ages_18"
+    },
+    "GLORY_SUPER_GOLDEN_AGE": {
+      "atlas": "ICON_ATLAS_GLORY_ICONS",
+      "index": 3,
+      "sheet": "Ages_18"
+    }
+  }
+}

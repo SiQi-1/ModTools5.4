@@ -1,0 +1,6357 @@
+{
+  "source_db": "C:\\Users\\24948\\AppData\\Local\\Firaxis Games\\Sid Meier's Civilization VI\\Cache\\DebugGameplay.sqlite",
+  "collection_types": [
+    "COLLECTION_ALLIANCE_CITIES",
+    "COLLECTION_ALLIANCE_COMBATS",
+    "COLLECTION_ALLIANCE_DISTRICTS",
+    "COLLECTION_ALLIANCE_PLAYERS",
+    "COLLECTION_ALLIANCE_TRADEROUTES",
+    "COLLECTION_ALLIANCE_TRAINED_UNITS",
+    "COLLECTION_ALLIANCE_UNITS",
+    "COLLECTION_ALL_CAPITAL_CITIES",
+    "COLLECTION_ALL_CAPITAL_DISTRICTS",
+    "COLLECTION_ALL_CAPTURED_CITIES",
+    "COLLECTION_ALL_CITIES",
+    "COLLECTION_ALL_DISTRICTS",
+    "COLLECTION_ALL_PLAYERS",
+    "COLLECTION_ALL_PLOT_YIELDS",
+    "COLLECTION_ALL_UNITS",
+    "COLLECTION_ALL_TEAMS",
+    "COLLECTION_CITY_DISTRICTS",
+    "COLLECTION_CITY_PLOT_YIELDS",
+    "COLLECTION_CITY_TRAINED_UNITS",
+    "COLLECTION_COMBAT_RESULTS",
+    "COLLECTION_EMERGENCY_CAPITAL_CITIES",
+    "COLLECTION_EMERGENCY_CITIES",
+    "COLLECTION_EMERGENCY_COMBATS",
+    "COLLECTION_EMERGENCY_DISTRICTS",
+    "COLLECTION_EMERGENCY_PLAYERS",
+    "COLLECTION_EMERGENCY_TRADE_ROUTES",
+    "COLLECTION_EMERGENCY_UNITS",
+    "COLLECTION_MAJOR_PLAYERS",
+    "COLLECTION_MAJOR_OPPOSING_PLAYERS",
+    "COLLECTION_MAJOR_OPPOSING_TEAMS",
+    "COLLECTION_MINOR_PLAYERS",
+    "COLLECTION_OWNER",
+    "COLLECTION_OWNER_CITY",
+    "COLLECTION_OWNER_PLAYER",
+    "COLLECTION_OWNER_UNIT",
+    "COLLECTION_PLAYER_ALLIANCES",
+    "COLLECTION_PLAYER_BUILT_CITIES",
+    "COLLECTION_PLAYER_CAPITAL_CITY",
+    "COLLECTION_PLAYER_CAPITAL_DISTRICTS",
+    "COLLECTION_PLAYER_CAPTURED_CITIES",
+    "COLLECTION_PLAYER_CITIES",
+    "COLLECTION_PLAYER_CITY_STATE_UNITS",
+    "COLLECTION_PLAYER_COMBAT",
+    "COLLECTION_PLAYER_COMBAT_RESULTS",
+    "COLLECTION_PLAYER_DISTRICTS",
+    "COLLECTION_PLAYER_GOVERNORS",
+    "COLLECTION_PLAYER_PLOT_YIELDS",
+    "COLLECTION_PLAYER_TRAINED_UNITS",
+    "COLLECTION_PLAYER_UNITS",
+    "COLLECTION_SINGLE_PLOT_YIELDS",
+    "COLLECTION_TEAM_CAPITAL_CITIES",
+    "COLLECTION_TEAM_CAPTURED_CITIES",
+    "COLLECTION_TEAM_CITIES",
+    "COLLECTION_TEAM_DISTRICTS",
+    "COLLECTION_TEAM_PLAYERS",
+    "COLLECTION_TEAM_UNITS",
+    "COLLECTION_UNIT_COMBAT",
+    "COLLECTION_UNIT_NEAREST_CITY",
+    "COLLECTION_UNIT_NEAREST_OWNER_CITY"
+  ],
+  "effect_types": [
+    {
+      "effect_type": "EFFECT_ACTIVATE_VOLCANOES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADD_BELIEF",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADD_CULTURE_BOMB_TRIGGER",
+      "parameter_names": [
+        "CaptureOwnedTerritory",
+        "DistrictType",
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_DIPLOMATIC_ACTION_OVERRIDE",
+      "parameter_names": [
+        "CivicType",
+        "DiplomaticAction"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_DIPLOMATIC_COMBAT_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "DiplomaticYieldSource",
+        "ReligiousOnly",
+        "TurnsActive"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_DIPLOMATIC_MOVEMENT_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "DiplomaticYieldSource",
+        "TurnsActive"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_DIPLOMATIC_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "DiplomaticYieldSource",
+        "StackWithOtherDiploYieldModifiers",
+        "TurnsActive",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_DIPLO_VISIBILITY",
+      "parameter_names": [
+        "Amount",
+        "Source",
+        "SourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_EXPENDED_GREAT_PERSON_TILES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_PLAYER_BELIEF_YIELD",
+      "parameter_names": [
+        "Amount",
+        "BeliefYieldType",
+        "PerXItems",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_PLAYER_FAVOR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_PLAYER_PROJECT_AVAILABILITY",
+      "parameter_names": [
+        "ProjectType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_PLAYER_SEQUESTERED_CARBON",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_PLAYER_UPGRADE_MILITARY_FORMATION_ON_CITY_CONQUEST",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADD_RELIGIOUS_BELIEF_YIELD",
+      "parameter_names": [
+        "Amount",
+        "BeliefYieldType",
+        "DistrictType",
+        "PerXItems",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_RELIGIOUS_BUILDING",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_RELIGIOUS_BUILDING_MULTIPLIER",
+      "parameter_names": [
+        "Founder",
+        "Multiplier",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADD_RELIGIOUS_UNIT",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ACCUMULATING_BONUS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ACTIVE_BUILDING_PRODUCTION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ADDITIONAL_PILLAGING",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType",
+        "PlunderType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ADD_AMENITY_PER_ADJACENT_LUXURY",
+      "parameter_names": [
+        "AddAmenity"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ADJACENT_CITY_RIVER_BUILDING_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ADJACENT_CITY_RIVER_DISTRICT_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ADJACENT_LEVIED_UNIT_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALLIANCE_PLAYER_STRENGTH_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_COMMON_ENEMY_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_TRADE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_BUILDINGS_PURCHASE_COST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_BUILDING_PRODUCTION_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "IsWonder"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_DISTRICTS_CULTURE_BOMB",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_DISTRICTS_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_DISTRICTS_PURCHASE_COST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_DISTRICT_PRODUCTION_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_GREAT_WORKS_TOURISM_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_GREAT_WORKS_YIELDS_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_PROJECTS_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_UNITS_PURCHASE_COST",
+      "parameter_names": [
+        "Amount",
+        "IncludeCivilian",
+        "UnitDomain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ALL_UNIT_PRODUCTION_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_ATTACKER_STRENGTH_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_AUTO_THEMED_BUILDINGS_WITH_X_SLOTS",
+      "parameter_names": [
+        "Amount",
+        "IsWonder"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BANNED_DIPLOMATIC_ACTIONS",
+      "parameter_names": [
+        "Banned",
+        "DiplomaticActionType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BANNED_DIPLOMATIC_ACTIONS_SPECIFIC_CIVILIZATION",
+      "parameter_names": [
+        "CivilizationType",
+        "DiplomaticActionType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BONUS_RATE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_FEATURE_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "FeatureType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_HOUSING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "BuildingType",
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_PURCHASE_COST",
+      "parameter_names": [
+        "Amount",
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "BuildingType",
+        "CityStatesOnly",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "BuildingType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT",
+      "parameter_names": [
+        "Amount",
+        "DistrictType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CAN_FAITH_PURCHASE_DISTRICTS",
+      "parameter_names": [
+        "CanPurchase"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITIES_FRESHWATER_HOUSING_BONUS",
+      "parameter_names": [
+        "HasBonus"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITIES_HAS_URBAN_DEFENSES",
+      "parameter_names": [
+        "DefenseValue"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_AIR_DEFENSE_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ALLOWED_IMPROVEMENT",
+      "parameter_names": [
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ALLOWED_INCOMING_REGIONAL_STACKING",
+      "parameter_names": [
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ALL_MILITARY_UNITS_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "EndEra",
+        "PromotionClass",
+        "StartEra"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ALL_YIELDS_CHANGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ALWAYS_LOYAL",
+      "parameter_names": [
+        "AlwaysLoyal"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_AMENITIES_FROM_CITY_STATES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_AMENITIES_FROM_GOVERNORS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_AMENITIES_FROM_GREAT_PEOPLE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_AMENITIES_FROM_RELIGION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_APPEAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ATTACKS_PER_TURN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_CAN_PURCHASE_DISTRICTS",
+      "parameter_names": [
+        "CanPurchase"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_CORPS_ARMY_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "UnitDomain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_CULTURE_BORDER_EXPANSION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ENTERTAINMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_ENTERTAINMENT_FROM_WONDER_ADJACENT_TO_LAKE",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION_FOR_STRATEGIC_DIVERSITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION_SPECIFIC_RESOURCE",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_EXTRA_AMENITY_FOR_LUXURY_DIVERSITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_EXTRA_DISTRICTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_FREE_POWER",
+      "parameter_names": [
+        "Amount",
+        "SourceType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_FRIENDLY_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_GOLD_FROM_CITIZENS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_GREATWORK_YIELD",
+      "parameter_names": [
+        "GreatWorkObjectType",
+        "ScalingFactor",
+        "YieldChange",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_GREAT_PERSON_POINTS_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_GREEN_ENERGY_TOURISM",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_GROWTH",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HAPPINESS_GREAT_PERSON",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType",
+        "HappinessType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HAPPINESS_YIELD",
+      "parameter_names": [
+        "Amount",
+        "HappinessType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HIT_POINTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HOUSING_FROM_GREAT_PEOPLE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HOUSING_FROM_GREAT_WORKS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_HOUSING_PER_DISTRICT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IDENTITY_PER_CITIZEN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IDENTITY_PER_TURN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IDENTITY_PRESSURE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IGNORE_STRATEGIC_RESOURCE_REQUIREMENTS",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IMPROVEMENT_TOURISM",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_INNER_DEFENSE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_NATIONAL_PARK_TOURISM",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_NO_CULTURE_BORDER_EXPANSION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_OUTER_DEFENSE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_POPULATION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_POPULATION_UNIT_CREATED",
+      "parameter_names": [
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PREVENT_BYPASS_OUTER_DEFENSES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PREVENT_MELEE_ATTACK_OUTER_DEFENSES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PRODUCTION_UNIT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_PROPERTY",
+      "parameter_names": [
+        "Amount",
+        "Key"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RANGED_STRIKE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGION_EXTRA_PROMOTIONS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGION_IGNORE_COMBAT",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGION_IGNORE_PRESSURE",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGION_ON_CAPTURE",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGION_PRESSURE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGIOUS_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RELIGIOUS_HEAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_REQUIRED_POWER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_RESOURCE_HARVEST_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_SETTLER_CONSUME_POP",
+      "parameter_names": [
+        "Enabled"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_SIEGE_PROTECTION",
+      "parameter_names": [
+        "Protected"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_SPY_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_STATE_TRADE_ROUTE_DISTRICT_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_STATE_TRADE_ROUTE_FLAT_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_STRATEGIC_RESOURCE_REQUIREMENT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TOURISM",
+      "parameter_names": [
+        "BoostsWonders",
+        "GreatWorkObjectType",
+        "ImprovementType",
+        "Religious",
+        "ScalingFactor"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TOURISM_LATE_ERAS",
+      "parameter_names": [
+        "MinimumEra",
+        "Modifier"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TOURISM_PER_FEATURE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_LUXURY_RESOURCE_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_STRATEGIC_RESOURCE_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_STRATEGIC_RESOURCE_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_BONUS_RESOURCE_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_BONUS_RESOURCE_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_LUXURY_RESOURCE_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_STRATEGIC_RESOURCE_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_UNIT_MAX_LEVEL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_FROM_FOREIGN_TRADE_ROUTES_PASSING_THROUGH",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_FROM_POWERED_BUILDING",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_MODIFIER_FROM_FAITH",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_MODIFIER_PER_GOVERNOR_TITLE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_DISTRICT",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_FLOOD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_MAJOR_TRADE_PARTNER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_POPULATION",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_CLASS_CITIES_IMPROVEMENT",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_TYPE",
+      "parameter_names": [
+        "Amount",
+        "TerrainType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CIVIC_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CO2_GENERATION_REDUCTION",
+      "parameter_names": [
+        "Amount",
+        "ResourceUsageType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CORPS_ARMY_MODIFIED_STRENGTH",
+      "parameter_names": [
+        "Amount",
+        "Corps",
+        "Domain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CORPS_ARMY_PREREQ",
+      "parameter_names": [
+        "CivicType",
+        "Corps",
+        "Domain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CULTURE_BOMB_CONVERTS_CITY",
+      "parameter_names": [
+        "ConvertsCity"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DEFENDER_STRENGTH_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DIPLOMATIC_ACTION_PREFERENCE",
+      "parameter_names": [
+        "Action",
+        "Favored"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISABLE_HEALING",
+      "parameter_names": [
+        "Disable",
+        "Foreign"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISABLE_INFLUENCE",
+      "parameter_names": [
+        "Disable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISABLE_PATRONAGE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISABLE_SETTLING",
+      "parameter_names": [
+        "Disabled"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_ADJACENT_NATURAL_WONDER_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_AMENITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_ATTACK_RANGE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_BUILDING_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_EXTRA_ENTERTAINMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_ENTERTAINMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_RANGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_HOUSING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_PREREQ",
+      "parameter_names": [
+        "DistrictType",
+        "TechType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_WITHIN_ONE_HEX_ESPIONAGE_DEFENSE_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+      "parameter_names": [
+        "DistrictType",
+        "YieldTypeToGrant",
+        "YieldTypeToMirror"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_APPEAL",
+      "parameter_names": [
+        "Description",
+        "DistrictType",
+        "RequiredAppeal",
+        "YieldChange",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DUPLICATE_FIRST_INFLUENCE_TOKEN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_RIVAL_GOVERNMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_SAME_RELIGION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_TRADE_ROUTE_TO",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_ACCUMALATION_TERRAIN",
+      "parameter_names": [
+        "Amount",
+        "TerrainType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_GREAT_WORK_SLOTS",
+      "parameter_names": [
+        "Amount",
+        "BuildingType",
+        "GreatWorkSlotType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_HEAL_GOVERNOR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_STARTING_POPULATION_OFF_HOME_CONTINENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_UNIT_COPY",
+      "parameter_names": [
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_EXTRA_UNIT_COPY_TAG",
+      "parameter_names": [
+        "Amount",
+        "Tag"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FEATURE_APPEAL_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FEATURE_NO_IMPROVEMENT_APPEAL_GOVERNOR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FEATURE_PREREQ",
+      "parameter_names": [
+        "CivicType",
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FLAT_BONUS",
+      "parameter_names": [
+        "Amount",
+        "BonusType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FOLLOWER_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FORBID_LAND_ROUTE",
+      "parameter_names": [
+        "Domestic"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FREE_CIVIC_BOOST_FIRST_TRADING_POST_EACH_CIV",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FREE_CIVIC_BOOST_WONDER_ERA",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FREE_TECH_BOOST_FIRST_TRADING_POST_EACH_CIV",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FREE_TECH_BOOST_WONDER_ERA",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_FULL_ACCESS_ONE_STRATEGIC",
+      "parameter_names": [
+        "Access"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GAINS_ALL_FOLLOWER_BELIEFS",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GAINS_FOUNDER_BELIEF_MAJORITY_RELIGION",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GAME_REALISM_SETTING",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GLOBAL_WMD_STOCKPILE",
+      "parameter_names": [
+        "Amount",
+        "TargetOnly"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GOLD_DISPERSAL",
+      "parameter_names": [
+        "Amount",
+        "Improvement"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GOVERNMENT_SLOTS",
+      "parameter_names": [
+        "Amount",
+        "GovernmentSlotType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GOVERNOR_ALLIANCE_POINTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GOVERNOR_GRIEVENCE_SCORE",
+      "parameter_names": [
+        "Score",
+        "Turns"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GOVERNOR_IDENTITY_PRESSURE",
+      "parameter_names": [
+        "Amount",
+        "DomesticCities",
+        "ForeignCities",
+        "OncePerCity"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PEOPLE_POINTS_PER_KILL",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PEOPLE_POINTS_PER_KILL_BY_DEFEATED_STRENGTH",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PERSON_GUARANTEE",
+      "parameter_names": [
+        "EraType",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PERSON_PATRONAGE_DISCOUNT_PERCENT",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PERSON_POINTS",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PERSON_POINTS_PERCENT",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_PERSON_POINTS_REFUND_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_WORK_OBJECT_NO_TOURISM",
+      "parameter_names": [
+        "NoTourism"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GREAT_WORK_OBJECT_TOURISM_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_HEAL_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IDENTITY_PER_TURN_FROM_NEARBY_GREAT_WORKS",
+      "parameter_names": [
+        "Amount",
+        "ForeignCities"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IGNORE_IDENTITY_PRESSURE",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IMPROVEMENT_AMENITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IMPROVEMENT_GOODY_HUT",
+      "parameter_names": [
+        "GoodyHutImprovementType",
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IMPROVEMENT_HOUSING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IMPROVEMENT_VALID_TERRAIN",
+      "parameter_names": [
+        "ImprovementType",
+        "TerrainType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_INFLUENCE_POINTS_PER_TURN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_INQUISITION_START_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_LOYALTY_FROM_GREAT_WORKS_CITIZENS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_MODIFIED_FREE_POWER_IN_CITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_MOST_ADVANCED_STRATEGIC_RESOURCE_COUNT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_MULTIPLY_TREASURY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NATURAL_WONDER_AMENITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NATURAL_WONDER_RELIC",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NO_FRESH_WATER_HOUSING",
+      "parameter_names": [
+        "NoHousing"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NO_GREAT_PERSON_POINTS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NUMBER_ALLIES_UNIT_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NUM_UNITS_SUPPORTED",
+      "parameter_names": [
+        "Amount",
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_OWNED_BONUS_RESOURCE_EXTRA_AMENITIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_OWNED_LUXURY_EXTRA_AMENITIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ADD_CHOP_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ADJUST_ENVOYS_NON_SPECIALTY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALLIANCE_FAVOR_MULTIPLIER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALLIED_WAR_DISCOUNT",
+      "parameter_names": [
+        "Discount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALL_ALLIANCES_PROVIDE_SHARED_VIS",
+      "parameter_names": [
+        "ShareVis"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALWAYS_ALLOW_COMMEMORATION_QUEST_COUNT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALWAYS_FULL_RELIGIOUS_TOURISM",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ALWAYS_LOYAL_COASTAL_HOME_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ANYONE_PLUNDER_FAVOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ANYONE_TRADE_TO_FAVOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_AUTO_THEMED_BUILDING",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BAN_CHOP",
+      "parameter_names": [
+        "NoRemove"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BAN_CITY_PRODUCTION",
+      "parameter_names": [
+        "BanDistrictBuildings"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BAN_POLICY",
+      "parameter_names": [
+        "PolicyType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BAN_RESOURCE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BAN_UNIT_PRODUCTION_YIELD",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BID_COST_MODIFIER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BLOCK_UNIT_ENTRY",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BUFF_UNIT_PRODUCTION_YIELD",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_BUILDING_FAVOR",
+      "parameter_names": [
+        "BuildingType",
+        "Favor"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_CAPITAL",
+      "parameter_names": [
+        "ProjectType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_CITY_TILES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_COUNTER_SPY_YIELD_AWARD_PER_LEVEL",
+      "parameter_names": [
+        "Amount",
+        "PerXLevels",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_CULTURAL_IDENTITY_PRESSURE_RADIUS_FROM_CAPITAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_DIPLOMATIC_VICTORY_POINTS",
+      "parameter_names": [
+        "Amount",
+        "Tooltip",
+        "VictoryResolution"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_DISTRICT_AIR_SLOTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_DISTRICT_AND_BUILDINGS_CREATE_UNIT_WITH_ABILITY_BY_CLASS",
+      "parameter_names": [
+        "DistrictType",
+        "UnitAbilityType",
+        "UnitPromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_UNIT",
+      "parameter_names": [
+        "DistrictType",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_YIELD",
+      "parameter_names": [
+        "Amount",
+        "DistrictType",
+        "ImprovementType",
+        "MustReplaceImprovement",
+        "YieldBasedOnAppeal",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_EMBARKED_UNIT_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_EMBARK_UNIT_PASS",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_EMERGENCY_FAVOR_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "Member"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ENFORCE_BORDERS",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_AERODROME_BUILDING_CONSTRUCTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_ARMY_KILLED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_ARTIFACT_EXTRACTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CITY_RELIGION_CONVERSION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CIVIC_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CONTINENT_DISCOVERED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CORPS_KILLED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CULTURE_BUILDING_CONSTRUCTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CURRENT_CIVIC",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CURRENT_TECH",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_DISTRICT_CONSTRUCTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_GREAT_PERSON_EARNED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_INDUSTRIAL_BUILDING_CONSTRUCTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NATURAL_WONDER_DISCOVERED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_KILLED_BY_GDR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_SEA_KILLED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_PRIDE_MOMENT",
+      "parameter_names": [
+        "Amount",
+        "MinScore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_SCIENCE_BUILDING_CONSTRUCTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_SPY_SUCCESSFUL_MISSION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_TECH_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_TRADE_ROUTE_COMPLETED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_UNIT_PROMOTION_EARNED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_EXTRA_FAVOR_PER_TURN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FAITH_FROM_DISPERSAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FAITH_PEACEFUL_FOUNDERS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FAVOR_REFUND_FOR_SUCCESSFUL_RESOLUTION",
+      "parameter_names": [
+        "Percent",
+        "ResolutionType",
+        "WhichEffect"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FEAUTE_REQUIRED_FOR_SPECIALTY_DISTRICTS",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED_EXCEPT",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FREE_GREAT_PERSON_POINTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FREE_RESOURCE_IMPORT",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_FREE_RESOURCE_IMPORT_EXTRACTION",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GOLD_INTEREST_PERCENT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GOVERNMENT_SLOT_TYPE",
+      "parameter_names": [
+        "GovernmentSlotType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GOVERNMENT_SLOT_TYPE_GRANT_FAVOR",
+      "parameter_names": [
+        "Amount",
+        "GovernmentSlotType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GOVERNOR_FAVOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GOVERNOR_POINTS",
+      "parameter_names": [
+        "Delta"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GREATPERSON_FAVOR_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GRIEVANCE_DECAY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_GRIEVANCE_GENERATION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_HEALING_FROM_DISPERSAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_IDENTITY_PER_TURN_FOR_DOMESTIC_TRADE_ROUTE_ORIGIN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_IMMEDIATE_TRADING_POST",
+      "parameter_names": [
+        "ImmediateTradingPost"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_IMPROVED_ROUTE_LEVEL",
+      "parameter_names": [
+        "ImprovedRouteLevel"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_INTERNATIONAL_TRADE_ROUTE_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_INTERNATIONAL_TRADE_ROUTE_YIELD_PER_IMPROVEMENT_IN_ORIGIN_CITY",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_JOINTWAR_EXPERIENCE",
+      "parameter_names": [
+        "Range"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_JOINTWAR_PLUNDER",
+      "parameter_names": [
+        "Multiplier"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_LEVIED_UNIT_UPGRADE_DISCOUNT_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_LEVY_DISCOUNT_PERCENT",
+      "parameter_names": [
+        "Percent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_LOYALTY_MARTIAL_LAW_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_MAX_WARMONGER_PERCENT",
+      "parameter_names": [
+        "MaxPercent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_NO_CAP_RESOURCE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_NO_OCCUPATION_PENALTIES",
+      "parameter_names": [
+        "NoPenalties"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_OPEN_BORDERS_FROM_INFLUENCE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_OTHER_GOVERNMENT_INTOLERANCE",
+      "parameter_names": [
+        "IntoleranceMultiplier",
+        "SameEraIntoleranceFlatBonus"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_OVERALL_TOURISM_REDUCTION",
+      "parameter_names": [
+        "Modifier"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_POLICY_FAVOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_POST_COMBAT_LOYALTY",
+      "parameter_names": [
+        "AdditionalGoldenAge",
+        "AffectLocal",
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_POST_PILLAGE_LOYALTY",
+      "parameter_names": [
+        "AffectLocal",
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_PREVENT_HARVEST_RESOURCE",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_PROGRESS_DIFF_TRADE_BONUS",
+      "parameter_names": [
+        "TechCivicsPerYield"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_PROPERTY",
+      "parameter_names": [
+        "Amount",
+        "Key"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RANDOM_CIVIC_BOOST_GOODY_HUT",
+      "parameter_names": [
+        "Amount",
+        "Source"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RANDOM_EVENT_AVOID",
+      "parameter_names": [
+        "RandomEventType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT",
+      "parameter_names": [
+        "Amount",
+        "Source"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RELIGIOUS_TOURISM_REDUCTION",
+      "parameter_names": [
+        "Modifier"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RESOURCE_ACCUMULATION_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_RESOURCE_STOCKPILE_CAP",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ROCK_BAND_UNIT_ALBUM_SALES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SCIENCE_VICTORY_POINTS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SCIENCE_VICTORY_POINTS_PER_TURN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SEND_INFLUENCE_TOKEN_FAVOR_BY_BONUS_TYPE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SEND_TRADE_ROUTE_FAVOR_BY_BONUS_TYPE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SKIP_FREE_CITY_STEP",
+      "parameter_names": [
+        "Skip"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SPECIALTY_DISTRICT_CANNOT_BE_BUILT_ADJACENT_TO_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SPECIFIC_DISTRICT_GRANT_ENVOYS",
+      "parameter_names": [
+        "Amount",
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SPY_BONUS",
+      "parameter_names": [
+        "Amount",
+        "Offense"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_STEAL_TECH_BOOSTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "Key"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SUZERAIN_BONUS_DISABLED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SUZERAIN_FAVOR_BY_BONUS_TYPE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_SUZERAIN_FAVOR_MULTIPLIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TARGET_CITY_SPY_YIELD_PERCENT",
+      "parameter_names": [
+        "Percent",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TERRAIN_WORK_IMPASSABLE_MODIFIER",
+      "parameter_names": [
+        "Ignore",
+        "TerrainType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TOKEN_ON_FIRST_MEETING",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TOKEN_ON_TRADE_ROUTE_STARTED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TOURISM",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TOURISM_FAVOR",
+      "parameter_names": [
+        "Favor",
+        "Tourism"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TOURISM_FROM_NATIONAL_PARKS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_GAIN_TILES_EN_ROUTE",
+      "parameter_names": [
+        "GainTileRadius"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_BY_CITY_STATE_BONUS_TYPE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_CAPACITY_ON_MEETING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_DESTINATION_YIELD_FOR_ALLY_ROUTE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_DESTINATION_YIELD_FOR_SUZERAIN_ROUTE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_ORIGIN_YIELD_FOR_ALLY_ROUTE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_ORIGIN_YIELD_FOR_SUZERAIN_ROUTE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_RELIGIOUS_PRESSURE",
+      "parameter_names": [
+        "Amount",
+        "Destination",
+        "Origin"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_TOURISM_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "Destination",
+        "Origin",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_FOLLOWER",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_IMPROVEMENT_IN_TARGET_CITY",
+      "parameter_names": [
+        "Amount",
+        "Destination",
+        "ImprovementType",
+        "Origin",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_PATH_TILE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_POST_IN_FOREIGN_CITY",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_POST_IN_OWN_CITY",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_TERRAIN_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "Origin",
+        "TerrainType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_TERRAIN_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "Origin",
+        "TerrainType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_BUILD_DISABLED",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_DISTRICT_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_PROJECT_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_DISCOUNT_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_RESOURCE_COST_DISCOUNT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_UNIT_WONDER_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_VALID_BUILDING",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_VALID_IMPROVEMENT",
+      "parameter_names": [
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_VALID_UNIT_BUILD",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_WARMONGER_MULTIPLIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_WMD_COUNT",
+      "parameter_names": [
+        "Amount",
+        "Type"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_WMD_MAINTENANCE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_TRIBUTARY",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_USED_INFLUENCE_TOKEN",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_MODIFIER_PER_EARNED_GREAT_PERSON",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_MODIFIER_PER_TRIBUTARY",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLOT_PURCHASE_COST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLOT_PURCHASE_COST_TERRAIN",
+      "parameter_names": [
+        "Amount",
+        "TerrainType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLOT_YIELD",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType",
+        "ScalingFactor",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_POLICY_AMENITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_POLICY_HOUSING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_POPULATION_AFTER_CONQUEST",
+      "parameter_names": [
+        "Percent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PREVENT_STRUCTURAL_DAMAGE",
+      "parameter_names": [
+        "Prevent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PROJECT_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "ProjectType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RANDOM_EVENT_MODIFIED_DAMAGE_OPPOSING_PLAYER",
+      "parameter_names": [
+        "Amount",
+        "RandomEventType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RANDOM_EVENT_NO_UNIT_DAMAGE",
+      "parameter_names": [
+        "NoDamage",
+        "RandomEventType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGION_AMENITIES_FOR_MINIMUM_FOLLOWERS",
+      "parameter_names": [
+        "Amenities",
+        "Followers"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGION_ANYONE_CONDEMNS_FAVOR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGION_BUILDING_DISCOUNT",
+      "parameter_names": [
+        "Discount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGION_CONDEMN_PROHIBITED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGIOUS_COMBAT_LOSS",
+      "parameter_names": [
+        "ReductionPercent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGIOUS_SPREAD_DISTANCE",
+      "parameter_names": [
+        "DistanceChange"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RELIGIOUS_SPREAD_STRENGTH",
+      "parameter_names": [
+        "EnhancingTechType",
+        "SpreadMultiplier",
+        "TechEnabledSpreadMultiplier"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RESOURCE_POWER_PROVIDED_GOVERNOR",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RESOURCE_YIELD_BY_COUNT",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RIVER_DISTRICT_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_RIVER_WONDER_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_SPACE_RACE_PROJECTS_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TECHNOLOGY_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TERRAIN_YIELD_FROM_ADJACENT_IMPROVEMENTS",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType",
+        "TerrainType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_CAPACITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_WATER_RANGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_CHANGE",
+      "parameter_names": [
+        "AffectDestination",
+        "AffectOrigin",
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "Intercontinental",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "Intercontinental",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FROM_OTHERS",
+      "parameter_names": [
+        "Amount",
+        "Domestic",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_DOMESTIC",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_INTERNATIONAL",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_TO_OTHERS",
+      "parameter_names": [
+        "Amount",
+        "Domestic",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRAIT_AMENITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNITS_RELIGIOUS_STRENGTH_BY_RELIGION_TYPE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ADVANCED_COASTAL_RAID",
+      "parameter_names": [
+        "UseAdvancedCoastalRaid"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ADVANCED_PILLAGING",
+      "parameter_names": [
+        "UseAdvancedPillaging"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_AGAINST_DISTRICT_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ANTI_AIR_STRENGTH",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ATTACK_AND_MOVE",
+      "parameter_names": [
+        "CanMove"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ATTACK_EXPERIENCE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ATTACK_RANGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BARBARIAN_COMBAT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BOOST_ALL_SPIES",
+      "parameter_names": [
+        "Amount",
+        "Defense"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BUILD_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BYPASS_COMBAT_UNIT",
+      "parameter_names": [
+        "Bypass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BYPASS_WALLS",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_BYPASS_WALLS_PROMOTION_CLASS",
+      "parameter_names": [
+        "PromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_CANNOT_ATTACK",
+      "parameter_names": [
+        "Disable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_CLEAR_TERRAIN_START_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_COMBAT_CAPTURE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_COMBAT_STRENGTH",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_COMBAT_UNIT_CAPTURE",
+      "parameter_names": [
+        "CanCapture",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_CONVERTS_BARBARIANS",
+      "parameter_names": [
+        "Converts"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DAMAGE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DIPLO_VISIBILITY_COMBAT_MODIFIER",
+      "parameter_names": [
+        "Amount",
+        "DeltaWithOpponent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DISASTER_CHARGES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DOMAIN_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "Domain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_PROMOTION_CLASS",
+      "parameter_names": [
+        "PromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_PROMOTION_CLASS",
+      "parameter_names": [
+        "PromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION_PROMOTION_CLASS",
+      "parameter_names": [
+        "PromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENEMY_TERRITORY_START_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENTER_FOREIGN_LANDS",
+      "parameter_names": [
+        "Enter"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ERA_STRENGTH_MODIFIER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ESCAPE_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ESCORT_MOBILITY",
+      "parameter_names": [
+        "EscortMobility"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_EVICT_PERCENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_EXERT_ZOC",
+      "parameter_names": [
+        "Exert"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_EXPERIENCE_LEVEL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_EXPERIENCE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_EXTRACT_SEA_ARTIFACTS",
+      "parameter_names": [
+        "Extract"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FAITH_ON_DISTRICT_PLUNDER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FAITH_ON_IMPROVEMENT_PLUNDER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FIGHT_WHILE_EMBARKED",
+      "parameter_names": [
+        "CanFight"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FLANKING_BONUS_MODIFIER",
+      "parameter_names": [
+        "Percent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FORCE_RETREAT",
+      "parameter_names": [
+        "ForceRetreat"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FOREIGN_SPREAD_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_COMBAT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_START_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_GRANT_EXPERIENCE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_GREAT_PERSON_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_HEAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_HEALING_MODIFIERS",
+      "parameter_names": [
+        "Amount",
+        "Type"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_HEALING_RELIGION_MODIFIERS",
+      "parameter_names": [
+        "Amount",
+        "Type"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_HIDDEN_VISIBILITY",
+      "parameter_names": [
+        "Hidden"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_HOLY_CITIES_COMBAT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_CLIFF_WALLS",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_RANGED_VS_DISTRICT_PENALTY",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_RESOURCE_MAINTENANCE",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_RIVERS",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_SHORES",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_STRATEGIC_RESOURCE_LEVIED",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_TERRAIN_COST",
+      "parameter_names": [
+        "Ignore",
+        "Type"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_ZOC",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_INITIATION_YIELD",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_INITIATION_YIELD_POPULATION",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_JUMP_ABILITY",
+      "parameter_names": [
+        "Range"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_LAND_VICTORY_SPREAD",
+      "parameter_names": [
+        "LandVictorySpread"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_MAINTENANCE_DISCOUNT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_MILITARY_FORMATION",
+      "parameter_names": [
+        "MilitaryFormationType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_MILITARY_POLICIES_COMBAT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_MOVE_AND_ATTACK",
+      "parameter_names": [
+        "CanAttack"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NATURAL_WONDER_DEFERRED_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NEIGHBOR_COMBAT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NO_BARB_XP_LIMIT",
+      "parameter_names": [
+        "NoLimit"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NO_FOREIGN_SPREAD",
+      "parameter_names": [
+        "NoSpread"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NO_REDUCTION_DAMAGE",
+      "parameter_names": [
+        "NoReduction"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NUM_ATTACKS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_OWNER",
+      "parameter_names": [
+        "NewOwner"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PARADROP_ABILITY",
+      "parameter_names": [
+        "CanDrop"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PER_LUXURY_ATTACK_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PER_UNUSED_MOVEMENT_COMBAT_BONUS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PILLAGE_DISTRICT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PILLAGE_IMPROVEMENT_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PLUNDER_YIELDS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_POST_COMBAT_HEAL",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_POST_COMBAT_YIELD",
+      "parameter_names": [
+        "OnlyWhenDefeatedEarlierEraUnit",
+        "PercentDefeatedStrength",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_POST_TOURISM_BOMB_LOYALTY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PROMOTE_NO_FINISH_MOVES",
+      "parameter_names": [
+        "NoFinishMoves"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PROPERTY",
+      "parameter_names": [
+        "Amount",
+        "Key"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_PURCHASE_COST",
+      "parameter_names": [
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_RAIDING",
+      "parameter_names": [
+        "Bonus",
+        "CanRaid"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_RELIC_UPON_DEATH",
+      "parameter_names": [
+        "RelicSource"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_DISTRICT",
+      "parameter_names": [
+        "Amount",
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_IMPROVEMENT",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATIONAL_PARK",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATURAL_WONDER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ROCK_BAND_TOURISM_BOMB_VALUE_PEACE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SEA_MOVEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SEE_HIDDEN",
+      "parameter_names": [
+        "SeeHidden"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SEE_THROUGH_FEATURES",
+      "parameter_names": [
+        "CanSee"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SEE_THROUGH_TERRAIN",
+      "parameter_names": [
+        "CanSee"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SIGHT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPREAD_CHARGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ADJACENT_LEVEL_BOOST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ENTIRE_CITY",
+      "parameter_names": [
+        "EntireCity"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_ESTABLISH_TIME",
+      "parameter_names": [
+        "ReductionPercent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_OFFENSIVE_OPERATION_TIME",
+      "parameter_names": [
+        "ReductionPercent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_OPERATION_CHANCE",
+      "parameter_names": [
+        "Amount",
+        "Offensive",
+        "OperationType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SPY_OPERATION_TIME",
+      "parameter_names": [
+        "OperationType",
+        "ReductionPercent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_STRENGTH_FROM_CITY_CULTURAL_IDENTITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_STRENGTH_REDUCTION_FOR_DAMAGE_MODIFIER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_SUPPORT_BONUS_MODIFIER",
+      "parameter_names": [
+        "Percent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TAG_ERA_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "EraType",
+        "UnitPromotionClass"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_CONVERT_CITY",
+      "parameter_names": [
+        "Convert"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_DISTRICT",
+      "parameter_names": [
+        "Amount",
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_IMPROVEMENT",
+      "parameter_names": [
+        "Amount",
+        "ImprovementType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATIONAL_PARK",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATURAL_WONDER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TOURISM_BOMB_RANGE",
+      "parameter_names": [
+        "Modifier",
+        "Range"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_TRADE_ROUTE_PLUNDER_IMMUNITY",
+      "parameter_names": [
+        "DomainType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_UPGRADE_GOODY_HUT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_VALID_TERRAIN",
+      "parameter_names": [
+        "TerrainType",
+        "Valid"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_WATER_DAMAGE_PROTECTION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_WMD_PROTECTION",
+      "parameter_names": [
+        "Blast",
+        "Fallout"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_YIELD_PER_TOURISM_BOMB",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_VALID_FEATURES_DISTRICTS",
+      "parameter_names": [
+        "DistrictType",
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_VALID_FEATURES_WONDERS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WAR_WEARINESS",
+      "parameter_names": [
+        "Amount",
+        "Domestic",
+        "Enemy",
+        "Overall"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WATER_HOUSING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WONDER_ADJACENT_NATURAL_WONDER_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "FeatureType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WONDER_ERA_PRODUCTION",
+      "parameter_names": [
+        "Amount",
+        "EndEra",
+        "IsWonder",
+        "StartEra"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WONDER_PRODUCTION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_WONDER_YIELD_CHANGE",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_YIELD_BY_NUMBER_OF_RESOURCES",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADOPT_ALLY_FOUNDED_RELIGIONS",
+      "parameter_names": [
+        "Adopt"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_CULTURE_SHARING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_ENVOY_POINTS_FROM_ALLY_TRIBUTARIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_GRANT_SHARED_VIS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_PRESSURE_FROM_NO_ALLY_RELIGION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_RESEARCH_AGREEMENT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_SCIENCE_SHARING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_SHARE_SUZERAIN",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_TOURISM_SHARING",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ALLIANCE_YIELD_INCOME_FROM_ALLY_RELIGION",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_MODIFIER",
+      "parameter_names": [
+        "ModifierId"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_MODIFIER_IF_PROMOTION_CLASS_MATCHES",
+      "parameter_names": [
+        "Amount",
+        "ModifierId"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_MODIFIER_TO_MINORCIVBONUSTYPE",
+      "parameter_names": [
+        "ModifierId"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_MODIFIER_TO_PLAYERTYPE",
+      "parameter_names": [
+        "ModifierId"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_UNIT_MODIFIER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_BECOME_CITY_SUZERAIN",
+      "parameter_names": [
+        "RemoveOthers"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_CHANGE_UNIT_OPERATION_AVAILABILITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_CITY_GRANT_RANDOM_RESOURCE_PRODUCT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_CITY_RECOMMISSION_REACTOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_CITY_REMOVE_OTHER_RELIGIONS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_ANGEVIN_EMPIRE",
+      "parameter_names": [
+        "BottomRankingDiploMod",
+        "HighPopulationThreshold",
+        "LowPopulationThreshold",
+        "StatementKey",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_ARCHIPELAGIC_STATE",
+      "parameter_names": [
+        "AcceptableIslandPercentage",
+        "MaxNegativeModifier",
+        "MaxPositiveModifier",
+        "MaxTilesLargeIsland",
+        "MaxTilesMediumIsland",
+        "MaxTilesSmallIsland",
+        "ReductionTurns",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_AYYUBID_DYNASTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_BLACK_QUEEN",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_BULL_MOOSE",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_BUSHIDO",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_CANADIAN_EXPEDITIONARY",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_END_TO_SUFFERING",
+      "parameter_names": [
+        "DisappointingHolySitePercentage",
+        "DisappointingLargeCityPercentage",
+        "MaxNegativeModifier",
+        "MaxPositiveModifier",
+        "StatementKey",
+        "TargetHolySitePercentage",
+        "TargetLargeCityPercentage"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_ENVIRONMENT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_ETHIOPIAN_HIGHLANDS",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_EXPLOITATIVE",
+      "parameter_names": [
+        "HiddenAgenda",
+        "HighScoreThreshold",
+        "IncrementValue",
+        "InitialValue",
+        "LowScoreThreshold",
+        "MaxDiploModifierMagnitude",
+        "NationalParkConstructionValue",
+        "PlotFeatureRemovalValue",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TileImprovementHighThreshold",
+        "TileImprovementLowThreshold",
+        "TileImprovementPreferenceValue"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_FLAT_EARTHER",
+      "parameter_names": [
+        "DiploModForCircumnavigation",
+        "DiploModPerSpaceProject",
+        "DiploModPerSpaceport",
+        "HiddenAgenda",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_HORN_CHEST_LOINS",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "CantBuildDiploMod",
+        "CorpsPrereqCivic",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_HORSE_LORD",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "PromotionClass1",
+        "PromotionClass2",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_KAITIAKITANGA",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "HiddenAgenda",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_KUBLAI_PAX",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_LAST_VIKING_KING",
+      "parameter_names": [
+        "BetterMilitaryBonus",
+        "HiddenAgenda",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TopMilitaryBonus"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_LAWGIVER",
+      "parameter_names": [
+        "BonusIfNotOriginalOwner",
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_LORD_OF_MINES",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "HiddenAgenda",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_MAGNIFICENCES",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_OPPORTUNIST",
+      "parameter_names": [
+        "EachSurpriseWarBonus",
+        "NeverSurpriseWarPenalty",
+        "RecentSurpriseWarBonus",
+        "StatementKey",
+        "SurpriseWarDegradeTurns"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_OPTIMUS_PRINCEPS",
+      "parameter_names": [
+        "BetterTerritoryBonus",
+        "HiddenAgenda",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TopTerritoryBonus"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_PARANOID",
+      "parameter_names": [
+        "HiddenAgenda",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_PATRON_OF_ARTS",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_PERPETUALLY_ON_GUARD",
+      "parameter_names": [
+        "PenaltyPerOccupiedCity",
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_QUEEN_OF_NILE",
+      "parameter_names": [
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_RAVEN_BANNER",
+      "parameter_names": [
+        "BottomPercentage",
+        "BottomRankingDiploMod",
+        "StatementKey",
+        "TopPercentage",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_SHORT_LIFE_GLORY",
+      "parameter_names": [
+        "EachWarDeclaredBonus",
+        "MajorWarBonus",
+        "MaxWarDeclaredBonus",
+        "NotAtWarPenalty",
+        "SinceWarPenaltyTurns",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_SIMON_BOLIVAR",
+      "parameter_names": [
+        "MinPromotedUnits",
+        "NumSteps",
+        "PercentageDifferencePerStep",
+        "ScorePerStep",
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_TRIEU_DEFENDER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_TURTLER",
+      "parameter_names": [
+        "BottomRankingDiploMod",
+        "HiddenAgenda",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_WITH_SHIELD_OR_ON_IT",
+      "parameter_names": [
+        "AvoidedWarPenalty",
+        "AvoidedWarPenaltyTurnsToRampUp",
+        "HighThreshold",
+        "IncrementValue",
+        "InitialValue",
+        "LowThreshold",
+        "MaxDiploModifierMagnitude",
+        "PaidForPeacePenalty",
+        "PaidForPeacePenaltyTurnsToFadeOut",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_AGENDA_ZEALOT",
+      "parameter_names": [
+        "BottomRankingDiploMod",
+        "HiddenAgenda",
+        "StatementKey",
+        "TopRankingDiploMod"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_ARCHAEOLOGY",
+      "parameter_names": [
+        "DiplomacyKey",
+        "IncrementValue",
+        "InitialValue",
+        "MessageThrottle",
+        "ModifierPerTransgression",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_BROKEN_PLEDGE",
+      "parameter_names": [
+        "IncrementValue",
+        "ModifierPerTransgression",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_BROKEN_PROMISE",
+      "parameter_names": [
+        "IncrementValue",
+        "ModifierPerTransgression",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_CULTURAL_ID",
+      "parameter_names": [
+        "CityGainLowerBound",
+        "CityGainUpperBound",
+        "ScorePerCity",
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_ESPIONAGE",
+      "parameter_names": [
+        "DiplomacyKey",
+        "IncrementValue",
+        "InitialValue",
+        "MessageThrottle",
+        "ModifierPerTransgression",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_FORCE_INCURSION",
+      "parameter_names": [
+        "IncrementValue",
+        "InitialValue",
+        "ReductionValue"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_GOVERNMENTS",
+      "parameter_names": [
+        "IncrementTurns",
+        "IncrementValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_KEPT_PLEDGE",
+      "parameter_names": [
+        "IncrementValue",
+        "InitialValue",
+        "ModifierPerKeptPledge",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_KEPT_PROMISE",
+      "parameter_names": [
+        "IncrementValue",
+        "InitialValue",
+        "ModifierPerKeptPromise",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_NEW_WARMONGER",
+      "parameter_names": [
+        "LowerLimit",
+        "PercentOfGrievances",
+        "ReductionTurns",
+        "ReductionValue"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_NO_PLEDGE",
+      "parameter_names": [
+        "IncrementValue",
+        "ModifierPerTransgression",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_NO_PROMISE",
+      "parameter_names": [
+        "IncrementValue",
+        "ModifierPerTransgression",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_ONE_SIDED_TRADES",
+      "parameter_names": [
+        "IncrementValue",
+        "MaxValue",
+        "ReductionTurns",
+        "ReductionValue",
+        "TradeValuePerModifierPoint"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_RANDOM",
+      "parameter_names": [
+        "DifficultyOffset",
+        "ReductionTurns",
+        "ReductionValue"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_SETTLED_CITIES",
+      "parameter_names": [
+        "DiplomacyKey",
+        "IncrementValue",
+        "InitialValue",
+        "MessageThrottle",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_SIMPLE_EFFECT",
+      "parameter_names": [
+        "Accumulates",
+        "DiplomacyKey",
+        "HiddenAgenda",
+        "IncrementTurns",
+        "IncrementValue",
+        "InitialValue",
+        "MaxValue",
+        "MessageThrottle",
+        "OnlyOwnersCity",
+        "ReductionTurns",
+        "ReductionValue",
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_THIRD_PARTY_EFFECTS",
+      "parameter_names": [
+        "AmountPerIncident",
+        "EffectType",
+        "IncrementValue",
+        "InitialValue",
+        "MaxEffectMagnitude",
+        "SimpleModifierDescription"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_THIRD_PARTY_WARMONGER",
+      "parameter_names": [
+        "LowerLimit",
+        "PercentOfGrievancesDelta"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_TRADE_RELATIONS",
+      "parameter_names": [
+        "BonusPerRoute",
+        "NoTradePenalty",
+        "OnlyInboundTrade",
+        "SimpleModifierDescription",
+        "StatementKey",
+        "TradeBonus"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DISABLE_PLAYER_GRIEVANCE_DECAY",
+      "parameter_names": [
+        "Disable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DISTRICT_ADD_NAVAL_UNIT",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DISTRICT_ADJACENCY",
+      "parameter_names": [
+        "Amount",
+        "Description",
+        "DistrictType",
+        "TilesRequired",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_DO_NOTHING",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_BUILDING_FAITH_PURCHASE",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_RELIGION_AUTO_SPREAD",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_RELIGION_AWARDS_ENVOY",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_RELIGION_AWARDS_ENVOY_RELIGIOUS_PRESSURE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_SPECIFIC_BUILDING_FAITH_PURCHASE",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ENABLE_UNIT_FAITH_PURCHASE",
+      "parameter_names": [
+        "Tag"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_EXPLORE_ENTIRE_MAP",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_FEATURE_ADJACENCY",
+      "parameter_names": [
+        "Amount",
+        "Description",
+        "DistrictType",
+        "FeatureType",
+        "TilesRequired",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GOVERNOR_ADJUST_CITY_COPY_LUXURIES_FOR_IMPORT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GOVERNOR_ADJUST_CITY_COPY_STRATEGICS_FOR_IMPORT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GOVERNOR_ADJUST_CITY_TOKENS_GRANTED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GOVERNOR_ADJUST_CITY_TOKENS_GRANTED_MODIFIER",
+      "parameter_names": [
+        "Percent"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GOVERNOR_ADJUST_IDENITITY_PER_TITLE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_ABILITY",
+      "parameter_names": [
+        "AbilityType",
+        "ModifierId"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_AIR_SLOTS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_ALL_TECHNOLOGY_BOOST_BY_ERA",
+      "parameter_names": [
+        "EndEraType",
+        "StartEraType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_BOOST_WITH_GREAT_PERSON",
+      "parameter_names": [
+        "GreatPersonClass",
+        "OtherPlayers",
+        "TechBoost"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_BUILDING_IN_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_BUILDING_IN_CITY_IGNORE",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CHEAPEST_BUILDING_IN_CITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_LOYALTY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_OWNER_INFLUENCE_TOKEN_WONDER",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_ROAD_TO_CAPITAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_TRADING_POST",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST",
+      "parameter_names": [
+        "BuildingProductionPercent",
+        "IncludeWonder",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_CITY_YIELD_PERCENT_UNIT_CREATED_COST",
+      "parameter_names": [
+        "UnitProductionPercent",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_COMBAT_ADJACENCY",
+      "parameter_names": [
+        "Enable"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FOUND_FOREIGN_CITY_TRADE_ROUTE_CAPACITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_ENVOYS_HERE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_RESOURCE_EXTRACTED",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_RESOURCE_FROM_UNIT_PLOT",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_RESOURCE_IN_CITY",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_RESOURCE_VISIBILITY",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_GOLDEN_AGE_TRADE_ROUTE_CAPACITY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_GREAT_PERSON_CLASS_IN_CITY",
+      "parameter_names": [
+        "Amount",
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_HEAL_AFTER_ACTION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_INFLUENCE_TOKEN",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_INFLUENCE_TOKEN_LEVY_MILITARY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_FAITH_FROM_HARVEST",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_FAITH_FROM_REMOVE_FEATURE",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_FREE_RESOURCE_EXTRACTED",
+      "parameter_names": [
+        "Amount",
+        "ResourceType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_RANDOM_CIVIC",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_RANDOM_TECHNOLOGY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_RELIGIOUS_PRESSURE_GREAT_PERSON_ACTIVATED",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_SPECIFIC_TECHNOLOGY",
+      "parameter_names": [
+        "TechType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_SPECIFIC_TECH_BOOST_GREAT_PERSON",
+      "parameter_names": [
+        "GrantTechIfBoosted",
+        "TechType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLAYER_YIELD_PERCENT_UNIT_COST",
+      "parameter_names": [
+        "UnitCostPercent",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PLOT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PRODUCTION_IN_CITY",
+      "parameter_names": [
+        "Amount",
+        "KeepOverflow"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_PROMOTION",
+      "parameter_names": [
+        "PromotionType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RANDOM_BASE_PROMOTION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RANDOM_CIVIC_BOOST_BY_ERA",
+      "parameter_names": [
+        "Amount",
+        "EndEraType",
+        "StartEraType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RANDOM_CIVIC_BOOST_ON_NEW_ERA",
+      "parameter_names": [
+        "Amount",
+        "ApplyImmediately"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RANDOM_TECHNOLOGY_BOOST_BY_ERA",
+      "parameter_names": [
+        "Amount",
+        "EndEraType",
+        "StartEraType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RANDOM_TECHNOLOGY_BOOST_ON_NEW_ERA",
+      "parameter_names": [
+        "Amount",
+        "ApplyImmediately"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RELIC",
+      "parameter_names": [
+        "Amount",
+        "RelicSource"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_RELIGIOUS_PRESSURE_BURST",
+      "parameter_names": [
+        "Amount",
+        "Range"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_ROUTE_IN_RADIUS",
+      "parameter_names": [
+        "Radius",
+        "RouteType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_SPY",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_STRENGTH_PER_ADJACENT_UNIT_TYPE",
+      "parameter_names": [
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_TOURISM_PER_EXCESS_LUXURIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_BY_CLASS",
+      "parameter_names": [
+        "UnitPromotionClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_BY_DOMAIN",
+      "parameter_names": [
+        "UnitDomain"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_IN_CITY",
+      "parameter_names": [
+        "AllowUniqueOverride",
+        "Amount",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_IN_EACH_DISTRICT",
+      "parameter_names": [
+        "IgnoreDefensible",
+        "UniqueOverride",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_OF_CLASS_AND_APPLY_ABILITY",
+      "parameter_names": [
+        "ModifierId",
+        "UnitPromotionClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_TYPE_UNLIMITED_PROMOTION_CHOICES",
+      "parameter_names": [
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_WITH_EXPERIENCE",
+      "parameter_names": [
+        "Experience",
+        "UniqueOverride",
+        "UnitType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_YIELD_ADJACENT_FEATURES",
+      "parameter_names": [
+        "Amount",
+        "FeatureType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_YIELD_ADJACENT_NATURAL_WONDERS",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_UNIT_YIELD_ADJACENT_TERRAINS",
+      "parameter_names": [
+        "Amount",
+        "TerrainType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD",
+      "parameter_names": [
+        "Amount",
+        "Scale",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD_BASED_ON_CURRENT_YIELD_RATE",
+      "parameter_names": [
+        "Multiplier",
+        "YieldToBaseOn",
+        "YieldToGrant"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD_PER_EXCESS_LUXURIES",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD_PER_FEATURE_IN_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD_PER_GREAT_WORK_IN_CITY",
+      "parameter_names": [
+        "Amount",
+        "GreatWorkObjectType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_IMPROVEMENT_ADJACENCY",
+      "parameter_names": [
+        "Amount",
+        "Description",
+        "DistrictType",
+        "ImprovementType",
+        "TilesRequired",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_KILL_EMERGENCY_TARGET_SPIES_IN_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_MAP_REMOVE_CLIFFS_IN_DIRECTION",
+      "parameter_names": [
+        "Radius"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_MOUNTAIN_PORTAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_ADJUST_FAVOR_FROM_DELEGATIONS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_ADJUST_FAVOR_FROM_EMBASSIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_ADJUST_YIELD_FROM_DELEGATIONS",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_ADJUST_YIELD_FROM_EMBASSIES",
+      "parameter_names": [
+        "Amount",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_DIPLOMACY_AGENDA_COMPARE_ARMY_SIZE",
+      "parameter_names": [
+        "AdjustPerStep",
+        "DeltaUnits",
+        "MaxSteps",
+        "MinUnitsNeeded",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_DIPLOMACY_AGENDA_DISTRICT_SPREAD",
+      "parameter_names": [
+        "SimpleModifierDescription",
+        "StatementKey"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_SEND_GOLD_TO_EMERGENCIES_OF_TYPE",
+      "parameter_names": [
+        "Amount",
+        "EmergencyType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_PURCHASE_PRODUCTION_IN_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_REPLACE_PLAYER_GOVERNMENT_SLOT_TYPE",
+      "parameter_names": [
+        "AddedGovernmentSlotType",
+        "ReplacedGovernmentSlotType",
+        "ReplacesAll"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_RESTORE_UNIT_MOVEMENT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_RIVER_ADJACENCY",
+      "parameter_names": [
+        "Amount",
+        "Description",
+        "DistrictType",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_SETTLED_FOREIGN_CONTINENT_UNIT_CLASS",
+      "parameter_names": [
+        "UnitPromotionClassType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_TERRAIN_ADJACENCY",
+      "parameter_names": [
+        "Amount",
+        "Description",
+        "DistrictType",
+        "TerrainType",
+        "TilesRequired",
+        "YieldType"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_TRADE_ROUTE_CANCEL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_TRADE_ROUTE_DISABLE",
+      "parameter_names": [
+        "Domestic",
+        "InternationalMajors",
+        "InternationalMinors"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_TREAT_CAPITAL_AS_HOLY_CITY",
+      "parameter_names": [
+        "Value"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_TREAT_HOLY_SITE_AS_HOLY_CITY",
+      "parameter_names": [
+        "Value"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_TRIGGER_GAME_MECHANIC",
+      "parameter_names": [
+        "MechanicName"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_UNIT_TELEPORT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_UNIT_TRANSFER_CITY_AS_GIFT_AND_APPLY_MODIFIER",
+      "parameter_names": [
+        "ModifierId"
+      ]
+    }
+  ],
+  "counts": {
+    "effect_types": 744,
+    "parameterized": 661
+  },
+  "requirement_types": [
+    {
+      "requirement_type": "REQUIREMENT_ALLIANCE_AT_WAR_WITH_COMBAT_TARGET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_ALLIANCE_CITY_HAS_TRADE_ROUTE_WITH_ALLY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_ALLY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_ALWAYS_MET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_ATTACKER_PLOT_IMPROVEMENT_DEFENSE_STRENGTH",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_ATTACKER_PLOT_IMPROVEMENT_TYPE_MATCHES",
+      "parameter_names": [
+        "ImprovementType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_CONVERTED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_FOLLOWS_PANTHEON",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_FOLLOWS_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_ANY_WONDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_BUILDING",
+      "parameter_names": [
+        "BuildingType",
+        "MustBeFunctioning"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_DISTRICT",
+      "parameter_names": [
+        "DistrictType",
+        "MustBeFunctioning"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_FEATURE",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_FULL_LOYALTY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_GARRISON_UNIT",
+      "parameter_names": [
+        "MilitaryFormation"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_GOVERNMENT_BUILDING_TIER",
+      "parameter_names": [
+        "GovernmentBuildingTier"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_GOVERNOR",
+      "parameter_names": [
+        "Established"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_GOVERNOR_WITH_X_TITLES",
+      "parameter_names": [
+        "Amount",
+        "Established"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_HIGH_ADJACENCY_DISTRICT",
+      "parameter_names": [
+        "Amount",
+        "DistrictType",
+        "YieldType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_NATIONAL_PARK",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_RESOURCE_TYPE_IMPROVED",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_SPECIFIC_GOVERNOR_PROMOTION_TYPE",
+      "parameter_names": [
+        "Established",
+        "GovernorPromotionType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_X_FEATURE_TYPE",
+      "parameter_names": [
+        "Amount",
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_X_POPULATION",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_X_SPECIALTY_DISTRICTS",
+      "parameter_names": [
+        "Amount",
+        "MustBeFunctioning"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_HAS_X_TERRAIN_TYPE",
+      "parameter_names": [
+        "Amount",
+        "Hills",
+        "TerrainType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_IS_ORIGINAL_OWNER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_IS_OWNER_CAPITAL_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_IS_POWERED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_LIBERATED",
+      "parameter_names": [
+        "OnlyOwnersCity"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_OCCUPIED",
+      "parameter_names": [
+        "OnlyOwnersCity"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_OCCUPIED_FRIEND",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_OWNER_ALLY_AT_WAR",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_RAZED",
+      "parameter_names": [
+        "OnlyOwnersCity"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CITY_TRANSFER_TYPE_MATCHES",
+      "parameter_names": [
+        "TransferType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CIVILIZATION_LEVEL",
+      "parameter_names": [
+        "OpponentCivLevel"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COLLECTION_ALL_MET",
+      "parameter_names": [
+        "CollectionType",
+        "RequirementSetId"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COLLECTION_ANY_MET",
+      "parameter_names": [
+        "CollectionType",
+        "RequirementSetId"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COLLECTION_COUNT_ATLEAST",
+      "parameter_names": [
+        "CollectionType",
+        "Count",
+        "RequirementSetId"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COLLECTION_COUNT_EQUALS",
+      "parameter_names": [
+        "CollectionType",
+        "Count"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_ATTACKER_IS_EMERGENCY_MEMBER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_ATTACKER_IS_EMERGENCY_MEMBER_WITH_SCORE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_ATTACKER_IS_PLAYER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_DEFENDER_IS_EMERGENCY_MEMBER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_DEFENDER_IS_EMERGENCY_MEMBER_WITH_SCORE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_DEFENDER_IS_PLAYER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_ENEMY_NOT_ALLIANCE_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_TYPE_MATCHES",
+      "parameter_names": [
+        "CombatType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_COMBAT_VERSUS_TYPE_MATCHES",
+      "parameter_names": [
+        "CombatVersusType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_CULTURE_BOMBED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DECLARED_FRIEND",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DEFENSIVE_PACT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DELEGATION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DEMAND_RECEIVED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DENOUNCED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DENOUNCED_FRIEND",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_DISTRICT_TYPE_MATCHES",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_DISTRICT_TYPE_MATCHES_CITY_CENTER",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_ESPIONAGE_DETECTED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_FOUNDED_NO_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_ERA_ATLEAST_EXPANSION",
+      "parameter_names": [
+        "EraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_ERA_ATMOST_EXPANSION",
+      "parameter_names": [
+        "EraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_ERA_IS",
+      "parameter_names": [
+        "EraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_HAS_CIVILIZATION_OR_LEADER_TRAIT",
+      "parameter_names": [
+        "TraitType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_TURN_MAX_REACHED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_GAME_VICTORY_ENABLED",
+      "parameter_names": [
+        "VictoryType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_GREAT_PERSON_TYPE_MATCHES",
+      "parameter_names": [
+        "GreatPersonClassType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_HAD_FRIENDLY_MEETING",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_MAP_HAS_FEATURE",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_NEAR_CULTURE_BORDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_NEAR_RELIGIOUS_CITY",
+      "parameter_names": [
+        "FriendlyCity"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_NEVER_MET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPEN_BORDERS",
+      "parameter_names": [
+        "GracePeriod"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_ERA_AGE_MATCHES",
+      "parameter_names": [
+        "Type"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_ERA_AT_LEAST",
+      "parameter_names": [
+        "MinimumEraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_BARBARIAN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_DISTRICT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_FORTIFIED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_FREE_CITY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_MINOR_CIV",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_OTHER_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_STRONGER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_IS_WOUNDED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_UNIT_DOMAIN_MATCHES",
+      "parameter_names": [
+        "UnitDomain"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_UNIT_PROMOTION_CLASS_MATCHES",
+      "parameter_names": [
+        "UnitPromotionClass"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_UNIT_TAG_MATCHES",
+      "parameter_names": [
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_OPPONENT_WAS_KILLED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_ALWAYS_ALLOWED_COMMEMORATION_QUEST",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_ATTACKED_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_AT_WAR_AND_HAS_MET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_AT_WAR_WITH_EMERGENCY_MEMBER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_AT_WAR_WITH_NEIGHBOR",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_AVERAGE_WALL_LEVEL_THRESHOLD",
+      "parameter_names": [
+        "AboveThreshold",
+        "AverageWallLevelThreshold"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_BUILT_NEW_WONDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_BUILT_WONDER",
+      "parameter_names": [
+        "WonderRatio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_CAN_EVER_EARN_GREAT_PERSON_CLASS",
+      "parameter_names": [
+        "GreatPersonClass"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_CITY_STATE_PROTECTOR",
+      "parameter_names": [
+        "LowerBound",
+        "NoLowerBound",
+        "NoUpperBound",
+        "UpperBound"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_CIVILIZED",
+      "parameter_names": [
+        "BelowThreshold",
+        "CampToCityDistance",
+        "ClearedCampValue",
+        "IgnoredCampValue",
+        "TotalScoreThreshold"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_COASTAL_CITIES",
+      "parameter_names": [
+        "BelowPercentage",
+        "MinimumCities",
+        "Percentage"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_COMPETING_MINORS",
+      "parameter_names": [
+        "PercentCompeting"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_CONQUERING_ALLYING_MINORS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_DEAL_ENACTED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_DECLARED_WAR",
+      "parameter_names": [
+        "ExcludeEmergencies",
+        "WarType",
+        "WhileMet"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_DEFAULT_DEFEAT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_DIPLO_VP_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "Ratio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_DISTRICT_THRESHOLD",
+      "parameter_names": [
+        "AboveThreshold",
+        "DistrictPercentThreshold",
+        "MinDistrictsNeeded"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_ERA_AT_LEAST",
+      "parameter_names": [
+        "EraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_EXPLORATION_LEAD",
+      "parameter_names": [
+        "ExplorationRatio",
+        "MinimumDelta"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_FAVOR_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "Ratio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_FINISHED_RESEARCH",
+      "parameter_names": [
+        "TechCivicDifferential"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_FOUNDED_NO_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_FOUNDED_OUR_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_FOUNDED_RELIGION_WITH_BELIEF",
+      "parameter_names": [
+        "BeliefType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_GOT_FIRST_PLACE_IN_EMERGENCY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_GOT_GREAT_PERSON",
+      "parameter_names": [
+        "GreatPersonRatio",
+        "MinimumDelta"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_GOT_HIGH_TIER_SCORE_IN_EMERGENCY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_GOT_LOW_TIER_SCORE_IN_EMERGENCY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HANDICAP_AT_OR_ABOVE",
+      "parameter_names": [
+        "Handicap"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAPPINESS_LEAD",
+      "parameter_names": [
+        "HappinessRatio",
+        "MinimumDelta"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_ACTIVE_ALLIANCE_OF_AT_LEAST_LEVEL",
+      "parameter_names": [
+        "Level"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_AT_LEAST_DIPLO_VIS_LEVEL",
+      "parameter_names": [
+        "Level"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUMBER_CITIES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUM_MILITARY_UNITS",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_BUILDING",
+      "parameter_names": [
+        "BuildingType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_CITY_ON_EMERGENCY_PLOT_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_CIVIC",
+      "parameter_names": [
+        "CivicType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_CIVILIZATION_OR_LEADER_TRAIT",
+      "parameter_names": [
+        "TraitType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_COMPLETED_PROJECT",
+      "parameter_names": [
+        "MinimumCompletions",
+        "ProjectType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_DARK_AGE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_DESIRED_LUXURY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_DISTRICT",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_ENVOY_WITH_EMERGENCY_DATA_PLAYER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_FEATURE",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_GIVEN_INFLUENCE_TOKENS",
+      "parameter_names": [
+        "MinimumTokens"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_GOLDEN_AGE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_GREAT_PERSON",
+      "parameter_names": [
+        "GreatPersonIndividual"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_GREAT_PERSON_CLASS",
+      "parameter_names": [
+        "GreatPersonClass"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_IMPROVEMENT",
+      "parameter_names": [
+        "ImprovementType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_MANY_ALLIANCES",
+      "parameter_names": [
+        "ChecKForFewer",
+        "MinOwnerAlliances"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_MET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_PANTHEON",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_RESOURCE_IMPROVED",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_RESOURCE_OWNED",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_RESOURCE_VISIBILITY",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_SAME_GOVERNMENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_SCIENCE_VICTORY_POINTS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_HAS_TECHNOLOGY",
+      "parameter_names": [
+        "TechnologyType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_INCOME_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "YieldRatio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IN_JOINT_EMERGENCY",
+      "parameter_names": [
+        "HostileOnly"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_ATTACKING",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_AT_LEAST_ALLIANCE_LEVEL_WITH_EMERGENCY_PLAYER",
+      "parameter_names": [
+        "Level"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_AT_PEACE",
+      "parameter_names": [
+        "Min Turns"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_AT_PEACE_WITH_ALL_MAJORS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_AT_WAR",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_CLOSE_TO_VICTORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_EMERGENCY_MEMBER_WITH_SCORE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_EMERGENCY_TARGET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_HUMAN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_MINOR",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_NEIGHBOR",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_NOT_WARMONGER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_RELIGION_FOUNDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SAME_RELIGION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SAME_SEX",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SHARING_INFO",
+      "parameter_names": [
+        "SharingInfoWell"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SUZERAIN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SUZERAIN_BONUS_ENABLED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SUZERAIN_OF_X",
+      "parameter_names": [
+        "LeaderType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_SUZERAIN_X_TYPE",
+      "parameter_names": [
+        "Amount",
+        "LeaderType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_TEAM_MEMBER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_IS_WINNING_ANY_VICTORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_LEADER_TYPE_MATCHES",
+      "parameter_names": [
+        "LeaderType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_MAJORITY_RELIGION_IS_OWNER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_MET_X_TURNS_AGO",
+      "parameter_names": [
+        "TurnsAgo"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_MILITARY_STRENGTH_LEAD",
+      "parameter_names": [
+        "DomainType",
+        "MinimumDelta",
+        "StrengthRatio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_MOUNTAIN_CITIES",
+      "parameter_names": [
+        "BelowPercentage",
+        "DistanceToMountain",
+        "MinimumCities",
+        "Percentage"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_NOT_COMPETING_MINORS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_NOT_INVOLVED_MINORS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_NUKE_LOVER",
+      "parameter_names": [
+        "BelowThreshold",
+        "BuiltNukeValue",
+        "TotalScoreThreshold",
+        "UsedNukeValue"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_ON_NON_HOME_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_OWNS_OBJECT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_PEACEFUL_ON_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_PILLAGE_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "Ratio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_POPULATION_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "PopulationRatio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_RELIGION_NOT_RECEIVED",
+      "parameter_names": [
+        "FoundingDelay"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_RELIGION_RECEIVED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_SHARES_HOME_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_TOURISM_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "Ratio"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_TURN_STARTED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_TYPE_MATCHES",
+      "parameter_names": [
+        "CivilizationType",
+        "LeaderType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_WITH_SHIELD_OR_ON_IT",
+      "parameter_names": [
+        "AgreementValue"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLAYER_YIELD_LEAD",
+      "parameter_names": [
+        "MinimumDelta",
+        "YieldRatio",
+        "YieldType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_BUILDING_TYPE_MATCHES",
+      "parameter_names": [
+        "BuildingType",
+        "MaxRange",
+        "MinRange"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_DISTRICT_TYPE_MATCHES",
+      "parameter_names": [
+        "DistrictType",
+        "MaxRange",
+        "MinRange",
+        "MustBeFunctioning"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_TERRITORY",
+      "parameter_names": [
+        "MaxRange",
+        "MinRange"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_UNIT_TAG_MATCHES",
+      "parameter_names": [
+        "IncludeCenter",
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_UNIT_TYPE_MATCHES",
+      "parameter_names": [
+        "IncludeCenter",
+        "UnitType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_IMPROVEMENT_TYPE_MATCHES",
+      "parameter_names": [
+        "ImprovementType",
+        "MaxRange",
+        "MinRange"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_RESOURCE_CLASS_TYPE_MATCHES",
+      "parameter_names": [
+        "ResourceClassType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_COAST",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_LAKE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_MOUNTAIN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_NATURAL_WONDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_OWNER",
+      "parameter_names": [
+        "MaxDistance",
+        "MinDistance"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_OWNER_AT_WAR",
+      "parameter_names": [
+        "MaxDistance",
+        "MinDistance"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_RIVER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_ADJACENT_TO_WONDER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_DISTRICT_IS_DEFENDED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_DISTRICT_TYPE_MATCHES",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_FEATURE_TAG_MATCHES",
+      "parameter_names": [
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_FEATURE_TYPE_MATCHES",
+      "parameter_names": [
+        "FeatureType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_HAS_ANY_DISTRICT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_HAS_ANY_FEATURE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_HAS_ANY_IMPROVEMENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_HAS_ANY_RESOURCE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IMPROVED_RESOURCE_CLASS_TYPE_MATCHES",
+      "parameter_names": [
+        "ResourceClassType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IMPROVEMENT_TYPE_MATCHES",
+      "parameter_names": [
+        "ImprovementType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_APPEAL_BETWEEN",
+      "parameter_names": [
+        "MaximumAppeal",
+        "MinimumAppeal"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_COAST",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_COASTAL_LAND",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_FRESH_WATER",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_HILLS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_IMPASSABLE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_LAKE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_MOUNTAIN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_IS_OWNER_CAPITAL_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_NEARBY_UNIT_TAG_MATCHES",
+      "parameter_names": [
+        "MaxDistance",
+        "MinDistance",
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_NEAR_CAPITAL",
+      "parameter_names": [
+        "MaxDistance",
+        "MinDistance"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_PROPERTY_MATCHES",
+      "parameter_names": [
+        "PropertyMinimum",
+        "PropertyName"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_RESOURCE_CLASS_TYPE_MATCHES",
+      "parameter_names": [
+        "ResourceClassType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_RESOURCE_TAG_MATCHES",
+      "parameter_names": [
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_RESOURCE_TYPE_MATCHES",
+      "parameter_names": [
+        "ResourceType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_RESOURCE_VISIBLE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_TERRAIN_CLASS_MATCHES",
+      "parameter_names": [
+        "TerrainClass"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_TERRAIN_TYPE_MATCHES",
+      "parameter_names": [
+        "TerrainType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_UNIT_CITY_HAS_ANY_DISTRICT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_UNIT_CITY_HAS_DISTRICT_SAME_OWNER",
+      "parameter_names": [
+        "DistrictType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_UNIT_EMBARKED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_UNIT_FLANKED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_UNIT_TYPE_MATCHES",
+      "parameter_names": [
+        "LayerIndex",
+        "UnitType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_PLOT_WONDER_IS_ERA",
+      "parameter_names": [
+        "EarliestEra",
+        "LatestEra"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_REQUIREMENTSET_IS_MET",
+      "parameter_names": [
+        "OnlyOwnersCity",
+        "RequirementSetId"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_RESIDENT_EMBASSY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TEAM_DIPLOMATIC_VICTORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TEAM_DOMINATION_VICTORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TEAM_HAS_HIGHEST_SCORE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TOURISTS_EXCEED_STAYCATIONERS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TRADE_ROUTE_BETWEEN_ALLIANCE_PARTNERS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TRADE_ROUTE_BETWEEN_EMERGENCY_MEMBERS",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TRADE_ROUTE_BETWEEN_EMERGENCY_MEMBER_AND_TARGET",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_TRADE_ROUTE_DESTINATION_IS_CITY_STATE",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_ADJACENT_TO_OWNER_TERRITORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_DAMAGE_MINIMUM",
+      "parameter_names": [
+        "MinimumAmount"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_DOMAIN_MATCHES",
+      "parameter_names": [
+        "UnitDomain"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_EMBARKED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_ERA_TYPE_MATCHES",
+      "parameter_names": [
+        "EraType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IN_EMERGENCY_TARGET_TERRITORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IN_ENEMY_TERRITORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IN_FORMATION",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IN_OWNER_TERRITORY",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IS_BARBARIAN",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_IS_LEVIED",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_ON_COAST",
+      "parameter_names": [
+        "Water"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_ON_HOME_CONTINENT",
+      "parameter_names": []
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_PLOT_HAS_NATIONAL_PARK",
+      "parameter_names": [
+        "MaxDistance",
+        "MinDistance",
+        "SameOwner"
+      ]
+    },
+    {      "requirement_type": "REQUIREMENT_UNIT_HAS_ABILITY",
+      "parameter_names": [
+        "UnitAbilityType"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_PROMOTION_CLASS_MATCHES",
+      "parameter_names": [
+        "UnitPromotionClass"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_TAG_MATCHES",
+      "parameter_names": [
+        "Tag"
+      ]
+    },
+    {
+      "requirement_type": "REQUIREMENT_UNIT_TYPE_MATCHES",
+      "parameter_names": [
+        "UnitType"
+      ]
+    }
+  ]
+}

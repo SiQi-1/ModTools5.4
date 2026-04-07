@@ -1,0 +1,39 @@
+{
+  "version": "beta-3",
+  "art_consumers": {
+    "WorldView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Cultures.artdef"],
+    "StrategicView_Translate": ["Buildings.artdef", "Landmarks.artdef"],
+    "Units": ["Cultures.artdef", "Units.artdef", "Landmarks.artdef"],
+    "Landmarks": ["Cultures.artdef", "Landmarks.artdef"],
+    "Cultures": ["Cultures.artdef"],
+    "LeaderFallback": ["FallbackLeaders.artdef"],
+    "Audio": ["Leaders.artdef", "Landmarks.artdef"],
+    "LeaderLighting": ["Leaders.artdef"],
+    "Leaders": ["Leaders.artdef"],
+    "UILensAsset": ["Overlay.artdef"],
+    "Overlay": ["Overlay.artdef"],
+    "StrategicView_Properties": ["StrategicView.artdef", "Landmarks.artdef"],
+    "StrategicView_Sprite": ["StrategicView.artdef", "Landmarks.artdef"],
+    "StrategicView_Route": ["StrategicView.artdef", "Landmarks.artdef"],
+    "StrategicView_TerrainType": ["StrategicView.artdef", "Landmarks.artdef"],
+    "StrategicView_TerrainBlendCorners": ["StrategicView.artdef", "Landmarks.artdef"],
+    "StrategicView_TerrainBlend": ["StrategicView.artdef", "Landmarks.artdef"],
+    "Farms": ["Landmarks.artdef"],
+    "Terrain": ["Landmarks.artdef"],
+    "Terrains": ["Landmarks.artdef"],
+    "Features": ["Landmarks.artdef"],
+    "Resources": ["Landmarks.artdef"],
+    "Improvements": ["Landmarks.artdef"],
+    "VFX": ["Landmarks.artdef"],
+    "IndirectGrid": ["Landmarks.artdef"],
+    "UnitSimulation": ["Landmarks.artdef"]
+  },
+  "libraries": {
+    "LeaderFallback": ["LeaderFallbacks"],
+    "UITexture": ["Shell_Loading", "UI_LeaderScenes", "UI_PrideMoments", "UILeaders"],
+    "UILensAsset": ["UILensModels"],
+    "StrategicView_Sprite": ["StrategicView_UILenses"],
+    "LeaderLighting": ["Leader_LightRigs"],
+    "Leader": ["leader_jasperkitty"]
+  }
+}

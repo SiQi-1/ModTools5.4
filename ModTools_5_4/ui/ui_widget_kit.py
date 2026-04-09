@@ -2110,6 +2110,31 @@ def _fetch_ability_class_tag_rows() -> List[Tuple[str, str]]:
     return parsed
 
 
+def _fetch_workspace_unit_ability_class_tag_rows() -> List[Tuple[str, str]]:
+    parsed: List[Tuple[str, str]] = []
+    seen: set[str] = set()
+    for entry in _workspace_entries("单位"):
+        if not isinstance(entry, dict):
+            continue
+        subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}
+        bindings = (
+            subtables.get("UnitAbilityBindings")
+            if isinstance(subtables.get("UnitAbilityBindings"), list)
+            else entry.get("unit_ability_bindings")
+            if isinstance(entry.get("unit_ability_bindings"), list)
+            else []
+        )
+        for binding in bindings:
+            if not isinstance(binding, dict):
+                continue
+            tag_text = str(binding.get("Tag") or "").strip().upper()
+            if not tag_text or tag_text in seen:
+                continue
+            seen.add(tag_text)
+            parsed.append((tag_text, tag_text))
+    return parsed
+
+
 def _fetch_great_work_object_type_rows() -> List[Tuple[str, str]]:
     if not DEFAULT_GAME_DB.exists():
         return []
@@ -2451,21 +2476,28 @@ def _build_building_entries(include_wonders: bool) -> List[Dict[str, object]]:
     district_lookup = _district_name_map()
     pinned_entries: List[Dict[str, object]] = []
     pinned_types: set[str] = set()
+
+    def _field(entry: Dict[str, object], key: str, default: object = "") -> object:
+        table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
+        if key in table_data:
+            return table_data.get(key)
+        return entry.get(key, default)
+
     for entry in _workspace_entries("建筑"):
-        building_type = _workspace_entry_type(entry)
+        building_type = _workspace_entry_type(entry) or str(_field(entry, "BuildingType") or "").strip()
         if not building_type or building_type in pinned_types:
             continue
-        table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
         try:
-            wonder_flag = int(table_data.get("IsWonder") or 0)
+            wonder_flag = int(_field(entry, "IsWonder", 0) or 0)
         except (TypeError, ValueError):
             wonder_flag = 0
         if not include_wonders and wonder_flag:
             continue
-        prereq_key = str(table_data.get("PrereqDistrict") or "").strip()
-        prereq_label = district_lookup.get(prereq_key, prereq_key) if prereq_key else ""
+        # Workspace-created buildings are intentionally pinned to top regardless of prereq district.
+        prereq_key = ""
+        prereq_label = ""
         try:
-            cost_value = int(table_data.get("Cost") or 0)
+            cost_value = int(_field(entry, "Cost", 0) or 0)
         except (TypeError, ValueError):
             cost_value = 0
         pinned_types.add(building_type)
@@ -2475,7 +2507,7 @@ def _build_building_entries(include_wonders: bool) -> List[Dict[str, object]]:
                 "name": _workspace_entry_display_name(entry),
                 "cost": cost_value,
                 "is_wonder": bool(wonder_flag),
-                "trait": str(table_data.get("TraitType") or "").strip(),
+                "trait": str(_field(entry, "TraitType") or "").strip(),
                 "prereq_district": prereq_key,
                 "prereq_name": prereq_label,
                 "_workspace_pin": True,
@@ -2524,6 +2556,19 @@ def _generate_group_colors(keys: Sequence[str]) -> Dict[str, QColor]:
         color = QColor.fromHslF(hue, 0.35, 0.92)
         color_map[key] = color
     return color_map
+
+
+def _building_group_color(label: str, group_colors: Dict[str, QColor]) -> QColor | None:
+    if label == WORKSPACE_PIN_GROUP_LABEL:
+        return QColor("#fde68a")
+    if label == "奇观":
+        return QColor("#fecaca")
+    if label == "无区域":
+        return QColor("#bfdbfe")
+    color = group_colors.get(label)
+    if color is not None:
+        return color
+    return QColor("#dbeafe")
 
 
 def _build_promotion_class_lookup() -> Dict[str, Dict[str, object]]:
@@ -3538,12 +3583,19 @@ class AbilityClassTagTemplate(BaseTemplateWidget):
         super().__init__("ABILITY_CLASS标签选择框", parent)
         self._label = QLabel("单位标签：")
         self._combo = QComboBox()
-        self._combo.setEditable(False)
-        self._combo.currentIndexChanged.connect(self.dataChanged.emit)
+        self._combo.setEditable(True)
+        self._combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self._combo.currentTextChanged.connect(self.dataChanged.emit)
         self._options: List[Tuple[str, str]] = []
-        self._placeholder = "请选择 ABILITY_CLASS 标签"
+        self._placeholder = "可输入或选择 ABILITY_CLASS 标签"
         self._build_layout()
-        self._populate_options(_fetch_ability_class_tag_rows())
+        self._populate_options(
+            workspace_rows=_fetch_workspace_unit_ability_class_tag_rows(),
+            db_rows=_fetch_ability_class_tag_rows(),
+        )
+        line_edit = self._combo.lineEdit()
+        if line_edit is not None:
+            line_edit.setPlaceholderText(self._placeholder)
 
     def _build_layout(self) -> None:
         layout = QVBoxLayout(self)
@@ -3561,23 +3613,45 @@ class AbilityClassTagTemplate(BaseTemplateWidget):
     def _normalize_value(self, value: object | None) -> str:
         return str(value or "").strip().upper()
 
-    def _populate_options(self, rows: Sequence[Tuple[str, str]]) -> None:
-        self._options = sorted(rows, key=lambda item: item[0])
+    def _populate_options(
+        self,
+        workspace_rows: Sequence[Tuple[str, str]],
+        db_rows: Sequence[Tuple[str, str]],
+    ) -> None:
+        merged: List[Tuple[str, str]] = []
+        seen: set[str] = set()
+
+        def _append_rows(rows: Sequence[Tuple[str, str]]) -> None:
+            for tag_type, _name in rows:
+                normalized = self._normalize_value(tag_type)
+                if not normalized or normalized in seen:
+                    continue
+                seen.add(normalized)
+                merged.append((normalized, normalized))
+
+        _append_rows(workspace_rows)
+        _append_rows(sorted(db_rows, key=lambda item: str(item[0] or "")))
+        self._options = merged
+
         with _block_signals(self._combo):
             self._combo.clear()
-            self._combo.addItem(self._placeholder, "")
             for tag_type, _name in self._options:
                 self._combo.addItem(tag_type, tag_type)
 
     def export_data(self) -> Dict[str, object]:
         current_data = self._combo.currentData()
+        if current_data is None:
+            current_data = self._combo.currentText()
         value = self._normalize_value(current_data)
         if not value:
             return {"tag": "", "value": "", "display": ""}
         return {"tag": value, "value": value, "display": value}
 
     def summary_text(self) -> str:
-        value = self._normalize_value(self._combo.currentData())
+        current_data = self._combo.currentData()
+        if current_data is None:
+            current_data = self._combo.currentText()
+        value = self._normalize_value(current_data)
         return value or "未选择"
 
     def set_label_text(self, text: str) -> None:
@@ -3590,7 +3664,7 @@ class AbilityClassTagTemplate(BaseTemplateWidget):
             if index != -1:
                 self._combo.setCurrentIndex(index)
             else:
-                self._combo.setCurrentIndex(0 if self._combo.count() else -1)
+                self._combo.setEditText(normalized)
         self.dataChanged.emit()
 
 
@@ -5183,7 +5257,8 @@ class _BuildingSearchDialog(QDialog):
         key = keyword.strip().lower()
         filtered: List[Dict[str, object]] = []
         for entry in self._rows:
-            if not self._show_cost_one and int(entry.get("cost") or 0) == 1:
+            is_workspace_pin = bool(entry.get("_workspace_pin"))
+            if not self._show_cost_one and int(entry.get("cost") or 0) == 1 and not is_workspace_pin:
                 continue
             if self._ignore_unknown and str(entry.get("name") or "").strip() == "未知":
                 continue
@@ -5239,6 +5314,10 @@ class _BuildingSearchByDistrictDialog(QDialog):
 
         self._rows = list(rows)
         self._filtered = list(rows)
+        self._visible_entries: List[Dict[str, object]] = []
+        self._row_entry_map: List[Dict[str, object] | None] = []
+        self._group_labels_in_view: List[str] = []
+        self._collapsed_groups: set[str] = set()
         self._selected: Dict[str, object] | None = None
         self._show_cost_one = False
         self._ignore_unknown = False
@@ -5279,17 +5358,18 @@ class _BuildingSearchByDistrictDialog(QDialog):
         toggle_row.addStretch(1)
         layout.addLayout(toggle_row)
 
-        self._tree = QTreeWidget()
-        self._tree.setHeaderLabels(["建筑", "BuildingType"])
-        self._tree.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self._tree.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self._tree.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        header = self._tree.header()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        self._tree.itemClicked.connect(self._handle_item_clicked)
-        self._tree.itemDoubleClicked.connect(self._handle_item_double_clicked)
-        layout.addWidget(self._tree, 1)
+        self._table = QTableWidget(0, 3)
+        self._table.setHorizontalHeaderLabels(["分组", "建筑", "BuildingType"])
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        header = self._table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self._table.cellClicked.connect(self._handle_cell_clicked)
+        self._table.cellDoubleClicked.connect(self._handle_double_click)
+        layout.addWidget(self._table, 1)
 
         button_row = QHBoxLayout()
         button_row.setContentsMargins(0, 0, 0, 0)
@@ -5326,7 +5406,8 @@ class _BuildingSearchByDistrictDialog(QDialog):
         key = keyword.strip().lower()
         filtered: List[Dict[str, object]] = []
         for entry in self._rows:
-            if not self._show_cost_one and int(entry.get("cost") or 0) == 1:
+            is_workspace_pin = bool(entry.get("_workspace_pin"))
+            if not self._show_cost_one and int(entry.get("cost") or 0) == 1 and not is_workspace_pin:
                 continue
             if self._ignore_unknown and str(entry.get("name") or "").strip() == "未知":
                 continue
@@ -5335,75 +5416,121 @@ class _BuildingSearchByDistrictDialog(QDialog):
             if not key or key in type_name or key in name:
                 filtered.append(entry)
         self._filtered = filtered
-        self._populate_tree()
+        self._populate_table()
 
-    def _populate_tree(self) -> None:
-        self._tree.clear()
+    def _populate_table(self) -> None:
+        self._table.setRowCount(0)
+        self._visible_entries = []
+        self._row_entry_map = []
         groups: Dict[str, List[Dict[str, object]]] = {}
         for entry in self._filtered:
             label = self._group_label_for_entry(entry)
             groups.setdefault(label, []).append(entry)
 
         ordered_labels = self._group_key_sequence(self._filtered)
+        self._group_labels_in_view = ordered_labels
+        self._collapsed_groups = {label for label in self._collapsed_groups if label in set(ordered_labels)}
         for label in ordered_labels:
             entries = groups.get(label, [])
             if not entries:
                 continue
-            if label == WORKSPACE_PIN_GROUP_LABEL:
-                color = QColor(WORKSPACE_PIN_BG)
-            else:
-                color = self._group_colors.get(label)
-            top_item = QTreeWidgetItem([label, ""])
-            top_item.setData(0, Qt.ItemDataRole.UserRole, None)
-            if color is not None:
-                for col in range(2):
-                    top_item.setBackground(col, QBrush(color))
-            if self._expand_all_toggle.isChecked():
-                top_item.setExpanded(True)
-            else:
-                top_item.setExpanded(False)
-            self._tree.addTopLevelItem(top_item)
+            color = _building_group_color(label, self._group_colors)
+            header_row = self._table.rowCount()
+            self._table.insertRow(header_row)
+            expanded = label not in self._collapsed_groups
+            group_item = QTableWidgetItem(("▼ " if expanded else "▶ ") + label)
+            name_header = QTableWidgetItem("")
+            type_header = QTableWidgetItem("")
+            group_item.setData(Qt.ItemDataRole.UserRole, {"kind": "group", "label": label})
+            for item in (group_item, name_header, type_header):
+                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
+                item.setBackground(QBrush((color.darker(108) if color is not None else QColor("#bfdbfe"))))
+                item.setForeground(QBrush(QColor("#0f172a")))
+            self._table.setItem(header_row, 0, group_item)
+            self._table.setItem(header_row, 1, name_header)
+            self._table.setItem(header_row, 2, type_header)
+            self._row_entry_map.append(None)
+
+            if not expanded:
+                continue
+
             for entry in entries:
-                child = QTreeWidgetItem([str(entry.get("name") or ""), str(entry.get("type") or "")])
-                child.setData(0, Qt.ItemDataRole.UserRole, entry)
-                if color is not None:
-                    shade = color.darker(103)
-                    for col in range(2):
-                        child.setBackground(col, QBrush(shade))
-                top_item.addChild(child)
+                row_idx = self._table.rowCount()
+                self._table.insertRow(row_idx)
+                group_item = QTableWidgetItem(label)
+                name_item = QTableWidgetItem(str(entry.get("name") or ""))
+                type_item = QTableWidgetItem(str(entry.get("type") or ""))
+                shade = color.lighter(108) if color is not None else QColor("#dbeafe")
+                for item in (group_item, name_item, type_item):
+                    item.setData(Qt.ItemDataRole.UserRole, entry)
+                    item.setBackground(QBrush(shade))
+                    item.setForeground(QBrush(QColor("#111827")))
+                self._table.setItem(row_idx, 0, group_item)
+                self._table.setItem(row_idx, 1, name_item)
+                self._table.setItem(row_idx, 2, type_item)
+                self._visible_entries.append(entry)
+                self._row_entry_map.append(entry)
 
-        self._apply_expand_state()
-
-    def _apply_expand_state(self) -> None:
+    def _apply_expand_state(self, _state: int | None = None) -> None:
         if self._expand_all_toggle.isChecked():
-            self._tree.expandAll()
+            self._collapsed_groups.clear()
         else:
-            self._tree.collapseAll()
+            self._collapsed_groups = set(self._group_labels_in_view)
+        self._populate_table()
 
-    def _handle_item_clicked(self, item: QTreeWidgetItem, _column: int) -> None:
-        if item.parent() is None:
-            item.setExpanded(not item.isExpanded())
-
-    def _handle_item_double_clicked(self, item: QTreeWidgetItem, _column: int) -> None:
-        if item.parent() is None:
-            item.setExpanded(not item.isExpanded())
+    def _handle_cell_clicked(self, row: int, _column: int) -> None:
+        if row < 0 or row >= self._table.rowCount():
             return
-        data = item.data(0, Qt.ItemDataRole.UserRole)
-        if isinstance(data, dict):
-            self._selected = data
-            self.accept()
+        item = self._table.item(row, 0)
+        if item is None:
+            return
+        payload = item.data(Qt.ItemDataRole.UserRole)
+        if not isinstance(payload, dict) or payload.get("kind") != "group":
+            return
+        label = str(payload.get("label") or "")
+        if not label:
+            return
+        if label in self._collapsed_groups:
+            self._collapsed_groups.remove(label)
+        else:
+            self._collapsed_groups.add(label)
+        if self._group_labels_in_view and len(self._collapsed_groups) == len(self._group_labels_in_view):
+            self._expand_all_toggle.blockSignals(True)
+            self._expand_all_toggle.setChecked(False)
+            self._expand_all_toggle.blockSignals(False)
+        elif not self._collapsed_groups:
+            self._expand_all_toggle.blockSignals(True)
+            self._expand_all_toggle.setChecked(True)
+            self._expand_all_toggle.blockSignals(False)
+        self._populate_table()
+
+    def _handle_double_click(self, row: int, _column: int) -> None:
+        if row < 0 or row >= self._table.rowCount():
+            return
+        item = self._table.item(row, 0)
+        if item is None:
+            return
+        payload = item.data(Qt.ItemDataRole.UserRole)
+        if isinstance(payload, dict) and payload.get("kind") == "group":
+            self._handle_cell_clicked(row, _column)
+            return
+        if 0 <= row < len(self._row_entry_map):
+            entry = self._row_entry_map[row]
+            if isinstance(entry, dict):
+                self._selected = entry
+                self.accept()
 
     def _handle_confirm(self) -> None:
-        current = self._tree.currentItem()
-        if current is None or current.parent() is None:
+        row = self._table.currentRow()
+        if row < 0 or row >= len(self._row_entry_map):
             self.reject()
             return
-        data = current.data(0, Qt.ItemDataRole.UserRole)
-        if isinstance(data, dict):
-            self._selected = data
-            self.accept()
-        else:
+        entry = self._row_entry_map[row]
+        if not isinstance(entry, dict):
             self.reject()
+            return
+        self._selected = entry
+        self.accept()
 
     def _handle_cost_toggle(self, _state: int) -> None:
         self._show_cost_one = self._show_cost_toggle.isChecked()

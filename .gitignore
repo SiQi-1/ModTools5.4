@@ -1,0 +1,15 @@
+# Logs
+ModifiersTool/logs/
+*.log
+logs/
+*.log
+*.CIV
+
+
+# Build artifacts
+build/
+*.spec
+
+# Python caches
+__pycache__/
+*.pyc

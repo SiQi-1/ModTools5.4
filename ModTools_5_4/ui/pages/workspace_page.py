@@ -425,7 +425,7 @@ class WorkspacePage(BasePage):
         self._cached_custom_project_files: list[str] = []
 
         # Expose current project workspace to shared UI selectors (ui_widget_kit).
-        set_workspace_sections_provider(lambda: self._project.sections)
+        set_workspace_sections_provider(self._workspace_sections_snapshot_for_selectors)
 
         self._project_tabs = QTabBar()
         self._project_tabs.setDocumentMode(True)
@@ -2312,6 +2312,10 @@ class WorkspacePage(BasePage):
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
                 default = _normalized(key, field_defaults.get(key))
+                if key == "ObsoleteEra":
+                    current_text = str(current or "").strip().upper()
+                    if current_text in {"", "NO_ERA"}:
+                        continue
                 if current == default:
                     continue
                 columns.append(key)
@@ -6655,6 +6659,16 @@ class WorkspacePage(BasePage):
         self._save_art_payload_to_project(self._art_workspace.export_project_payload())
         payload = self._modifier_workspace.export_project_payload()
         self._save_modifier_payload_to_project(payload)
+
+    def _workspace_sections_snapshot_for_selectors(self) -> dict[str, object]:
+        # Ensure selector dialogs can read the latest edits across workspaces,
+        # not only the last-saved project.sections snapshot.
+        if not self._loading_project:
+            try:
+                self._sync_workspace_sections_from_editors()
+            except Exception as exc:
+                LOGGER.debug("selector sections snapshot sync failed: %s", exc)
+        return self._project.sections if isinstance(self._project.sections, dict) else {}
 
     def _load_workspace_sections_into_editors(self) -> None:
         self._loading_project = True

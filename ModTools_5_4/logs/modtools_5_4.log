@@ -14689,3 +14689,1156 @@
 2026-04-07 11:27:17,146 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
 2026-04-07 11:27:17,154 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
 2026-04-07 11:27:17,155 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-07 21:49:48,662 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-07 21:49:48,689 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-07 21:49:48,697 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-07 21:49:48,954 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-07 21:49:49,051 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:49:49,113 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:49:49,151 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:49:49,216 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:49:49,232 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:49:49,251 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:49:49,985 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-07 21:49:49,986 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1949524732464
+2026-04-07 21:49:49,987 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-07 21:49:49,988 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-07 21:49:49,988 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-07 21:49:49,988 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-07 21:49:50,040 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:49:50,102 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:49:50,137 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:49:50,199 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:49:50,214 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:49:50,233 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:49:50,243 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-07 21:49:50,243 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-07 21:49:50,246 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-07 21:49:50,298 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:49:50,359 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:49:50,395 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:49:50,473 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:49:50,499 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:49:50,532 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:49:50,546 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-07 21:49:50,547 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1949524732464
+2026-04-07 21:49:50,547 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-07 21:49:50,548 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-07 21:49:50,548 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-07 21:49:50,548 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-07 21:49:50,634 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:49:50,710 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:49:50,748 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:49:50,821 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:49:50,839 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:49:50,863 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:49:50,878 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-07 21:49:50,879 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-07 21:50:13,795 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-07 21:50:13,843 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:50:13,902 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:50:13,935 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:50:13,994 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:50:14,009 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:50:14,027 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:50:14,478 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:50:14,489 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1949524732464
+2026-04-07 21:50:14,489 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-07 21:50:14,490 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1949524732464
+2026-04-07 21:50:14,490 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-07 21:50:14,491 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1949524732464
+2026-04-07 21:50:14,492 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-07 21:50:14,494 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:14,499 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:14,499 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:14,500 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:14,505 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:14,505 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:14,508 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=223
+2026-04-07 21:50:14,510 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 21:50:14,513 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 21:50:14,562 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:50:14,621 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:50:14,655 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:50:14,715 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:50:14,729 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:50:14,748 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:50:15,197 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:50:15,225 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 21:50:15,280 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:50:15,342 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:50:15,379 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:50:15,438 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:50:15,452 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:50:15,470 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:50:15,930 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:50:15,931 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:15,935 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:15,935 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:15,938 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=223
+2026-04-07 21:50:15,951 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:15,956 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:15,956 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:15,957 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:15,962 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:15,962 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:15,965 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=223
+2026-04-07 21:50:15,967 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 21:50:15,970 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 21:50:16,018 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:50:16,076 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:50:16,109 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:50:16,167 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:50:16,181 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:50:16,199 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:50:16,628 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:50:16,647 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 21:50:16,653 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:16,661 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:16,662 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:16,665 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:16,669 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:16,669 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:16,671 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:16,675 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:16,675 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:16,679 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=223
+2026-04-07 21:50:16,680 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 21:50:16,683 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 21:50:16,732 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:50:16,789 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:50:16,823 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:50:16,881 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:50:16,896 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:50:16,914 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:50:17,343 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:50:17,361 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 21:50:17,366 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-07 21:50:20,929 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:50:20,934 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:50:20,934 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:50:20,937 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=223
+2026-04-07 21:57:15,419 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:57:15,423 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:57:15,423 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:57:15,424 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:57:15,428 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:57:15,429 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:57:15,432 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=225
+2026-04-07 21:57:15,434 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 21:57:15,437 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 21:57:15,483 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:57:15,538 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:57:15,570 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:57:15,628 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:57:15,642 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:57:15,659 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:57:16,087 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:57:16,106 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 21:57:57,228 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:57:57,232 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:57:57,233 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:57:57,234 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 21:57:57,239 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 21:57:57,239 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 21:57:57,242 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=225
+2026-04-07 21:57:57,244 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 21:57:57,247 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 21:57:57,295 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 21:57:57,352 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 21:57:57,385 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 21:57:57,444 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 21:57:57,458 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 21:57:57,476 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 21:57:57,921 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 21:57:57,940 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 22:06:35,988 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:06:35,993 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:06:35,993 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:06:35,995 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:06:35,999 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:06:35,999 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:06:36,002 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=4 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=225
+2026-04-07 22:06:36,006 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 22:06:36,008 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 22:06:36,056 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 22:06:36,112 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 22:06:36,145 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 22:06:36,203 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 22:06:36,218 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 22:06:36,236 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 22:06:36,682 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=6 | need_hits=6
+2026-04-07 22:06:36,701 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 22:06:36,716 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=66 selected=14
+2026-04-07 22:06:41,930 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=66 selected=14
+2026-04-07 22:06:42,297 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=66 selected=14
+2026-04-07 22:08:53,276 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=66 selected=14
+2026-04-07 22:08:59,460 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:08:59,465 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:08:59,465 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:08:59,466 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:08:59,471 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:08:59,471 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:08:59,474 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=6 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=227
+2026-04-07 22:08:59,476 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=217 configured_sources=206
+2026-04-07 22:08:59,479 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 22:08:59,530 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 22:08:59,586 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 22:08:59,620 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 22:08:59,679 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 22:08:59,693 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 22:08:59,712 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 22:09:00,164 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=2 moment=11 source=7 | need_hits=6
+2026-04-07 22:09:00,185 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 22:09:00,196 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=67 selected=14
+2026-04-07 22:09:01,941 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:09:01,945 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:09:01,946 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:09:01,947 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:09:01,951 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:09:01,952 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:09:01,955 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=14 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=229
+2026-04-07 22:09:01,957 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=223 configured_sources=206
+2026-04-07 22:09:01,960 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=217
+2026-04-07 22:09:02,013 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 22:09:02,076 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 22:09:02,113 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 22:09:02,177 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 22:09:02,192 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 22:09:02,212 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 22:09:02,683 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=3 moment=11 source=8 | need_hits=6
+2026-04-07 22:09:02,702 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-07 22:09:05,967 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:09:06,392 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:09:14,225 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:09:18,051 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:09:18,582 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:09:25,232 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=68 selected=14
+2026-04-07 22:10:33,275 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=69 selected=14
+2026-04-07 22:10:58,804 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=70 selected=14
+2026-04-07 22:11:39,087 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:11:39,092 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:11:39,092 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:11:39,093 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-07 22:11:39,098 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-07 22:11:39,098 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-07 22:11:39,101 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-07 22:11:39,103 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=229 configured_sources=212
+2026-04-07 22:11:39,106 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=223
+2026-04-07 22:11:39,154 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-07 22:11:39,212 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-07 22:11:39,246 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-07 22:11:39,306 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-07 22:11:39,321 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-07 22:11:39,340 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-07 22:11:39,811 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-07 22:11:39,830 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-08 16:42:05,450 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-08 16:42:05,479 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-08 16:42:05,487 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-08 16:42:05,755 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-08 16:42:05,841 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 16:42:05,909 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 16:42:05,949 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 16:42:06,017 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 16:42:06,037 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 16:42:06,059 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 16:42:06,770 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-08 16:42:06,774 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=2126843568496
+2026-04-08 16:42:06,776 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-08 16:42:06,779 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-08 16:42:06,779 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-08 16:42:06,779 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-08 16:42:06,828 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 16:42:06,888 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 16:42:06,922 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 16:42:06,985 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 16:42:06,999 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 16:42:07,018 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 16:42:07,027 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-08 16:42:07,028 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-08 16:42:07,033 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-08 16:42:07,082 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 16:42:07,143 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 16:42:07,178 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 16:42:07,239 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 16:42:07,257 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 16:42:07,275 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 16:42:07,283 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-08 16:42:07,283 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=2126843568496
+2026-04-08 16:42:07,284 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-08 16:42:07,289 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-08 16:42:07,289 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-08 16:42:07,289 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-08 16:42:07,340 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 16:42:07,402 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 16:42:07,437 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 16:42:07,497 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 16:42:07,511 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 16:42:07,529 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 16:42:07,537 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-08 16:42:07,538 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-08 18:55:29,408 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-08 18:55:29,468 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 18:55:29,524 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 18:55:29,559 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 18:55:29,618 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 18:55:29,632 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 18:55:29,651 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 18:55:30,246 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-08 18:55:30,256 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2126843568496
+2026-04-08 18:55:30,257 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-08 18:55:30,257 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2126843568496
+2026-04-08 18:55:30,257 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-08 18:55:30,259 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2126843568496
+2026-04-08 18:55:30,259 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-08 18:55:30,262 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:30,268 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:30,268 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:30,271 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:30,276 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:30,276 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:30,280 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-08 18:55:30,282 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-08 18:55:30,286 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-08 18:55:30,338 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 18:55:30,399 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 18:55:30,433 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 18:55:30,495 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 18:55:30,510 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 18:55:30,529 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 18:55:31,001 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-08 18:55:31,069 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-08 18:55:31,127 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 18:55:31,187 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 18:55:31,220 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 18:55:31,280 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 18:55:31,296 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 18:55:31,315 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 18:55:31,773 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-08 18:55:31,774 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:31,778 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:31,779 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:31,782 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-08 18:55:31,786 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:31,790 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:31,791 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:31,792 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:31,797 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:31,797 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:31,800 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-08 18:55:31,802 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-08 18:55:31,806 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-08 18:55:31,858 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 18:55:31,919 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 18:55:31,952 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 18:55:32,013 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 18:55:32,027 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 18:55:32,046 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 18:55:32,515 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-08 18:55:32,535 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-08 18:55:32,540 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:32,550 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:32,552 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:32,554 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:32,558 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:32,558 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:32,559 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-08 18:55:32,564 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-08 18:55:32,564 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-08 18:55:32,568 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-08 18:55:32,569 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-08 18:55:32,573 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-08 18:55:32,624 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-08 18:55:32,682 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-08 18:55:32,718 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-08 18:55:32,778 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-08 18:55:32,792 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-08 18:55:32,811 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-08 18:55:33,277 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-08 18:55:33,297 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=26 folders=13 can_generate=True
+2026-04-08 18:55:33,303 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-09 19:58:05,959 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 19:58:05,984 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 19:58:05,984 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 19:58:05,986 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 19:58:05,991 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 19:58:05,991 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 19:58:05,995 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 19:58:05,997 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 19:58:06,001 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 19:58:06,064 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 19:58:06,127 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 19:58:06,164 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 19:58:06,227 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 19:58:06,244 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 19:58:06,264 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 19:58:06,847 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 19:58:06,901 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 19:59:26,096 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 19:59:26,101 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 19:59:26,101 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 19:59:26,103 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 19:59:26,107 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 19:59:26,108 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 19:59:26,111 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 19:59:26,113 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 19:59:26,116 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 19:59:26,164 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 19:59:26,221 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 19:59:26,255 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 19:59:26,313 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 19:59:26,327 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 19:59:26,345 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 19:59:26,827 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 19:59:26,846 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:04:21,698 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 20:04:21,726 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 20:04:21,735 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 20:04:22,005 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 20:04:22,060 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:22,117 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:22,153 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:22,212 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:22,225 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:22,243 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:22,808 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 20:04:22,809 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1755165763184
+2026-04-09 20:04:22,809 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 20:04:22,810 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 20:04:22,811 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 20:04:22,811 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 20:04:22,863 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:22,925 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:22,960 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:23,022 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:23,037 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:23,056 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:23,066 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 20:04:23,066 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 20:04:23,068 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 20:04:23,120 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:23,182 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:23,217 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:23,278 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:23,293 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:23,311 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:23,320 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 20:04:23,321 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1755165763184
+2026-04-09 20:04:23,321 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 20:04:23,321 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 20:04:23,321 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 20:04:23,322 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 20:04:23,371 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:23,429 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:23,464 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:23,523 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:23,537 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:23,557 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:23,566 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 20:04:23,566 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 20:04:28,945 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-09 20:04:28,994 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:29,052 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:29,084 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:29,142 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:29,156 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:29,174 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:29,632 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:04:29,640 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1755165763184
+2026-04-09 20:04:29,640 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 20:04:29,641 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1755165763184
+2026-04-09 20:04:29,641 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 20:04:29,642 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1755165763184
+2026-04-09 20:04:29,643 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 20:04:29,645 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:29,650 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:29,650 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:29,652 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:29,657 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:29,657 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:29,660 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 20:04:29,662 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 20:04:29,665 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:04:29,714 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:29,772 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:29,806 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:29,864 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:29,878 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:29,896 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:30,355 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:04:30,379 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:04:30,432 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:30,491 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:30,526 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:30,584 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:30,598 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:30,616 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:31,067 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:04:31,067 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,072 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,072 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,075 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 20:04:31,078 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,083 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,084 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,085 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,090 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,090 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,093 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 20:04:31,095 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 20:04:31,098 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:04:31,147 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:31,204 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:31,237 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:31,295 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:31,309 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:31,327 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:31,775 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:04:31,794 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:04:31,800 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,808 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,810 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,812 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,816 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,816 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,818 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:04:31,822 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:04:31,822 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:04:31,826 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 20:04:31,827 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 20:04:31,830 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:04:31,878 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:04:31,934 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:04:31,967 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:04:32,023 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:04:32,037 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:04:32,055 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:04:32,522 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:04:32,542 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:04:32,548 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-09 20:05:04,230 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:07,149 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=3, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:12,722 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:05:12,727 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:05:12,727 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=4, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:12,729 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:05:12,733 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:05:12,733 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=4, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:12,736 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=12 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=231
+2026-04-09 20:05:12,739 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 20:05:12,742 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:05:12,789 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:05:12,846 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:05:12,880 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:05:12,939 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:05:12,954 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:05:12,972 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:05:13,420 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:05:13,439 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:05:13,454 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=71 selected=None
+2026-04-09 20:05:19,002 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=71 selected=None
+2026-04-09 20:05:32,348 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=71 selected=None
+2026-04-09 20:05:51,697 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=4, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:54,707 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:05:54,711 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:05:54,711 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=5, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:54,712 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:05:54,717 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:05:54,717 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=5, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:05:54,720 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=16 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=235
+2026-04-09 20:05:54,722 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=235 configured_sources=224
+2026-04-09 20:05:54,725 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:05:54,772 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:05:54,830 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:05:54,864 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:05:54,923 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:05:54,937 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:05:54,956 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:05:55,409 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=2 moment=11 source=9 | need_hits=6
+2026-04-09 20:05:55,429 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:05:55,441 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=72 selected=None
+2026-04-09 20:05:58,977 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=72 selected=None
+2026-04-09 20:06:01,161 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=5, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:02,030 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:02,034 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:02,035 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=6, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:02,036 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:02,040 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:02,040 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=6, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:02,044 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=20 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=239
+2026-04-09 20:06:02,046 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=242 configured_sources=224
+2026-04-09 20:06:02,049 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:06:02,097 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:06:02,155 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:06:02,188 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:06:02,246 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:06:02,261 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:06:02,279 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:06:02,733 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=3 moment=11 source=9 | need_hits=6
+2026-04-09 20:06:02,752 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:06:02,764 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=73 selected=None
+2026-04-09 20:06:05,011 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=73 selected=None
+2026-04-09 20:06:06,114 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=6, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:07,475 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:07,480 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:07,480 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=7, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:07,481 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:07,485 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:07,485 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=7, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:07,489 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=24 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=243
+2026-04-09 20:06:07,491 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=249 configured_sources=224
+2026-04-09 20:06:07,493 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:06:07,540 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:06:07,596 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:06:07,629 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:06:07,686 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:06:07,700 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:06:07,717 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:06:08,168 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=4 moment=11 source=9 | need_hits=6
+2026-04-09 20:06:08,187 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:06:08,199 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=74 selected=None
+2026-04-09 20:06:09,445 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=74 selected=None
+2026-04-09 20:06:10,384 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=7, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:11,688 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:11,692 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:11,692 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=8, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:11,693 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:11,697 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:11,697 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=8, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:11,701 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=28 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=247
+2026-04-09 20:06:11,703 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=256 configured_sources=224
+2026-04-09 20:06:11,705 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:06:11,751 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:06:11,809 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:06:11,843 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:06:11,902 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:06:11,916 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:06:11,935 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:06:12,392 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=5 moment=11 source=9 | need_hits=6
+2026-04-09 20:06:12,412 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:06:12,424 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=75 selected=None
+2026-04-09 20:06:13,743 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=75 selected=None
+2026-04-09 20:06:15,610 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=8, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:16,798 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:16,803 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:16,803 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:16,804 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:06:16,808 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:06:16,808 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:06:16,811 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=32 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=251
+2026-04-09 20:06:16,813 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=263 configured_sources=224
+2026-04-09 20:06:16,816 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=235
+2026-04-09 20:06:16,861 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:06:16,916 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:06:16,949 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:06:17,009 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:06:17,024 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:06:17,043 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:06:17,499 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=6 moment=11 source=9 | need_hits=6
+2026-04-09 20:06:17,519 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 20:06:17,530 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:06:18,863 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:06:23,630 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:07:40,944 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:08:04,779 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:08:35,103 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:08:37,980 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=76 selected=None
+2026-04-09 20:10:18,789 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:10:18,794 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:10:18,794 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:10:18,795 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 20:10:18,799 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 20:10:18,799 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 20:10:18,803 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 20:10:18,805 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=270 configured_sources=259
+2026-04-09 20:10:18,808 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=270
+2026-04-09 20:10:18,854 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 20:10:18,910 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 20:10:18,942 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 20:10:19,000 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 20:10:19,014 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 20:10:19,031 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 20:10:19,468 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 20:10:19,487 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:05:15,811 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 21:05:15,836 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 21:05:15,844 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 21:05:16,085 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:05:16,197 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:05:16,261 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:05:16,296 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:05:16,364 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:05:16,383 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:05:16,403 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:05:17,111 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:05:17,112 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1685892623056
+2026-04-09 21:05:17,114 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:05:17,114 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:05:17,115 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:05:17,115 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:05:17,164 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:05:17,222 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:05:17,257 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:05:17,315 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:05:17,329 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:05:17,347 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:05:17,357 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:05:17,357 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:05:17,360 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:05:17,409 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:05:17,467 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:05:17,504 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:05:17,569 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:05:17,586 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:05:17,609 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:05:17,618 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:05:17,618 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1685892623056
+2026-04-09 21:05:17,622 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:05:17,622 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:05:17,623 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:05:17,623 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:05:17,673 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:05:17,733 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:05:17,767 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:05:17,825 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:05:17,839 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:05:17,858 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:05:17,867 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:05:17,867 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:06:32,423 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-09 21:06:32,472 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:06:32,527 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:06:32,559 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:06:32,618 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:06:32,632 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:06:32,650 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:06:33,123 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:06:33,130 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1685892623056
+2026-04-09 21:06:33,131 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:06:33,131 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1685892623056
+2026-04-09 21:06:33,131 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:06:33,132 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1685892623056
+2026-04-09 21:06:33,133 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:06:33,136 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:33,141 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:33,142 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:33,143 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:33,148 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:33,148 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:33,152 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:06:33,155 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:06:33,159 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:06:33,210 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:06:33,269 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:06:33,301 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:06:33,359 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:06:33,373 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:06:33,392 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:06:33,854 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:06:33,896 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:06:33,953 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:06:34,011 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:06:34,044 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:06:34,103 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:06:34,118 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:06:34,136 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:06:34,607 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:06:34,608 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:34,612 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:34,612 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:34,616 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:06:34,622 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:34,627 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:34,627 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:34,628 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:34,633 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:34,633 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:34,637 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:06:34,639 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:06:34,642 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:06:34,693 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:06:34,750 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:06:34,784 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:06:34,840 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:06:34,854 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:06:34,873 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:06:35,327 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:06:35,346 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:06:35,353 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:35,361 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:35,364 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:35,367 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:35,371 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:35,371 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:35,372 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:06:35,377 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:06:35,377 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:06:35,381 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:06:35,383 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:06:35,386 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:06:35,434 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:06:35,492 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:06:35,525 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:06:35,586 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:06:35,602 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:06:35,621 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:06:36,072 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:06:36,091 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:06:36,097 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-09 21:09:33,888 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:20:51,888 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 21:20:51,912 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 21:20:51,918 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 21:20:52,157 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:20:52,210 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:52,269 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:52,308 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:52,368 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:52,383 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:52,405 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:52,534 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:20:52,535 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1778569686992
+2026-04-09 21:20:52,535 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:20:52,536 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:20:52,537 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:20:52,537 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:20:52,591 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:52,652 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:52,689 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:52,754 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:52,770 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:52,790 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:52,800 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:20:52,801 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:20:52,803 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:20:52,856 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:52,923 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:52,959 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:53,023 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:53,037 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:53,057 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:53,066 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:20:53,066 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1778569686992
+2026-04-09 21:20:53,066 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:20:53,067 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:20:53,067 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:20:53,067 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:20:53,117 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:53,184 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:53,217 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:53,277 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:53,293 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:53,312 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:53,320 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:20:53,321 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:20:58,329 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-09 21:20:58,377 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:58,434 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:58,468 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:58,527 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:58,542 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:58,561 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:59,026 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:20:59,035 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1778569686992
+2026-04-09 21:20:59,035 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:20:59,036 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1778569686992
+2026-04-09 21:20:59,036 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:20:59,037 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=1778569686992
+2026-04-09 21:20:59,038 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:20:59,040 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:20:59,045 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:20:59,046 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:20:59,047 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:20:59,052 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:20:59,052 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:20:59,055 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:20:59,059 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:20:59,062 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:20:59,113 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:59,168 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:59,202 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:20:59,261 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:20:59,275 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:20:59,295 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:20:59,764 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:20:59,787 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:20:59,851 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:20:59,913 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:20:59,948 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:21:00,010 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:21:00,025 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:21:00,045 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:21:00,532 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:21:00,532 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:00,537 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:00,537 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:00,541 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:21:00,545 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:00,550 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:00,550 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:00,551 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:00,557 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:00,557 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:00,561 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:21:00,563 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:21:00,567 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:21:00,621 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:21:00,679 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:21:00,712 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:21:00,771 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:21:00,786 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:21:00,806 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:21:01,285 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:21:01,306 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:21:01,314 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:01,322 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:01,323 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:01,326 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:01,330 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:01,330 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:01,331 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:21:01,336 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:21:01,337 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:21:01,341 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:21:01,343 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:21:01,347 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:21:01,398 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:21:01,457 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:21:01,491 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:21:01,550 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:21:01,564 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:21:01,584 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:21:02,056 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:21:02,076 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:21:02,083 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-09 21:21:03,610 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:33,351 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 21:26:33,373 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 21:26:33,379 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 21:26:33,621 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:26:33,673 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:33,734 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:33,768 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:33,827 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:33,841 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:33,860 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:33,983 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:26:33,984 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=2522926197456
+2026-04-09 21:26:33,985 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:26:33,986 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:26:33,986 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:26:33,986 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:26:34,036 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:34,096 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:34,130 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:34,191 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:34,206 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:34,224 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:34,234 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:26:34,235 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:26:34,237 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 21:26:34,287 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:34,346 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:34,378 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:34,437 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:34,453 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:34,479 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:34,489 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:26:34,489 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=2522926197456
+2026-04-09 21:26:34,489 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 21:26:34,490 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 21:26:34,490 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 21:26:34,490 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 21:26:34,541 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:34,604 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:34,642 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:34,705 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:34,720 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:34,739 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:34,748 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 21:26:34,749 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 21:26:39,760 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=1 source=6 need=6 civs=1 moments=11
+2026-04-09 21:26:39,808 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:39,867 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:39,898 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:39,960 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:39,975 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:39,994 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:40,455 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:26:40,462 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2522926197456
+2026-04-09 21:26:40,462 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:26:40,462 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2522926197456
+2026-04-09 21:26:40,463 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:26:40,464 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=19 | model_rows=19 | model_id=2522926197456
+2026-04-09 21:26:40,464 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=REQSET_SIQI_C0032_PLOT_ADJACENT_TO_RIVER
+2026-04-09 21:26:40,467 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:40,473 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:40,473 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:40,475 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:40,479 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:40,480 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:40,483 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:26:40,488 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:26:40,492 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:26:40,541 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:40,599 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:40,633 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:40,693 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:40,708 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:40,727 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:41,178 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:26:41,202 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:26:41,258 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:41,315 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:41,351 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:41,409 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:41,423 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:41,445 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:41,904 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:26:41,904 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:41,909 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:41,909 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:41,913 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:26:41,916 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:41,920 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:41,920 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:41,921 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:41,926 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:41,926 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:41,930 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:26:41,932 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:26:41,935 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:26:41,986 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:42,045 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:42,079 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:42,141 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:42,156 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:42,174 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:42,631 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:26:42,651 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:26:42,657 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:42,665 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:42,667 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:42,670 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:42,674 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:42,675 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:42,676 | INFO | ModTools_5_4.ui.pages.workspace_page | Built civilization SQL preview: civ_entries=1 mapped_gp_bindings=0 fallback_gp_bindings=0
+2026-04-09 21:26:42,680 | INFO | ModTools_5_4.ui.pages.workspace_page | [GovernorSql] entries=5 governors=5 promotions=30 text_rows=90 traits=5
+2026-04-09 21:26:42,680 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=9, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 21:26:42,684 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=5 leader_base=30 district=16 building=10 unit=8 improvement=0 governor=90 great_people=0 policy=0 belief=0 project=36 agenda=0 civ_city=25 civ_citizen=25 leader_diplomacy=0 total=255
+2026-04-09 21:26:42,686 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=277 configured_sources=266
+2026-04-09 21:26:42,690 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=277
+2026-04-09 21:26:42,741 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 21:26:42,800 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 21:26:42,835 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 21:26:42,894 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 21:26:42,908 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 21:26:42,926 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 21:26:43,390 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=1 alias=1 moment=11 source=9 | need_hits=6
+2026-04-09 21:26:43,409 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=30 folders=13 can_generate=True
+2026-04-09 21:26:43,416 | INFO | ModTools_5_4.ui.pages.workspace_page | Full workspace refresh completed after project load: project=未命名工程
+2026-04-09 22:08:04,501 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 22:08:04,525 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 22:08:04,532 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 22:08:04,774 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 22:08:04,826 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:08:04,885 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:08:04,919 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:08:04,975 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:08:04,990 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:08:05,007 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:08:05,124 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:08:05,125 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1866608454352
+2026-04-09 22:08:05,125 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 22:08:05,126 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 22:08:05,126 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 22:08:05,126 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 22:08:05,170 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:08:05,222 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:08:05,253 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:08:05,314 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:08:05,328 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:08:05,351 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:08:05,361 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:08:05,361 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 22:08:05,364 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 22:08:05,413 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:08:05,472 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:08:05,508 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:08:05,573 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:08:05,588 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:08:05,606 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:08:05,614 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:08:05,614 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1866608454352
+2026-04-09 22:08:05,614 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 22:08:05,615 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 22:08:05,615 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 22:08:05,615 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 22:08:05,662 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:08:05,720 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:08:05,753 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:08:05,813 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:08:05,827 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:08:05,845 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:08:05,854 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:08:05,854 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 22:13:27,441 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 GovernmentSlots options
+2026-04-09 22:13:27,464 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 13 Government options
+2026-04-09 22:13:27,471 | INFO | ModTools_5_4.ui.ui_widget_kit | Loaded 5 BeliefClasses options
+2026-04-09 22:13:27,721 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 22:13:27,773 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:13:27,833 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:13:27,868 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:13:27,930 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:13:27,945 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:13:27,964 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:13:28,084 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:13:28,085 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1640830986480
+2026-04-09 22:13:28,086 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 22:13:28,086 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 22:13:28,087 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 22:13:28,087 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 22:13:28,136 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:13:28,197 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:13:28,232 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:13:28,294 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:13:28,309 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:13:28,327 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:13:28,337 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:13:28,338 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 22:13:28,340 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] payload imported: alias=0 source=0 need=0 civs=0 moments=0
+2026-04-09 22:13:28,391 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:13:28,451 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:13:28,488 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:13:28,554 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:13:28,568 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:13:28,587 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:13:28,596 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:13:28,597 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset model updated | items=1 | model_rows=1 | model_id=1640830986480
+2026-04-09 22:13:28,597 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Reqset refresh inputs | owner_text= | subject_text=
+2026-04-09 22:13:28,597 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 22:13:28,597 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 22:13:28,597 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 22:13:28,648 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:13:28,712 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:13:28,748 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:13:28,810 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:13:28,825 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:13:28,845 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:13:28,853 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:13:28,853 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=15 folders=13 can_generate=False
+2026-04-09 22:13:46,687 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=1, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 22:13:46,688 | INFO | ModTools_5_4.ui.pages.workspace_page | Built project SQL preview: entries=1, mode=0, xp1=0, xp2=0, prereqs=0
+2026-04-09 22:13:46,688 | INFO | ModTools_5_4.ui.pages.workspace_page | [TextPreview] ordered rows civ_base=0 leader_base=0 district=0 building=0 unit=0 improvement=0 governor=0 great_people=0 policy=0 belief=0 project=0 agenda=0 civ_city=0 civ_citizen=0 leader_diplomacy=0 total=0
+2026-04-09 22:13:46,688 | INFO | ModTools_5_4.ui.pages.workspace_page | [IMGPlanPreview] rows=1 configured_sources=1
+2026-04-09 22:13:46,688 | INFO | ModTools_5_4.ui.pages.workspace_page | [TexturesPlanPreview] rows=1
+2026-04-09 22:13:46,735 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=district count=59
+2026-04-09 22:13:46,792 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=building count=185
+2026-04-09 22:13:46,825 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=improvement count=106
+2026-04-09 22:13:46,883 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=unit count=187
+2026-04-09 22:13:46,897 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=project count=45
+2026-04-09 22:13:46,915 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] loaded alias options entity=belief count=59
+2026-04-09 22:13:46,925 | INFO | ModTools_5_4.ui.pages.art_workspace | [ArtWorkspace] refreshed rows: civ=0 alias=0 moment=0 source=0 | need_hits=0
+2026-04-09 22:13:46,925 | INFO | ModTools_5_4.ui.pages.workspace_page | [RootOutput] manifest built files=16 folders=13 can_generate=False
+2026-04-09 22:13:46,935 | INFO | ModTools_5_4.ui.pages.modifier_workspace | Owner sync applied: owners=1 selected=None

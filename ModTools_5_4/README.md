@@ -1,7 +1,7 @@
 
 # ModTools 5.4 使用教程（文明6 Mod 制作）
 
-本工具是一个基于 PyQt6 的可视化工程编辑器：用一个 `.CIV` 工程文件保存你的编辑状态，并根据你选定的 ModBuddy `.civ6proj` 工程目录，一键生成 SQL/XML/Icons 等输出文件。
+本工具是一个基于 PyQt6 的可视化工程编辑器：用一个 `.CIV` 工程文件保存编辑状态，并根据你选定的 ModBuddy `.civ6proj` 工程目录，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件。
 
 > 重要：第一次使用请先完成“设置 → 文本数据库”流程，否则中文解析/预览会大量显示“未知”，文本预览也会不完整。
 
@@ -20,7 +20,7 @@
 
 ### 1.1 游戏数据库（外部链接）
 
-- 用途：用于“导入（从数据库复制原版模板）”、Modifiers 搜索、部分下拉选项/校验。
+- 用途：用于“导入（从数据库复制原版模板）”、Modifiers 搜索、部分下拉选项/校验、Moments 纹理选择等。
 - 操作：在“游戏数据库（外部链接）”中选择你的 Civ6 游戏数据库（`.sqlite`/`.db`），点击“保存游戏数据库配置”。
 
 > 没有配置时，工具会尝试使用内置默认路径；但如果默认库不存在，导入/搜索会不可用。
@@ -53,7 +53,7 @@
 
 ## 2. 工程概念：`.CIV` vs `.civ6proj`
 
-- `.CIV`：ModTools 5.4 的工程文件（JSON），保存你在各工作区的输入数据。
+- `.CIV`：ModTools 5.4 的工程文件（JSON），保存你在各工作区的输入数据（包含美术、修改器、文本等状态）。
 - `.civ6proj`：ModBuddy 工程文件。ModTools 通过它确定**输出根目录**与**应生成哪些文件**。
 
 生成输出时，文件会写入到你选择的 `.civ6proj` 所在目录（同级/子文件夹）。
@@ -70,6 +70,7 @@
 - 点击“选择 .civ6proj”，选中你的 ModBuddy 工程文件。
 - 可填写 Mod 名字/描述/作者等。
 - “一键配置”：快速生成/整理常用的 FrontEndActionData / InGameActionData 条目与文件清单。
+- 如已有自定义 XLP/Art.xml，建议点击“刷新配置”同步工程总览与 Art.xml 来源配置。
 
 3) 在各分类中“新增”对象并编辑
 
@@ -81,7 +82,7 @@
 - “生成该文件”：仅生成右侧输出树当前选中的文件。
 - “生成所有文件”：生成全部输出文件；如有同名文件已存在，会弹窗选择要覆盖的文件。
 
-图片输出会在生成时一并执行，并在弹窗里汇总“写入/跳过”数量。
+图片与纹理会在生成时一并执行，并在弹窗里汇总“写入/跳过”数量。
 
 ---
 
@@ -90,9 +91,10 @@
 ### 4.1 工程根节点（输出总览/生成）
 
 - 右侧会显示“将要输出的文件树”和文件内容预览。
-- 特殊文件：`IMG/图片生成清单.txt`
-	- 用于展示图片输出计划（目标尺寸/来源/说明）。
-	- 该 `IMG/` 目录不会被写进 `.civ6proj` 的 Content/Folder Include（避免污染工程），但生成时仍会把图片按计划输出到工程目录。
+- 特殊文件：
+	- `IMG/图片生成清单.txt`：展示图片输出计划（目标尺寸/来源/说明）。生成时会输出 PNG，并联动纹理输出。
+	- `Textures/纹理生成清单.txt`：展示纹理输出计划（仅预览；当前不会落盘清单文件，但会输出 dds/tex）。
+- 若存在“删除计划”，工程总览会标红显示待删文件；在“生成所有文件”时会提示是否执行删除。
 
 ### 4.2 基础信息（必须配置）
 
@@ -103,12 +105,15 @@
 	- **语言**：影响 Text 输出结构（例如是否附带英文等）。
 - 工程文件配置：
 	- “FrontEndActionData / InGameActionData” 列表：控制 ModBuddy 加载哪些文件、LoadOrder 等。
-	- “一键配置/一键删除”：用于快速生成或清空这些条目。
+	- 文件管理：支持“选择文件/从此加载组删除/删除选中文件（加入删除计划）”。
+	- `UpdateDatabase` 新建文件支持 SQL/XML 二选一。
+- “刷新配置”：更新工程总览，同时扫描工程目录内自定义 XLP 并合并 Art.xml 来源配置。
 
 ### 4.3 文明 / 领袖
 
 - “新增文明/新增领袖”后进入子条目编辑器，填写名称、描述、关联关系、以及相关文本。
 - 领袖相关的“首都名/名言”等文本即使为空，也会被纳入 Text 预览（保证结构完整）。
+- 领袖基础信息中新增“选择界面顺序”与“是否新增外交背景幕布(BARBAROSSA_4)”选项。
 
 ### 4.4 区域 / 建筑 / 单位 / 改良设施
 
@@ -123,12 +128,18 @@
 - 多个子表/附属表编辑（按分类不同）。
 - 图片槽位：用于生成图标/肖像等多尺寸输出（最终会出现在工程根节点的图片生成清单里）。
 
-> 注意：某些字段即便你在 UI 中有“默认显示值”，也不等同于数据库默认值；工具会按“必须输出”的规则补全关键字段（例如单位 `Domain`）。
+重要规则：
+
+- 必填字段在 UI 中会标红 `*`，生成前会校验并补齐默认值或阻止生成。
+- 单位 `Domain` 始终输出，避免默认值省略导致缺列。
+- 改良设施 `PlunderType` 默认补 `NO_PLUNDER`，区域 `MilitaryDomain` 默认补 `NO_DOMAIN`。
+- 子条目工作区顶部支持“删除当前对象”。
 
 ### 4.5 总督 / 伟人
 
 - 总督：已接入子条目编辑器，可填写总督相关数据与文本。
 - 伟人：支持从数据库导入“伟人类型”作为模板，并编辑 Class/Unit/Individuals 等数据。
+- 总督头像支持真实圆形裁切，并可选黑边（导出与预览一致）。
 
 ### 4.6 政策卡 / 项目 / 信仰
 
@@ -140,21 +151,51 @@
 - 当前只保留分类框架与预览入口；“议程子条目编辑器”尚未接入。
 - 现阶段请先用其他方式维护议程相关数据，或等待后续版本完善。
 
-### 4.8 美术（Icons.xml / ArtDef / XLP 预览与配置）
+### 4.8 美术（Icons.xml / ArtDef / XLP / Art.xml / Textures）
 
 美术工作区会自动刷新，并提供：
 
 - “基础模板文件（勾选后生成）”：可勾选额外输出的 XLP / ArtDef 模板文件。
-- “打开预览窗口”：在独立窗口按文件分 Tab 查看 XLP / ArtDef / Icons.xml 预览。
+- “打开预览窗口”：在独立窗口按文件分 Tab 查看 XLP / ArtDef / Icons.xml / Art.xml 预览。
 - “未导入图片实体（可选别名）”：当某个实体没有导入图片时，可选择使用原版 `IconName` 作为别名。
 - “ArtDef 来源编辑”：为区域/建筑/改良/单位选择 ArtDef 模板来源。
 
-> 单位肖像别名会自动规范化为 `ICON_UNIT_*_PORTRAIT`，确保 Icons.xml 的 OtherName 正确指向 portrait。
+图标与 ArtDef 规则：
+
+- 单位肖像别名会自动规范化为 `ICON_UNIT_*_PORTRAIT`。
+- 空对象分类不再生成对应 ArtDef；若全部为空，会保底输出 `Cultures.artdef`。
+
+领袖 XLP / Leaders.artdef：
+
+- 美术页新增“领袖xlp与Leaders.artdef生成”编辑区，每个领袖可勾选独立 xlp。
+- 领袖 xlp 文件名固定为 `{leaderType.lower()}.xlp`，`m_ClassName` 为 `Leader`。
+- `Leaders.artdef` 仅在至少勾选一个领袖 xlp 时才生成。
+
+Art.xml：
+
+- Art.xml 配置由“工作区规则 + 工程原始 Art.xml”自动合并。
+- 若工程目录不存在 Art.xml，会回退使用内置空白模板作为保底。
+- 输出文件名与 `.civ6proj` 同名：`{工程名}.Art.xml`。
+- 仅写入实际存在的 artdef/xlp 条目，避免写入未来文件。
+
+Textures 纹理链路：
+
+- 生成 `Textures/*.dds/.tex`，`.tex` 使用可用的 `TextureInstance` 模板。
+- `{工程名}_dds.xlp` 会包含可实际生成的纹理条目（图标、总督、领袖、Moments 导入图等）。
+- `FALLBACK_*` 纹理不会写入 `{工程名}_dds.xlp`。
+- `IMG/` 与 `Textures/` 不会写入 `.civ6proj` 的 Content/Folder Include。
+
+Moments（历史时刻插画）：
+
+- 支持“导入图片 / 使用数据库 Texture（二选一）”。
+- 导入图片模式会生成 `IMG/Moment_*.png` + `Textures/Moment_*.dds/.tex`，并写入 `{工程名}_Moments.sql` 与 `{工程名}_dds.xlp`。
+- 数据库 Texture 模式仅生成 SQL，不输出图片与纹理。
 
 ### 4.9 文本（Text.sql / Text.xml 预览）
 
 - 文本工作区用于统一预览最终的 Text 输出（SQL 或 XML）。
-- 文本来源包括：各分类输入的 Name/Description 等、修改器预览文本（`ModifierStrings`）、以及工具自动补齐的必要文本行。
+- 文本来源包括：各分类输入的 Name/Description、修改器预览文本（`ModifierStrings`）、单位 Ability 文本等。
+- 描述类文本框支持右键插入 FontIcons（`[ICON_XXX]`），编辑区显示为图标，导出/预览仍为 token 字符串。
 - 若你未在“设置”中配置并导入文本库，预览会出现大量“未知”。
 
 ### 4.10 修改器（Modifiers/Requirements/UnitAbilities）
@@ -167,8 +208,10 @@
 
 重要行为说明：
 
-- `AbilityType` 参数支持“可输入 + 下拉选项”；下拉显示文本可能包含“中文 | 英文Type”，但最终导出只写英文 Type（避免污染 SQL）。
-- 当 UnitAbility 选择 `CLASS_*` 类型标签时，不会重复生成 `Tags(Vocabulary='ABILITY_CLASS')`，只保留必要的关联输出。
+- `AbilityType` 参数支持“可输入 + 下拉选项”，下拉来自修改器页新增的 UnitAbility。
+- `AbilityType` 导出只写英文 `UnitAbilityType`，不会写“中文 | 英文”显示文本。
+- UnitAbility 的 `CLASS_*` 仅写 `TypeTags`，不重复生成 `Tags(Vocabulary='ABILITY_CLASS')`。
+- 当 `EffectType = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 时，会生成 `ModifierStrings(Preview)` 并同步 Text 预览的 `LOC_MODIFIER_*_PREVIEW`。
 
 ---
 
@@ -200,6 +243,10 @@
 
 - “生成该文件”：会询问是否覆盖。
 - “生成所有文件”：会弹出覆盖选择列表，你可以勾选要覆盖的文件，其余跳过。
+
+### 6.4 为什么 IMG/Textures 没有写入 .civ6proj
+
+- 这是设计行为：IMG/Textures 不写入工程定义，避免污染 ModBuddy Content/Folder Include。
 
 ---
 

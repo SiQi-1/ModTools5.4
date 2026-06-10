@@ -16,6 +16,17 @@ from ..db.paths import DEFAULT_GAME_DB, DEFAULT_TEXT_SOURCE_DB
 
 SETTINGS_FILE = settings_file_path()
 SOURCE_SETTINGS_FILE = PACKAGE_ROOT / "data" / "settings.json"
+PORTABLE_DB_RELATIVE_PATH = Path("local_text_New.sqlite")
+
+
+def _source_root_dir() -> Path:
+    return PACKAGE_ROOT.parent
+
+
+def _portable_settings_dir() -> Path:
+    if is_frozen():
+        return SETTINGS_FILE.parent
+    return _source_root_dir()
 
 
 @dataclass(slots=True)
@@ -43,7 +54,22 @@ def _resolve_settings_path(raw_path: object) -> str:
     candidate = Path(text)
     if candidate.is_absolute():
         return str(candidate)
-    return str((SETTINGS_FILE.parent / candidate).resolve())
+    return str((_portable_settings_dir() / candidate).resolve())
+
+
+def _serialize_path_for_settings(raw_path: object) -> str:
+    text = str(raw_path or "").strip()
+    if not text:
+        return ""
+    candidate = Path(text)
+    if not candidate.is_absolute():
+        return text.replace("\\", "/")
+
+    portable_root = _portable_settings_dir().resolve()
+    try:
+        return str(candidate.resolve().relative_to(portable_root)).replace("\\", "/")
+    except Exception:
+        return str(candidate)
 
 
 def _load_json_dict(path: Path) -> dict[str, object] | None:
@@ -81,8 +107,8 @@ def load_settings() -> UserSettings:
                     text_dbs.append(TextDbEntry(name=name, path=path))
 
     settings = UserSettings(
-        game_db_path=str(payload.get("game_db_path") or DEFAULT_GAME_DB),
-        base_text_source_db_path=str(payload.get("base_text_source_db_path") or DEFAULT_TEXT_SOURCE_DB),
+        game_db_path=_resolve_settings_path(payload.get("game_db_path") or DEFAULT_GAME_DB),
+        base_text_source_db_path=_resolve_settings_path(payload.get("base_text_source_db_path") or DEFAULT_TEXT_SOURCE_DB),
         text_databases=text_dbs,
         active_text_db_path=_resolve_settings_path(payload.get("active_text_db_path")),
     )
@@ -97,13 +123,21 @@ def load_settings() -> UserSettings:
 def save_settings(settings: UserSettings) -> None:
     SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
     payload = asdict(settings)
+    payload["game_db_path"] = _serialize_path_for_settings(settings.game_db_path)
+    payload["base_text_source_db_path"] = _serialize_path_for_settings(settings.base_text_source_db_path)
+    payload["active_text_db_path"] = _serialize_path_for_settings(settings.active_text_db_path)
+    payload["text_databases"] = [
+        {"name": entry.get("name", ""), "path": _serialize_path_for_settings(entry.get("path"))}
+        for entry in payload.get("text_databases", [])
+        if isinstance(entry, dict)
+    ]
     SETTINGS_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def ensure_text_db_entry(settings: UserSettings, db_path: Path, display_name: str | None = None) -> None:
-    normalized = str(db_path)
+    normalized = str(db_path.resolve())
     for entry in settings.text_databases:
-        if entry.path == normalized:
+        if Path(entry.path).resolve() == Path(normalized):
             if display_name:
                 entry.name = display_name
             return
@@ -111,4 +145,4 @@ def ensure_text_db_entry(settings: UserSettings, db_path: Path, display_name: st
 
 
 def set_active_text_db(settings: UserSettings, db_path: Path) -> None:
-    settings.active_text_db_path = str(db_path)
+    settings.active_text_db_path = str(db_path.resolve())

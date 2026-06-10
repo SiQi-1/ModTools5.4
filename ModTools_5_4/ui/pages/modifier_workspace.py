@@ -16,6 +16,7 @@ from PyQt6.QtCore import Qt, QTimer, QStringListModel
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
     QAbstractItemView,
+    QApplication,
     QCheckBox,
     QComboBox,
     QDialog,
@@ -178,6 +179,8 @@ TEMPLATE_PARAM_MAPPINGS: Dict[str, str] = {
     "LatestEra": "era",
     "MinimumEraType": "era",
     "EraType": "era",
+    "EndEraType": "era",
+    "StartEraType": "era",
     "ResourceType": "resource_search",
     "TerrainType": "terrain",
     "TechType": "technology_search",
@@ -295,6 +298,82 @@ class SearchListDialog(QDialog):
     def selected(self) -> str | None:
         item = self._list.currentItem()
         return item.text() if item else None
+
+
+class ReqsetSearchDialog(QDialog):
+    def __init__(
+        self,
+        title: str,
+        rows: Sequence[tuple[str, str]],
+        current_value: str = "",
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.resize(760, 560)
+
+        self._all_rows: List[tuple[str, str]] = list(rows)
+
+        layout = QVBoxLayout(self)
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("输入中文注释或条件集名字过滤")
+        layout.addWidget(self._search_edit)
+
+        self._table = QTableWidget(0, 2)
+        self._table.setHorizontalHeaderLabels(["中文注释", "条件集名字"])
+        header = self._table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.itemDoubleClicked.connect(lambda _item: self.accept())
+        layout.addWidget(self._table, 1)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        self._search_edit.textChanged.connect(self._apply_filter)
+        self._apply_filter("")
+        self._select_by_value(current_value)
+
+    def _apply_filter(self, text: str) -> None:
+        needle = text.strip().lower()
+        self._table.setRowCount(0)
+        for comment, reqset_id in self._all_rows:
+            comment_text = str(comment or "")
+            id_text = str(reqset_id or "")
+            if needle and needle not in comment_text.lower() and needle not in id_text.lower():
+                continue
+            row = self._table.rowCount()
+            self._table.insertRow(row)
+            self._table.setItem(row, 0, QTableWidgetItem(comment_text or ""))
+            self._table.setItem(row, 1, QTableWidgetItem(id_text or "（空）"))
+
+    def _select_by_value(self, value: str) -> None:
+        target = str(value or "")
+        for row in range(self._table.rowCount()):
+            item = self._table.item(row, 1)
+            if item is None:
+                continue
+            text = item.text()
+            normalized = "" if text == "（空）" else text
+            if normalized == target:
+                self._table.selectRow(row)
+                break
+
+    def selected(self) -> str | None:
+        selected = self._table.selectionModel().selectedRows() if self._table.selectionModel() is not None else []
+        if not selected:
+            return None
+        row = selected[0].row()
+        item = self._table.item(row, 1)
+        if item is None:
+            return None
+        text = item.text().strip()
+        return "" if text == "（空）" else text
 
 
 class TextPreviewDialog(QDialog):
@@ -578,6 +657,11 @@ class HomePage(BasePage):
         self._owner_delete_btn: QPushButton | None = None
         self._owner_toggle_btn: QPushButton | None = None
         self._owner_selected_label: QLabel | None = None
+        self._owner_bind_compact_bar: QWidget | None = None
+        self._owner_bind_compact_label: QLabel | None = None
+        self._owner_bind_compact_add_btn: QPushButton | None = None
+        self._owner_bind_compact_del_btn: QPushButton | None = None
+        self._owner_bind_selected_row: int = -1
         self._loading_owner_attachment_editor = False
 
         # Part 3 widgets
@@ -945,6 +1029,27 @@ class HomePage(BasePage):
 
         outer.addLayout(header)
 
+        compact_bar = QWidget()
+        compact_layout = QHBoxLayout(compact_bar)
+        compact_layout.setContentsMargins(0, 0, 0, 0)
+        compact_layout.setSpacing(8)
+        compact_layout.addWidget(QLabel("当前 ModifierId"))
+        compact_current_label = QLabel("（无）")
+        compact_current_label.setStyleSheet("color: #64748b;")
+        self._owner_bind_compact_label = compact_current_label
+        compact_layout.addWidget(compact_current_label, 1)
+        compact_add_btn = QPushButton("添加 ModifierId")
+        compact_add_btn.clicked.connect(self._handle_bind_modifier)
+        self._owner_bind_compact_add_btn = compact_add_btn
+        compact_layout.addWidget(compact_add_btn)
+        compact_del_btn = QPushButton("删除选中")
+        compact_del_btn.clicked.connect(self._handle_unbind_modifier)
+        self._owner_bind_compact_del_btn = compact_del_btn
+        compact_layout.addWidget(compact_del_btn)
+        compact_bar.setVisible(False)
+        self._owner_bind_compact_bar = compact_bar
+        outer.addWidget(compact_bar)
+
         body = QWidget()
         body_layout = QHBoxLayout(body)
         body_layout.setContentsMargins(0, 0, 0, 0)
@@ -1015,7 +1120,10 @@ class HomePage(BasePage):
         collapsed = self._owner_toggle_btn.isChecked()
         self._owner_section_body.setVisible(not collapsed)
         self._owner_toggle_btn.setText("展开" if collapsed else "折叠")
-        self._owner_delete_btn.setVisible(not collapsed)
+        if self._owner_delete_btn is not None:
+            self._owner_delete_btn.setVisible(not collapsed)
+        if self._owner_bind_compact_bar is not None:
+            self._owner_bind_compact_bar.setVisible(collapsed)
         self._update_owner_section_state()
 
     def _update_owner_section_state(self) -> None:
@@ -1027,7 +1135,12 @@ class HomePage(BasePage):
                 self._owner_toggle_btn.setText("折叠")
                 if self._owner_section_body is not None:
                     self._owner_section_body.setVisible(True)
+                if self._owner_bind_compact_bar is not None:
+                    self._owner_bind_compact_bar.setVisible(False)
+        if self._owner_bind_compact_bar is not None and self._owner_toggle_btn is not None and has_owner:
+            self._owner_bind_compact_bar.setVisible(self._owner_toggle_btn.isChecked())
         self._update_owner_bind_buttons()
+        self._update_owner_bind_compact_label()
         self._update_ability_buttons_state()
 
     def _update_ability_buttons_state(self) -> None:
@@ -1455,6 +1568,7 @@ class HomePage(BasePage):
         table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.itemSelectionChanged.connect(self._on_modifier_selected)
+        table.itemDoubleClicked.connect(self._on_modifier_row_double_clicked)
         table.currentCellChanged.connect(lambda *_args: self._on_modifier_selected())
         table.setMinimumWidth(self.LEFT_MIN_WIDTH)
         self._modifier_list = table
@@ -1561,11 +1675,10 @@ class HomePage(BasePage):
         owner_req_row.addWidget(owner_req_input, 1)
         owner_req_menu = QMenu(self)
         owner_req_btn = QToolButton()
-        owner_req_btn.setText("▼")
-        owner_req_btn.setToolTip("选择条件集")
-        owner_req_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        owner_req_btn.setMenu(owner_req_menu)
-        owner_req_btn.setFixedWidth(26)
+        owner_req_btn.setText("搜索")
+        owner_req_btn.setToolTip("搜索并选择条件集")
+        owner_req_btn.clicked.connect(lambda: self._open_reqset_search_dialog("owner"))
+        owner_req_btn.setFixedWidth(52)
         self._owner_reqset_menu = owner_req_menu
         self._owner_reqset_btn = owner_req_btn
         owner_req_row.addWidget(owner_req_btn)
@@ -1582,11 +1695,10 @@ class HomePage(BasePage):
         subject_req_row.addWidget(subject_req_input, 1)
         subject_req_menu = QMenu(self)
         subject_req_btn = QToolButton()
-        subject_req_btn.setText("▼")
-        subject_req_btn.setToolTip("选择条件集")
-        subject_req_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        subject_req_btn.setMenu(subject_req_menu)
-        subject_req_btn.setFixedWidth(26)
+        subject_req_btn.setText("搜索")
+        subject_req_btn.setToolTip("搜索并选择条件集")
+        subject_req_btn.clicked.connect(lambda: self._open_reqset_search_dialog("subject"))
+        subject_req_btn.setFixedWidth(52)
         self._subject_reqset_menu = subject_req_menu
         self._subject_reqset_btn = subject_req_btn
         subject_req_row.addWidget(subject_req_btn)
@@ -2306,7 +2418,14 @@ class HomePage(BasePage):
         self._update_owner_section_state()
 
     def _on_owner_bind_selection_changed(self) -> None:
+        if self._owner_bind_table is not None:
+            selected = self._owner_bind_table.selectionModel().selectedRows()
+            if selected:
+                self._owner_bind_selected_row = selected[0].row()
+            elif self._owner_bind_table.rowCount() == 0:
+                self._owner_bind_selected_row = -1
         self._update_owner_bind_buttons()
+        self._update_owner_bind_compact_label()
         self._update_owner_attachment_editor_state()
 
     @staticmethod
@@ -2456,9 +2575,11 @@ class HomePage(BasePage):
             return
         self._owner_bind_table.setRowCount(0)
         if not (0 <= self._selected_owner_index < len(self._owners)):
+            self._owner_bind_selected_row = -1
             self._owner_bind_table.setColumnCount(1)
             self._owner_bind_table.setHorizontalHeaderLabels(["绑定的 ModifierId"])
             self._owner_bind_table.horizontalHeader().setStretchLastSection(True)
+            self._update_owner_bind_compact_label()
             self._update_owner_attachment_editor_state()
             self._update_owner_bind_buttons()
             return
@@ -2481,17 +2602,57 @@ class HomePage(BasePage):
             self._owner_bind_table.setItem(row, 0, QTableWidgetItem(row_data.get("modifier_id", "")))
             if is_special_owner:
                 self._owner_bind_table.setItem(row, 1, QTableWidgetItem(row_data.get("attachment_target_type", "")))
+        if self._owner_bind_table.rowCount() > 0:
+            target_row = self._owner_bind_selected_row
+            if target_row < 0 or target_row >= self._owner_bind_table.rowCount():
+                target_row = 0
+            self._owner_bind_selected_row = target_row
+            self._owner_bind_table.selectRow(target_row)
+        else:
+            self._owner_bind_selected_row = -1
+        self._update_owner_bind_compact_label()
         self._update_owner_attachment_editor_state()
         self._update_owner_bind_buttons()
+
+    def _update_owner_bind_compact_label(self) -> None:
+        if self._owner_bind_compact_label is None:
+            return
+        if not (0 <= self._selected_owner_index < len(self._owners)):
+            self._owner_bind_compact_label.setText("（无）")
+            self._owner_bind_compact_label.setToolTip("")
+            return
+        owner = self._owners[self._selected_owner_index]
+        rows = self._owner_binding_rows(owner)
+        if not rows:
+            self._owner_bind_selected_row = -1
+            self._owner_bind_compact_label.setText("（无）")
+            self._owner_bind_compact_label.setToolTip("")
+            return
+        if self._owner_bind_selected_row < 0 or self._owner_bind_selected_row >= len(rows):
+            self._owner_bind_selected_row = 0
+        current_id = str(rows[self._owner_bind_selected_row].get("modifier_id") or "").strip()
+        self._owner_bind_compact_label.setText(current_id or "（无）")
+        self._owner_bind_compact_label.setToolTip(current_id)
 
     def _update_owner_bind_buttons(self) -> None:
         has_owner = 0 <= self._selected_owner_index < len(self._owners)
         has_modifier = self._get_current_modifier_id() is not None
         if self._owner_bind_add_btn is not None:
             self._owner_bind_add_btn.setEnabled(has_owner and has_modifier)
+        if self._owner_bind_compact_add_btn is not None:
+            self._owner_bind_compact_add_btn.setEnabled(has_owner and has_modifier)
+        has_selection = False
+        if has_owner:
+            owner = self._owners[self._selected_owner_index]
+            rows = self._owner_binding_rows(owner)
+            has_selection = 0 <= self._owner_bind_selected_row < len(rows)
         if self._owner_bind_del_btn is not None and self._owner_bind_table is not None:
-            has_selection = bool(self._owner_bind_table.selectionModel().selectedRows())
+            selected_rows = self._owner_bind_table.selectionModel().selectedRows()
+            if selected_rows:
+                has_selection = True
             self._owner_bind_del_btn.setEnabled(has_owner and has_selection)
+        if self._owner_bind_compact_del_btn is not None:
+            self._owner_bind_compact_del_btn.setEnabled(has_owner and has_selection)
 
     def _handle_bind_modifier(self) -> None:
         if not (0 <= self._selected_owner_index < len(self._owners)):
@@ -2514,10 +2675,13 @@ class HomePage(BasePage):
             if self._is_attachment_target_owner(owner):
                 rows[existing_index]["attachment_target_type"] = attachment_target_type
                 self._set_owner_binding_rows(owner, rows)
+                self._owner_bind_selected_row = existing_index
                 self._refresh_owner_binding_table()
                 self._owner_bind_table.selectRow(existing_index)
                 QMessageBox.information(self, "提示", "该 ModifierId 已绑定，AttachmentTargetType 已更新")
                 return
+            self._owner_bind_selected_row = existing_index
+            self._refresh_owner_binding_table()
             QMessageBox.information(self, "提示", "该 ModifierId 已绑定")
             return
 
@@ -2528,23 +2692,33 @@ class HomePage(BasePage):
             }
         )
         self._set_owner_binding_rows(owner, rows)
+        self._owner_bind_selected_row = len(rows) - 1
         self._refresh_owner_binding_table()
-        self._owner_bind_table.selectRow(self._owner_bind_table.rowCount() - 1)
+        if self._owner_bind_table.rowCount() > 0:
+            self._owner_bind_table.selectRow(self._owner_bind_table.rowCount() - 1)
 
     def _handle_unbind_modifier(self) -> None:
         if self._owner_bind_table is None:
             return
         if not (0 <= self._selected_owner_index < len(self._owners)):
             return
-        selected = self._owner_bind_table.selectionModel().selectedRows()
-        if not selected:
-            return
-        row = selected[0].row()
         owner = self._owners[self._selected_owner_index]
+        row = -1
+        selected = self._owner_bind_table.selectionModel().selectedRows()
+        if selected:
+            row = selected[0].row()
+        elif 0 <= self._owner_bind_selected_row < len(self._owner_binding_rows(owner)):
+            row = self._owner_bind_selected_row
+        if row < 0:
+            return
         rows = self._owner_binding_rows(owner)
         if 0 <= row < len(rows):
             rows.pop(row)
             self._set_owner_binding_rows(owner, rows)
+        if rows:
+            self._owner_bind_selected_row = min(max(row - 1, 0), len(rows) - 1)
+        else:
+            self._owner_bind_selected_row = -1
         self._refresh_owner_binding_table()
 
     # -------------------- Modifier Handlers --------------------
@@ -2657,6 +2831,25 @@ class HomePage(BasePage):
         self._modifier_editor_index = row
         self._set_modifier_editor_enabled(True)
         self._update_owner_bind_buttons()
+
+    def _on_modifier_row_double_clicked(self, item: QTableWidgetItem) -> None:
+        if self._modifier_list is None:
+            return
+        row = item.row()
+        if row < 0 or row >= len(self._modifiers):
+            return
+        self._select_modifier_row(row)
+        if not (0 <= self._selected_owner_index < len(self._owners)):
+            return
+        owner = self._owners[self._selected_owner_index]
+        modifier_id = str(self._modifiers[row].modifier_id or "").strip()
+        if not modifier_id:
+            return
+        existed_before = any(entry.get("modifier_id") == modifier_id for entry in self._owner_binding_rows(owner))
+        self._handle_bind_modifier()
+        existed_after = any(entry.get("modifier_id") == modifier_id for entry in self._owner_binding_rows(owner))
+        if (not existed_before) and existed_after:
+            QApplication.beep()
 
     def _modifier_display_text(self, record: ModifierRecord, index: int) -> str:
         return record.comment.strip() or f"Modifier {index + 1}"
@@ -3402,6 +3595,51 @@ class HomePage(BasePage):
                 self._req_type_combo.setCurrentText(selected)
 
     # -------------------- Requirement set options (placeholder) --------------------
+    def _collect_reqset_picker_rows(self) -> List[tuple[str, str]]:
+        item_ids = {
+            str(r.requirement_set_id or "").strip()
+            for r in self._requirement_sets
+            if str(r.requirement_set_id or "").strip()
+        }
+        item_ids.update({
+            str(m.owner_reqset or "").strip()
+            for m in self._modifiers
+            if str(m.owner_reqset or "").strip()
+        })
+        item_ids.update({
+            str(m.subject_reqset or "").strip()
+            for m in self._modifiers
+            if str(m.subject_reqset or "").strip()
+        })
+        rows: List[tuple[str, str]] = [("", "")]
+        for reqset_id in sorted(item_ids):
+            comment = self._find_reqset_comment(reqset_id)
+            rows.append((comment, reqset_id))
+        rows[1:] = sorted(rows[1:], key=lambda entry: (entry[0] == "", entry[0], entry[1]))
+        return rows
+
+    def _open_reqset_search_dialog(self, target: str) -> None:
+        self._refresh_reqset_options()
+        rows = self._collect_reqset_picker_rows()
+        if target == "owner":
+            current = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
+            title = "选择 OwnerRequirementSetId"
+        else:
+            current = self._subject_reqset_input.text().strip() if self._subject_reqset_input else ""
+            title = "选择 SubjectRequirementSetId"
+        dialog = ReqsetSearchDialog(title, rows, current_value=current, parent=self)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        selected = dialog.selected()
+        if selected is None:
+            return
+        if target == "owner":
+            if self._owner_reqset_input is not None:
+                self._owner_reqset_input.setText(selected)
+        else:
+            if self._subject_reqset_input is not None:
+                self._subject_reqset_input.setText(selected)
+
     def _refresh_reqset_options(self, options: Sequence[str] | None = None) -> None:
         """更新条件集下拉选项。"""
         if self._owner_reqset_menu is None or self._subject_reqset_menu is None:
@@ -4653,6 +4891,7 @@ class HomePage(BasePage):
         modifier_type = self._modifier_type_combo.currentText().strip() if self._modifier_type_combo else ""
         type_fragment = self._extract_modifier_type_fragment(modifier_type)
         param_fragment = self._extract_first_param_fragment()
+        reqset_fragment = self._extract_modifier_reqset_fragment(prefix1, prefix2)
         parts = ["MODIFIER"]
         if prefix1:
             parts.append(prefix1)
@@ -4662,12 +4901,51 @@ class HomePage(BasePage):
             parts.append(type_fragment)
         if param_fragment:
             parts.append(param_fragment)
+        if reqset_fragment:
+            parts.append(reqset_fragment)
         return "_".join(parts)
 
     def _apply_modifier_id_default(self) -> None:
         if self._modifier_id_input is None:
             return
         self._modifier_id_input.setText(self._build_modifier_id_auto())
+        if self._comment_input is not None:
+            self._comment_input.setText(self._build_modifier_comment_auto())
+
+    def _build_modifier_comment_auto(self) -> str:
+        reqset_comment = self._resolve_modifier_reqset_comment()
+        param_comment = self._build_param_comment_from_rows(self._collect_param_rows())
+        return self._join_comment_parts(reqset_comment, param_comment)
+
+    def _resolve_modifier_reqset_comment(self) -> str:
+        owner_id = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
+        subject_id = self._subject_reqset_input.text().strip() if self._subject_reqset_input else ""
+        comments: List[str] = []
+        for reqset_id in (owner_id, subject_id):
+            if not reqset_id:
+                continue
+            comment = self._find_reqset_comment(reqset_id)
+            if comment and comment not in comments:
+                comments.append(comment)
+        return " ".join(comments)
+
+    def _find_reqset_comment(self, reqset_id: str) -> str:
+        target = str(reqset_id or "").strip()
+        if not target:
+            return ""
+        for record in self._requirement_sets:
+            rid = str(getattr(record, "requirement_set_id", "") or "").strip()
+            if rid == target:
+                return str(getattr(record, "comment", "") or "").strip()
+        return ""
+
+    def _extract_modifier_reqset_fragment(self, prefix1: str, prefix2: str) -> str:
+        owner_id = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
+        subject_id = self._subject_reqset_input.text().strip() if self._subject_reqset_input else ""
+        reqset_id = owner_id or subject_id
+        if not reqset_id:
+            return ""
+        return self._reqset_suffix_fragment(reqset_id, prefix1, prefix2)
 
     def _extract_modifier_type_fragment(self, modifier_type: str) -> str:
         if not modifier_type:
@@ -4752,6 +5030,93 @@ class HomePage(BasePage):
         if not dec_part:
             return int_part
         return f"{int_part}{dec_part}"
+
+    def _signed_amount_text(self, value: object | None) -> str:
+        raw = self._extract_param_value(value)
+        if isinstance(raw, bool) or raw is None:
+            return ""
+        try:
+            number = float(str(raw).strip())
+        except (TypeError, ValueError):
+            return ""
+        normalized = self._normalize_numeric_text(str(number))
+        if not normalized:
+            return ""
+        if normalized.startswith("-"):
+            return normalized
+        return f"+{normalized}"
+
+    def _display_text_from_value(self, value: object | None) -> str:
+        if isinstance(value, dict):
+            display = value.get("display")
+            if isinstance(display, str) and display.strip():
+                return display.strip()
+        raw = self._extract_param_value(value)
+        if isinstance(raw, str):
+            text = raw.strip()
+            if not text:
+                return ""
+            if re.fullmatch(r"-?\d+(\.\d+)?", text):
+                return ""
+            return text
+        return ""
+
+    def _parameter_desc_text(self, name: str, value: object | None) -> str:
+        display = self._display_text_from_value(value)
+        if display:
+            return display
+        return self._humanize_param_name(name)
+
+    def _humanize_param_name(self, name: str) -> str:
+        text = str(name or "").strip()
+        if not text:
+            return ""
+        parts = re.findall(r"[A-Z]+(?=[A-Z][a-z]|\d|$)|[A-Z]?[a-z]+|\d+", text)
+        if not parts:
+            return text
+        return " ".join(parts)
+
+    def _build_param_comment_from_rows(self, rows: List[Dict[str, object]]) -> str:
+        amount_text = ""
+        desc_text = ""
+        for param in rows:
+            name = str(param.get("name", "") or "").strip()
+            if not name:
+                continue
+            value = param.get("value")
+            if name.lower() == "amount":
+                amount_text = self._signed_amount_text(value)
+                continue
+            if not desc_text:
+                desc_text = self._parameter_desc_text(name, value)
+        if not desc_text:
+            desc_text = "参数"
+        if amount_text:
+            return f"{amount_text} {desc_text}".strip()
+        return desc_text
+
+    def _join_comment_parts(self, left: str, right: str) -> str:
+        parts = [str(left or "").strip(), str(right or "").strip()]
+        return " ".join(part for part in parts if part)
+
+    def _reqset_suffix_fragment(self, reqset_id: str, prefix1: str, prefix2: str) -> str:
+        text = str(reqset_id or "").strip().upper()
+        if not text:
+            return ""
+        if text.startswith("REQSET_"):
+            text = text[7:]
+        parts = [p for p in text.split("_") if p]
+        idx = 0
+        p1 = str(prefix1 or "").strip().upper()
+        p2 = str(prefix2 or "").strip().upper()
+        if p1 and idx < len(parts) and parts[idx] == p1:
+            idx += 1
+        if p2 and idx < len(parts) and parts[idx] == p2:
+            idx += 1
+        remain = parts[idx:] if idx < len(parts) else parts
+        if remain:
+            return "_".join(remain)
+        return self._last_non_numeric_segment(text)
 
     def _extract_param_value(self, value: object | None) -> object | None:
         if isinstance(value, dict):
@@ -4844,6 +5209,11 @@ class HomePage(BasePage):
         if self._req_id_input is None:
             return
         self._req_id_input.setText(self._build_requirement_id_auto())
+        if self._req_comment_input is not None:
+            self._req_comment_input.setText(self._build_requirement_comment_auto())
+
+    def _build_requirement_comment_auto(self) -> str:
+        return self._build_param_comment_from_rows(self._collect_req_param_rows())
 
     def _extract_requirement_type_fragment(self, requirement_type: str) -> str:
         if not requirement_type:

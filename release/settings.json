@@ -1,0 +1,15 @@
+{
+  "game_db_path": "C:/Users/24948/AppData/Local/Firaxis Games/Sid Meier's Civilization VI/Cache/DebugGameplay.sqlite",
+  "base_text_source_db_path": "C:/Users/24948/AppData/Local/Firaxis Games/Sid Meier's Civilization VI/Cache/DebugLocalization.sqlite",
+  "text_databases": [
+    {
+      "name": "local_text",
+      "path": "local_text.sqlite"
+    },
+    {
+      "name": "local_text_New",
+      "path": "local_text_New.sqlite"
+    }
+  ],
+  "active_text_db_path": "local_text_New.sqlite"
+}

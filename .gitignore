@@ -4,7 +4,11 @@ ModifiersTool/logs/
 logs/
 *.log
 *.CIV
-
+ai_*
+outputs/
+tools/
+.*/
+*.txt
 
 # Build artifacts
 build/
@@ -13,3 +17,7 @@ build/
 # Python caches
 __pycache__/
 *.pyc
+
+# Local research artifacts (not for git)
+local_db_queries/
+local_notes/

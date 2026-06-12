@@ -9,6 +9,7 @@ outputs/
 tools/
 .*/
 *.txt
+CLAUDE.md
 
 # Build artifacts
 build/

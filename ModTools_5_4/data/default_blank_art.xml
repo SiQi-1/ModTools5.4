@@ -204,6 +204,7 @@
       </relativeArtDefPaths>
       <libraryDependencies>
         <Element text="Water"/>
+        <Element text="SkyBoxTexture"/>
       </libraryDependencies>
       <loadsLibraries>true</loadsLibraries>
     </Element>
@@ -216,21 +217,15 @@
       </libraryDependencies>
       <loadsLibraries>true</loadsLibraries>
     </Element>
-    <Element>
-      <consumerName text="ScreenWashEffects"/>
-      <relativeArtDefPaths>
-      </relativeArtDefPaths>
-      <libraryDependencies>
-        <Element text="ColorKey"/>
-      </libraryDependencies>
-      <loadsLibraries>true</loadsLibraries>
-    </Element>
+
     <Element>
       <consumerName text="Camera"/>
       <relativeArtDefPaths>
       </relativeArtDefPaths>
-      <libraryDependencies/>
-      <loadsLibraries>false</loadsLibraries>
+      <libraryDependencies>
+        <Element text="CameraAnimation"/>
+      </libraryDependencies>
+      <loadsLibraries>true</loadsLibraries>
     </Element>
     <Element>
       <consumerName text="Terrains"/>
@@ -272,6 +267,14 @@
       <relativeArtDefPaths>
       </relativeArtDefPaths>
       <libraryDependencies/>
+      <loadsLibraries>false</loadsLibraries>
+    </Element>
+    <Element>
+      <consumerName text="IconManager"/>
+      <relativeArtDefPaths>
+      </relativeArtDefPaths>
+      <libraryDependencies>
+      </libraryDependencies>
       <loadsLibraries>false</loadsLibraries>
     </Element>
     <Element>
@@ -412,6 +415,11 @@
     </Element>
   </artConsumers>
   <gameLibraries>
+    <Element>
+      <libraryName text="CameraAnimation"/>
+      <relativePackagePaths>
+      </relativePackagePaths>
+    </Element>
     <Element>
       <libraryName text="CityBuildings"/>
       <relativePackagePaths>

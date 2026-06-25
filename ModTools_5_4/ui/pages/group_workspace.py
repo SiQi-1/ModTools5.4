@@ -47,7 +47,7 @@ from ...app.settings_store import load_settings
 from ...db.interface import get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
 from ..ui_widget_kit import IconTokenTextEdit, NewlineTokenTextEdit, build_template_widget
-from .entity_table_form import BeliefCompositeEditor, BuildingCompositeEditor, DistrictCompositeEditor, ImprovementCompositeEditor, PolicyCompositeEditor, ProjectCompositeEditor, UnitCompositeEditor
+from .entity_table_form import AgendaCompositeEditor, BeliefCompositeEditor, BuildingCompositeEditor, DistrictCompositeEditor, ImprovementCompositeEditor, PolicyCompositeEditor, ProjectCompositeEditor, UnitCompositeEditor
 from .great_people_editor import GreatPeopleCompositeEditor
 
 SECTION_FILE_BASENAME = {
@@ -214,6 +214,94 @@ def _active_game_db_path() -> Path:
     if configured and Path(configured).exists():
         return Path(configured)
     return DEFAULT_GAME_DB
+
+
+def _query_random_agendas() -> list[tuple[str, str]]:
+    """Return (AgendaType, display_name) from RandomAgendas with Chinese names resolved."""
+    gdb = _active_game_db_path()
+    if not gdb.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(gdb))
+        rows = conn.execute(
+            "SELECT ra.AgendaType, a.Name FROM RandomAgendas ra "
+            "LEFT JOIN Agendas a ON ra.AgendaType = a.AgendaType "
+            "ORDER BY ra.AgendaType"
+        ).fetchall()
+        conn.close()
+        result: list[tuple[str, str]] = []
+        for agenda_type, name_tag in rows:
+            chinese_name = resolve_chinese_text_or_unknown(str(name_tag or ""))
+            display = f"{agenda_type}（{chinese_name}）"
+            result.append((str(agenda_type), display))
+        return result
+    except sqlite3.Error:
+        return []
+
+
+def _query_ai_list_types() -> list[str]:
+    """Return distinct System values from AiListTypes table in game DB."""
+    gdb = _active_game_db_path()
+    if not gdb.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(gdb))
+        rows = conn.execute("SELECT DISTINCT System FROM AiLists ORDER BY System").fetchall()
+        conn.close()
+        return [str(r[0]) for r in rows if r[0]]
+    except sqlite3.Error:
+        return []
+
+
+def _query_agenda_reqset_options() -> list[tuple[str, str]]:
+    """Return (SubjectRequirementSetId, display) for all agenda diplomacy ReqSets."""
+    gdb = _active_game_db_path()
+    if not gdb.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(gdb))
+        rows = conn.execute(
+            "SELECT DISTINCT m.SubjectRequirementSetId "
+            "FROM Modifiers m "
+            "WHERE m.ModifierType = 'MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER' "
+            "AND m.SubjectRequirementSetId IS NOT NULL "
+            "ORDER BY m.SubjectRequirementSetId"
+        ).fetchall()
+        conn.close()
+        return [(str(r[0]), str(r[0])) for r in rows]
+    except sqlite3.Error:
+        return []
+
+
+def _resolve_loc_text(tag: str) -> str:
+    """Resolve a LOC tag to Chinese text from the active text database."""
+    if not tag or not tag.strip():
+        return ""
+    from ...db.interface import get_chinese_text_for_tag_or_unknown
+    result = get_chinese_text_for_tag_or_unknown(tag)
+    if result == "未知":
+        # Try base text source database as fallback
+        from ...app.settings_store import load_settings
+        settings = load_settings()
+        base_path = settings.base_text_source_db_path
+        if base_path and Path(base_path).exists():
+            try:
+                conn = sqlite3.connect(str(base_path))
+                row = conn.execute(
+                    "SELECT Text FROM LocalizedText WHERE Tag = ? AND lower(Language) = 'zh_hans_cn' LIMIT 1",
+                    (tag,),
+                ).fetchone()
+                conn.close()
+                if row:
+                    return str(row[0] or "") or tag
+            except sqlite3.Error:
+                pass
+    return result
+
+
+def _query_empty_reqsets() -> list[dict[str, object]]:
+    """Fallback: return empty list for custom reqset provider."""
+    return []
 
 
 def _active_text_db_path() -> Path | None:
@@ -3493,6 +3581,7 @@ class SectionItemWorkspacePanel(QWidget):
         on_item_changed: Callable[[str, int, dict[str, object]], None],
         on_duplicate_item: Callable[[str, int, dict[str, object]], None] | None = None,
         on_delete_item: Callable[[str, int], None] | None = None,
+        custom_reqsets_provider: Callable[[], list[dict[str, object]]] | None = None,
     ) -> None:
         super().__init__()
         self.setObjectName("sectionItemWorkspacePanel")
@@ -3619,6 +3708,23 @@ class SectionItemWorkspacePanel(QWidget):
         )
         self._great_people_editor.dataChanged.connect(self._handle_great_people_changed)
 
+        self._agenda_editor = AgendaCompositeEditor(
+            shared_params_provider=shared_params_provider,
+            type_builder=lambda shared, head, midfix_code, short_name: _build_entity_type(
+                shared,
+                head=head,
+                midfix_code=midfix_code,
+                short_name=short_name,
+            ),
+            image_widget_factory=lambda size, enable_circle: _ImageSlotWidget(size, enable_circle_crop=enable_circle),
+            leader_entries_provider=lambda: list(self._bindable_entries_provider("领袖")),
+            random_agendas_provider=_query_random_agendas,
+            ai_list_types_provider=_query_ai_list_types,
+            custom_reqset_provider=custom_reqsets_provider or _query_empty_reqsets,
+            text_search_provider=_resolve_loc_text,
+        )
+        self._agenda_editor.dataChanged.connect(self._handle_agenda_changed)
+
         self._placeholder_page = self._wrap_main_scroll(self._placeholder)
         self._civilization_page = self._wrap_main_scroll(self._civilization_editor)
         self._leader_page = self._wrap_main_scroll(self._leader_editor)
@@ -3631,6 +3737,7 @@ class SectionItemWorkspacePanel(QWidget):
         self._project_page = self._wrap_main_scroll(self._project_editor)
         self._governor_page = self._wrap_main_scroll(self._governor_editor)
         self._great_people_page = self._wrap_main_scroll(self._great_people_editor)
+        self._agenda_page = self._wrap_main_scroll(self._agenda_editor)
 
         self._stack.addWidget(self._placeholder_page)
         self._stack.addWidget(self._civilization_page)
@@ -3644,6 +3751,7 @@ class SectionItemWorkspacePanel(QWidget):
         self._stack.addWidget(self._project_page)
         self._stack.addWidget(self._governor_page)
         self._stack.addWidget(self._great_people_page)
+        self._stack.addWidget(self._agenda_page)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -3703,6 +3811,9 @@ class SectionItemWorkspacePanel(QWidget):
         elif section == "伟人":
             self._great_people_editor.set_entry(entry, fallback_name=fallback_name)
             self._stack.setCurrentWidget(self._great_people_page)
+        elif section == "议程":
+            self._agenda_editor.set_entry(entry, fallback_name=fallback_name)
+            self._stack.setCurrentWidget(self._agenda_page)
         else:
             self._placeholder.setText(f"{section} 子条目编辑器待接入。\n已保留统一框架与预览逻辑。")
             self._stack.setCurrentWidget(self._placeholder_page)
@@ -3743,6 +3854,10 @@ class SectionItemWorkspacePanel(QWidget):
             return
         if self._section == "伟人" and self._index >= 0:
             self._on_item_changed(self._section, self._index, self._great_people_editor.export_entry())
+            return
+        if self._section == "议程" and self._index >= 0:
+            self._on_item_changed(self._section, self._index, self._agenda_editor.export_entry())
+            return
 
     def _handle_civilization_changed(self) -> None:
         if self._loading:
@@ -3848,6 +3963,14 @@ class SectionItemWorkspacePanel(QWidget):
         if self._section != "伟人" or self._index < 0:
             return
         payload = self._great_people_editor.export_entry()
+        self._on_item_changed(self._section, self._index, payload)
+
+    def _handle_agenda_changed(self) -> None:
+        if self._loading:
+            return
+        if self._section != "议程" or self._index < 0:
+            return
+        payload = self._agenda_editor.export_entry()
         self._on_item_changed(self._section, self._index, payload)
 
     def _handle_delete_current(self) -> None:

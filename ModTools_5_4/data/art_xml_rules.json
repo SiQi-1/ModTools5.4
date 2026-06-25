@@ -30,10 +30,10 @@
   },
   "libraries": {
     "LeaderFallback": ["LeaderFallbacks"],
-    "UITexture": ["Shell_Loading", "UI_LeaderScenes", "UI_PrideMoments", "UILeaders"],
-    "UILensAsset": ["UILensModels"],
-    "StrategicView_Sprite": ["StrategicView_UILenses"],
-    "LeaderLighting": ["Leader_LightRigs"],
+    "UITexture": [],
+    "UILensAsset": ["UILensAssets"],
+    "StrategicView_Sprite": ["strategicview/strategicview_uilenses"],
+    "LeaderLighting": [],
     "Leader": ["leader_jasperkitty"]
   }
 }

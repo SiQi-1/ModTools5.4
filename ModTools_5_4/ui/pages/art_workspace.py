@@ -2024,10 +2024,27 @@ class ArtWorkspacePanel(QWidget):
                 continue
             required_ids.append({"name": n, "id": i})
 
+        raw_details = data.get("consumer_details") if isinstance(data.get("consumer_details"), dict) else {}
+        consumer_details: dict[str, dict[str, object]] = {}
+        for cname, detail in raw_details.items():
+            key = str(cname or "").strip()
+            if not key or not isinstance(detail, dict):
+                continue
+            raw_deps = detail.get("libraryDependencies") if isinstance(detail.get("libraryDependencies"), list) else []
+            deps = self._dedupe_preserve_order([str(d or "") for d in raw_deps if str(d or "").strip()])
+            loads = str(detail.get("loadsLibraries") or "").strip().lower()
+            if loads not in {"true", "false"}:
+                loads = ""
+            consumer_details[key] = {
+                "libraryDependencies": deps,
+                "loadsLibraries": loads,
+            }
+
         return {
             "art_consumers": consumers,
             "libraries": libraries,
             "required_game_art_ids": required_ids,
+            "consumer_details": consumer_details,
         }
 
     def _merge_art_xml_configs(self, primary: object, secondary: object) -> dict[str, object]:
@@ -2068,10 +2085,32 @@ class ArtWorkspacePanel(QWidget):
                 seen_required.add(key)
                 required.append({"name": name, "id": rid})
 
+        merged_details: dict[str, dict[str, object]] = {}
+        first_details = first.get("consumer_details") if isinstance(first.get("consumer_details"), dict) else {}
+        second_details = second.get("consumer_details") if isinstance(second.get("consumer_details"), dict) else {}
+        all_detail_names = set(first_details.keys()) | set(second_details.keys())
+        for cname in all_detail_names:
+            fd = first_details.get(cname) if isinstance(first_details.get(cname), dict) else {}
+            sd = second_details.get(cname) if isinstance(second_details.get(cname), dict) else {}
+            deps = sd.get("libraryDependencies") if sd.get("libraryDependencies") else fd.get("libraryDependencies")
+            loads = sd.get("loadsLibraries") if sd.get("loadsLibraries") else fd.get("loadsLibraries")
+            if isinstance(deps, list):
+                deps = self._dedupe_preserve_order([str(d or "") for d in deps if str(d or "").strip()])
+            else:
+                deps = []
+            loads_str = str(loads or "").strip().lower()
+            if loads_str not in {"true", "false"}:
+                loads_str = ""
+            merged_details[cname] = {
+                "libraryDependencies": deps,
+                "loadsLibraries": loads_str,
+            }
+
         return {
             "art_consumers": merged_consumers,
             "libraries": merged_libraries,
             "required_game_art_ids": required,
+            "consumer_details": merged_details,
         }
 
     def _load_art_xml_rules(self) -> dict[str, object]:
@@ -2092,6 +2131,11 @@ class ArtWorkspacePanel(QWidget):
         leader_packages = [row.leader_type.lower() for row in self._selected_leader_xlp_rows() if _safe_text(row.leader_type)]
         existing = libraries.get("Leader") if isinstance(libraries.get("Leader"), list) else []
         libraries["Leader"] = self._dedupe_preserve_order([*existing, *leader_packages])
+
+        # UITexture 包名是项目特定的（如 Siqi_Leaders_0040_dds）
+        ascii_name = re.sub(r"[^A-Za-z0-9_]+", "_", self._output_basename()).strip("_") or "project"
+        libraries["UITexture"] = [f"{ascii_name}_dds"]
+
         return merged
 
     def _default_blank_art_xml_config(self) -> dict[str, object]:
@@ -2212,6 +2256,7 @@ class ArtWorkspacePanel(QWidget):
         consumers: dict[str, list[str]] = {}
         libraries: dict[str, list[str]] = {}
         required_ids: list[dict[str, str]] = []
+        consumer_details: dict[str, dict[str, object]] = {}
 
         art_consumers = root.find("artConsumers")
         if art_consumers is not None:
@@ -2228,6 +2273,22 @@ class ArtWorkspacePanel(QWidget):
                         if text:
                             paths.append(text)
                 consumers[name] = self._dedupe_preserve_order(paths)
+
+                deps: list[str] = []
+                lib_deps = elem.find("libraryDependencies")
+                if lib_deps is not None:
+                    for d in lib_deps.findall("Element"):
+                        text = str(d.attrib.get("text") or "").strip()
+                        if text:
+                            deps.append(text)
+                loads_node = elem.find("loadsLibraries")
+                loads_text = (loads_node.text or "").strip().lower() if loads_node is not None else ""
+                if loads_text not in {"true", "false"}:
+                    loads_text = ""
+                consumer_details[name] = {
+                    "libraryDependencies": self._dedupe_preserve_order(deps),
+                    "loadsLibraries": loads_text,
+                }
 
         game_libraries = root.find("gameLibraries")
         if game_libraries is not None:
@@ -2261,6 +2322,7 @@ class ArtWorkspacePanel(QWidget):
                 "art_consumers": consumers,
                 "libraries": libraries,
                 "required_game_art_ids": required_ids,
+                "consumer_details": consumer_details,
             }
         )
 
@@ -2360,23 +2422,50 @@ class ArtWorkspacePanel(QWidget):
     def _discover_available_xlp_packages(self) -> set[str]:
         packages: set[str] = set()
 
-        for filename, _content in self._build_xlp_files():
-            text = str(filename or "").strip()
-            if not text:
-                continue
-            stem = Path(text).stem.strip().lower()
-            if stem:
-                packages.add(stem)
+        for filename, content in self._build_xlp_files():
+            name = self._extract_xlp_package_name(content)
+            if name:
+                packages.add(name.strip().lower())
+            elif filename:
+                stem = Path(str(filename or "").strip()).stem.strip().lower()
+                if stem:
+                    packages.add(stem)
+
+        # 项目特定的 UITexture 包名（如 Siqi_Leaders_0040_dds），
+        # 在预览模式下 _build_xlp_files 里只有占位名 UI_Icons_dds。
+        base_name = self._output_basename()
+        if base_name:
+            ascii_name = re.sub(r"[^A-Za-z0-9_]+", "_", base_name).strip("_") or "project"
+            packages.add(f"{ascii_name}_dds".lower())
 
         civ6proj = self._current_civ6proj_path()
         if isinstance(civ6proj, Path) and civ6proj.exists():
             parent = civ6proj.parent
             for pattern in ("*.xlp", "XLPs/*.xlp"):
                 for path in parent.glob(pattern):
+                    try:
+                        content = path.read_text(encoding="utf-8")
+                        name = self._extract_xlp_package_name(content)
+                        if name:
+                            packages.add(name.strip().lower())
+                            continue
+                    except Exception:
+                        pass
                     stem = str(path.stem or "").strip().lower()
                     if stem:
                         packages.add(stem)
         return packages
+
+    @staticmethod
+    def _extract_xlp_package_name(xlp_content: str) -> str:
+        try:
+            root = ET.fromstring(xlp_content)
+            node = root.find("m_PackageName")
+            if node is not None:
+                return (node.attrib.get("text") or node.text or "").strip()
+        except Exception:
+            pass
+        return ""
 
     def _build_art_xml_xml(self) -> str:
         merged = self._merged_art_xml_config()
@@ -2418,6 +2507,7 @@ class ArtWorkspacePanel(QWidget):
             if name:
                 existing_consumers[name] = elem
 
+        consumer_details = merged.get("consumer_details") if isinstance(merged.get("consumer_details"), dict) else {}
         all_consumer_names = list(existing_consumers.keys()) + [
             key for key in consumers_map.keys() if key not in existing_consumers
         ]
@@ -2452,6 +2542,22 @@ class ArtWorkspacePanel(QWidget):
                 rel_paths.remove(child)
             for text in final_paths:
                 ET.SubElement(rel_paths, "Element", {"text": text})
+
+            detail = consumer_details.get(consumer_name) if isinstance(consumer_details.get(consumer_name), dict) else {}
+            configured_deps = detail.get("libraryDependencies") if isinstance(detail.get("libraryDependencies"), list) else []
+            configured_loads = str(detail.get("loadsLibraries") or "").strip().lower()
+            if configured_deps or configured_loads in {"true", "false"}:
+                lib_deps_elem = elem.find("libraryDependencies")
+                if lib_deps_elem is not None:
+                    for child in list(lib_deps_elem):
+                        lib_deps_elem.remove(child)
+                    for dep in configured_deps:
+                        text = str(dep or "").strip()
+                        if text:
+                            ET.SubElement(lib_deps_elem, "Element", {"text": text})
+                loads_elem = elem.find("loadsLibraries")
+                if loads_elem is not None and configured_loads in {"true", "false"}:
+                    loads_elem.text = configured_loads
 
         game_libraries = root.find("gameLibraries")
         if game_libraries is None:

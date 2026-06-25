@@ -29,6 +29,7 @@ from PyQt6.QtWidgets import (
     QDialogButtonBox,
     QDoubleSpinBox,
     QFormLayout,
+    QFrame,
     QGridLayout,
     QGroupBox,
     QHeaderView,
@@ -42,7 +43,10 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSpinBox,
+    QSplitter,
+    QStackedWidget,
     QTableWidget,
+    QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -863,6 +867,27 @@ PROJECT_TEMPLATE_MAPPING: dict[str, str] = {
 BELIEF_TEMPLATE_MAPPING: dict[str, str] = {
     "BeliefClassType": "belief_class",
 }
+
+def build_agendas_main_schema() -> MainTableSchema:
+    fields: list[TableFieldSpec] = [
+        TableFieldSpec("Name", "议程名字（中文）", "text", "basic", "", chinese_input=True),
+        TableFieldSpec("Description", "议程描述（中文）", "text", "basic", "", chinese_input=True, tokenized_multiline=True),
+    ]
+
+    return MainTableSchema(
+        table_name="Agendas",
+        head="AGENDA",
+        midfix_code="A",
+        abbr_key="abbr",
+        type_key="AgendaType",
+        name_key="Name",
+        description_key="Description",
+        icon_size=(256, 256),
+        fields=fields,
+        linked_groups=[],
+        has_images=False,
+        top_basic_visual_limit=16,
+    )
 
 
 def build_districts_main_schema() -> MainTableSchema:
@@ -5436,6 +5461,1610 @@ class BeliefCompositeEditor(QWidget):
     def _request_duplicate(self) -> None:
         payload = self.export_entry()
         self.duplicateRequested.emit(payload)
+
+    def _emit_data_changed(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
+
+class _ReqSetSearchDialog(QDialog):
+    """搜索 SubjectRequirementSetId：数据库模式 / 自建模式，三列显示，双击选中。"""
+
+    reqsetSelected = pyqtSignal(str, object)  # reqset_id, imported_args (dict) or None for self-built
+
+    def __init__(
+        self,
+        text_search_provider: Callable[[str], str],
+        custom_reqset_provider: Callable[[], list[dict[str, object]]],
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("选择 SubjectRequirementSetId")
+        self.resize(780, 520)
+
+        self._text_search_provider = text_search_provider
+        self._custom_reqset_provider = custom_reqset_provider
+        self._db_rows: list[tuple[str, str, str, dict[str, object]]] = []  # (rsid, desc_text, stmt_text, args)
+        self._custom_rows: list[dict[str, object]] = []
+        self._mode = "db"  # "db" or "custom"
+
+        layout = QVBoxLayout(self)
+
+        # Search bar
+        search_row = QHBoxLayout()
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("搜索条件集ID…")
+        self._search_edit.textChanged.connect(self._on_search)
+        search_row.addWidget(self._search_edit, 1)
+        layout.addLayout(search_row)
+
+        # Mode toggles
+        toggle_row = QHBoxLayout()
+        self._db_check = QCheckBox("仅数据库")
+        self._db_check.setChecked(True)
+        self._db_check.toggled.connect(self._on_mode_changed)
+        toggle_row.addWidget(self._db_check)
+        self._custom_check = QCheckBox("仅自建")
+        self._custom_check.toggled.connect(self._on_mode_changed)
+        toggle_row.addWidget(self._custom_check)
+        toggle_row.addStretch(1)
+        layout.addLayout(toggle_row)
+
+        # Table
+        self._table = QTableWidget(0, 3)
+        self._table.setHorizontalHeaderLabels(["条件集ID", "描述文本", "台词文本"])
+        self._table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
+        self._table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self._table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        self._table.verticalHeader().setVisible(False)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.cellDoubleClicked.connect(self._on_double_click)
+        layout.addWidget(self._table, 1)
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        btn_row.addStretch(1)
+        cancel_btn = QPushButton("取消")
+        cancel_btn.clicked.connect(self.reject)
+        btn_row.addWidget(cancel_btn)
+        select_btn = QPushButton("选择")
+        select_btn.clicked.connect(self._on_select)
+        btn_row.addWidget(select_btn)
+        layout.addLayout(btn_row)
+
+        # Load data
+        self._load_db_data()
+        self._load_custom_data()
+        self._populate_table()
+
+    def _load_db_data(self) -> None:
+        from ...app.settings_store import load_settings
+        settings = load_settings()
+        gdb = settings.game_db_path
+        if not gdb or not Path(gdb).exists():
+            return
+        try:
+            conn = sqlite3.connect(str(gdb))
+            # For each unique SubjectRequirementSetId, get the first Modifier's description/statement
+            rows = conn.execute(
+                "SELECT m.SubjectRequirementSetId, m.ModifierId FROM Modifiers m "
+                "WHERE m.ModifierType = 'MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER' "
+                "AND m.SubjectRequirementSetId IS NOT NULL "
+                "ORDER BY m.SubjectRequirementSetId"
+            ).fetchall()
+            # Group by SubjectRequirementSetId, keep first ModifierId
+            seen: set[str] = set()
+            first_mod: dict[str, str] = {}
+            for rsid, mod_id in rows:
+                rs = str(rsid)
+                if rs not in seen:
+                    seen.add(rs)
+                    first_mod[rs] = str(mod_id)
+
+            # Get arguments for each first modifier
+            for rsid, mod_id in first_mod.items():
+                args_rows = conn.execute(
+                    "SELECT Name, Value FROM ModifierArguments WHERE ModifierId = ?", (mod_id,)
+                ).fetchall()
+                args: dict[str, object] = {}
+                desc_tag = ""
+                stmt_tag = ""
+                for name, value in args_rows:
+                    n = str(name)
+                    v = str(value or "")
+                    args[n] = v
+                    if n == "SimpleModifierDescription":
+                        desc_tag = v
+                    elif n == "StatementKey":
+                        stmt_tag = v
+                desc_text = self._text_search_provider(desc_tag) if desc_tag else ""
+                stmt_text = self._text_search_provider(stmt_tag) if stmt_tag else ""
+                self._db_rows.append((rsid, desc_text, stmt_text, args))
+            conn.close()
+        except sqlite3.Error:
+            pass
+
+    def _load_custom_data(self) -> None:
+        self._custom_rows = self._custom_reqset_provider() if callable(self._custom_reqset_provider) else []
+
+    def _on_mode_changed(self) -> None:
+        if self._db_check.isChecked() and self._custom_check.isChecked():
+            # Both checked — not allowed, reset
+            if self._mode == "custom":
+                self._custom_check.setChecked(False)
+                self._mode = "db"
+            else:
+                self._db_check.setChecked(False)
+                self._mode = "custom"
+        elif self._db_check.isChecked():
+            self._mode = "db"
+        elif self._custom_check.isChecked():
+            self._mode = "custom"
+        else:
+            # Neither checked — keep current
+            if self._mode == "db":
+                self._db_check.setChecked(True)
+            else:
+                self._custom_check.setChecked(True)
+        self._populate_table()
+
+    def _on_search(self, _text: str) -> None:
+        self._populate_table()
+
+    def _populate_table(self) -> None:
+        keyword = self._search_edit.text().strip().lower()
+        self._table.setRowCount(0)
+
+        if self._mode == "db":
+            self._table.setHorizontalHeaderLabels(["条件集ID", "描述文本", "台词文本"])
+            rows_to_show = self._db_rows
+        else:
+            self._table.setHorizontalHeaderLabels(["条件集ID", "条件集注释", "条件注释"])
+            rows_to_show = []  # type: ignore[assignment]
+
+        if self._mode == "db":
+            for rsid, desc_text, stmt_text, _args in self._db_rows:
+                if keyword and keyword not in rsid.lower() and keyword not in desc_text:
+                    continue
+                r = self._table.rowCount()
+                self._table.insertRow(r)
+                self._table.setItem(r, 0, QTableWidgetItem(rsid))
+                self._table.setItem(r, 1, QTableWidgetItem(desc_text))
+                self._table.setItem(r, 2, QTableWidgetItem(stmt_text))
+                self._table.item(r, 0).setData(Qt.ItemDataRole.UserRole, rsid)
+        else:
+            for entry in self._custom_rows:
+                if not isinstance(entry, dict):
+                    continue
+                rsid = str(entry.get("requirement_set_id") or entry.get("RequirementSetId") or "").strip()
+                if not rsid:
+                    continue
+                if keyword and keyword not in rsid.lower():
+                    continue
+                comment = str(entry.get("comment") or "")
+                # Requirement comments: comma-joined
+                reqs = entry.get("bound_requirements") or entry.get("requirements") or []
+                req_comments: list[str] = []
+                if isinstance(reqs, list):
+                    for req in reqs:
+                        if isinstance(req, dict):
+                            rc = str(req.get("comment") or "")
+                            if rc:
+                                req_comments.append(rc)
+                req_comment_str = ", ".join(req_comments) if req_comments else ""
+                r = self._table.rowCount()
+                self._table.insertRow(r)
+                self._table.setItem(r, 0, QTableWidgetItem(rsid))
+                self._table.setItem(r, 1, QTableWidgetItem(comment))
+                self._table.setItem(r, 2, QTableWidgetItem(req_comment_str))
+                self._table.item(r, 0).setData(Qt.ItemDataRole.UserRole, rsid)
+
+    def _on_double_click(self, row: int, _col: int) -> None:
+        item = self._table.item(row, 0)
+        if item is None:
+            return
+        rsid = item.data(Qt.ItemDataRole.UserRole)
+        if not rsid:
+            return
+        if self._mode == "db":
+            # Find the args for this rsid
+            for _rsid, _desc, _stmt, args in self._db_rows:
+                if _rsid == rsid:
+                    self.reqsetSelected.emit(str(rsid), dict(args))
+                    break
+        else:
+            self.reqsetSelected.emit(str(rsid), None)
+        self.accept()
+
+    def _on_select(self) -> None:
+        row = self._table.currentRow()
+        if row >= 0:
+            self._on_double_click(row, 0)
+
+
+class AgendaModifierEditor(QWidget):
+    """单个议程 Modifier 编辑器（无外框，由列表容器管理删除）。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(
+        self,
+        text_search_provider: Callable[[str], str],
+        custom_reqset_provider: Callable[[], list[dict[str, object]]],
+    ) -> None:
+        super().__init__()
+        self._loading = False
+        self._agenda_type = ""
+        self._prefix = ""
+        self._leader_name = ""
+        self._text_search_provider = text_search_provider
+        self._custom_reqset_provider = custom_reqset_provider
+        self._imported_desc_ref = ""
+        self._imported_stmt_ref = ""
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+
+        # SubjectRequirementSetId — button + display
+        rs_row = QHBoxLayout()
+        rs_row.addWidget(QLabel("SubjectRequirementSetId"))
+        self._reqset_display = QLineEdit()
+        self._reqset_display.setReadOnly(True)
+        self._reqset_display.setPlaceholderText("点击右侧按钮选择条件集…")
+        rs_row.addWidget(self._reqset_display, 1)
+        self._select_reqset_btn = QPushButton("选择条件集")
+        self._select_reqset_btn.clicked.connect(self._open_search_dialog)
+        rs_row.addWidget(self._select_reqset_btn)
+        layout.addLayout(rs_row)
+
+        # ModifierId + auto-name button
+        mod_id_row = QHBoxLayout()
+        mod_id_row.addWidget(QLabel("ModifierId"))
+        self._modifier_id_edit = QLineEdit()
+        self._modifier_id_edit.textChanged.connect(self._on_modifier_id_changed)
+        mod_id_row.addWidget(self._modifier_id_edit, 1)
+        self._auto_name_btn = QPushButton("自动命名")
+        self._auto_name_btn.clicked.connect(self._auto_name)
+        mod_id_row.addWidget(self._auto_name_btn)
+        layout.addLayout(mod_id_row)
+
+        # Numeric args grid
+        num_grid = QGridLayout()
+        num_grid.setHorizontalSpacing(8)
+
+        num_grid.addWidget(QLabel("InitialValue"), 0, 0)
+        self._initial_value = QSpinBox()
+        self._initial_value.setRange(-999, 999)
+        self._initial_value.setValue(0)
+        self._initial_value.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._initial_value, 0, 1)
+
+        num_grid.addWidget(QLabel("MaxValue"), 0, 2)
+        self._max_value = QSpinBox()
+        self._max_value.setRange(-999, 999)
+        self._max_value.setSpecialValueText("无限制")
+        self._max_value.setValue(0)
+        self._max_value.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._max_value, 0, 3)
+
+        num_grid.addWidget(QLabel("IncrementTurns"), 1, 0)
+        self._increment_turns = QSpinBox()
+        self._increment_turns.setRange(0, 999)
+        self._increment_turns.setValue(0)
+        self._increment_turns.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._increment_turns, 1, 1)
+
+        num_grid.addWidget(QLabel("IncrementValue"), 1, 2)
+        self._increment_value = QSpinBox()
+        self._increment_value.setRange(-999, 999)
+        self._increment_value.setValue(0)
+        self._increment_value.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._increment_value, 1, 3)
+
+        num_grid.addWidget(QLabel("ReductionTurns"), 2, 0)
+        self._reduction_turns = QSpinBox()
+        self._reduction_turns.setRange(0, 999)
+        self._reduction_turns.setValue(0)
+        self._reduction_turns.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._reduction_turns, 2, 1)
+
+        num_grid.addWidget(QLabel("ReductionValue"), 2, 2)
+        self._reduction_value = QSpinBox()
+        self._reduction_value.setRange(-999, 999)
+        self._reduction_value.setValue(0)
+        self._reduction_value.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._reduction_value, 2, 3)
+
+        num_grid.addWidget(QLabel("MessageThrottle"), 3, 0)
+        self._message_throttle = QSpinBox()
+        self._message_throttle.setRange(0, 999)
+        self._message_throttle.setValue(20)
+        self._message_throttle.valueChanged.connect(lambda _: self._notify_change())
+        num_grid.addWidget(self._message_throttle, 3, 1)
+        layout.addLayout(num_grid)
+
+        # HiddenAgenda checkbox
+        self._hidden_agenda = QCheckBox("HiddenAgenda（隐藏议程，触发后可见）")
+        self._hidden_agenda.toggled.connect(self._on_hidden_toggled)
+        layout.addWidget(self._hidden_agenda)
+
+        # SimpleModifierDescription: Chinese text + auto LOC tag + reference
+        layout.addWidget(QLabel("SimpleModifierDescription（中文描述）"))
+        self._simple_desc_text = QLineEdit()
+        self._simple_desc_text.setPlaceholderText("输入中文描述…")
+        self._simple_desc_text.textChanged.connect(lambda _: self._notify_change())
+        layout.addWidget(self._simple_desc_text)
+        loc_row1 = QHBoxLayout()
+        loc_row1.addWidget(QLabel("LOC Tag:"))
+        self._simple_desc_loc = QLineEdit()
+        self._simple_desc_loc.setReadOnly(True)
+        loc_row1.addWidget(self._simple_desc_loc, 1)
+        layout.addLayout(loc_row1)
+        self._simple_desc_ref = QLabel("")
+        self._simple_desc_ref.setObjectName("pageInfoLabel")
+        self._simple_desc_ref.setWordWrap(True)
+        layout.addWidget(self._simple_desc_ref)
+
+        # StatementKey: Chinese text + auto LOC tag + reference
+        self._stmt_group = QVBoxLayout()
+        stmt_label = QLabel("StatementKey 台词（中文文本）")
+        self._stmt_group.addWidget(stmt_label)
+        self._statement_text = QLineEdit()
+        self._statement_text.setPlaceholderText("输入外交台词…")
+        self._statement_text.textChanged.connect(lambda _: self._notify_change())
+        self._stmt_group.addWidget(self._statement_text)
+        loc_row2 = QHBoxLayout()
+        loc_row2.addWidget(QLabel("LOC Tag:"))
+        self._statement_loc = QLineEdit()
+        self._statement_loc.setReadOnly(True)
+        loc_row2.addWidget(self._statement_loc, 1)
+        self._stmt_group.addLayout(loc_row2)
+        self._statement_ref = QLabel("")
+        self._statement_ref.setObjectName("pageInfoLabel")
+        self._statement_ref.setWordWrap(True)
+        self._stmt_group.addWidget(self._statement_ref)
+        layout.addLayout(self._stmt_group)
+
+        layout.addStretch(1)
+
+    # ── help text ──────────────────────────────────────────────────────
+
+    def display_name(self) -> str:
+        mod_id = self._modifier_id_edit.text().strip()
+        if mod_id:
+            return mod_id
+        rsid = self._reqset_display.text().strip()
+        return rsid or "新 Modifier"
+
+    # ── naming helpers ─────────────────────────────────────────────────
+
+    def _reqset_short(self) -> str:
+        txt = self._reqset_display.text().strip()
+        if not txt:
+            return ""
+        for prefix in ("PLAYER_", "PLAYERS_", "AGENDA_REQUIRE_", "STANDARD_DIPLOMATIC_"):
+            if txt.startswith(prefix):
+                return txt[len(prefix):]
+        return txt
+
+    def _gen_modifier_id(self) -> str:
+        short = self._reqset_short()
+        if not self._prefix or not short:
+            return ""
+        return f"MODIFIER_{self._prefix}_{short}"
+
+    def _gen_simple_desc_loc(self) -> str:
+        mod_id = self._modifier_id_edit.text().strip()
+        return f"LOC_{mod_id}_DESCRIPTION" if mod_id else ""
+
+    def _gen_statement_loc(self) -> str:
+        mod_id = self._modifier_id_edit.text().strip()
+        return f"LOC_{mod_id}_STATEMENT" if mod_id else ""
+
+    def _auto_name(self) -> None:
+        mod_id = self._gen_modifier_id()
+        if mod_id:
+            self._modifier_id_edit.setText(mod_id)
+        self._sync_loc_tags()
+
+    def _on_modifier_id_changed(self, _text: str) -> None:
+        self._sync_loc_tags()
+        self._notify_change()
+
+    def _sync_loc_tags(self) -> None:
+        self._simple_desc_loc.setText(self._gen_simple_desc_loc())
+        self._statement_loc.setText(self._gen_statement_loc())
+        self._update_ref_texts()
+
+    # ── search dialog ─────────────────────────────────────────────────
+
+    def _open_search_dialog(self) -> None:
+        dlg = _ReqSetSearchDialog(
+            text_search_provider=self._text_search_provider,
+            custom_reqset_provider=self._custom_reqset_provider,
+            parent=self,
+        )
+        dlg.reqsetSelected.connect(self._on_reqset_selected)
+        dlg.exec()
+
+    def _on_reqset_selected(self, rsid: str, imported_args: object) -> None:
+        self._reqset_display.setText(rsid)
+        if isinstance(imported_args, dict):
+            self._loading = True
+            args = dict(imported_args)
+            def _set_int(spin: QSpinBox, key: str, default: int = 0) -> None:
+                try:
+                    spin.setValue(int(args.get(key, default)))
+                except (TypeError, ValueError):
+                    spin.setValue(default)
+            _set_int(self._initial_value, "InitialValue", 0)
+            _set_int(self._max_value, "MaxValue", 0)
+            _set_int(self._increment_turns, "IncrementTurns", 0)
+            _set_int(self._increment_value, "IncrementValue", 0)
+            _set_int(self._reduction_turns, "ReductionTurns", 0)
+            _set_int(self._reduction_value, "ReductionValue", 0)
+            _set_int(self._message_throttle, "MessageThrottle", 20)
+            self._hidden_agenda.setChecked(args.get("HiddenAgenda", "0") == "1")
+            # Save imported game LOC tag texts as reference
+            imported_desc_tag = str(args.get("SimpleModifierDescription") or "")
+            imported_stmt_tag = str(args.get("StatementKey") or "")
+            self._imported_desc_ref = self._text_search_provider(imported_desc_tag) if imported_desc_tag and callable(self._text_search_provider) else ""
+            self._imported_stmt_ref = self._text_search_provider(imported_stmt_tag) if imported_stmt_tag and callable(self._text_search_provider) else ""
+            self._loading = False
+        if not self._modifier_id_edit.text().strip():
+            self._auto_name()
+        self._notify_change()
+
+    # ── data load / save ──────────────────────────────────────────────
+
+    def set_context(self, agenda_type: str, prefix: str, abbr: str, leader_name: str) -> None:
+        self._agenda_type = _safe_text(agenda_type)
+        self._prefix = _safe_text(prefix)
+        self._leader_name = leader_name
+
+    def set_payload(self, payload: dict[str, object]) -> None:
+        self._loading = True
+        self._modifier_id_edit.setText(str(payload.get("ModifierId") or ""))
+        self._reqset_display.setText(str(payload.get("SubjectRequirementSetId") or ""))
+
+        args = payload.get("Arguments")
+        args_dict: dict[str, object] = dict(args) if isinstance(args, dict) else {}
+
+        def _int_from(key: str, default: int = 0) -> int:
+            try: return int(args_dict.get(key, default))
+            except (TypeError, ValueError): return default
+
+        self._initial_value.setValue(_int_from("InitialValue", 0))
+        self._max_value.setValue(_int_from("MaxValue", 0))
+        self._increment_turns.setValue(_int_from("IncrementTurns", 0))
+        self._increment_value.setValue(_int_from("IncrementValue", 0))
+        self._reduction_turns.setValue(_int_from("ReductionTurns", 0))
+        self._reduction_value.setValue(_int_from("ReductionValue", 0))
+        self._message_throttle.setValue(_int_from("MessageThrottle", 20))
+        self._hidden_agenda.setChecked(_int_from("HiddenAgenda", 0) != 0)
+        self._simple_desc_text.setText(str(args_dict.get("SimpleModifierText", "")))
+        self._statement_text.setText(str(args_dict.get("StatementText", "")))
+        self._imported_desc_ref = str(args_dict.get("_ImportedDescRef", ""))
+        self._imported_stmt_ref = str(args_dict.get("_ImportedStmtRef", ""))
+        self._sync_loc_tags()
+        self._loading = False
+
+    def export_payload(self) -> dict[str, object]:
+        args: dict[str, str] = {}
+        def _add_int(key: str, spin: QSpinBox, skip_zero: bool = True) -> None:
+            val = spin.value()
+            if not skip_zero or val != 0:
+                args[key] = str(val)
+        _add_int("InitialValue", self._initial_value, skip_zero=False)
+        _add_int("MaxValue", self._max_value)
+        _add_int("IncrementTurns", self._increment_turns)
+        _add_int("IncrementValue", self._increment_value)
+        _add_int("ReductionTurns", self._reduction_turns)
+        _add_int("ReductionValue", self._reduction_value)
+        _add_int("MessageThrottle", self._message_throttle)
+        if self._hidden_agenda.isChecked():
+            args["HiddenAgenda"] = "1"
+
+        simple_loc = self._simple_desc_loc.text().strip()
+        stmt_loc = self._statement_loc.text().strip()
+        if simple_loc:
+            args["SimpleModifierDescription"] = simple_loc
+        if stmt_loc:
+            args["StatementKey"] = stmt_loc
+        simple_text = self._simple_desc_text.text().strip()
+        stmt_text = self._statement_text.text().strip()
+        if simple_text:
+            args["SimpleModifierText"] = simple_text
+        if stmt_text:
+            args["StatementText"] = stmt_text
+        if self._imported_desc_ref:
+            args["_ImportedDescRef"] = self._imported_desc_ref
+        if self._imported_stmt_ref:
+            args["_ImportedStmtRef"] = self._imported_stmt_ref
+
+        return {
+            "ModifierId": self._modifier_id_edit.text().strip(),
+            "ModifierType": "MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER",
+            "SubjectRequirementSetId": self._reqset_display.text().strip(),
+            "Arguments": args,
+        }
+
+    # ── visibility / reference ────────────────────────────────────────
+
+    def _on_hidden_toggled(self, checked: bool) -> None:
+        for i in range(self._stmt_group.count()):
+            w = self._stmt_group.itemAt(i).widget()
+            if w is not None:
+                w.setVisible(not checked)
+        self._update_ref_texts()
+        self._notify_change()
+
+    def _update_ref_texts(self) -> None:
+        if getattr(self, '_imported_desc_ref', ''):
+            self._simple_desc_ref.setText(f"参考（游戏原文）: {self._imported_desc_ref}")
+        else:
+            self._simple_desc_ref.setText("")
+
+        if getattr(self, '_imported_stmt_ref', ''):
+            self._statement_ref.setText(f"参考（游戏原文）: {self._imported_stmt_ref}")
+        else:
+            self._statement_ref.setText("")
+
+    def _notify_change(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
+
+class AgendaModifierListEditor(QWidget):
+    """左列 Modifier 列表 + 右侧编辑区，支持增删切换。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(
+        self,
+        text_search_provider: Callable[[str], str],
+        custom_reqset_provider: Callable[[], list[dict[str, object]]],
+    ) -> None:
+        super().__init__()
+        self._loading = False
+        self._agenda_type = ""
+        self._prefix = ""
+        self._abbr = ""
+        self._leader_name = ""
+        self._text_search_provider = text_search_provider
+        self._custom_reqset_provider = custom_reqset_provider
+        self._editors: list[AgendaModifierEditor] = []
+
+        group = QGroupBox("议程 Modifier")
+        outer = QVBoxLayout(group)
+
+        # Splitter: left list | right editor
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Left panel
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._modifier_list = QListWidget()
+        self._modifier_list.currentRowChanged.connect(self._on_list_selection_changed)
+        left_layout.addWidget(self._modifier_list, 1)
+
+        btn_row = QHBoxLayout()
+        add_btn = QPushButton("＋ 添加")
+        add_btn.clicked.connect(self._add_modifier)
+        btn_row.addWidget(add_btn)
+        self._remove_btn = QPushButton("✕ 删除")
+        self._remove_btn.clicked.connect(self._remove_selected)
+        self._remove_btn.setEnabled(False)
+        btn_row.addWidget(self._remove_btn)
+        left_layout.addLayout(btn_row)
+
+        splitter.addWidget(left)
+
+        # Right panel — QStackedWidget of editors
+        self._editor_stack = QStackedWidget()
+        self._editor_stack.addWidget(QLabel("请添加或选择一个 Modifier"))
+        splitter.addWidget(self._editor_stack)
+
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
+        splitter.setSizes([200, 520])
+
+        outer.addWidget(splitter)
+        self.setLayout(outer)
+
+    def set_context(self, agenda_type: str, prefix: str, abbr: str, leader_name: str) -> None:
+        self._agenda_type = _safe_text(agenda_type)
+        self._prefix = _safe_text(prefix)
+        self._abbr = _safe_text(abbr)
+        self._leader_name = leader_name
+        for e in self._editors:
+            e.set_context(agenda_type, prefix, abbr, leader_name)
+
+    def set_payload(self, modifiers: list[dict[str, object]]) -> None:
+        self._loading = True
+        self._clear_all()
+        for mod in modifiers:
+            if isinstance(mod, dict):
+                self._add_modifier_widget(mod)
+        if self._editors:
+            self._modifier_list.setCurrentRow(0)
+        self._loading = False
+
+    def export_payload(self) -> list[dict[str, object]]:
+        result: list[dict[str, object]] = []
+        for e in self._editors:
+            payload = e.export_payload()
+            if payload.get("ModifierId") or payload.get("SubjectRequirementSetId"):
+                result.append(payload)
+        return result
+
+    def _add_modifier(self) -> None:
+        self._add_modifier_widget({})
+        self._modifier_list.setCurrentRow(len(self._editors) - 1)
+
+    def _add_modifier_widget(self, payload: dict[str, object]) -> None:
+        e = AgendaModifierEditor(
+            text_search_provider=self._text_search_provider,
+            custom_reqset_provider=self._custom_reqset_provider,
+        )
+        e.set_context(self._agenda_type, self._prefix, self._abbr, getattr(self, '_leader_name', ''))
+        e.set_payload(payload)
+        e.dataChanged.connect(self._emit_data_changed)
+        self._editors.append(e)
+
+        idx = self._editor_stack.addWidget(e)  # add after placeholder
+        item = QListWidgetItem(e.display_name())
+        item.setData(Qt.ItemDataRole.UserRole, idx)
+        self._modifier_list.addItem(item)
+
+    def _on_list_selection_changed(self, row: int) -> None:
+        self._remove_btn.setEnabled(row >= 0)
+        if 0 <= row < len(self._editors):
+            item = self._modifier_list.item(row)
+            stack_idx = item.data(Qt.ItemDataRole.UserRole) if item else -1
+            if stack_idx >= 0 and stack_idx < self._editor_stack.count():
+                self._editor_stack.setCurrentIndex(stack_idx)
+        else:
+            self._editor_stack.setCurrentIndex(0)  # placeholder
+
+    def _remove_selected(self) -> None:
+        row = self._modifier_list.currentRow()
+        if row < 0 or row >= len(self._editors):
+            return
+        self._modifier_list.takeItem(row)
+        editor = self._editors.pop(row)
+        self._editor_stack.removeWidget(editor)
+        editor.deleteLater()
+        # Update data indices for remaining items
+        for r in range(self._modifier_list.count()):
+            item = self._modifier_list.item(r)
+            if item and self._editor_stack.count() > r + 1:
+                item.setData(Qt.ItemDataRole.UserRole, r + 1)
+        self._emit_data_changed()
+
+    def _clear_all(self) -> None:
+        self._modifier_list.clear()
+        for e in self._editors:
+            self._editor_stack.removeWidget(e)
+            e.deleteLater()
+        self._editors.clear()
+        self._editor_stack.setCurrentIndex(0)
+
+    def _emit_data_changed(self) -> None:
+        if self._loading:
+            return
+        # Refresh list item names
+        for r, e in enumerate(self._editors):
+            item = self._modifier_list.item(r)
+            if item:
+                item.setText(e.display_name())
+        self.dataChanged.emit()
+
+
+def _agenda_table_hint(table: str) -> str:
+    hints: dict[str, str] = {
+        "HistoricalAgendas": "绑定该议程所属领袖。每个领袖建议只绑一个议程。",
+        "AgendaTraits": "自动生成 TraitType = TRAIT_{AgendaType}，始终输出。",
+        "ExclusiveAgendas": "可选：与随机议程互斥。AgendaTwo 候选来自游戏库 RandomAgendas。",
+        "AiLists": "AI 偏好组。System 决定偏好类型，ListType 可自动生成或手填。",
+        "AgendaModifiers": "议程外交效果 Modifier (MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER)。选择 SubjectRequirementSetId 以从数据库导入官方模版。ModifierString(Preview) 自动生成。",
+    }
+    return hints.get(table, "")
+
+
+class _LeaderDropdown(QWidget):
+    """下拉选择当前工程中的领袖。"""
+
+    changed = pyqtSignal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._combo = QComboBox()
+        self._combo.currentIndexChanged.connect(lambda _: self.changed.emit())
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(QLabel("LeaderType"))
+        layout.addWidget(self._combo, 1)
+        self.setLayout(layout)
+
+    def set_leader_list(self, leaders: list[tuple[str, str]]) -> None:
+        current = self._combo.currentData()
+        self._combo.blockSignals(True)
+        self._combo.clear()
+        for leader_type, display_name in leaders:
+            self._combo.addItem(display_name, leader_type)
+        if current:
+            idx = self._combo.findData(current)
+            if idx >= 0:
+                self._combo.setCurrentIndex(idx)
+        self._combo.blockSignals(False)
+
+    def current_leader_type(self) -> str:
+        return str(self._combo.currentData() or "")
+
+    def set_current_leader_type(self, leader_type: str) -> None:
+        idx = self._combo.findData(leader_type)
+        if idx >= 0:
+            self._combo.setCurrentIndex(idx)
+
+    def add_leader_if_missing(self, leader_type: str, display_name: str) -> None:
+        idx = self._combo.findData(leader_type)
+        if idx < 0:
+            self._combo.addItem(display_name, leader_type)
+
+
+class HistoricalAgendasEditor(QWidget):
+    """领袖绑定 + 外交告别语（LOC Tag 自动生成，只读）。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(
+        self,
+        leader_entries_provider: Callable[[], list[dict[str, str]]],
+        text_search_provider: Callable[[str], str],
+    ) -> None:
+        super().__init__()
+        self._loading = False
+        self._leader_dropdown = _LeaderDropdown()
+        self._leader_dropdown.changed.connect(self._on_leader_changed)
+
+        self._leader_entries_provider = leader_entries_provider
+        self._text_search_provider = text_search_provider
+
+        group = QGroupBox("HistoricalAgendas（领袖绑定）")
+        layout = QVBoxLayout(group)
+        tip = QLabel(_agenda_table_hint("HistoricalAgendas"))
+        tip.setWordWrap(True)
+        layout.addWidget(tip)
+        layout.addWidget(self._leader_dropdown)
+
+        # Exit Kudo
+        layout.addWidget(QLabel("赞许告别语（中文）"))
+        self._exit_kudo_text = QLineEdit()
+        self._exit_kudo_text.setPlaceholderText("输入中文告别语（赞许）…")
+        self._exit_kudo_text.textChanged.connect(lambda _: self.dataChanged.emit())
+        layout.addWidget(self._exit_kudo_text)
+
+        kudo_tag_row = QHBoxLayout()
+        kudo_tag_row.addWidget(QLabel("LOC Tag（自动）"))
+        self._exit_kudo_tag = QLineEdit()
+        self._exit_kudo_tag.setReadOnly(True)
+        kudo_tag_row.addWidget(self._exit_kudo_tag, 1)
+        layout.addLayout(kudo_tag_row)
+
+        self._exit_kudo_ref = QLabel("")
+        self._exit_kudo_ref.setObjectName("pageInfoLabel")
+        self._exit_kudo_ref.setWordWrap(True)
+        layout.addWidget(self._exit_kudo_ref)
+
+        # Exit Warning
+        layout.addWidget(QLabel("警告告别语（中文）"))
+        self._exit_warn_text = QLineEdit()
+        self._exit_warn_text.setPlaceholderText("输入中文告别语（警告）…")
+        self._exit_warn_text.textChanged.connect(lambda _: self.dataChanged.emit())
+        layout.addWidget(self._exit_warn_text)
+
+        warn_tag_row = QHBoxLayout()
+        warn_tag_row.addWidget(QLabel("LOC Tag（自动）"))
+        self._exit_warn_tag = QLineEdit()
+        self._exit_warn_tag.setReadOnly(True)
+        warn_tag_row.addWidget(self._exit_warn_tag, 1)
+        layout.addLayout(warn_tag_row)
+
+        self._exit_warn_ref = QLabel("")
+        self._exit_warn_ref.setObjectName("pageInfoLabel")
+        self._exit_warn_ref.setWordWrap(True)
+        layout.addWidget(self._exit_warn_ref)
+
+        self.setLayout(layout)
+
+    def _leader_name(self) -> str:
+        """Extract leader name from LeaderType: 'LEADER_SIQI_MORTIS' -> 'SIQI_MORTIS'"""
+        lt = self._leader_dropdown.current_leader_type()
+        if lt.startswith("LEADER_"):
+            return lt[len("LEADER_"):]
+        return lt
+
+    def _gen_exit_kudo_tag(self) -> str:
+        name = self._leader_name()
+        return f"LOC_DIPLO_KUDO_EXIT_LEADER_{name}_ANY" if name else ""
+
+    def _gen_exit_warn_tag(self) -> str:
+        name = self._leader_name()
+        return f"LOC_DIPLO_WARNING_EXIT_LEADER_{name}_ANY" if name else ""
+
+    def _on_leader_changed(self) -> None:
+        self._sync_loc_tags()
+        self._update_exit_refs()
+        self.dataChanged.emit()
+
+    def _sync_loc_tags(self) -> None:
+        self._exit_kudo_tag.setText(self._gen_exit_kudo_tag())
+        self._exit_warn_tag.setText(self._gen_exit_warn_tag())
+
+    def refresh_leader_list(self) -> None:
+        entries = self._leader_entries_provider() if callable(self._leader_entries_provider) else []
+        leaders: list[tuple[str, str]] = []
+        for entry in entries:
+            if isinstance(entry, dict):
+                lt = str(entry.get("type") or "").strip()
+                if lt:
+                    name = str(entry.get("name") or "").strip() or lt
+                    leaders.append((lt, f"{lt}（{name}）"))
+        self._leader_dropdown.set_leader_list(leaders)
+
+    def current_leader_type(self) -> str:
+        return self._leader_dropdown.current_leader_type()
+
+    def set_entry(self, payload: dict[str, object]) -> None:
+        self._loading = True
+        self.refresh_leader_list()
+        leader_type = str(payload.get("LeaderType") or "").strip()
+        if leader_type:
+            self._leader_dropdown.add_leader_if_missing(leader_type, leader_type)
+        self._leader_dropdown.set_current_leader_type(leader_type)
+        self._sync_loc_tags()
+
+        self._exit_kudo_text.setText(str(payload.get("ExitKudoText") or ""))
+        self._exit_warn_text.setText(str(payload.get("ExitWarnText") or ""))
+        self._update_exit_refs()
+        self._loading = False
+
+    def export_payload(self) -> dict[str, object]:
+        result: dict[str, object] = {
+            "LeaderType": self._leader_dropdown.current_leader_type(),
+        }
+        kudo_text = self._exit_kudo_text.text().strip()
+        warn_text = self._exit_warn_text.text().strip()
+        kudo_tag = self._gen_exit_kudo_tag()
+        warn_tag = self._gen_exit_warn_tag()
+        if kudo_text and kudo_tag:
+            result["ExitKudoStatementKey"] = kudo_tag
+            result["ExitKudoText"] = kudo_text
+        if warn_text and warn_tag:
+            result["ExitWarningStatementKey"] = warn_tag
+            result["ExitWarnText"] = warn_text
+        return result
+
+    def _update_exit_refs(self) -> None:
+        kudo_fallback = self._text_search_provider("LOC_DIPLO_KUDO_EXIT_ANY_ANY") if callable(self._text_search_provider) else ""
+        warn_fallback = self._text_search_provider("LOC_DIPLO_WARNING_EXIT_ANY_ANY") if callable(self._text_search_provider) else ""
+        self._exit_kudo_ref.setText(f"参考保底: {kudo_fallback}" if kudo_fallback else "")
+        self._exit_warn_ref.setText(f"参考保底: {warn_fallback}" if warn_fallback else "")
+
+
+class ExclusiveAgendasEditor(QWidget):
+    """ExclusiveAgendas 可选副表 — 多行，AgendaTwo 从 RandomAgendas 选择。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(self, random_agendas_provider: Callable[[], list[tuple[str, str]]]) -> None:
+        super().__init__()
+        self._agenda_type = ""
+        self._loading = False
+        self._random_agendas: list[tuple[str, str]] = []
+        self._rows: list[dict[str, str]] = []
+        self._random_agendas_provider = random_agendas_provider
+
+        group = QGroupBox("ExclusiveAgendas（互斥议程，可选）")
+        layout = QVBoxLayout(group)
+        tip = QLabel(_agenda_table_hint("ExclusiveAgendas"))
+        tip.setWordWrap(True)
+        layout.addWidget(tip)
+
+        top_row = QHBoxLayout()
+        self._agenda_type_display = QLineEdit()
+        self._agenda_type_display.setReadOnly(True)
+        top_row.addWidget(QLabel("AgendaOne"))
+        top_row.addWidget(self._agenda_type_display, 1)
+        self._add_button = QPushButton("＋ 添加互斥")
+        self._add_button.clicked.connect(self._add_row)
+        top_row.addWidget(self._add_button)
+        layout.addLayout(top_row)
+
+        self._table = QTableWidget(0, 2)
+        self._table.setHorizontalHeaderLabels(["AgendaTwo（随机议程）", "操作"])
+        header = self._table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        self._table.setColumnWidth(1, 56)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(32)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        layout.addWidget(self._table)
+
+        self.setLayout(layout)
+
+    def set_agenda_type(self, agenda_type: str) -> None:
+        self._agenda_type = _safe_text(agenda_type)
+        self._agenda_type_display.setText(self._agenda_type)
+
+    def set_payload(self, rows: list[dict[str, object]]) -> None:
+        self._loading = True
+        self._random_agendas = self._random_agendas_provider() if callable(self._random_agendas_provider) else []
+        self._rows = []
+        self._table.setRowCount(0)
+        for entry in rows:
+            if isinstance(entry, dict):
+                agenda_two = _safe_text(entry.get("AgendaTwo"))
+                self._rows.append({"AgendaTwo": agenda_two})
+                self._append_table_row(agenda_two)
+        self._loading = False
+
+    def export_payload(self) -> list[dict[str, str]]:
+        result: list[dict[str, str]] = []
+        for data in self._rows:
+            agenda_two = _safe_text(data.get("AgendaTwo"))
+            if agenda_two:
+                result.append({
+                    "AgendaOne": self._agenda_type,
+                    "AgendaTwo": agenda_two,
+                })
+        return result
+
+    def _add_row(self) -> None:
+        idx = self._table.rowCount()
+        self._table.insertRow(idx)
+        combo = QComboBox()
+        combo.addItem("", "")
+        for ra_type, ra_display in self._random_agendas:
+            combo.addItem(ra_display, ra_type)
+        combo.setEditable(True)
+        combo.currentTextChanged.connect(lambda text, r=idx: self._on_row_text(r, text))
+        self._table.setCellWidget(idx, 0, combo)
+
+        del_btn = QPushButton("✕")
+        del_btn.setFixedSize(32, 26)
+        del_btn.clicked.connect(lambda *_a, r=idx: self._delete_row(r))
+        self._table.setCellWidget(idx, 1, del_btn)
+
+        self._rows.append({"AgendaTwo": ""})
+        self._notify_change()
+
+    def _append_table_row(self, agenda_two: str) -> None:
+        idx = self._table.rowCount()
+        self._table.insertRow(idx)
+        combo = QComboBox()
+        combo.addItem("", "")
+        for ra_type, ra_display in self._random_agendas:
+            combo.addItem(ra_display, ra_type)
+        combo.setEditable(True)
+        # Try to find by data (type) first, fall back to text match
+        found_idx = combo.findData(agenda_two)
+        if found_idx >= 0:
+            combo.setCurrentIndex(found_idx)
+        elif agenda_two:
+            combo.setCurrentText(agenda_two)
+        combo.currentTextChanged.connect(lambda text, r=idx: self._on_row_text(r, text))
+        self._table.setCellWidget(idx, 0, combo)
+
+        del_btn = QPushButton("✕")
+        del_btn.setFixedSize(32, 26)
+        del_btn.clicked.connect(lambda *_a, r=idx: self._delete_row(r))
+        self._table.setCellWidget(idx, 1, del_btn)
+
+    def _delete_row(self, row: int) -> None:
+        if 0 <= row < len(self._rows):
+            self._rows.pop(row)
+        self._table.removeRow(row)
+        self._notify_change()
+
+    def _on_row_text(self, row: int, _text: str) -> None:
+        if 0 <= row < len(self._rows):
+            widget = self._table.cellWidget(row, 0)
+            if isinstance(widget, QComboBox):
+                data = widget.currentData()
+                self._rows[row]["AgendaTwo"] = str(data or widget.currentText() or "").strip()
+            self._notify_change()
+
+    def _notify_change(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
+
+class _AiFavoredItemRow:
+    """单行 AiFavoredItems 数据。"""
+    def __init__(self, item: str = "", favored: bool = True, value: int = 0,
+                 string_val: str = "", min_diff: str = "", max_diff: str = "",
+                 tooltip: str = ""):
+        self.item = item
+        self.favored = favored
+        self.value = value
+        self.string_val = string_val
+        self.min_diff = min_diff
+        self.max_diff = max_diff
+        self.tooltip = tooltip
+
+
+class _AiFavoredItemsTable(QWidget):
+    """AiFavoredItems 多行表编辑器，含高级字段折叠。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._loading = False
+        self._rows: list[_AiFavoredItemRow] = []
+        self._show_advanced = False
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        # Header
+        hdr = QHBoxLayout()
+        hdr.addWidget(QLabel("AiFavoredItems"))
+        hdr.addStretch(1)
+        self._add_btn = QPushButton("＋ 添加行")
+        self._add_btn.clicked.connect(self._add_row)
+        hdr.addWidget(self._add_btn)
+        layout.addLayout(hdr)
+
+        # Table
+        self._table = QTableWidget(0, 4)
+        self._table.setHorizontalHeaderLabels(["Item", "Favored", "Value", "操作"])
+        self._table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self._table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        self._table.setColumnWidth(1, 60)
+        self._table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+        self._table.setColumnWidth(2, 60)
+        self._table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+        self._table.setColumnWidth(3, 40)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(30)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        layout.addWidget(self._table)
+
+        # Advanced toggle
+        self._adv_toggle = QPushButton("展开高级字段 ▼")
+        self._adv_toggle.setCheckable(True)
+        self._adv_toggle.toggled.connect(self._on_advanced_toggled)
+        layout.addWidget(self._adv_toggle)
+
+        # Advanced fields — hidden by default, shown as extra columns in a second table (simpler: just add extra text edits per row)
+        # Instead of complex column toggling, we'll use per-row hidden widgets shown/hidden by toggle
+
+        self._rebuild_table()
+
+    def _on_advanced_toggled(self, checked: bool) -> None:
+        self._show_advanced = checked
+        self._adv_toggle.setText("收起高级字段 ▲" if checked else "展开高级字段 ▼")
+        self._rebuild_table()
+
+    def set_loading(self, loading: bool) -> None:
+        self._loading = loading
+
+    def set_payload(self, rows: list[dict[str, object]]) -> None:
+        self._loading = True
+        self._rows.clear()
+        for entry in rows:
+            if isinstance(entry, dict):
+                self._rows.append(_AiFavoredItemRow(
+                    item=str(entry.get("Item") or ""),
+                    favored=bool(int(entry.get("Favored", 1))),
+                    value=int(entry.get("Value", 0)),
+                    string_val=str(entry.get("StringVal") or ""),
+                    min_diff=str(entry.get("MinDifficulty") or ""),
+                    max_diff=str(entry.get("MaxDifficulty") or ""),
+                    tooltip=str(entry.get("TooltipString") or ""),
+                ))
+        self._rebuild_table()
+        self._loading = False
+
+    def export_payload(self) -> list[dict[str, object]]:
+        result: list[dict[str, object]] = []
+        for row in self._rows:
+            if not row.item.strip():
+                continue
+            entry: dict[str, object] = {
+                "Item": row.item,
+                "Favored": 1 if row.favored else 0,
+                "Value": row.value,
+            }
+            if row.string_val:
+                entry["StringVal"] = row.string_val
+            if row.min_diff:
+                entry["MinDifficulty"] = row.min_diff
+            if row.max_diff:
+                entry["MaxDifficulty"] = row.max_diff
+            if row.tooltip:
+                entry["TooltipString"] = row.tooltip
+            result.append(entry)
+        return result
+
+    def _add_row(self) -> None:
+        self._rows.append(_AiFavoredItemRow())
+        self._rebuild_table()
+        self._notify_change()
+
+    def _delete_row(self, idx: int) -> None:
+        if 0 <= idx < len(self._rows):
+            self._rows.pop(idx)
+        self._rebuild_table()
+        self._notify_change()
+
+    def _rebuild_table(self) -> None:
+        self._table.setRowCount(0)
+        col_count = 8 if self._show_advanced else 4
+        self._table.setColumnCount(col_count)
+        if self._show_advanced:
+            self._table.setHorizontalHeaderLabels(
+                ["Item", "Favored", "Value", "StrVal", "MinDiff", "MaxDiff", "Tooltip", "操作"])
+            for c in range(3, 8):
+                self._table.horizontalHeader().setSectionResizeMode(c, QHeaderView.ResizeMode.Stretch)
+            self._table.setColumnWidth(7, 40)
+        else:
+            self._table.setHorizontalHeaderLabels(["Item", "Favored", "Value", "操作"])
+            self._table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+            self._table.setColumnWidth(3, 40)
+
+        for _row_idx, data in enumerate(self._rows):
+            r = self._table.rowCount()
+            self._table.insertRow(r)
+
+            item_edit = QLineEdit(data.item)
+            item_edit.setPlaceholderText("如 DIPLOACTION_DECLARE_FRIENDSHIP")
+            item_edit.textChanged.connect(lambda text, i=r: self._on_cell_changed(i, 0, text))
+            self._table.setCellWidget(r, 0, item_edit)
+
+            fav_cb = QCheckBox()
+            fav_cb.setChecked(data.favored)
+            fav_cb.toggled.connect(lambda checked, i=r: self._on_cell_changed(i, 1, checked))
+            fav_w = QWidget()
+            fav_l = QHBoxLayout(fav_w)
+            fav_l.setContentsMargins(4, 0, 4, 0)
+            fav_l.addWidget(fav_cb)
+            self._table.setCellWidget(r, 1, fav_w)
+
+            val_spin = QSpinBox()
+            val_spin.setRange(-9999, 9999)
+            val_spin.setValue(data.value)
+            val_spin.valueChanged.connect(lambda v, i=r: self._on_cell_changed(i, 2, v))
+            self._table.setCellWidget(r, 2, val_spin)
+
+            if self._show_advanced:
+                sv_edit = QLineEdit(data.string_val)
+                sv_edit.setPlaceholderText("StringVal")
+                sv_edit.textChanged.connect(lambda text, i=r: self._on_cell_changed(i, 3, text))
+                self._table.setCellWidget(r, 3, sv_edit)
+
+                md_min = QLineEdit(data.min_diff)
+                md_min.setPlaceholderText("MinDifficulty")
+                md_min.textChanged.connect(lambda text, i=r: self._on_cell_changed(i, 4, text))
+                self._table.setCellWidget(r, 4, md_min)
+
+                md_max = QLineEdit(data.max_diff)
+                md_max.setPlaceholderText("MaxDifficulty")
+                md_max.textChanged.connect(lambda text, i=r: self._on_cell_changed(i, 5, text))
+                self._table.setCellWidget(r, 5, md_max)
+
+                tt_edit = QLineEdit(data.tooltip)
+                tt_edit.setPlaceholderText("TooltipString")
+                tt_edit.textChanged.connect(lambda text, i=r: self._on_cell_changed(i, 6, text))
+                self._table.setCellWidget(r, 6, tt_edit)
+
+                del_col = 7
+            else:
+                del_col = 3
+
+            del_btn = QPushButton("✕")
+            del_btn.setFixedSize(28, 26)
+            del_btn.clicked.connect(lambda *_a, i=r: self._delete_row(i))
+            self._table.setCellWidget(r, del_col, del_btn)
+
+    def _on_cell_changed(self, row_idx: int, col: int, value: object) -> None:
+        if row_idx >= len(self._rows):
+            return
+        d = self._rows[row_idx]
+        if col == 0:
+            d.item = str(value or "")
+        elif col == 1:
+            d.favored = bool(value)
+        elif col == 2:
+            d.value = int(value)
+        elif col == 3 and self._show_advanced:
+            d.string_val = str(value or "")
+        elif col == 4 and self._show_advanced:
+            d.min_diff = str(value or "")
+        elif col == 5 and self._show_advanced:
+            d.max_diff = str(value or "")
+        elif col == 6 and self._show_advanced:
+            d.tooltip = str(value or "")
+        self._notify_change()
+
+    def _notify_change(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
+
+class AiListsEditor(QWidget):
+    """左列偏好组列表 + 右侧编辑区。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(self, ai_list_types_provider: Callable[[], list[str]], prefix_provider: Callable[[], str]) -> None:
+        super().__init__()
+        self._agenda_type = ""
+        self._leader_type = ""
+        self._abbr = ""
+        self._loading = False
+        self._groups: list[dict[str, object]] = []
+        self._system_options: list[str] = []
+        self._ai_list_types_provider = ai_list_types_provider
+        self._prefix_provider = prefix_provider
+        self._editors: list[_AiFavoredItemsTable] = []
+
+        group = QGroupBox("AI 偏好 (AiLists + AiFavoredItems)")
+        outer = QVBoxLayout(group)
+
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Left panel — group list
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._group_list = QListWidget()
+        self._group_list.currentRowChanged.connect(self._on_group_selected)
+        left_layout.addWidget(self._group_list, 1)
+
+        btn_row = QHBoxLayout()
+        add_btn = QPushButton("＋ 新增偏好组")
+        add_btn.clicked.connect(self._add_group)
+        btn_row.addWidget(add_btn)
+        self._remove_btn = QPushButton("✕ 删除")
+        self._remove_btn.clicked.connect(self._remove_selected)
+        self._remove_btn.setEnabled(False)
+        btn_row.addWidget(self._remove_btn)
+        left_layout.addLayout(btn_row)
+
+        splitter.addWidget(left)
+
+        # Right panel — editor stack
+        self._editor_stack = QStackedWidget()
+        self._editor_stack.addWidget(QLabel("请添加或选择一个 AI 偏好组"))
+        self._system_combos: list[QComboBox] = []
+        self._list_type_edits: list[QLineEdit] = []
+
+        splitter.addWidget(self._editor_stack)
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
+        splitter.setSizes([200, 520])
+
+        outer.addWidget(splitter)
+        self.setLayout(outer)
+
+    def _auto_list_type(self, system: str) -> str:
+        if not system:
+            return ""
+        prefix = self._prefix_provider() if callable(self._prefix_provider) else ""
+        abbr = self._abbr
+        parts = [prefix, abbr, system] if prefix else [abbr, system]
+        return "".join(p for p in parts if p)
+
+    def set_context(self, agenda_type: str, leader_type: str, abbr: str) -> None:
+        self._agenda_type = _safe_text(agenda_type)
+        self._leader_type = _safe_text(leader_type)
+        self._abbr = _safe_text(abbr)
+        self._system_options = self._ai_list_types_provider() if callable(self._ai_list_types_provider) else []
+
+    def set_payload(self, groups: list[dict[str, object]]) -> None:
+        self._loading = True
+        self._clear_all()
+        if isinstance(groups, list):
+            for grp in groups:
+                if isinstance(grp, dict):
+                    self._add_group_widget(grp)
+        if self._editors:
+            self._group_list.setCurrentRow(0)
+        self._loading = False
+
+    def export_payload(self) -> list[dict[str, object]]:
+        result: list[dict[str, object]] = []
+        for i in range(self._group_list.count()):
+            system_combo = self._system_combos[i]
+            list_type_edit = self._list_type_edits[i]
+            items_table = self._editors[i]
+            system = system_combo.currentText().strip()
+            list_type = list_type_edit.text().strip() or list_type_edit.placeholderText() or self._auto_list_type(system)
+            fav_items = items_table.export_payload()
+            if system or list_type or fav_items:
+                result.append({
+                    "LeaderType": self._leader_type,
+                    "AgendaType": self._agenda_type,
+                    "ListType": list_type,
+                    "System": system,
+                    "AiFavoredItems": fav_items,
+                })
+        return result
+
+    def _on_group_selected(self, row: int) -> None:
+        self._remove_btn.setEnabled(row >= 0)
+        if 0 <= row < self._editor_stack.count() - 1:
+            self._editor_stack.setCurrentIndex(row + 1)  # +1 for placeholder
+
+    def _add_group(self) -> None:
+        self._add_group_widget({})
+        self._group_list.setCurrentRow(self._group_list.count() - 1)
+
+    def _add_group_widget(self, grp_data: dict[str, object]) -> None:
+        system = _safe_text(grp_data.get("System", ""))
+        list_type = _safe_text(grp_data.get("ListType", ""))
+        fav_items_payload = grp_data.get("AiFavoredItems")
+        fav_list = list(fav_items_payload) if isinstance(fav_items_payload, list) else []
+
+        page = QWidget()
+        page_layout = QVBoxLayout(page)
+        page_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Row: System + ListType
+        top = QHBoxLayout()
+        top.addWidget(QLabel("System"))
+        sys_combo = QComboBox()
+        sys_combo.setEditable(True)
+        sys_combo.addItem("", "")
+        for opt in self._system_options:
+            sys_combo.addItem(opt, opt)
+        if system:
+            sys_combo.setCurrentText(system)
+        sys_combo.currentTextChanged.connect(self._emit_data_changed)
+        top.addWidget(sys_combo, 1)
+        self._system_combos.append(sys_combo)
+
+        top.addWidget(QLabel("ListType"))
+        lt_edit = QLineEdit()
+        lt_edit.setPlaceholderText(self._auto_list_type(system) or "自动生成")
+        if list_type:
+            lt_edit.setText(list_type)
+        lt_edit.textChanged.connect(lambda _: self._emit_data_changed())
+        top.addWidget(lt_edit, 1)
+        self._list_type_edits.append(lt_edit)
+
+        page_layout.addLayout(top)
+
+        # AiFavoredItems table
+        items_table = _AiFavoredItemsTable()
+        items_table.set_payload(fav_list)
+        items_table.dataChanged.connect(self._emit_data_changed)
+        self._editors.append(items_table)
+        page_layout.addWidget(items_table, 1)
+
+        # Stack index
+        stack_idx = self._editor_stack.addWidget(page)
+        item = QListWidgetItem(list_type or system or f"偏好组 {self._group_list.count() + 1}")
+        item.setData(Qt.ItemDataRole.UserRole, stack_idx)
+        self._group_list.addItem(item)
+
+    def _remove_selected(self) -> None:
+        row = self._group_list.currentRow()
+        if row < 0 or row >= len(self._editors):
+            return
+        self._group_list.takeItem(row)
+        page = self._editor_stack.widget(row + 1)  # +1 for placeholder
+        self._editor_stack.removeWidget(page)
+        page.deleteLater()
+        self._system_combos.pop(row)
+        self._list_type_edits.pop(row)
+        self._editors.pop(row)
+        # Re-index remaining items
+        for r in range(self._group_list.count()):
+            item = self._group_list.item(r)
+            if item and r + 1 < self._editor_stack.count():
+                item.setData(Qt.ItemDataRole.UserRole, r + 1)
+        self._emit_data_changed()
+
+    def _clear_all(self) -> None:
+        self._group_list.clear()
+        for i in range(self._editor_stack.count() - 1, 0, -1):
+            w = self._editor_stack.widget(i)
+            self._editor_stack.removeWidget(w)
+            w.deleteLater()
+        self._system_combos.clear()
+        self._list_type_edits.clear()
+        self._editors.clear()
+
+    def _emit_data_changed(self) -> None:
+        if self._loading:
+            return
+        # Refresh list names
+        for r in range(self._group_list.count()):
+            item = self._group_list.item(r)
+            if item is None:
+                continue
+            lt = self._list_type_edits[r].text().strip()
+            sys = self._system_combos[r].currentText().strip()
+            name = lt or sys or f"偏好组 {r + 1}"
+            item.setText(name)
+        self.dataChanged.emit()
+
+
+class AgendaCompositeEditor(QWidget):
+    """议程复合编辑器 —— 议程表 + Modifier + AI偏好。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(
+        self,
+        *,
+        shared_params_provider: Callable[[], dict[str, object]],
+        type_builder: Callable[[dict[str, object], str, str, object | None], str],
+        image_widget_factory: Callable[[tuple[int, int], bool], QWidget],
+        leader_entries_provider: Callable[[], list[dict[str, str]]],
+        random_agendas_provider: Callable[[], list[tuple[str, str]]],
+        ai_list_types_provider: Callable[[], list[str]],
+        custom_reqset_provider: Callable[[], list[dict[str, object]]],
+        text_search_provider: Callable[[str], str],
+    ) -> None:
+        super().__init__()
+        self._loading = False
+        self._leader_entries_provider = leader_entries_provider
+
+        self._main_editor = MainTableEditor(
+            schema=build_agendas_main_schema(),
+            shared_params_provider=shared_params_provider,
+            type_builder=type_builder,
+            image_widget_factory=image_widget_factory,
+        )
+        self._historical_editor = HistoricalAgendasEditor(
+            leader_entries_provider,
+            text_search_provider,
+        )
+        self._exclusive_editor = ExclusiveAgendasEditor(random_agendas_provider)
+        self._modifier_editor = AgendaModifierListEditor(
+            text_search_provider=text_search_provider,
+            custom_reqset_provider=custom_reqset_provider,
+        )
+        self._ai_lists_editor = AiListsEditor(
+            ai_list_types_provider=ai_list_types_provider,
+            prefix_provider=lambda: str(shared_params_provider().get("prefix", "")),
+        )
+
+        self._trait_display = QLineEdit()
+        self._trait_display.setReadOnly(True)
+
+        self._main_editor.dataChanged.connect(self._handle_main_changed)
+        self._historical_editor.dataChanged.connect(self._emit_data_changed)
+        self._exclusive_editor.dataChanged.connect(self._emit_data_changed)
+        self._modifier_editor.dataChanged.connect(self._emit_data_changed)
+        self._ai_lists_editor.dataChanged.connect(self._emit_data_changed)
+
+        # 议程相关表区域
+        agenda_section = QGroupBox("议程相关表")
+        agenda_layout = QVBoxLayout(agenda_section)
+        agenda_layout.addWidget(self._main_editor)
+
+        trait_row = QHBoxLayout()
+        trait_row.addWidget(QLabel("TraitType（自动生成）"))
+        trait_row.addWidget(self._trait_display, 1)
+        agenda_layout.addLayout(trait_row)
+        agenda_layout.addWidget(self._historical_editor)
+        agenda_layout.addWidget(self._exclusive_editor)
+
+        # AI 偏好区域
+        ai_section = QGroupBox("AI 偏好相关表")
+        ai_layout = QVBoxLayout(ai_section)
+        ai_layout.addWidget(self._ai_lists_editor)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(10)
+        layout.addWidget(agenda_section)
+        layout.addWidget(self._modifier_editor)
+        layout.addWidget(ai_section)
+
+    def _sync_agenda_context(self) -> None:
+        agenda_type = self._main_editor.current_type()
+        leader_type = self._historical_editor.current_leader_type()
+        abbr = _safe_text(self._main_editor._abbr_edit.text())
+        prefix = _safe_text(self._main_editor._shared_params_provider().get("prefix", ""))
+        self._trait_display.setText(f"TRAIT_{agenda_type}" if agenda_type else "")
+        self._exclusive_editor.set_agenda_type(agenda_type)
+        leader_name = leader_type[len("LEADER_"):] if leader_type.startswith("LEADER_") else leader_type
+        self._modifier_editor.set_context(agenda_type, prefix, abbr, leader_name)
+        self._ai_lists_editor.set_context(agenda_type, leader_type, abbr)
+
+    def _handle_main_changed(self) -> None:
+        self._sync_agenda_context()
+        self._emit_data_changed()
+
+    def set_entry(self, entry: dict[str, object], fallback_name: str) -> None:
+        self._loading = True
+        self._main_editor.set_entry(entry, fallback_name)
+        self._sync_agenda_context()
+
+        # HistoricalAgendas
+        historical = entry.get("historical_agendas")
+        historical_dict = dict(historical) if isinstance(historical, dict) else {}
+        self._historical_editor.set_entry(historical_dict)
+
+        # Sub tables
+        subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}
+
+        # ExclusiveAgendas
+        exclusive_payload = subtables.get("ExclusiveAgendas") if isinstance(subtables.get("ExclusiveAgendas"), list) else []
+        self._exclusive_editor.set_payload(exclusive_payload if isinstance(exclusive_payload, list) else [])
+
+        # AgendaModifiers
+        modifiers_payload = subtables.get("AgendaModifiers") if isinstance(subtables.get("AgendaModifiers"), list) else []
+        self._modifier_editor.set_payload(modifiers_payload if isinstance(modifiers_payload, list) else [])
+
+        # AiLists
+        ai_lists_payload = subtables.get("AiLists") if isinstance(subtables.get("AiLists"), list) else []
+        self._ai_lists_editor.set_payload(ai_lists_payload if isinstance(ai_lists_payload, list) else [])
+
+        self._loading = False
+
+    def export_entry(self) -> dict[str, object]:
+        payload = self._main_editor.export_entry()
+
+        historical_payload = self._historical_editor.export_payload()
+        leader_type = str(historical_payload.get("LeaderType") or "")
+        if leader_type:
+            historical_payload["AgendaType"] = self._main_editor.current_type()
+            payload["historical_agendas"] = historical_payload
+        else:
+            payload.pop("historical_agendas", None)
+
+        subtables = payload.get("subtables") if isinstance(payload.get("subtables"), dict) else {}
+        if not isinstance(subtables, dict):
+            subtables = {}
+
+        exclusive = self._exclusive_editor.export_payload()
+        if exclusive:
+            subtables["ExclusiveAgendas"] = exclusive
+        else:
+            subtables.pop("ExclusiveAgendas", None)
+
+        modifiers = self._modifier_editor.export_payload()
+        if modifiers:
+            subtables["AgendaModifiers"] = modifiers
+        else:
+            subtables.pop("AgendaModifiers", None)
+
+        ai_lists = self._ai_lists_editor.export_payload()
+        if ai_lists:
+            subtables["AiLists"] = ai_lists
+        else:
+            subtables.pop("AiLists", None)
+
+        if subtables:
+            payload["subtables"] = subtables
+        else:
+            payload.pop("subtables", None)
+        return payload
 
     def _emit_data_changed(self) -> None:
         if self._loading:

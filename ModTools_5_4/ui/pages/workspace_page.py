@@ -44,7 +44,7 @@ from PyQt6.QtWidgets import (
 from .base_page import BasePage
 from .art_workspace import ArtWorkspacePanel
 from .basic_info_workspace import BasicInfoWorkspacePanel
-from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
+from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
 from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel
 from .modifier_workspace import ModifierWorkspacePanel
 from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDialog, _ImprovementSearchDialog, _UnitSearchDialog
@@ -489,6 +489,7 @@ class WorkspacePage(BasePage):
             civilizations_provider=self._list_civilizations_for_leader,
             on_item_changed=self._handle_section_item_changed,
             on_duplicate_item=self._handle_duplicate_section_item,
+            custom_reqsets_provider=self._list_custom_reqsets,
             on_delete_item=self._handle_delete_section_item,
         )
 
@@ -749,6 +750,12 @@ class WorkspacePage(BasePage):
                 return self._sql_preview_to_xml(data_sql)
             return data_sql
 
+        if section == "议程":
+            data_sql, _text_sql = self._build_agenda_sql_pair()
+            if fmt == "xml":
+                return self._sql_preview_to_xml(data_sql)
+            return data_sql
+
         if section != "文明":
             base_name = {
                 "领袖": "Leaders",
@@ -779,6 +786,7 @@ class WorkspacePage(BasePage):
         _policy_data_sql, policy_text_sql = self._build_policy_sql_pair()
         _project_data_sql, project_text_sql = self._build_project_sql_pair()
         _belief_data_sql, belief_text_sql = self._build_belief_sql_pair()
+        _agenda_data_sql, agenda_text_sql = self._build_agenda_sql_pair()
 
         civ_infos = self._extract_localized_row_infos(civ_text_sql)
         leader_infos = self._extract_localized_row_infos(leader_text_sql)
@@ -791,6 +799,7 @@ class WorkspacePage(BasePage):
         policy_infos = self._extract_localized_row_infos(policy_text_sql)
         project_infos = self._extract_localized_row_infos(project_text_sql)
         belief_infos = self._extract_localized_row_infos(belief_text_sql)
+        agenda_infos = self._extract_localized_row_infos(agenda_text_sql)
 
         civ_entries = self._project.sections.get("文明")
         civ_entries = [entry for entry in civ_entries if isinstance(entry, dict)] if isinstance(civ_entries, list) else []
@@ -964,7 +973,7 @@ class WorkspacePage(BasePage):
         policy_groups = _groups_by_section("政策卡", policy_infos)
         belief_groups = _groups_by_section("信仰", belief_infos)
         project_groups = _groups_by_section("项目", project_infos)
-        agenda_groups: list[tuple[str, list[str]]] = []
+        agenda_groups: list[tuple[str, list[str]]] = _groups_by_section("议程", agenda_infos)
 
         # 额外文本：UnitAbility / ModifierStrings 等不一定包含“单位type”的 Tag，
         # 若仅按 entity_type in tag 过滤，会导致它们在 Text 预览里缺失。
@@ -1318,12 +1327,15 @@ class WorkspacePage(BasePage):
             stem = self._moment_output_stem(game_data_type)
             if not stem:
                 continue
+            source_state = dict(image)
+            source_state.setdefault("canvas_width", 456)
+            source_state.setdefault("canvas_height", 332)
             plans.append(
                 {
                     "relative_path": f"IMG/{stem}.png",
                     "target_width": 456,
                     "target_height": 332,
-                    "source_state": image if isinstance(image, dict) else {},
+                    "source_state": source_state,
                     "source_path": source_path,
                     "category": "moment",
                 }
@@ -4281,6 +4293,238 @@ class WorkspacePage(BasePage):
         ).rstrip()
         return data_sql, text_sql
 
+    def _build_agenda_sql_pair(self) -> tuple[str, str]:
+        entries = self._project.sections.get("议程")
+        agenda_entries = [entry for entry in entries if isinstance(entry, dict)] if isinstance(entries, list) else []
+        if not agenda_entries:
+            return "-- Agendas.sql\n-- 暂无议程数据", "-- Text.sql\n-- 暂无议程文本数据"
+
+        schema = build_agendas_main_schema()
+        field_defaults: dict[str, object] = {field.key: field.default for field in schema.fields}
+
+        types_rows: list[str] = []
+        traits_rows: list[str] = []
+        agendas_rows: list[str] = []
+        agenda_traits_rows: list[str] = []
+        historical_rows: list[str] = []
+        exclusive_rows: list[str] = []
+        ai_lists_rows: list[str] = []
+        ai_favored_items_rows: list[str] = []
+        modifier_rows: list[str] = []
+        modifier_args_rows: list[str] = []
+        modifier_strings_rows: list[str] = []
+        trait_modifiers_rows: list[str] = []
+        text_rows: list[str] = []
+
+        def _value_or_default(data: dict[str, object], key: str) -> object:
+            value = data.get(key)
+            if value is None:
+                return field_defaults.get(key)
+            return value
+
+        for index, entry in enumerate(agenda_entries, start=1):
+            agenda_type = str(entry.get("type") or "").strip()
+            if not agenda_type:
+                agenda_type = f"AGENDA_CUSTOM_{index}"
+
+            table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
+            agenda_name = str(_value_or_default(table_data, "Name") or "")
+            agenda_desc = str(_value_or_default(table_data, "Description") or "")
+
+            types_rows.append(f"('{self._sql_escape(agenda_type)}', 'KIND_AGENDA')")
+
+            agendas_rows.append(
+                "(" + ", ".join(
+                    [
+                        f"'{self._sql_escape(agenda_type)}'",
+                        f"'LOC_{self._sql_escape(agenda_type)}_NAME'",
+                        f"'LOC_{self._sql_escape(agenda_type)}_DESCRIPTION'",
+                    ]
+                ) + ")"
+            )
+
+            text_rows.append(f"('zh_Hans_CN','LOC_{agenda_type}_NAME','{self._sql_escape(agenda_name)}')")
+            text_rows.append(f"('zh_Hans_CN','LOC_{agenda_type}_DESCRIPTION','{self._sql_escape(agenda_desc)}')")
+
+            # TraitType = TRAIT_{AgendaType} (auto, always generated)
+            trait_type = f"TRAIT_{agenda_type}"
+            types_rows.append(f"('{self._sql_escape(trait_type)}', 'KIND_TRAIT')")
+            traits_rows.append(f"('{self._sql_escape(trait_type)}', 'LOC_{self._sql_escape(trait_type)}_NAME', 'LOC_{self._sql_escape(trait_type)}_DESCRIPTION')")
+            agenda_traits_rows.append(f"('{self._sql_escape(agenda_type)}', '{self._sql_escape(trait_type)}')")
+            # Trait name/description text
+            trait_name = agenda_name + "（特质）" if agenda_name else agenda_type
+            text_rows.append(f"('zh_Hans_CN','LOC_{trait_type}_NAME','{self._sql_escape(trait_name)}')")
+            text_rows.append(f"('zh_Hans_CN','LOC_{trait_type}_DESCRIPTION','{self._sql_escape(agenda_desc)}')")
+
+            # HistoricalAgendas
+            historical = entry.get("historical_agendas")
+            if isinstance(historical, dict):
+                leader_type = str(historical.get("LeaderType") or "").strip()
+                if leader_type:
+                    historical_rows.append(f"('{self._sql_escape(leader_type)}', '{self._sql_escape(agenda_type)}')")
+                # Exit diplomacy texts (Kudo/Warning exit statements)
+                exit_kudo_tag = str(historical.get("ExitKudoStatementKey") or "").strip()
+                exit_kudo_text = str(historical.get("ExitKudoText") or "").strip()
+                exit_warn_tag = str(historical.get("ExitWarningStatementKey") or "").strip()
+                exit_warn_text = str(historical.get("ExitWarnText") or "").strip()
+                if exit_kudo_tag and exit_kudo_text:
+                    text_rows.append(f"('zh_Hans_CN','{self._sql_escape(exit_kudo_tag)}','{self._sql_escape(exit_kudo_text)}')")
+                if exit_warn_tag and exit_warn_text:
+                    text_rows.append(f"('zh_Hans_CN','{self._sql_escape(exit_warn_tag)}','{self._sql_escape(exit_warn_text)}')")
+
+            # Sub tables
+            subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}
+
+            # ExclusiveAgendas
+            exclusive_payload = subtables.get("ExclusiveAgendas") if isinstance(subtables.get("ExclusiveAgendas"), list) else []
+            for ex in exclusive_payload:
+                if isinstance(ex, dict):
+                    agenda_two = str(ex.get("AgendaTwo") or "").strip()
+                    if agenda_two:
+                        exclusive_rows.append(f"('{self._sql_escape(agenda_type)}', '{self._sql_escape(agenda_two)}')")
+
+            # AiLists
+            ai_lists_payload = subtables.get("AiLists") if isinstance(subtables.get("AiLists"), list) else []
+            for al in ai_lists_payload:
+                if isinstance(al, dict):
+                    list_type = str(al.get("ListType") or "").strip()
+                    system = str(al.get("System") or "").strip()
+                    if list_type and system:
+                        ai_leader = str(al.get("LeaderType") or leader_type).strip() or leader_type
+                        ai_lists_rows.append(
+                            f"('{self._sql_escape(list_type)}', '{self._sql_escape(ai_leader)}', "
+                            f"'{self._sql_escape(agenda_type)}', '{self._sql_escape(system)}')"
+                        )
+                        # AiFavoredItems under this ListType
+                        def _opt_str(val: object | None) -> str:
+                            v = str(val or "").strip()
+                            return f"'{self._sql_escape(v)}'" if v else "NULL"
+
+                        fav_items = al.get("AiFavoredItems")
+                        fav_list = list(fav_items) if isinstance(fav_items, list) else []
+                        for fi in fav_list:
+                            if not isinstance(fi, dict):
+                                continue
+                            item = str(fi.get("Item") or "").strip()
+                            if not item:
+                                continue
+                            favored = 1 if int(fi.get("Favored", 1)) else 0
+                            value = int(fi.get("Value", 0))
+                            sv = _opt_str(fi.get("StringVal"))
+                            md_min = _opt_str(fi.get("MinDifficulty"))
+                            md_max = _opt_str(fi.get("MaxDifficulty"))
+                            tt = _opt_str(fi.get("TooltipString"))
+                            cols = f"'{self._sql_escape(list_type)}', '{self._sql_escape(item)}', {favored}, {value}, {sv}, {md_min}, {md_max}, {tt}"
+                            ai_favored_items_rows.append(f"({cols})")
+
+            # AgendaModifiers
+            modifiers_payload = subtables.get("AgendaModifiers") if isinstance(subtables.get("AgendaModifiers"), list) else []
+            for mod in modifiers_payload:
+                if not isinstance(mod, dict):
+                    continue
+                mod_id = str(mod.get("ModifierId") or "").strip()
+                if not mod_id:
+                    continue
+                mod_type = str(mod.get("ModifierType") or "MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER").strip()
+                subj_reqset = str(mod.get("SubjectRequirementSetId") or "").strip()
+
+                types_rows.append(f"('{self._sql_escape(mod_id)}', 'KIND_MODIFIER')")
+
+                if subj_reqset:
+                    modifier_rows.append(
+                        f"('{self._sql_escape(mod_id)}', '{self._sql_escape(mod_type)}', "
+                        f"'{self._sql_escape(subj_reqset)}')"
+                    )
+                else:
+                    modifier_rows.append(
+                        f"('{self._sql_escape(mod_id)}', '{self._sql_escape(mod_type)}')"
+                    )
+
+                trait_modifiers_rows.append(
+                    f"('{self._sql_escape(trait_type)}', '{self._sql_escape(mod_id)}')"
+                )
+
+                args = mod.get("Arguments")
+                args_dict = dict(args) if isinstance(args, dict) else {}
+
+                # Output Chinese text to LocalizedText
+                desc_loc = str(args_dict.get("SimpleModifierDescription") or "").strip()
+                desc_text = str(args_dict.get("SimpleModifierText") or "").strip()
+                stmt_loc = str(args_dict.get("StatementKey") or "").strip()
+                stmt_text = str(args_dict.get("StatementText") or "").strip()
+                if desc_loc and desc_text:
+                    text_rows.append(f"('zh_Hans_CN','{self._sql_escape(desc_loc)}','{self._sql_escape(desc_text)}')")
+                if stmt_loc and stmt_text:
+                    text_rows.append(f"('zh_Hans_CN','{self._sql_escape(stmt_loc)}','{self._sql_escape(stmt_text)}')")
+
+                for arg_name, arg_value in args_dict.items():
+                    arg_name_str = str(arg_name).strip()
+                    arg_value_str = str(arg_value or "").strip()
+                    if arg_name_str and arg_value_str and not arg_name_str.startswith("_"):
+                        modifier_args_rows.append(
+                            f"('{self._sql_escape(mod_id)}', "
+                            f"'{self._sql_escape(arg_name_str)}', "
+                            f"'{self._sql_escape(arg_value_str)}')"
+                        )
+
+                # ModifierString Preview
+                if desc_loc:
+                    modifier_strings_rows.append(
+                        f"('{self._sql_escape(mod_id)}', 'Preview', '{self._sql_escape(desc_loc)}')"
+                    )
+
+        types_rows = self._deduplicate_rows(types_rows)
+        traits_rows = self._deduplicate_rows(traits_rows)
+        agendas_rows = self._deduplicate_rows(agendas_rows)
+        agenda_traits_rows = self._deduplicate_rows(agenda_traits_rows)
+        historical_rows = self._deduplicate_rows(historical_rows)
+        exclusive_rows = self._deduplicate_rows(exclusive_rows)
+        ai_lists_rows = self._deduplicate_rows(ai_lists_rows)
+        ai_favored_items_rows = self._deduplicate_rows(ai_favored_items_rows)
+        modifier_rows = self._deduplicate_rows(modifier_rows)
+        modifier_args_rows = self._deduplicate_rows(modifier_args_rows)
+        modifier_strings_rows = self._deduplicate_rows(modifier_strings_rows)
+        trait_modifiers_rows = self._deduplicate_rows(trait_modifiers_rows)
+        text_rows = self._deduplicate_rows(text_rows)
+
+        LOGGER.info("Built agenda SQL preview: entries=%d", len(agenda_entries))
+
+        sql_blocks: list[str] = []
+        sql_blocks.append(self._build_insert_block("Types", "Types", ["Type", "Kind"], types_rows))
+        if traits_rows:
+            sql_blocks.append(self._build_insert_block("Traits", "Traits", ["TraitType", "Name", "Description"], traits_rows))
+        sql_blocks.append(self._build_insert_block("Agendas", "Agendas", ["AgendaType", "Name", "Description"], agendas_rows))
+        sql_blocks.append(self._build_insert_block("AgendaTraits", "AgendaTraits", ["AgendaType", "TraitType"], agenda_traits_rows))
+        if historical_rows:
+            sql_blocks.append(self._build_insert_block("HistoricalAgendas", "HistoricalAgendas", ["LeaderType", "AgendaType"], historical_rows))
+        if exclusive_rows:
+            sql_blocks.append(self._build_insert_block("ExclusiveAgendas", "ExclusiveAgendas", ["AgendaOne", "AgendaTwo"], exclusive_rows))
+        if ai_lists_rows:
+            sql_blocks.append(self._build_insert_block("AiLists", "AiLists", ["ListType", "LeaderType", "AgendaType", "System"], ai_lists_rows))
+        if ai_favored_items_rows:
+            ai_fav_cols = ["ListType", "Item", "Favored", "Value", "StringVal", "MinDifficulty", "MaxDifficulty", "TooltipString"]
+            sql_blocks.append(self._build_insert_block("AiFavoredItems", "AiFavoredItems", ai_fav_cols, ai_favored_items_rows))
+        if modifier_rows:
+            sql_blocks.append(self._build_insert_block("Modifiers", "Modifiers", ["ModifierId", "ModifierType", "SubjectRequirementSetId"], modifier_rows))
+        if modifier_args_rows:
+            sql_blocks.append(self._build_insert_block("ModifierArguments", "ModifierArguments", ["ModifierId", "Name", "Value"], modifier_args_rows))
+        if modifier_strings_rows:
+            sql_blocks.append(self._build_insert_block("ModifierStrings", "ModifierStrings", ["ModifierId", "Context", "Text"], modifier_strings_rows))
+        if trait_modifiers_rows:
+            sql_blocks.append(self._build_insert_block("TraitModifiers", "TraitModifiers", ["TraitType", "ModifierId"], trait_modifiers_rows))
+
+        data_sql = "\n".join([block for block in sql_blocks if block and block.strip()]).rstrip()
+        data_sql = re.sub(r";\n(-- )", r";\n\n\1", data_sql)
+
+        text_sql = "\n".join(
+            [
+                "-- Text.sql",
+                "",
+                self._build_insert_block("LocalizedText", "LocalizedText", ["Language", "Tag", "Text"], text_rows),
+            ]
+        ).rstrip()
+        return data_sql, text_sql
+
     def _build_governor_sql_pair(self) -> tuple[str, str]:
         entries = self._project.sections.get("总督")
         governor_entries = [entry for entry in entries if isinstance(entry, dict)] if isinstance(entries, list) else []
@@ -5096,6 +5340,37 @@ class WorkspacePage(BasePage):
             )
         return output
 
+    def _list_custom_reqsets(self) -> list[dict[str, object]]:
+        """Return all custom requirement sets from the modifier workspace for the agenda search dialog."""
+        modifier = self._project.sections.get("修改器")
+        if not isinstance(modifier, dict):
+            return []
+        reqsets = modifier.get("requirement_sets")
+        if not isinstance(reqsets, list):
+            return []
+        requirements = modifier.get("requirements")
+        reqs_list = list(requirements) if isinstance(requirements, list) else []
+
+        output: list[dict[str, object]] = []
+        for rs in reqsets:
+            if not isinstance(rs, dict):
+                continue
+            rsid = str(rs.get("requirement_set_id") or "").strip()
+            if not rsid:
+                continue
+            comment = str(rs.get("comment") or "")
+            bound_ids = rs.get("bound_requirements") if isinstance(rs.get("bound_requirements"), list) else []
+            bound_reqs: list[dict[str, object]] = []
+            for req in reqs_list:
+                if isinstance(req, dict) and req.get("requirement_id") in bound_ids:
+                    bound_reqs.append({"comment": str(req.get("comment") or "")})
+            output.append({
+                "requirement_set_id": rsid,
+                "comment": comment,
+                "bound_requirements": bound_reqs,
+            })
+        return output
+
     def _list_civilizations_for_leader(self) -> list[dict[str, object]]:
         entries = self._project.sections.get("文明")
         if not isinstance(entries, list):
@@ -5253,6 +5528,21 @@ class WorkspacePage(BasePage):
                     "abbr": "",
                     "table_name": "Beliefs",
                     "table_data": {},
+                    "images": {},
+                }
+            )
+        elif section == "议程":
+            payload.update(
+                {
+                    "abbr": "",
+                    "table_name": "Agendas",
+                    "table_data": {},
+                    "historical_agendas": {},
+                    "subtables": {
+                        "ExclusiveAgendas": [],
+                        "AgendaModifiers": [],
+                        "AiLists": [],
+                    },
                     "images": {},
                 }
             )
@@ -8859,6 +9149,7 @@ class WorkspacePage(BasePage):
         policy_data_sql, _ = self._build_policy_sql_pair()
         project_data_sql, _ = self._build_project_sql_pair()
         belief_data_sql, _ = self._build_belief_sql_pair()
+        agenda_data_sql, _ = self._build_agenda_sql_pair()
 
         def _apply_single_data(section: str, base_name: str, sql_content: str) -> None:
             if not self._should_emit_optional_section_file(section):
@@ -8878,6 +9169,7 @@ class WorkspacePage(BasePage):
         _apply_single_data("政策卡", "Policies", policy_data_sql)
         _apply_single_data("项目", "Projects", project_data_sql)
         _apply_single_data("信仰", "Beliefs", belief_data_sql)
+        _apply_single_data("议程", "Agendas", agenda_data_sql)
 
         unit_fmt = self._get_group_preview_format("单位")
         if self._should_emit_optional_section_file("单位"):
@@ -8898,7 +9190,11 @@ class WorkspacePage(BasePage):
                 files[f"Data/{output_base}_GreatWorks.sql"] = great_work_data_sql
 
         if self._should_emit_optional_section_file("议程"):
-            files[f"Data/{output_base}_Agendas.sql"] = "-- Agendas.sql\n-- 暂未接入"
+            agenda_fmt = self._get_group_preview_format("议程")
+            if agenda_fmt == "xml":
+                files[f"Data/{output_base}_Agendas.xml"] = self._sql_preview_to_xml(agenda_data_sql)
+            else:
+                files[f"Data/{output_base}_Agendas.sql"] = agenda_data_sql
 
         files.update(
             {

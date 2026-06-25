@@ -50,6 +50,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ..ui_widget_kit import BaseTemplateWidget, build_template_widget
+from ...db.interface import get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
 from ...db.paths import DATA_DIR, DEFAULT_GAME_DB
 from .base_page import BasePage
 
@@ -605,6 +606,101 @@ class UnitAbilityEditorDialog(QDialog):
         self.accept()
 
 
+_FORMAT_OPTIONS: List[tuple[str, str]] = [
+    ("text", "文本 — 查中文名"),
+    ("signed", "有符号数字 — +2 / -1"),
+    ("unsigned", "纯数字 — 2"),
+    ("modifier_ref", "修改器引用 — 查注释"),
+    ("bool_true", "布尔-真 — 真时拼参数名"),
+    ("bool_hide", "布尔-隐藏 — 真时拼文本"),
+    ("skip", "跳过 — 不参与注释"),
+]
+
+
+class CommentTemplateEditDialog(QDialog):
+    def __init__(
+        self,
+        effect_type: str,
+        templates: Dict[str, dict],
+        on_save: Callable[[str, dict], None],
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("编辑注释模版")
+        self.resize(760, 520)
+        self._effect_type = str(effect_type or "").strip()
+        self._templates = templates
+        self._on_save = on_save
+        self._format_combos: Dict[int, QComboBox] = {}
+
+        layout = QVBoxLayout(self)
+
+        layout.addWidget(QLabel(f"EffectType：{self._effect_type}"))
+        layout.addSpacing(8)
+
+        layout.addWidget(QLabel("注释模版"))
+        tip = QLabel("占位符：{ParamName} 表示纯值，{+:ParamName} 表示带正负号的值")
+        tip.setStyleSheet("color: gray; font-size: 11px;")
+        layout.addWidget(tip)
+        self._comment_edit = QLineEdit()
+        layout.addWidget(self._comment_edit)
+        layout.addSpacing(8)
+
+        self._param_table = QTableWidget(0, 2)
+        self._param_table.setHorizontalHeaderLabels(["参数名", "格式"])
+        self._param_table.horizontalHeader().setStretchLastSection(True)
+        self._param_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._param_table.verticalHeader().setVisible(False)
+        self._param_table.setMinimumHeight(240)
+        layout.addWidget(self._param_table, 1)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(self._handle_save)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+        self._load_current_template()
+
+    def _load_current_template(self) -> None:
+        template = self._templates.get(self._effect_type)
+        if not isinstance(template, dict):
+            self._comment_edit.setText("")
+            return
+        self._comment_edit.setText(str(template.get("comment") or ""))
+        params = template.get("params") if isinstance(template.get("params"), dict) else {}
+        self._param_table.setRowCount(0)
+        self._format_combos.clear()
+        for name, fmt in params.items():
+            row = self._param_table.rowCount()
+            self._param_table.insertRow(row)
+            self._param_table.setItem(row, 0, QTableWidgetItem(str(name)))
+            combo = QComboBox()
+            current_key = str(fmt or "").strip().lower()
+            selected_idx = 0
+            for idx, (key, label) in enumerate(_FORMAT_OPTIONS):
+                combo.addItem(label, key)
+                if key == current_key:
+                    selected_idx = idx
+            combo.setCurrentIndex(selected_idx)
+            self._param_table.setCellWidget(row, 1, combo)
+            self._format_combos[row] = combo
+
+    def _handle_save(self) -> None:
+        if not self._effect_type:
+            return
+        comment = self._comment_edit.text().strip()
+        params: Dict[str, str] = {}
+        for row in range(self._param_table.rowCount()):
+            name_item = self._param_table.item(row, 0)
+            name = str(name_item.text() or "").strip() if name_item else ""
+            combo = self._format_combos.get(row)
+            fmt = str(combo.currentData() or "").strip() if combo else ""
+            if name and fmt:
+                params[name] = fmt
+        self._on_save(self._effect_type, {"comment": comment, "params": params})
+        self.accept()
+
+
 class HomePage(BasePage):
     page_id = "home"
     display_name = "首页"
@@ -629,6 +725,10 @@ class HomePage(BasePage):
         self._requirement_types: List[str] = []
         self._requirement_param_map: Dict[str, List[str]] = {}
         self._attachment_target_types: List[str] = []
+        self._comment_templates: Dict[str, dict] = {}
+        self._comment_template_path: Path = DATA_DIR / "effect_comment_templates.json"
+        self._req_comment_templates: Dict[str, dict] = {}
+        self._req_comment_template_path: Path = DATA_DIR / "requirement_comment_templates.json"
 
         self._loading_modifier_editor = False
         self._loading_reqset_editor = False
@@ -670,6 +770,7 @@ class HomePage(BasePage):
         self._prefix2_input: QLineEdit | None = None
         self._modifier_id_input: QLineEdit | None = None
         self._comment_input: QLineEdit | None = None
+        self._save_template_btn: QPushButton | None = None
         self._modifier_type_combo: QComboBox | None = None
         self._effect_type_combo: QComboBox | None = None
         self._collection_type_combo: QComboBox | None = None
@@ -708,6 +809,7 @@ class HomePage(BasePage):
 
         self._req_id_input: QLineEdit | None = None
         self._req_comment_input: QLineEdit | None = None
+        self._save_req_template_btn: QPushButton | None = None
         self._req_type_combo: QComboBox | None = None
         self._req_type_search_btn: QPushButton | None = None
         self._req_likeliness_spin: QSpinBox | None = None
@@ -760,6 +862,29 @@ class HomePage(BasePage):
         self._requirement_types = requirement_types
         self._requirement_param_map = requirement_param_map
         self._attachment_target_types = self._load_attachment_target_types()
+        self._load_comment_templates()
+        self._load_req_comment_templates()
+
+    def _load_comment_templates(self) -> None:
+        if not self._comment_template_path.exists():
+            LOGGER.warning("Comment templates file not found: %s", self._comment_template_path)
+            self._comment_templates = {}
+            return
+        try:
+            self._comment_templates = json.loads(self._comment_template_path.read_text(encoding="utf-8"))
+        except Exception:
+            LOGGER.exception("Failed to load comment templates")
+            self._comment_templates = {}
+
+    def _load_req_comment_templates(self) -> None:
+        if not self._req_comment_template_path.exists():
+            self._req_comment_templates = {}
+            return
+        try:
+            self._req_comment_templates = json.loads(self._req_comment_template_path.read_text(encoding="utf-8"))
+        except Exception:
+            LOGGER.exception("Failed to load requirement comment templates")
+            self._req_comment_templates = {}
 
     def _load_attachment_target_types(self) -> List[str]:
         if not DEFAULT_GAME_DB.exists():
@@ -1627,6 +1752,10 @@ class HomePage(BasePage):
         self._comment_input.textChanged.connect(self._update_modifier_list_label)
         self._comment_input.textChanged.connect(lambda _t: self._on_modifier_editor_changed("comment"))
         comment_row.addWidget(self._comment_input, 1)
+        self._save_template_btn = compact_button("✎", 28)
+        self._save_template_btn.setToolTip("编辑当前效果器的注释模版")
+        self._save_template_btn.clicked.connect(self._handle_open_template_editor)
+        comment_row.addWidget(self._save_template_btn)
         layout.addLayout(comment_row)
 
         modtype_row = QHBoxLayout()
@@ -2065,6 +2194,10 @@ class HomePage(BasePage):
         self._req_comment_input.textChanged.connect(self._update_requirement_list_label)
         self._req_comment_input.textChanged.connect(lambda _t: self._on_requirement_editor_changed("comment"))
         comment_row.addWidget(self._req_comment_input, 1)
+        self._save_req_template_btn = compact_button("✎", 28)
+        self._save_req_template_btn.setToolTip("编辑当前条件类型的注释模版")
+        self._save_req_template_btn.clicked.connect(self._handle_open_req_template_editor)
+        comment_row.addWidget(self._save_req_template_btn)
         layout.addLayout(comment_row)
 
         type_row = QHBoxLayout()
@@ -2724,7 +2857,7 @@ class HomePage(BasePage):
     # -------------------- Modifier Handlers --------------------
     def _handle_add_modifier(self) -> None:
         self._persist_current_modifier()
-        modifier_id = self._build_modifier_id_default()
+        modifier_id = self._deduplicate_modifier_id(self._build_modifier_id_default())
         record = ModifierRecord(
             modifier_id=modifier_id,
             modifier_type="",
@@ -4908,14 +5041,180 @@ class HomePage(BasePage):
     def _apply_modifier_id_default(self) -> None:
         if self._modifier_id_input is None:
             return
-        self._modifier_id_input.setText(self._build_modifier_id_auto())
+        auto_id = self._build_modifier_id_auto()
+        dedup_id = self._deduplicate_modifier_id(auto_id)
+        self._modifier_id_input.setText(dedup_id)
         if self._comment_input is not None:
             self._comment_input.setText(self._build_modifier_comment_auto())
 
+    def _deduplicate_modifier_id(self, base_id: str) -> str:
+        current_index = self._modifier_editor_index
+        existing_ids: set[str] = set()
+        for idx, m in enumerate(self._modifiers):
+            if idx != current_index:
+                existing_ids.add(m.modifier_id)
+        candidate = base_id
+        counter = 1
+        while candidate in existing_ids:
+            counter += 1
+            candidate = f"{base_id}{counter}"
+        return candidate if counter > 1 else base_id
+
+    def _build_auto_comment_from_template(self) -> str:
+        effect_type = self._effect_type_combo.currentText().strip() if self._effect_type_combo else ""
+        if not effect_type:
+            return ""
+        template = self._comment_templates.get(effect_type)
+        if not isinstance(template, dict):
+            return ""
+        comment_raw = str(template.get("comment") or "").strip()
+        if not comment_raw:
+            return ""
+        params_spec = template.get("params") if isinstance(template.get("params"), dict) else {}
+        if not params_spec:
+            return comment_raw
+
+        param_values: Dict[str, object] = {}
+        for row in self._collect_param_rows():
+            name = str(row.get("name") or "").strip()
+            if name:
+                param_values[name] = row.get("value")
+
+        result = comment_raw
+        for param_name, fmt in params_spec.items():
+            fmt_str = str(fmt or "").strip().lower()
+            value = param_values.get(param_name)
+            replacement = self._format_template_param(param_name, value, fmt_str)
+            placeholder_signed = f"{{+:{param_name}}}"
+            placeholder_unsigned = f"{{{param_name}}}"
+            result = result.replace(placeholder_signed, replacement)
+            result = result.replace(placeholder_unsigned, replacement)
+        return result
+
+    def _format_template_param(
+        self,
+        param_name: str,
+        value: object | None,
+        fmt: str,
+    ) -> str:
+        raw = self._extract_param_value(value)
+        if fmt == "signed":
+            return self._format_signed(raw)
+        if fmt == "unsigned":
+            return self._format_unsigned(raw)
+        if fmt == "bool_true":
+            return param_name if raw else ""
+        if fmt == "bool_hide":
+            if raw:
+                text = str(raw).strip()
+                return resolve_chinese_text_or_unknown(text)
+            return ""
+        if fmt == "modifier_ref":
+            mod_id = str(raw).strip() if raw is not None else ""
+            if not mod_id:
+                return ""
+            for m in self._modifiers:
+                if m.modifier_id == mod_id and m.comment.strip():
+                    return m.comment.strip()
+            cn = get_chinese_text_for_tag_or_unknown(f"LOC_{mod_id}_NAME")
+            return cn if cn and cn != "未知" else mod_id
+        if fmt == "skip":
+            return ""
+        # default: text — try LOC_{value}_NAME tag first, then nested LOC refs
+        text = str(raw).strip() if raw is not None else ""
+        if not text:
+            return ""
+        cn = get_chinese_text_for_tag_or_unknown(f"LOC_{text}_NAME")
+        if cn and cn != "未知":
+            return cn
+        cn = resolve_chinese_text_or_unknown(text)
+        return cn if cn and cn != "未知" else text
+
+    @staticmethod
+    def _format_signed(value: object | None) -> str:
+        if isinstance(value, bool) or value is None:
+            return ""
+        text = str(value).strip()
+        try:
+            num = float(text)
+        except (TypeError, ValueError):
+            return text
+        if num == int(num):
+            text = str(int(num))
+        else:
+            text = str(num)
+        if num > 0:
+            return f"+{text}"
+        return text
+
+    @staticmethod
+    def _format_unsigned(value: object | None) -> str:
+        if isinstance(value, bool) or value is None:
+            return ""
+        text = str(value).strip()
+        try:
+            num = float(text)
+            if num == int(num):
+                return str(int(num))
+            return str(num)
+        except (TypeError, ValueError):
+            return text
+
     def _build_modifier_comment_auto(self) -> str:
+        template_comment = self._build_auto_comment_from_template()
+        if template_comment:
+            return template_comment
         reqset_comment = self._resolve_modifier_reqset_comment()
         param_comment = self._build_param_comment_from_rows(self._collect_param_rows())
         return self._join_comment_parts(reqset_comment, param_comment)
+
+    def _handle_open_template_editor(self) -> None:
+        effect_type = self._effect_type_combo.currentText().strip() if self._effect_type_combo else ""
+        if not effect_type:
+            return
+        dlg = CommentTemplateEditDialog(
+            effect_type,
+            self._comment_templates,
+            on_save=self._on_template_saved,
+            parent=self,
+        )
+        dlg.exec()
+
+    def _on_template_saved(self, effect_type: str, entry: dict) -> None:
+        self._comment_templates[effect_type] = entry
+        try:
+            self._comment_template_path.write_text(
+                json.dumps(self._comment_templates, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            LOGGER.exception("Failed to save comment template for %s", effect_type)
+        if self._comment_input is not None:
+            self._comment_input.setText(self._build_modifier_comment_auto())
+
+    def _handle_open_req_template_editor(self) -> None:
+        req_type = self._req_type_combo.currentText().strip() if self._req_type_combo else ""
+        if not req_type:
+            return
+        dlg = CommentTemplateEditDialog(
+            req_type,
+            self._req_comment_templates,
+            on_save=self._on_req_template_saved,
+            parent=self,
+        )
+        dlg.exec()
+
+    def _on_req_template_saved(self, req_type: str, entry: dict) -> None:
+        self._req_comment_templates[req_type] = entry
+        try:
+            self._req_comment_template_path.write_text(
+                json.dumps(self._req_comment_templates, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            LOGGER.exception("Failed to save requirement comment template for %s", req_type)
+        if self._req_comment_input is not None:
+            self._req_comment_input.setText(self._build_requirement_comment_auto())
 
     def _resolve_modifier_reqset_comment(self) -> str:
         owner_id = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
@@ -5017,7 +5316,8 @@ class HomePage(BasePage):
             return self._normalize_numeric_text(f"{raw:.6f}")
         return name_upper
 
-    def _normalize_numeric_text(self, text: str) -> str:
+    @staticmethod
+    def _normalize_numeric_text(text: str) -> str:
         cleaned = text.strip()
         match = re.fullmatch(r"(-?\d+)(?:\.(\d+))?", cleaned)
         if not match:
@@ -5208,12 +5508,58 @@ class HomePage(BasePage):
     def _apply_requirement_id_default(self) -> None:
         if self._req_id_input is None:
             return
-        self._req_id_input.setText(self._build_requirement_id_auto())
+        auto_id = self._build_requirement_id_auto()
+        dedup_id = self._deduplicate_requirement_id(auto_id)
+        self._req_id_input.setText(dedup_id)
         if self._req_comment_input is not None:
             self._req_comment_input.setText(self._build_requirement_comment_auto())
 
+    def _deduplicate_requirement_id(self, base_id: str) -> str:
+        existing_ids: set[str] = set()
+        for idx, r in enumerate(self._requirements):
+            if idx != self._current_req_index:
+                existing_ids.add(r.requirement_id)
+        candidate = base_id
+        counter = 1
+        while candidate in existing_ids:
+            counter += 1
+            candidate = f"{base_id}{counter}"
+        return candidate if counter > 1 else base_id
+
     def _build_requirement_comment_auto(self) -> str:
+        template_comment = self._build_requirement_comment_from_template()
+        if template_comment:
+            return template_comment
         return self._build_param_comment_from_rows(self._collect_req_param_rows())
+
+    def _build_requirement_comment_from_template(self) -> str:
+        req_type = self._req_type_combo.currentText().strip() if self._req_type_combo else ""
+        if not req_type:
+            return ""
+        template = self._req_comment_templates.get(req_type)
+        if not isinstance(template, dict):
+            return ""
+        comment_raw = str(template.get("comment") or "").strip()
+        if not comment_raw:
+            return ""
+        params_spec = template.get("params") if isinstance(template.get("params"), dict) else {}
+        if not params_spec:
+            return comment_raw
+
+        param_values: Dict[str, object] = {}
+        for row in self._collect_req_param_rows():
+            name = str(row.get("name") or "").strip()
+            if name:
+                param_values[name] = row.get("value")
+
+        result = comment_raw
+        for param_name, fmt in params_spec.items():
+            fmt_str = str(fmt or "").strip().lower()
+            value = param_values.get(param_name)
+            replacement = self._format_template_param(param_name, value, fmt_str)
+            result = result.replace(f"{{+:{param_name}}}", replacement)
+            result = result.replace(f"{{{param_name}}}", replacement)
+        return result
 
     def _extract_requirement_type_fragment(self, requirement_type: str) -> str:
         if not requirement_type:

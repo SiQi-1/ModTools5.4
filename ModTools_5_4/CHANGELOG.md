@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-06-26 - 5.4.0-beta.5（AI Agent 对话系统）
+
+### 新增：AI Agent 聊天面板
+- 新增 `agent/` 包：完整 AI Agent 框架，支持自然语言驱动的 Mod 数据编辑
+- **LLM 后端**：支持 Ollama 兼容的本地模型（Qwen2.5、Llama3.1、DeepSeek-R1 等）
+- **工具系统**：14 个工具（10 个只读 + 4 个提案），覆盖工作区查询、效果/条件搜索、实体创建/编辑/删除、修改器链编排
+- **知识提炼**：从 800+ EffectType 和 270+ RequirementType 中提取 Top80/Top40 常用项注入系统提示词
+- **对话面板**：可折叠的右侧面板（Ctrl+Shift+A 或菜单"窗口 → AI助手"），消息气泡、提案预览卡片（Before/After 对比树）、Apply/Reject 确认
+- **安全机制**：所有修改均走预览→确认→应用流程，Agent 不能直接修改数据
+- **模型配置**：支持设置 Ollama URL 和模型名
+
+### 新增文件
+- `ModTools_5_4/agent/__init__.py`
+- `ModTools_5_4/agent/chat_message.py`
+- `ModTools_5_4/agent/llm_backend.py`
+- `ModTools_5_4/agent/tools.py`
+- `ModTools_5_4/agent/tool_executor.py`
+- `ModTools_5_4/agent/agent_session.py`
+- `ModTools_5_4/agent/system_prompt.py`
+- `ModTools_5_4/agent/knowledge/__init__.py`
+- `ModTools_5_4/agent/knowledge/build_knowledge.py`
+- `ModTools_5_4/agent/knowledge/effect_types_compact.json`
+- `ModTools_5_4/agent/knowledge/requirement_types_compact.json`
+- `ModTools_5_4/agent/knowledge/collection_types.json`
+- `ModTools_5_4/agent/knowledge/entity_schemas.json`
+- `ModTools_5_4/ui/pages/agent_chat_panel.py`
+
+### 修改文件
+- `workspace_page.py`：集成聊天面板（splitter第三元素）、实现提案应用方法
+- `main_window.py`："窗口"菜单新增"AI助手"项
+
+### 备注
+- Agent 仅操作数据工作区（不涉及 Lua、不涉及图片导入）
+- 需要本地运行 Ollama 服务（默认 http://127.0.0.1:11434）
+- 推荐模型：qwen2.5:7b（中文理解好，function calling 能力强）
+
 ## 2026-03-25 - 修复：编辑器输出 "Unknown property box-shadow"
 
 ### 问题描述

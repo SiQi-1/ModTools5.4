@@ -1,0 +1,2194 @@
+{
+  "Districts": {
+    "table_name": "Districts",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "区域名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "区域描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "TraitType",
+        "label": "TraitType",
+        "field_type": "trait_toggle",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdvisorType",
+        "label": "顾问类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "advisor_type"
+      },
+      {
+        "key": "PlunderType",
+        "label": "掠夺类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_PLUNDER",
+        "required": false,
+        "template_key": "plunder_type"
+      },
+      {
+        "key": "PlunderAmount",
+        "label": "掠夺数值",
+        "field_type": "int",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CostProgressionModel",
+        "label": "成本递增模型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_COST_PROGRESSION",
+        "required": false,
+        "template_key": "cost_progression"
+      },
+      {
+        "key": "CostProgressionParam1",
+        "label": "成本递增参数",
+        "field_type": "int",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MilitaryDomain",
+        "label": "军事领域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_DOMAIN",
+        "required": true,
+        "template_key": "domain"
+      },
+      {
+        "key": "Cost",
+        "label": "建造成本",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "HitPoints",
+        "label": "耐久值",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Appeal",
+        "label": "魅力",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Housing",
+        "label": "住房",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Entertainment",
+        "label": "宜居度",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Maintenance",
+        "label": "维护费",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AirSlots",
+        "label": "空军槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CitizenSlots",
+        "label": "市民槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TravelTime",
+        "label": "修复回合",
+        "field_type": "int",
+        "section": "number",
+        "default": -1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CityStrengthModifier",
+        "label": "城市防御修正",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MaxPerPlayer",
+        "label": "每玩家上限",
+        "field_type": "real",
+        "section": "number",
+        "default": -1.0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Coast",
+        "label": "允许沿海",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresPlacement",
+        "label": "需要地块放置",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresPopulation",
+        "label": "需要人口",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "NoAdjacentCity",
+        "label": "不可邻接城市中心",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CityCenter",
+        "label": "作为城市中心",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Aqueduct",
+        "label": "视为引水渠",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "InternalOnly",
+        "label": "仅内部可建",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ZOC",
+        "label": "提供控制区",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "FreeEmbark",
+        "label": "提供免费登船",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CaptureRemovesBuildings",
+        "label": "被占领移除建筑",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CaptureRemovesCityDefenses",
+        "label": "被占领移除城防",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TradeEmbark",
+        "label": "商路可登船",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OnePerCity",
+        "label": "每城限一",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AllowsHolyCity",
+        "label": "允许圣城",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdjacentToLand",
+        "label": "必须邻接陆地",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanAttack",
+        "label": "可进行攻击",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CaptureRemovesDistrict",
+        "label": "被占领移除区域",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": [
+      {
+        "first_key": "PlunderType",
+        "second_key": "PlunderAmount"
+      },
+      {
+        "first_key": "CostProgressionModel",
+        "second_key": "CostProgressionParam1"
+      }
+    ]
+  },
+  "Buildings": {
+    "table_name": "Buildings",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "建筑名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "建筑描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Quote",
+        "label": "名言（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "QuoteAudio",
+        "label": "名言音频（英文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "PrereqDistrict",
+        "label": "前置区域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "district_search"
+      },
+      {
+        "key": "AdjacentDistrict",
+        "label": "邻接区域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "district_search"
+      },
+      {
+        "key": "AdjacentResource",
+        "label": "邻接资源",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "resource_search"
+      },
+      {
+        "key": "PurchaseYield",
+        "label": "购买产出类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "yield"
+      },
+      {
+        "key": "ObsoleteEra",
+        "label": "过时时代",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_ERA",
+        "required": false,
+        "template_key": "era"
+      },
+      {
+        "key": "AdvisorType",
+        "label": "顾问类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "advisor_type"
+      },
+      {
+        "key": "AdjacentImprovement",
+        "label": "邻接改良设施",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "improvement_search"
+      },
+      {
+        "key": "CityAdjacentTerrain",
+        "label": "城市邻接地形",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "terrain"
+      },
+      {
+        "key": "TraitType",
+        "label": "TraitType",
+        "field_type": "trait_toggle",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "GovernmentTierRequirement",
+        "label": "政体等级需求（英文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Cost",
+        "label": "建造成本",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MaxPlayerInstances",
+        "label": "每玩家上限",
+        "field_type": "int",
+        "section": "number",
+        "default": -1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MaxWorldInstances",
+        "label": "全世界上限",
+        "field_type": "int",
+        "section": "number",
+        "default": -1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OuterDefenseHitPoints",
+        "label": "外城防耐久",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Housing",
+        "label": "住房",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Entertainment",
+        "label": "宜居度",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Maintenance",
+        "label": "维护费",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OuterDefenseStrength",
+        "label": "外城防强度",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CitizenSlots",
+        "label": "市民槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RegionalRange",
+        "label": "区域范围",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "GrantFortification",
+        "label": "驻防加成",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "DefenseModifier",
+        "label": "防御修正",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Capital",
+        "label": "首都限定",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresPlacement",
+        "label": "需要地块放置",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresRiver",
+        "label": "需要河流",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Coast",
+        "label": "允许沿海",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "EnabledByReligion",
+        "label": "宗教启用",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AllowsHolyCity",
+        "label": "允许圣城",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MustPurchase",
+        "label": "必须购买",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "IsWonder",
+        "label": "是否奇观",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MustBeLake",
+        "label": "必须湖泊",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MustNotBeLake",
+        "label": "不能湖泊",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdjacentToMountain",
+        "label": "必须邻山",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresReligion",
+        "label": "需要宗教",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "InternalOnly",
+        "label": "仅内部可建",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresAdjacentRiver",
+        "label": "必须邻接河流",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MustBeAdjacentLand",
+        "label": "必须邻接陆地",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdjacentCapital",
+        "label": "必须邻接首都",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "UnlocksGovernmentPolicy",
+        "label": "解锁政体政策",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": []
+  },
+  "Units": {
+    "table_name": "Units",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "单位名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "单位描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Domain",
+        "label": "领域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "DOMAIN_LAND",
+        "required": false,
+        "template_key": "domain"
+      },
+      {
+        "key": "FormationClass",
+        "label": "编队类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": true,
+        "template_key": "formation_class"
+      },
+      {
+        "key": "CostProgressionModel",
+        "label": "成本递增模型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_COST_PROGRESSION",
+        "required": false,
+        "template_key": "cost_progression"
+      },
+      {
+        "key": "CostProgressionParam1",
+        "label": "成本递增参数",
+        "field_type": "int",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PromotionClass",
+        "label": "晋升类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "unit_promotion_class"
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "PrereqDistrict",
+        "label": "前置区域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "district_search"
+      },
+      {
+        "key": "StrategicResource",
+        "label": "战略资源",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "resource_strategic"
+      },
+      {
+        "key": "PurchaseYield",
+        "label": "购买产出",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "yield"
+      },
+      {
+        "key": "PseudoYieldType",
+        "label": "伪产出类型（英文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ObsoleteTech",
+        "label": "过时科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "ObsoleteCivic",
+        "label": "过时市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "MandatoryObsoleteTech",
+        "label": "强制过时科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "MandatoryObsoleteCivic",
+        "label": "强制过时市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "AdvisorType",
+        "label": "顾问类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "advisor_type"
+      },
+      {
+        "key": "LeaderType",
+        "label": "限定领袖（英文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Flavor",
+        "label": "Flavor（英文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TraitType",
+        "label": "TraitType",
+        "field_type": "trait_toggle",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BaseSightRange",
+        "label": "基础视野",
+        "field_type": "int",
+        "section": "number",
+        "default": 2,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BaseMoves",
+        "label": "基础移动力",
+        "field_type": "int",
+        "section": "number",
+        "default": 2,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Combat",
+        "label": "近战战斗力",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RangedCombat",
+        "label": "远程战斗力",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Range",
+        "label": "射程",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Bombard",
+        "label": "轰炸战斗力",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Cost",
+        "label": "建造成本",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PopulationCost",
+        "label": "人口成本",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BuildCharges",
+        "label": "建造次数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ReligiousStrength",
+        "label": "宗教强度",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ReligionEvictPercent",
+        "label": "宗教驱逐比例",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "SpreadCharges",
+        "label": "传播次数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ReligiousHealCharges",
+        "label": "宗教治疗次数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "InitialLevel",
+        "label": "初始等级",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "NumRandomChoices",
+        "label": "随机晋升数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqPopulation",
+        "label": "人口前置需求",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Maintenance",
+        "label": "维护费",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AirSlots",
+        "label": "空军槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AntiAirCombat",
+        "label": "防空战斗力",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ParkCharges",
+        "label": "公园次数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "DisasterCharges",
+        "label": "灾害次数",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "FoundCity",
+        "label": "可建城",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "FoundReligion",
+        "label": "可建宗教",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MakeTradeRoute",
+        "label": "可建商路",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "EvangelizeBelief",
+        "label": "可传教",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "LaunchInquisition",
+        "label": "可发起审判",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresInquisition",
+        "label": "需要可审判",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ExtractsArtifacts",
+        "label": "可发掘文物",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanCapture",
+        "label": "可俘虏",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanRetreatWhenCaptured",
+        "label": "被俘可撤退",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AllowBarbarians",
+        "label": "蛮族可用",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanTrain",
+        "label": "可训练",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MustPurchase",
+        "label": "必须购买",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Stackable",
+        "label": "可堆叠",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanTargetAir",
+        "label": "可攻击空中",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ZoneOfControl",
+        "label": "控制区",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Spy",
+        "label": "间谍单位",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "WMDCapable",
+        "label": "可携带核武",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "IgnoreMoves",
+        "label": "IgnoreMoves",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TeamVisibility",
+        "label": "团队共享视野",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "EnabledByReligion",
+        "label": "宗教启用",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TrackReligion",
+        "label": "TrackReligion",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "UseMaxMeleeTrainedStrength",
+        "label": "使用最高近战训练力",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ImmediatelyName",
+        "label": "立即命名",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanEarnExperience",
+        "label": "可获得经验",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": []
+  },
+  "Improvements": {
+    "table_name": "Improvements",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "改良设施名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "改良设施描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "PlunderType",
+        "label": "掠夺类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_PLUNDER",
+        "required": true,
+        "template_key": "plunder_type"
+      },
+      {
+        "key": "PlunderAmount",
+        "label": "掠夺数值",
+        "field_type": "int",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TraitType",
+        "label": "TraitType",
+        "field_type": "trait_toggle",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "YieldFromAppeal",
+        "label": "魅力产出",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "yield"
+      },
+      {
+        "key": "Domain",
+        "label": "领域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "DOMAIN_LAND",
+        "required": false,
+        "template_key": "domain"
+      },
+      {
+        "key": "ImprovementOnRemove",
+        "label": "移除后改良设施",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "improvement_search"
+      },
+      {
+        "key": "DispersalGold",
+        "label": "拆除后获得金币",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Housing",
+        "label": "住房",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TilesRequired",
+        "label": "需求地块数",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AirSlots",
+        "label": "空军槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "DefenseModifier",
+        "label": "防御修正值",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "GrantFortification",
+        "label": "驻防加成",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MinimumAppeal",
+        "label": "最低魅力需求",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "WeaponSlots",
+        "label": "核武器发射槽位",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ReligiousUnitHealRate",
+        "label": "ReligiousUnitHealRate",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Appeal",
+        "label": "相邻地块魅力加成",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "YieldFromAppealPercent",
+        "label": "魅力产出百分比",
+        "field_type": "int",
+        "section": "number",
+        "default": 100,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ValidAdjacentTerrainAmount",
+        "label": "需要相邻指定地形数量",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MovementChange",
+        "label": "移动力变化",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "TilesPerGoody",
+        "label": "TilesPerGoody",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "GoodyRange",
+        "label": "GoodyRange",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BarbarianCamp",
+        "label": "蛮族营地",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Buildable",
+        "label": "可建造",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RemoveOnEntry",
+        "label": "进入后移除",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Goody",
+        "label": "部落村庄",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "SameAdjacentValid",
+        "label": "允许相邻",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresRiver",
+        "label": "需求河流",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "EnforceTerrain",
+        "label": "EnforceTerrain",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BuildInLine",
+        "label": "线性建造",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "CanBuildOutsideTerritory",
+        "label": "可在境外建造",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BuildOnFrontier",
+        "label": "边境建造",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Coast",
+        "label": "沿海",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OnePerCity",
+        "label": "每城唯一",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdjacentSeaResource",
+        "label": "邻接海洋资源",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresAdjacentBonusOrLuxury",
+        "label": "需求邻接加成或奢侈",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Workable",
+        "label": "可工作",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "GoodyNotify",
+        "label": "GoodyNotify",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "NoAdjacentSpecialtyDistrict",
+        "label": "不可邻接专业区域",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "RequiresAdjacentLuxury",
+        "label": "需求邻接奢侈",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AdjacentToLand",
+        "label": "邻接陆地",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Removable",
+        "label": "可移除",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OnlyOpenBorders",
+        "label": "仅开放边界",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Capturable",
+        "label": "可占领",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": [
+      {
+        "first_key": "PlunderType",
+        "second_key": "PlunderAmount"
+      }
+    ]
+  },
+  "Policies": {
+    "table_name": "Policies",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "政策卡名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "政策卡描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "GovernmentSlotType",
+        "label": "政策槽位",
+        "field_type": "template",
+        "section": "basic",
+        "default": "SLOT_WILDCARD",
+        "required": false,
+        "template_key": "government_slot"
+      },
+      {
+        "key": "RequiresGovernmentUnlock",
+        "label": "需要政体解锁",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ExplicitUnlock",
+        "label": "显式解锁",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": []
+  },
+  "Projects": {
+    "table_name": "Projects",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "项目名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "ShortName",
+        "label": "项目短名（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "项目描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PopupText",
+        "label": "弹窗文本（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqTech",
+        "label": "前置科技",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "technology_search"
+      },
+      {
+        "key": "PrereqCivic",
+        "label": "前置市政",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "civic_search"
+      },
+      {
+        "key": "PrereqDistrict",
+        "label": "前置区域",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "district_search"
+      },
+      {
+        "key": "RequiredBuilding",
+        "label": "需要建筑",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "building_search_no_trait"
+      },
+      {
+        "key": "VisualBuildingType",
+        "label": "展示建筑",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "building_search_all"
+      },
+      {
+        "key": "CostProgressionModel",
+        "label": "成本递增模型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "NO_PROGRESSION_MODEL",
+        "required": false,
+        "template_key": "cost_progression"
+      },
+      {
+        "key": "CostProgressionParam1",
+        "label": "成本递增参数",
+        "field_type": "int",
+        "section": "basic",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "PrereqResource",
+        "label": "前置资源",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "resource_search"
+      },
+      {
+        "key": "AdvisorType",
+        "label": "顾问类型",
+        "field_type": "template",
+        "section": "basic",
+        "default": "ADVISOR_GENERIC",
+        "required": false,
+        "template_key": "advisor_type"
+      },
+      {
+        "key": "Cost",
+        "label": "基础成本",
+        "field_type": "int",
+        "section": "number",
+        "default": 1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "MaxPlayerInstances",
+        "label": "每玩家上限",
+        "field_type": "int",
+        "section": "number",
+        "default": -1,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "AmenitiesWhileActive",
+        "label": "进行中宜居度",
+        "field_type": "int",
+        "section": "number",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "SpaceRace",
+        "label": "太空竞赛项目",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "OuterDefenseRepair",
+        "label": "修复外城防",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "WMD",
+        "label": "WMD项目",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "UnlocksFromEffect",
+        "label": "效果解锁",
+        "field_type": "bool",
+        "section": "bool",
+        "default": 0,
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": [
+      {
+        "first_key": "CostProgressionModel",
+        "second_key": "CostProgressionParam1"
+      }
+    ]
+  },
+  "Beliefs": {
+    "table_name": "Beliefs",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "信仰名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "信仰描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "BeliefClassType",
+        "label": "信仰类别",
+        "field_type": "template",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": "belief_class"
+      }
+    ],
+    "linked_groups": []
+  },
+  "Agendas": {
+    "table_name": "Agendas",
+    "fields": [
+      {
+        "key": "Name",
+        "label": "议程名字（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      },
+      {
+        "key": "Description",
+        "label": "议程描述（中文）",
+        "field_type": "text",
+        "section": "basic",
+        "default": "",
+        "required": false,
+        "template_key": null
+      }
+    ],
+    "linked_groups": []
+  },
+  "Civilizations": {
+    "table_name": "Civilizations",
+    "fields": [
+      {
+        "key": "CivilizationType",
+        "label": "文明类型",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Name",
+        "label": "名称",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Description",
+        "label": "描述",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Adjective",
+        "label": "形容词",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "CapitalName",
+        "label": "首都名",
+        "field_type": "text",
+        "required": false
+      }
+    ]
+  },
+  "Leaders": {
+    "table_name": "Leaders",
+    "fields": [
+      {
+        "key": "LeaderType",
+        "label": "领袖类型",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Name",
+        "label": "名称",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Sex",
+        "label": "性别",
+        "field_type": "text",
+        "required": false
+      },
+      {
+        "key": "CapitalName",
+        "label": "首都名",
+        "field_type": "text",
+        "required": false
+      }
+    ]
+  }
+}

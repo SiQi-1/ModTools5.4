@@ -1,0 +1,402 @@
+"""Tool execution dispatch — reads workspace state, searches knowledge, builds proposals.
+
+Does NOT modify data directly. Proposals are returned for user approval, then
+applied by WorkspacePage.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+from pathlib import Path
+from typing import Callable
+
+logger = logging.getLogger(__name__)
+
+_KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
+
+
+class ToolExecutor:
+    def __init__(self, sections_provider: Callable[[], dict[str, object]]):
+        self._sections_provider = sections_provider
+        self._effect_types: dict = {}
+        self._requirement_types: dict = {}
+        self._collection_types: list[str] = []
+        self._entity_schemas: dict = {}
+        self._load_knowledge()
+
+    def _load_knowledge(self) -> None:
+        for fname, target in [
+            ("effect_types_compact.json", "_effect_types"),
+            ("requirement_types_compact.json", "_requirement_types"),
+            ("entity_schemas.json", "_entity_schemas"),
+        ]:
+            path = _KNOWLEDGE_DIR / fname
+            if path.exists():
+                with open(path, "r", encoding="utf-8") as f:
+                    setattr(self, target, json.load(f))
+        ct_path = _KNOWLEDGE_DIR / "collection_types.json"
+        if ct_path.exists():
+            with open(ct_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self._collection_types = data.get("collection_types", [])
+
+    def execute(self, tool_name: str, params: dict) -> dict:
+        method = getattr(self, f"_exec_{tool_name}", None)
+        if method is None:
+            return {"error": f"未知工具: {tool_name}"}
+        try:
+            result = method(params)
+            return result
+        except Exception as e:
+            logger.exception("Tool %s failed", tool_name)
+            return {"error": f"工具执行失败: {e}"}
+
+    # ── Read tools ──
+
+    def _exec_list_sections(self, params: dict) -> dict:
+        sections = self._sections_provider()
+        include_direct = params.get("include_direct", True)
+        result = {"group_sections": [], "direct_sections": []}
+        for key in [
+            "文明", "领袖", "区域", "建筑", "单位", "改良设施",
+            "总督", "伟人", "政策卡", "项目", "信仰", "议程",
+        ]:
+            entries = sections.get(key)
+            count = len(entries) if isinstance(entries, list) else 0
+            result["group_sections"].append({"name": key, "entry_count": count})
+        if include_direct:
+            for key in ["基础信息", "美术", "文本", "修改器"]:
+                data = sections.get(key)
+                has_data = data is not None and (not isinstance(data, dict) or bool(data))
+                result["direct_sections"].append({"name": key, "has_data": has_data})
+        return result
+
+    def _exec_get_section_entries(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        sections = self._sections_provider()
+        entries = sections.get(section_name)
+        if not isinstance(entries, list):
+            return {"section_name": section_name, "entries": [], "count": 0}
+        summary = []
+        for i, entry in enumerate(entries):
+            summary.append({
+                "index": i,
+                "name": entry.get("name", ""),
+                "abbr": entry.get("abbr", ""),
+                "table_name": entry.get("table_name", ""),
+            })
+        return {"section_name": section_name, "entries": summary, "count": len(summary)}
+
+    def _exec_get_entry_detail(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        entry_index = params["entry_index"]
+        sections = self._sections_provider()
+        entries = sections.get(section_name)
+        if not isinstance(entries, list) or entry_index >= len(entries):
+            return {"error": f"条目不存在: {section_name}[{entry_index}]"}
+        entry = dict(entries[entry_index])
+        # Simplify image data to avoid overwhelming the LLM
+        if "images" in entry and isinstance(entry["images"], dict):
+            entry["images"] = {k: "[image data]" for k in entry["images"]}
+        return {"section_name": section_name, "index": entry_index, "data": entry}
+
+    def _exec_get_direct_section(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        sections = self._sections_provider()
+        data = sections.get(section_name)
+        if data is None:
+            return {"section_name": section_name, "data": None}
+        raw = dict(data) if isinstance(data, dict) else {"value": str(data)}
+        # Summarize large modifier data
+        if section_name == "修改器" and "data" in raw:
+            md = raw["data"]
+            if isinstance(md, dict):
+                raw["data"] = {
+                    "owners_count": len(md.get("owners", [])),
+                    "modifiers_count": len(md.get("modifiers", [])),
+                    "requirement_sets_count": len(md.get("requirement_sets", [])),
+                    "requirements_count": len(md.get("requirements", [])),
+                    "unit_abilities_count": len(md.get("unit_abilities", [])),
+                }
+        return {"section_name": section_name, "data": raw}
+
+    def _exec_get_modifier_summary(self, params: dict) -> dict:
+        sections = self._sections_provider()
+        mod_section = sections.get("修改器")
+        if not isinstance(mod_section, dict):
+            return {"error": "修改器工作区未初始化"}
+        data = mod_section.get("data")
+        if not isinstance(data, dict):
+            return {"error": "修改器数据为空"}
+        return {
+            "owners": len(data.get("owners", [])),
+            "unit_abilities": len(data.get("unit_abilities", [])),
+            "modifiers": len(data.get("modifiers", [])),
+            "requirement_sets": len(data.get("requirement_sets", [])),
+            "requirements": len(data.get("requirements", [])),
+        }
+
+    def _exec_get_modifier_detail(self, params: dict) -> dict:
+        sections = self._sections_provider()
+        mod_section = sections.get("修改器")
+        if not isinstance(mod_section, dict):
+            return {"error": "修改器工作区未初始化"}
+        data = mod_section.get("data")
+        if not isinstance(data, dict):
+            return {"error": "修改器数据为空"}
+
+        modifier_id = params.get("modifier_id")
+        owner_key = params.get("owner_key")
+
+        owners = data.get("owners", [])
+        modifiers = data.get("modifiers", [])
+        reqsets = data.get("requirement_sets", [])
+        reqs = data.get("requirements", [])
+
+        if modifier_id:
+            mod = next((m for m in modifiers if m.get("modifier_id") == modifier_id), None)
+            if not mod:
+                return {"error": f"未找到修改器: {modifier_id}"}
+            return self._build_modifier_chain(mod, owners, reqsets, reqs)
+
+        if owner_key:
+            table_name, type_name = owner_key.split(":", 1)
+            owner = next(
+                (o for o in owners
+                 if o.get("table_name") == table_name and o.get("type_name") == type_name),
+                None,
+            )
+            if not owner:
+                return {"error": f"未找到拥有者: {owner_key}"}
+            result = {"owner": owner, "modifiers": []}
+            bindings = owner.get("owner_bindings") or []
+            bound_ids = [b.get("modifier_id") for b in bindings if b.get("modifier_id")]
+            # Also check legacy bound_modifier_ids
+            legacy = owner.get("bound_modifier_ids") or []
+            for mid in legacy:
+                if mid not in bound_ids:
+                    bound_ids.append(mid)
+            for mid in bound_ids:
+                mod = next((m for m in modifiers if m.get("modifier_id") == mid), None)
+                if mod:
+                    result["modifiers"].append(
+                        self._build_modifier_chain(mod, owners, reqsets, reqs)
+                    )
+            return result
+
+        return {"error": "请指定modifier_id或owner_key"}
+
+    def _build_modifier_chain(self, mod: dict, owners, reqsets, reqs) -> dict:
+        result = {"modifier": mod}
+        # Resolve reqsets
+        result["owner_reqset"] = self._resolve_reqset(mod.get("owner_reqset"), reqsets, reqs)
+        result["subject_reqset"] = self._resolve_reqset(mod.get("subject_reqset"), reqsets, reqs)
+        return result
+
+    def _resolve_reqset(self, rs_id, reqsets, reqs):
+        if not rs_id:
+            return None
+        rs = next((r for r in reqsets if r.get("requirement_set_id") == rs_id), None)
+        if not rs:
+            return {"requirement_set_id": rs_id, "error": "未找到"}
+        result = dict(rs)
+        resolved = []
+        for rid in rs.get("bound_requirements", []):
+            r = next((r for r in reqs if r.get("requirement_id") == rid), None)
+            resolved.append(r if r else {"requirement_id": rid, "error": "未找到"})
+        result["requirements"] = resolved
+        return result
+
+    def _exec_search_effect_types(self, params: dict) -> dict:
+        query = params["query"].lower()
+        limit = params.get("limit", 15)
+        results = []
+        for et, info in self._effect_types.items():
+            comment = info.get("c", "")
+            if not comment:
+                continue
+            if query in comment.lower() or query in et.lower():
+                results.append({
+                    "effect_type": et,
+                    "comment": comment,
+                    "params": info.get("pn", []),
+                })
+                if len(results) >= limit * 2:
+                    break
+        # Sort: shorter effect_type names first (more common), then by relevance
+        results.sort(key=lambda x: (len(x["effect_type"]), x["effect_type"]))
+        return {"query": query, "results": results[:limit]}
+
+    def _exec_search_requirement_types(self, params: dict) -> dict:
+        query = params["query"].lower()
+        limit = params.get("limit", 15)
+        results = []
+        for rt, info in self._requirement_types.items():
+            comment = info.get("c", "")
+            if not comment:
+                continue
+            if query in comment.lower() or query in rt.lower():
+                results.append({
+                    "requirement_type": rt,
+                    "comment": comment,
+                    "params": list(info.get("p", {}).keys()),
+                })
+                if len(results) >= limit * 2:
+                    break
+        results.sort(key=lambda x: (len(x["requirement_type"]), x["requirement_type"]))
+        return {"query": query, "results": results[:limit]}
+
+    def _exec_get_entity_schema(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        # Map Chinese names to schema keys
+        name_map = {
+            "文明": "Civilizations", "领袖": "Leaders",
+            "区域": "Districts", "建筑": "Buildings",
+            "单位": "Units", "改良设施": "Improvements",
+            "政策卡": "Policies", "项目": "Projects",
+            "信仰": "Beliefs", "议程": "Agendas",
+        }
+        key = name_map.get(section_name, section_name)
+        schema = self._entity_schemas.get(key)
+        if not schema:
+            available = list(self._entity_schemas.keys())
+            return {"error": f"未找到实体Schema: {section_name}", "available": available}
+        return {"table_name": schema.get("table_name"), "fields": schema.get("fields", [])}
+
+    def _exec_get_effect_parameters(self, params: dict) -> dict:
+        effect_type = params["effect_type"]
+        info = self._effect_types.get(effect_type)
+        if not info:
+            return {"error": f"未找到效果类型: {effect_type}"}
+        return {
+            "effect_type": effect_type,
+            "comment": info.get("c", ""),
+            "params": info.get("pn", []),
+            "param_types": info.get("p", {}),
+        }
+
+    # ── Propose tools ──
+
+    def _exec_propose_add_entity(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        data = params["data"]
+        description = params["description"]
+
+        # Ensure minimum required fields
+        if "name" not in data:
+            data["name"] = description
+        if "abbr" not in data:
+            data["abbr"] = data.get("name", "NEW")
+
+        sections = self._sections_provider()
+        current = sections.get(section_name)
+        current_count = len(current) if isinstance(current, list) else 0
+
+        return {
+            "action": "add_entity",
+            "section_name": section_name,
+            "description": description,
+            "data": data,
+            "insert_at_index": current_count,
+            "preview": {"before": f"（新建，当前{section_name}有{current_count}个条目）", "after": data},
+        }
+
+    def _exec_propose_edit_entity(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        entry_index = params["entry_index"]
+        data = params["data"]
+        description = params["description"]
+
+        sections = self._sections_provider()
+        entries = sections.get(section_name)
+        if not isinstance(entries, list) or entry_index >= len(entries):
+            return {"error": f"条目不存在: {section_name}[{entry_index}]"}
+        current = dict(entries[entry_index])
+        merged = dict(current)
+        merged.update(data)
+
+        return {
+            "action": "edit_entity",
+            "section_name": section_name,
+            "entry_index": entry_index,
+            "description": description,
+            "data": data,
+            "preview": {"before": current, "after": merged},
+        }
+
+    def _exec_propose_add_modifier(self, params: dict) -> dict:
+        owner = params["owner"]
+        modifier = params["modifier"]
+        reqsets = params.get("reqsets", [])
+        requirements = params.get("requirements", [])
+        description = params["description"]
+
+        # Validate
+        warnings = []
+        effect_type = modifier.get("effect_type", "")
+        if effect_type and effect_type not in self._effect_types:
+            warnings.append(f"EffectType '{effect_type}' 在知识库中未找到，请确认是否正确")
+        for req in requirements:
+            rt = req.get("requirement_type", "")
+            if rt and rt not in self._requirement_types:
+                warnings.append(f"RequirementType '{rt}' 在知识库中未找到，请确认是否正确")
+
+        # Generate IDs if not provided
+        if "modifier_id" not in modifier:
+            modifier["modifier_id"] = f"MODIFIER_{_safe_id(description)}"
+        for i, rs in enumerate(reqsets):
+            if "requirement_set_id" not in rs:
+                rs["requirement_set_id"] = f"REQSET_{_safe_id(description)}{'_' + str(i) if i else ''}"
+        for req in requirements:
+            if "requirement_id" not in req:
+                req["requirement_id"] = f"REQ_{_safe_id(description)}"
+
+        return {
+            "action": "add_modifier",
+            "description": description,
+            "owner": owner,
+            "modifier": modifier,
+            "reqsets": reqsets,
+            "requirements": requirements,
+            "warnings": warnings,
+            "preview": {
+                "owner": owner,
+                "modifier": modifier,
+                "requirement_sets": reqsets,
+                "requirements": requirements,
+            },
+        }
+
+    def _exec_propose_delete_entity(self, params: dict) -> dict:
+        section_name = params["section_name"]
+        entry_index = params["entry_index"]
+        description = params["description"]
+
+        sections = self._sections_provider()
+        entries = sections.get(section_name)
+        if not isinstance(entries, list) or entry_index >= len(entries):
+            return {"error": f"条目不存在: {section_name}[{entry_index}]"}
+        current = entries[entry_index]
+
+        return {
+            "action": "delete_entity",
+            "section_name": section_name,
+            "entry_index": entry_index,
+            "description": description,
+            "preview": {"deleted_entry": current.get("name", str(entry_index))},
+        }
+
+
+def _safe_id(text: str) -> str:
+    """Convert a Chinese description to a safe ID fragment."""
+    import re
+    # Extract alphanumeric parts, or just use uppercase hex
+    parts = re.findall(r"[A-Za-z0-9一-鿿]+", text)
+    if not parts:
+        return "MODIFIER"
+    result = "_".join(parts[:3]).upper().replace(" ", "_")
+    # If result is all Chinese, use a short hash
+    if any("一" <= c <= "鿿" for c in result[:10]) and not any(c.isascii() for c in result if c != "_"):
+        result = "MOD_" + "_".join(f"{ord(c):04X}" for c in text[:4] if c.isalpha())
+    return result[:40]

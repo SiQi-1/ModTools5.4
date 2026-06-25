@@ -85,6 +85,10 @@ class MainWindow(QMainWindow):
             action.triggered.connect(partial(self.show_page, page_id))
             view_menu.addAction(action)
 
+        view_menu.addSeparator()
+        self._add_action(view_menu, "AI助手", self._toggle_agent_chat)
+        self._add_action(view_menu, "切换AI面板 (Ctrl+Shift+A)", self._toggle_agent_chat)
+
         about_menu = menu_bar.addMenu("关于")
         self._add_action(about_menu, "版本信息", self._show_about_dialog)
 
@@ -111,6 +115,10 @@ class MainWindow(QMainWindow):
         self._stack.setCurrentWidget(page)
         page.on_activate()
         self.statusBar().showMessage(f"当前页面: {page.display_name or page_id}", 1600)
+
+    def _toggle_agent_chat(self) -> None:
+        if self._workspace_page is not None:
+            self._workspace_page.toggle_agent_chat_panel()
 
     def _handle_new_project(self) -> None:
         if self._workspace_page is None:

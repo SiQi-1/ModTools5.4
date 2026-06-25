@@ -1,0 +1,191 @@
+"""One-time script to build compact knowledge files for the AI Agent.
+
+Reads: data/effect_comment_templates.json, data/requirement_comment_templates.json,
+       data/effect_type_parameters.json, data/art_xml_rules.json
+Writes: agent/knowledge/effect_types_compact.json,
+        agent/knowledge/requirement_types_compact.json,
+        agent/knowledge/collection_types.json,
+        agent/knowledge/entity_schemas.json
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
+KNOWLEDGE_OUT = Path(__file__).resolve().parent
+
+
+def build_collection_types():
+    """Extract collection types from effect_type_parameters.json."""
+    src = DATA_DIR / "effect_type_parameters.json"
+    if not src.exists():
+        print(f"SKIP: {src} not found")
+        return
+    with open(src, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    collection_types = data.get("collection_types", [])
+    out_path = KNOWLEDGE_OUT / "collection_types.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump({"collection_types": collection_types}, f, ensure_ascii=False, indent=2)
+    print(f"Wrote {len(collection_types)} collection types to {out_path}")
+
+
+def build_effect_types_compact():
+    """Merge effect_comment_templates.json + effect_type_parameters.json into one compact file."""
+    # Load comment templates (Chinese descriptions + param types)
+    ct_path = DATA_DIR / "effect_comment_templates.json"
+    ep_path = DATA_DIR / "effect_type_parameters.json"
+    if not ct_path.exists():
+        print(f"SKIP: {ct_path} not found")
+        return
+    with open(ct_path, "r", encoding="utf-8") as f:
+        comments = json.load(f)
+    param_names = {}
+    if ep_path.exists():
+        with open(ep_path, "r", encoding="utf-8") as f:
+            ep_data = json.load(f)
+        for entry in ep_data.get("effect_types", []):
+            param_names[entry["effect_type"]] = entry.get("parameter_names", [])
+
+    compact = {}
+    for effect_type, info in comments.items():
+        entry = {
+            "c": info.get("comment", ""),          # Chinese comment template
+            "p": info.get("params", {}),            # param name -> type
+            "pn": param_names.get(effect_type, []),  # param names in order
+        }
+        compact[effect_type] = entry
+
+    out_path = KNOWLEDGE_OUT / "effect_types_compact.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(compact, f, ensure_ascii=False)
+    print(f"Wrote {len(compact)} effect types to {out_path}")
+
+
+def build_requirement_types_compact():
+    """Compact requirement comment templates."""
+    ct_path = DATA_DIR / "requirement_comment_templates.json"
+    if not ct_path.exists():
+        print(f"SKIP: {ct_path} not found")
+        return
+    with open(ct_path, "r", encoding="utf-8") as f:
+        comments = json.load(f)
+
+    compact = {}
+    for req_type, info in comments.items():
+        entry = {
+            "c": info.get("comment", ""),
+            "p": info.get("params", {}),
+        }
+        compact[req_type] = entry
+
+    out_path = KNOWLEDGE_OUT / "requirement_types_compact.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(compact, f, ensure_ascii=False)
+    print(f"Wrote {len(compact)} requirement types to {out_path}")
+
+
+def build_entity_schemas():
+    """Extract entity table schemas from entity_table_form.py schema builders.
+
+    We import the schema builders and extract field metadata.
+    """
+    sys.path.insert(0, str(PROJECT_ROOT.parent))
+    try:
+        from ModTools_5_4.ui.pages.entity_table_form import (
+            build_districts_main_schema,
+            build_buildings_main_schema,
+            build_units_main_schema,
+            build_improvements_main_schema,
+            build_policies_main_schema,
+            build_projects_main_schema,
+            build_beliefs_main_schema,
+            build_agendas_main_schema,
+        )
+    except ImportError as e:
+        print(f"WARNING: Could not import schema builders: {e}")
+        print("Skipping entity_schemas.json generation.")
+        return
+
+    schema_builders = {
+        "Districts": build_districts_main_schema,
+        "Buildings": build_buildings_main_schema,
+        "Units": build_units_main_schema,
+        "Improvements": build_improvements_main_schema,
+        "Policies": build_policies_main_schema,
+        "Projects": build_projects_main_schema,
+        "Beliefs": build_beliefs_main_schema,
+        "Agendas": build_agendas_main_schema,
+    }
+
+    schemas = {}
+    for name, builder in schema_builders.items():
+        try:
+            schema = builder()
+            fields = []
+            for f in schema.fields:
+                fields.append({
+                    "key": f.key,
+                    "label": f.label,
+                    "field_type": f.field_type,
+                    "section": f.section,
+                    "default": f.default,
+                    "required": getattr(f, "required", False),
+                    "template_key": f.template_key,
+                })
+            schemas[name] = {
+                "table_name": schema.table_name,
+                "fields": fields,
+                "linked_groups": [
+                    {"first_key": lg.first_key, "second_key": lg.second_key}
+                    for lg in (schema.linked_groups or [])
+                ],
+            }
+        except Exception as e:
+            print(f"  Error building schema for {name}: {e}")
+
+    # Add manual schemas for sections without TableFieldSpec builders
+    manual_schemas = {
+        "Civilizations": {
+            "table_name": "Civilizations",
+            "fields": [
+                {"key": "CivilizationType", "label": "文明类型", "field_type": "text", "required": True},
+                {"key": "Name", "label": "名称", "field_type": "text", "required": True},
+                {"key": "Description", "label": "描述", "field_type": "text", "required": True},
+                {"key": "Adjective", "label": "形容词", "field_type": "text", "required": True},
+                {"key": "CapitalName", "label": "首都名", "field_type": "text", "required": False},
+            ],
+        },
+        "Leaders": {
+            "table_name": "Leaders",
+            "fields": [
+                {"key": "LeaderType", "label": "领袖类型", "field_type": "text", "required": True},
+                {"key": "Name", "label": "名称", "field_type": "text", "required": True},
+                {"key": "Sex", "label": "性别", "field_type": "text", "required": False},
+                {"key": "CapitalName", "label": "首都名", "field_type": "text", "required": False},
+            ],
+        },
+    }
+    schemas.update(manual_schemas)
+
+    out_path = KNOWLEDGE_OUT / "entity_schemas.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(schemas, f, ensure_ascii=False, indent=2)
+    print(f"Wrote {len(schemas)} entity schemas to {out_path}")
+
+
+def main():
+    print("Building agent knowledge files...")
+    build_collection_types()
+    build_effect_types_compact()
+    build_requirement_types_compact()
+    build_entity_schemas()
+    print("Done.")
+
+
+if __name__ == "__main__":
+    main()

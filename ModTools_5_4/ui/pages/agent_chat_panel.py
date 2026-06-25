@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ...agent.agent_session import AgentSession
-from ...agent.llm_backend import LlmBackend
+from ...agent.llm_backend import LlmBackend, PROVIDERS
 from ...agent.tool_executor import ToolExecutor
 from ...agent.system_prompt import build_system_prompt
 
@@ -358,17 +358,54 @@ class AgentChatPanel(QWidget):
     def _show_settings(self):
         dlg = QDialog(self)
         dlg.setWindowTitle("AI 助手设置")
+        dlg.setMinimumWidth(400)
         layout = QFormLayout(dlg)
 
-        url_edit = QLineEdit(self._llm_backend.base_url)
-        layout.addRow("Ollama URL:", url_edit)
+        # Provider selection
+        provider_names = list(PROVIDERS.keys())
+        provider_labels = [PROVIDERS[k]["label"] for k in provider_names]
+        provider_combo = QComboBox()
+        provider_combo.addItems(provider_labels)
+        try:
+            idx = provider_names.index(self._llm_backend.provider)
+        except ValueError:
+            idx = 0
+        provider_combo.setCurrentIndex(idx)
+        layout.addRow("服务商:", provider_combo)
 
+        # URL
+        url_edit = QLineEdit(self._llm_backend.base_url)
+        layout.addRow("API URL:", url_edit)
+
+        # API Key
+        key_edit = QLineEdit(self._llm_backend.api_key)
+        key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        key_edit.setPlaceholderText("Ollama本地模式无需填写")
+        layout.addRow("API Key:", key_edit)
+
+        # Model
         model_combo = QComboBox()
         model_combo.setEditable(True)
-        model_combo.addItems(["qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b",
-                               "llama3.1:8b", "deepseek-r1:7b", "deepseek-r1:14b"])
+        model_combo.addItems([
+            "deepseek-chat", "deepseek-reasoner",
+            "gpt-4o-mini", "gpt-4o",
+            "qwen2.5:7b", "qwen2.5:14b",
+        ])
         model_combo.setCurrentText(self._llm_backend.model)
         layout.addRow("模型:", model_combo)
+
+        # Auto-switch URL when provider changes
+        def _on_provider_changed(index):
+            key = provider_names[index]
+            preset = PROVIDERS[key]
+            url_edit.setText(preset["default_url"])
+            model_combo.setCurrentText(preset["default_model"])
+            if key == "ollama":
+                key_edit.setPlaceholderText("Ollama本地模式无需填写")
+                key_edit.setText("")
+            else:
+                key_edit.setPlaceholderText("输入API Key")
+        provider_combo.currentIndexChanged.connect(_on_provider_changed)
 
         btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok |
                                     QDialogButtonBox.StandardButton.Cancel)
@@ -377,9 +414,25 @@ class AgentChatPanel(QWidget):
         layout.addRow(btn_box)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            self._llm_backend.base_url = url_edit.text().strip().rstrip("/")
-            self._llm_backend.model = model_combo.currentText()
-            self._agent.reset()  # Reset session with old prompt, new model takes effect next call
+            provider_key = provider_names[provider_combo.currentIndex()]
+            self._llm_backend = LlmBackend(
+                provider=provider_key,
+                api_key=key_edit.text().strip(),
+                base_url=url_edit.text().strip(),
+                model=model_combo.currentText().strip(),
+            )
+            self._agent = AgentSession(
+                self._llm_backend,
+                self._tool_executor,
+                self._system_prompt,
+                parent=self,
+            )
+            self._agent.response_started.connect(self._on_response_started)
+            self._agent.response_chunk.connect(self._on_response_chunk)
+            self._agent.response_finished.connect(self._on_response_finished)
+            self._agent.preview_ready.connect(self._on_preview_ready)
+            self._agent.thinking.connect(self._on_thinking)
+            self._agent.error_occurred.connect(self._on_error)
             self._status_label.setText("✅ 就绪 (已更新)")
             self._status_label.setStyleSheet("color: #27ae60;")
 

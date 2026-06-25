@@ -32,6 +32,43 @@ class ToolDef:
     parameters: dict
     requires_preview: bool = False
 
+    def to_openai_dict(self, strict: bool = False) -> dict:
+        """Convert to OpenAI-compatible function dict. Set strict=True for DeepSeek."""
+        func: dict = {
+            "name": self.name,
+            "description": self.description,
+            "parameters": dict(self.parameters),
+        }
+        if strict:
+            func["strict"] = True
+        # Ensure all nested object schemas have additionalProperties: false
+        _enforce_object_constraints(func["parameters"])
+        return {"type": "function", "function": func}
+
+    def to_openai_dict_legacy(self) -> dict:
+        """Legacy format without strict mode (for models that don't support it)."""
+        return {"type": "function", "function": {
+            "name": self.name,
+            "description": self.description,
+            "parameters": self.parameters,
+        }}
+
+
+def _enforce_object_constraints(schema: dict) -> None:
+    """Recursively add additionalProperties: false to all object schemas."""
+    if not isinstance(schema, dict):
+        return
+    if schema.get("type") == "object":
+        schema.setdefault("additionalProperties", False)
+    if "properties" in schema:
+        for prop in schema.get("properties", {}).values():
+            _enforce_object_constraints(prop)
+    if "items" in schema:
+        _enforce_object_constraints(schema["items"])
+    if "anyOf" in schema:
+        for sub in schema.get("anyOf", []):
+            _enforce_object_constraints(sub)
+
 
 TOOL_DEFS: list[ToolDef] = []
 

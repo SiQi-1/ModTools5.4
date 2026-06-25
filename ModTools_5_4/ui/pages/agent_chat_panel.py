@@ -387,6 +387,7 @@ class AgentChatPanel(QWidget):
         model_combo = QComboBox()
         model_combo.setEditable(True)
         model_combo.addItems([
+            "deepseek-v4-flash", "deepseek-v4-pro",
             "deepseek-chat", "deepseek-reasoner",
             "gpt-4o-mini", "gpt-4o",
             "qwen2.5:7b", "qwen2.5:14b",

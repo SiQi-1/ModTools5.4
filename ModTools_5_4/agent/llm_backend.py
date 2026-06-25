@@ -26,7 +26,7 @@ PROVIDERS = {
         "label": "DeepSeek (云端)",
         "default_url": "https://api.deepseek.com",
         "chat_path": "/v1/chat/completions",
-        "default_model": "deepseek-chat",
+        "default_model": "deepseek-v4-flash",
     },
     "openai": {
         "label": "OpenAI (云端)",
@@ -156,13 +156,24 @@ class LlmBackend(QObject):
         payload: dict = {
             "model": self.model,
             "messages": messages,
-            "stream": False,  # Non-stream for tool calling reliability
+            "stream": False,
         }
+        if self.provider == "deepseek":
+            payload["temperature"] = 1.0
+
         if tools:
             if self._is_ollama:
                 payload["tools"] = tools
             else:
-                payload["tools"] = [t for t in tools]
+                # For DeepSeek, apply strict mode to tools
+                if self.provider == "deepseek":
+                    from .tools import TOOL_DEFS
+                    strict_tools = []
+                    for td in TOOL_DEFS:
+                        strict_tools.append(td.to_openai_dict(strict=True))
+                    payload["tools"] = strict_tools
+                else:
+                    payload["tools"] = [t for t in tools]
                 payload["tool_choice"] = "auto"
 
         headers = {}

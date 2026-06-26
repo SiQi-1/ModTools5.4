@@ -132,13 +132,16 @@ class AgentSession(QObject):
                 )
                 return
 
-            # If any proposal tools were called, STOP and show preview to user
+            # If propose tools called, emit preview and stop
             if self._pending_proposal is not None:
+                self.response_finished.emit("")
+                description = self._pending_proposal.get("description", "变更提案")
+                self.preview_ready.emit(self._pending_proposal, description)
                 return
 
             self._call_llm()
         else:
-            # Final text response
+            # Final text response (no more tool calls)
             msg = ChatMessage.assistant(content=content)
             self._messages.append(msg)
             self.response_finished.emit(content)

@@ -44,6 +44,14 @@ class AgentSession(QObject):
         for td in TOOL_DEFS:
             self._tools.append(td.to_openai_dict_legacy())
 
+    def accept_proposal(self) -> None:
+        """Feed proposal acceptance back to the model so it can continue."""
+        self._messages.append(ChatMessage.user("变更已应用，可以继续下一步。"))
+        self._pending_proposal = None
+        self._tool_iteration = 0
+        self.response_started.emit()
+        self._call_llm()
+
     def reset(self) -> None:
         self._messages.clear()
         self._pending_proposal = None

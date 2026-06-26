@@ -394,6 +394,8 @@ class AgentChatPanel(QWidget):
             self._on_apply_proposal(proposal)
             self._append_message("assistant", "✅ 变更已应用。")
             self._remove_proposal_card()
+            # Continue the agent loop for multi-step requests
+            self._agent.accept_proposal()
         except Exception as e:
             self._append_message("assistant", f"❌ 应用变更失败：{e}")
 

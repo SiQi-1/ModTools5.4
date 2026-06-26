@@ -290,6 +290,17 @@ class ToolExecutor:
         if "abbr" not in data:
             data["abbr"] = data.get("name", "NEW")
 
+        # Flat entity types (文明/领袖/总督/伟人): fields go at TOP LEVEL, never in table_data
+        FLAT_SECTIONS = {"文明", "领袖", "总督", "伟人"}
+        if section_name in FLAT_SECTIONS:
+            td = data.get("table_data")
+            if isinstance(td, dict) and td:
+                # Model wrongly put fields in table_data — move them to top level
+                for k, v in td.items():
+                    if k not in data:
+                        data[k] = v
+                del data["table_data"]
+
         # Validate field names against known schema
         schema_key = self._section_to_schema_key(section_name)
         schema = self._entity_schemas.get(schema_key, {})
@@ -308,7 +319,8 @@ class ToolExecutor:
             return {
                 "error": f"字段名不匹配！你使用了不存在或错误的字段：{unknown}。\n"
                          f"该实体({section_name})的有效字段包括：{known_sample}...\n"
-                         f"请调用 get_entity_schema('{section_name}') 确认字段名后重新提案。"
+                         f"请调用 get_entity_schema('{section_name}') 确认字段名后重新提案。\n"
+                         f"注意：{section_name}是扁平格式，字段直接放在data顶层，不要放进table_data！"
             }
 
         sections = self._sections_provider()

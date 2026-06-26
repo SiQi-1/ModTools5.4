@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ...agent.agent_session import AgentSession
+from ...app.settings_store import load_agent_settings, save_agent_settings
 from ...agent.llm_backend import LlmBackend, PROVIDERS
 from ...agent.tool_executor import ToolExecutor
 from ...agent.system_prompt import build_system_prompt
@@ -168,8 +169,14 @@ class AgentChatPanel(QWidget):
         self._proposal_card: _ProposalCard | None = None
         self._proposals = []
 
-        # Backend initialization
-        self._llm_backend = LlmBackend(model="qwen2.5:7b")
+        # Backend initialization — load persisted settings
+        agent_cfg = load_agent_settings()
+        self._llm_backend = LlmBackend(
+            provider=agent_cfg.provider,
+            api_key=agent_cfg.api_key,
+            base_url=agent_cfg.base_url,
+            model=agent_cfg.model,
+        )
         self._tool_executor = ToolExecutor(sections_provider)
         self._system_prompt = build_system_prompt()
 
@@ -203,7 +210,8 @@ class AgentChatPanel(QWidget):
         header_bar.addWidget(title)
         header_bar.addStretch()
 
-        self._status_label = QLabel("⚪ 未连接")
+        provider_label = PROVIDERS.get(agent_cfg.provider, {}).get("label", agent_cfg.provider)
+        self._status_label = QLabel(f"⚪ {provider_label}")
         self._status_label.setStyleSheet("color: #888;")
         header_bar.addWidget(self._status_label)
         header_bar.addSpacing(8)
@@ -436,6 +444,15 @@ class AgentChatPanel(QWidget):
             self._agent.error_occurred.connect(self._on_error)
             self._status_label.setText("✅ 就绪 (已更新)")
             self._status_label.setStyleSheet("color: #27ae60;")
+
+            # Persist settings
+            from ...app.settings_store import AgentSettings
+            save_agent_settings(AgentSettings(
+                provider=provider_key,
+                api_key=key_edit.text().strip(),
+                base_url=url_edit.text().strip(),
+                model=model_combo.currentText().strip(),
+            ))
 
     def update_sections_provider(self, provider):
         self._sections_provider = provider

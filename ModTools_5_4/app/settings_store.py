@@ -146,3 +146,41 @@ def ensure_text_db_entry(settings: UserSettings, db_path: Path, display_name: st
 
 def set_active_text_db(settings: UserSettings, db_path: Path) -> None:
     settings.active_text_db_path = str(db_path.resolve())
+
+
+# ── Agent settings (stored in the same settings JSON under "agent" key) ──
+
+from dataclasses import dataclass as _dataclass
+
+
+@_dataclass(slots=True)
+class AgentSettings:
+    provider: str = "deepseek"
+    api_key: str = ""
+    base_url: str = ""
+    model: str = "deepseek-v4-flash"
+
+
+def load_agent_settings() -> AgentSettings:
+    payload = _load_json_dict(SETTINGS_FILE) or {}
+    agent_payload = payload.get("agent")
+    if not isinstance(agent_payload, dict):
+        return AgentSettings()
+    return AgentSettings(
+        provider=str(agent_payload.get("provider") or "deepseek"),
+        api_key=str(agent_payload.get("api_key") or ""),
+        base_url=str(agent_payload.get("base_url") or ""),
+        model=str(agent_payload.get("model") or "deepseek-v4-flash"),
+    )
+
+
+def save_agent_settings(agent: AgentSettings) -> None:
+    payload = _load_json_dict(SETTINGS_FILE) or {}
+    payload["agent"] = {
+        "provider": agent.provider,
+        "api_key": agent.api_key,
+        "base_url": agent.base_url,
+        "model": agent.model,
+    }
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SETTINGS_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

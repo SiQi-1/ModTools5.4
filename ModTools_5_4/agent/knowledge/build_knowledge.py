@@ -235,9 +235,20 @@ def build_entity_schemas():
                 {"key": "images", "label": "图片", "field_type": "object", "required": False,
                  "default": {}, "desc": "图标图片数据，{}表示空"},
                 {"key": "city_info", "label": "城市名设置", "field_type": "object", "required": False,
-                 "default": {}, "desc": "城市名配置，{}表示空/默认"},
+                 "default": {},
+                 "desc": "三种模式(mode_index): 0=复制现有文明(existing_selection选文明,无需填内容), "
+                         "1=自定义(custom_entries填城市名列表), 2=随机(random_count填数量,无需填内容)。\n"
+                         "通常用模式1(自定义)：{\"mode_index\":1, \"custom_entries\":[\"长安\",\"洛阳\",\"邺城\",...], \"custom_count\":10}\n"
+                         "或用模式0(复制)：{\"mode_index\":0, \"existing_selection\":\"CIVILIZATION_CHINA\"}"},
                 {"key": "citizen_info", "label": "市民名设置", "field_type": "object", "required": False,
-                 "default": {}, "desc": "市民名配置，{}表示空/默认"},
+                 "default": {},
+                 "desc": "三种模式同city_info。自定义时custom_entries格式: "
+                         "{\"name\":\"张三\", \"female\":false, \"modern\":false}\n"
+                         "female: false=男/true=女, modern: false=古代/true=现代\n"
+                         "建议每种组合(female×modern)至少各1个，共4-16个名字。\n"
+                         "示例：{\"mode_index\":1, \"custom_entries\":["
+                         "{\"name\":\"张良\",\"female\":false,\"modern\":false},"
+                         "{\"name\":\"吕雉\",\"female\":true,\"modern\":false}], \"custom_count\":8}"},
                 {"key": "start_bias", "label": "起始偏好", "field_type": "object", "required": False,
                  "default": {},
                  "desc": "出生地偏好。格式: {\"terrains\":[],\"features\":[],\"resources\":[],\"river_enabled\":false,\"river_tier\":1}。\n"

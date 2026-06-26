@@ -2237,7 +2237,7 @@
         "field_type": "object",
         "required": false,
         "default": {},
-        "desc": "城市名配置，{}表示空/默认"
+        "desc": "三种模式(mode_index): 0=复制现有文明(existing_selection选文明,无需填内容), 1=自定义(custom_entries填城市名列表), 2=随机(random_count填数量,无需填内容)。\n通常用模式1(自定义)：{\"mode_index\":1, \"custom_entries\":[\"长安\",\"洛阳\",\"邺城\",...], \"custom_count\":10}\n或用模式0(复制)：{\"mode_index\":0, \"existing_selection\":\"CIVILIZATION_CHINA\"}"
       },
       {
         "key": "citizen_info",
@@ -2245,7 +2245,7 @@
         "field_type": "object",
         "required": false,
         "default": {},
-        "desc": "市民名配置，{}表示空/默认"
+        "desc": "三种模式同city_info。自定义时custom_entries格式: {\"name\":\"张三\", \"female\":false, \"modern\":false}\nfemale: false=男/true=女, modern: false=古代/true=现代\n建议每种组合(female×modern)至少各1个，共4-16个名字。\n示例：{\"mode_index\":1, \"custom_entries\":[{\"name\":\"张良\",\"female\":false,\"modern\":false},{\"name\":\"吕雉\",\"female\":true,\"modern\":false}], \"custom_count\":8}"
       },
       {
         "key": "start_bias",

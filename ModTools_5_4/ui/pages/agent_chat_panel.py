@@ -210,7 +210,7 @@ class AgentChatPanel(QWidget):
         header_bar.addWidget(title)
         header_bar.addStretch()
 
-        provider_label = PROVIDERS.get(agent_cfg.provider, {}).get("label", agent_cfg.provider)
+        provider_label = PROVIDERS.get(self._llm_backend.provider, {}).get("label", self._llm_backend.provider)
         self._status_label = QLabel(f"⚪ {provider_label}")
         self._status_label.setStyleSheet("color: #888;")
         header_bar.addWidget(self._status_label)

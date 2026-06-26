@@ -118,10 +118,11 @@ class AgentSession(QObject):
                     name=name,
                 ))
                 from .tools import TOOL_DEFS
-                for td in TOOL_DEFS:
-                    if td.name == name and td.requires_preview:
-                        self._pending_proposal = result
-                        break
+                if "error" not in result:
+                    for td in TOOL_DEFS:
+                        if td.name == name and td.requires_preview:
+                            self._pending_proposal = result
+                            break
 
             self._tool_iteration += 1
             if self._tool_iteration >= MAX_TOOL_ITERATIONS:

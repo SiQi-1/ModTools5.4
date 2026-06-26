@@ -280,11 +280,11 @@ class ToolExecutor:
     # ── Propose tools ──
 
     def _exec_propose_add_entity(self, params: dict) -> dict:
-        section_name = params["section_name"]
-        data = params["data"]
-        description = params["description"]
-
-        # Ensure minimum required fields
+        section_name = params.get("section_name", "文明")
+        data = params.get("data") or {}
+        if not isinstance(data, dict):
+            return {"error": "data参数必须是对象"}
+        description = params.get("description") or str(data.get("name", "新条目"))
         if "name" not in data:
             data["name"] = description
         if "abbr" not in data:
@@ -304,10 +304,10 @@ class ToolExecutor:
         }
 
     def _exec_propose_edit_entity(self, params: dict) -> dict:
-        section_name = params["section_name"]
-        entry_index = params["entry_index"]
-        data = params["data"]
-        description = params["description"]
+        section_name = params.get("section_name", "")
+        entry_index = params.get("entry_index", 0)
+        data = params.get("data") or {}
+        description = params.get("description") or f"编辑{section_name}[{entry_index}]"
 
         sections = self._sections_provider()
         entries = sections.get(section_name)
@@ -327,11 +327,11 @@ class ToolExecutor:
         }
 
     def _exec_propose_add_modifier(self, params: dict) -> dict:
-        owner = params["owner"]
-        modifier = params["modifier"]
+        owner = params.get("owner") or {}
+        modifier = params.get("modifier") or {}
         reqsets = params.get("reqsets", [])
         requirements = params.get("requirements", [])
-        description = params["description"]
+        description = params.get("description") or str(modifier.get("modifier_id", "新修改器"))
 
         # Validate
         warnings = []
@@ -370,9 +370,9 @@ class ToolExecutor:
         }
 
     def _exec_propose_delete_entity(self, params: dict) -> dict:
-        section_name = params["section_name"]
-        entry_index = params["entry_index"]
-        description = params["description"]
+        section_name = params.get("section_name", "")
+        entry_index = params.get("entry_index", 0)
+        description = params.get("description") or f"删除{section_name}[{entry_index}]"
 
         sections = self._sections_provider()
         entries = sections.get(section_name)

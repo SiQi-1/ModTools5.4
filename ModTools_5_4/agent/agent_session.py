@@ -14,7 +14,7 @@ from .tool_executor import ToolExecutor
 
 logger = logging.getLogger(__name__)
 
-MAX_TOOL_ITERATIONS = 10
+MAX_TOOL_ITERATIONS = 20
 MAX_HISTORY_MESSAGES = 30
 
 

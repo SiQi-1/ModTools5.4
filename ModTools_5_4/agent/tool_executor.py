@@ -334,30 +334,31 @@ class ToolExecutor:
         # Auto-correct common field name mistakes inside start_bias
         sb = data.get("start_bias")
         if isinstance(sb, dict) and sb:
-            # terrain_types → terrains
-            if "terrain_types" in sb and "terrains" not in sb:
-                sb["terrains"] = sb.pop("terrain_types")
-            if "terrain_type" in sb and "terrains" not in sb:
-                sb["terrains"] = sb.pop("terrain_type")
-            # feature_types → features
-            if "feature_types" in sb and "features" not in sb:
-                sb["features"] = sb.pop("feature_types")
-            if "feature_type" in sb and "features" not in sb:
-                sb["features"] = sb.pop("feature_type")
-            # resource_types → resources
-            if "resource_types" in sb and "resources" not in sb:
-                sb["resources"] = sb.pop("resource_types")
-            if "resource_type" in sb and "resources" not in sb:
-                sb["resources"] = sb.pop("resource_type")
-            # rivers bool → river_enabled + river_tier
+            # Fix key names
+            for wrong, right in [
+                ("terrain_types", "terrains"), ("terrain_type", "terrains"),
+                ("feature_types", "features"), ("feature_type", "features"),
+                ("resource_types", "resources"), ("resource_type", "resources"),
+            ]:
+                if wrong in sb and right not in sb:
+                    sb[right] = sb.pop(wrong)
             if "rivers" in sb and "river_enabled" not in sb:
                 sb["river_enabled"] = bool(sb.pop("rivers"))
                 sb.setdefault("river_tier", 3)
             if "river" in sb and "river_enabled" not in sb:
                 sb["river_enabled"] = bool(sb.pop("river"))
                 sb.setdefault("river_tier", 3)
-            # Remove coast (not a real start_bias field)
             sb.pop("coast", None)
+
+            # Convert simple string arrays to BiasRowsEditor format:
+            # ["TERRAIN_GRASS"] → [{"selector_data": {"type": "TERRAIN_GRASS"}, "tier": 1}]
+            for key in ("terrains", "features", "resources"):
+                arr = sb.get(key)
+                if isinstance(arr, list) and arr and isinstance(arr[0], str):
+                    sb[key] = [
+                        {"selector_data": {"type": v}, "tier": 1}
+                        for v in arr
+                    ]
 
         # Validate field names against known schema
         schema_key = self._section_to_schema_key(section_name)

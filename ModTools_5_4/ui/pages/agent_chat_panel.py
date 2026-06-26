@@ -16,7 +16,11 @@ from PyQt6.QtWidgets import (
 )
 
 from ...agent.agent_session import AgentSession
+import os
+import subprocess
+
 from ...app.settings_store import load_agent_settings, save_agent_settings
+from ...app.user_paths import settings_file_path
 from ...agent.llm_backend import LlmBackend, PROVIDERS
 from ...agent.tool_executor import ToolExecutor
 from ...agent.system_prompt import build_system_prompt
@@ -416,6 +420,12 @@ class AgentChatPanel(QWidget):
                 key_edit.setPlaceholderText("输入API Key")
         provider_combo.currentIndexChanged.connect(_on_provider_changed)
 
+        # Config folder button
+        config_path = settings_file_path()
+        open_btn = QPushButton(f"打开配置文件夹: {config_path}")
+        open_btn.clicked.connect(lambda: self._open_config_folder(config_path))
+        layout.addRow("配置:", open_btn)
+
         btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok |
                                     QDialogButtonBox.StandardButton.Cancel)
         btn_box.accepted.connect(dlg.accept)
@@ -453,6 +463,15 @@ class AgentChatPanel(QWidget):
                 base_url=url_edit.text().strip(),
                 model=model_combo.currentText().strip(),
             ))
+
+    @staticmethod
+    def _open_config_folder(path):
+        folder = path.parent
+        folder.mkdir(parents=True, exist_ok=True)
+        try:
+            os.startfile(str(folder))
+        except AttributeError:
+            subprocess.Popen(["xdg-open", str(folder)])
 
     def update_sections_provider(self, provider):
         self._sections_provider = provider

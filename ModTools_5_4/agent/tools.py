@@ -219,6 +219,20 @@ _tool(
     required=["effect_type"],
 )
 
+_tool(
+    "get_enum_values",
+    "获取某个枚举类型的可选值列表。用于了解字段可以填写哪些值。"
+    "可用于填充起始偏好(start_bias)的地形/地貌/资源，或其他下拉选项。",
+    {
+        "enum_type": {
+            "type": "string",
+            "description": "枚举类型名称",
+            "enum": ["terrains", "features", "resources"],
+        },
+    },
+    required=["enum_type"],
+)
+
 
 # ── Propose tools (require preview) ──
 

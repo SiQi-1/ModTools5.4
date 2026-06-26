@@ -1,0 +1,492 @@
+{
+  "terrains": [
+    {
+      "value": "TERRAIN_COAST",
+      "label": "海岸与湖泊"
+    },
+    {
+      "value": "TERRAIN_DESERT",
+      "label": "沙漠"
+    },
+    {
+      "value": "TERRAIN_DESERT_HILLS",
+      "label": "沙漠（丘陵）"
+    },
+    {
+      "value": "TERRAIN_DESERT_MOUNTAIN",
+      "label": "沙漠（山脉）"
+    },
+    {
+      "value": "TERRAIN_GRASS",
+      "label": "草原"
+    },
+    {
+      "value": "TERRAIN_GRASS_HILLS",
+      "label": "草原（丘陵）"
+    },
+    {
+      "value": "TERRAIN_GRASS_MOUNTAIN",
+      "label": "草原（山脉）"
+    },
+    {
+      "value": "TERRAIN_OCEAN",
+      "label": "海洋"
+    },
+    {
+      "value": "TERRAIN_PLAINS",
+      "label": "平原"
+    },
+    {
+      "value": "TERRAIN_PLAINS_HILLS",
+      "label": "平原（丘陵）"
+    },
+    {
+      "value": "TERRAIN_PLAINS_MOUNTAIN",
+      "label": "平原（山脉）"
+    },
+    {
+      "value": "TERRAIN_SNOW",
+      "label": "雪地"
+    },
+    {
+      "value": "TERRAIN_SNOW_HILLS",
+      "label": "雪地（丘陵）"
+    },
+    {
+      "value": "TERRAIN_SNOW_MOUNTAIN",
+      "label": "雪地（山脉）"
+    },
+    {
+      "value": "TERRAIN_TUNDRA",
+      "label": "冻土"
+    },
+    {
+      "value": "TERRAIN_TUNDRA_HILLS",
+      "label": "冻土（丘陵）"
+    },
+    {
+      "value": "TERRAIN_TUNDRA_MOUNTAIN",
+      "label": "冻土（山脉）"
+    }
+  ],
+  "features": [
+    {
+      "value": "FEATURE_BARRIER_REEF",
+      "label": "FEATURE_BARRIER_REEF"
+    },
+    {
+      "value": "FEATURE_BERMUDA_TRIANGLE",
+      "label": "FEATURE_BERMUDA_TRIANGLE"
+    },
+    {
+      "value": "FEATURE_BURNING_FOREST",
+      "label": "FEATURE_BURNING_FOREST"
+    },
+    {
+      "value": "FEATURE_BURNING_JUNGLE",
+      "label": "FEATURE_BURNING_JUNGLE"
+    },
+    {
+      "value": "FEATURE_BURNT_FOREST",
+      "label": "FEATURE_BURNT_FOREST"
+    },
+    {
+      "value": "FEATURE_BURNT_JUNGLE",
+      "label": "FEATURE_BURNT_JUNGLE"
+    },
+    {
+      "value": "FEATURE_CHOCOLATEHILLS",
+      "label": "FEATURE_CHOCOLATEHILLS"
+    },
+    {
+      "value": "FEATURE_CLIFFS_DOVER",
+      "label": "FEATURE_CLIFFS_DOVER"
+    },
+    {
+      "value": "FEATURE_CRATER_LAKE",
+      "label": "FEATURE_CRATER_LAKE"
+    },
+    {
+      "value": "FEATURE_DEAD_SEA",
+      "label": "FEATURE_DEAD_SEA"
+    },
+    {
+      "value": "FEATURE_DELICATE_ARCH",
+      "label": "FEATURE_DELICATE_ARCH"
+    },
+    {
+      "value": "FEATURE_DEVILSTOWER",
+      "label": "FEATURE_DEVILSTOWER"
+    },
+    {
+      "value": "FEATURE_EVEREST",
+      "label": "FEATURE_EVEREST"
+    },
+    {
+      "value": "FEATURE_EYE_OF_THE_SAHARA",
+      "label": "FEATURE_EYE_OF_THE_SAHARA"
+    },
+    {
+      "value": "FEATURE_EYJAFJALLAJOKULL",
+      "label": "FEATURE_EYJAFJALLAJOKULL"
+    },
+    {
+      "value": "FEATURE_FLOODPLAINS",
+      "label": "FEATURE_FLOODPLAINS"
+    },
+    {
+      "value": "FEATURE_FLOODPLAINS_GRASSLAND",
+      "label": "FEATURE_FLOODPLAINS_GRASSLAND"
+    },
+    {
+      "value": "FEATURE_FLOODPLAINS_PLAINS",
+      "label": "FEATURE_FLOODPLAINS_PLAINS"
+    },
+    {
+      "value": "FEATURE_FOREST",
+      "label": "FEATURE_FOREST"
+    },
+    {
+      "value": "FEATURE_FOUNTAIN_OF_YOUTH",
+      "label": "FEATURE_FOUNTAIN_OF_YOUTH"
+    },
+    {
+      "value": "FEATURE_GALAPAGOS",
+      "label": "FEATURE_GALAPAGOS"
+    },
+    {
+      "value": "FEATURE_GEOTHERMAL_FISSURE",
+      "label": "FEATURE_GEOTHERMAL_FISSURE"
+    },
+    {
+      "value": "FEATURE_GIANTS_CAUSEWAY",
+      "label": "FEATURE_GIANTS_CAUSEWAY"
+    },
+    {
+      "value": "FEATURE_GOBUSTAN",
+      "label": "FEATURE_GOBUSTAN"
+    },
+    {
+      "value": "FEATURE_HA_LONG_BAY",
+      "label": "FEATURE_HA_LONG_BAY"
+    },
+    {
+      "value": "FEATURE_ICE",
+      "label": "FEATURE_ICE"
+    },
+    {
+      "value": "FEATURE_IKKIL",
+      "label": "FEATURE_IKKIL"
+    },
+    {
+      "value": "FEATURE_JUNGLE",
+      "label": "FEATURE_JUNGLE"
+    },
+    {
+      "value": "FEATURE_KILIMANJARO",
+      "label": "FEATURE_KILIMANJARO"
+    },
+    {
+      "value": "FEATURE_LAKE_RETBA",
+      "label": "FEATURE_LAKE_RETBA"
+    },
+    {
+      "value": "FEATURE_LYSEFJORDEN",
+      "label": "FEATURE_LYSEFJORDEN"
+    },
+    {
+      "value": "FEATURE_MARSH",
+      "label": "FEATURE_MARSH"
+    },
+    {
+      "value": "FEATURE_MATTERHORN",
+      "label": "FEATURE_MATTERHORN"
+    },
+    {
+      "value": "FEATURE_OASIS",
+      "label": "FEATURE_OASIS"
+    },
+    {
+      "value": "FEATURE_PAITITI",
+      "label": "FEATURE_PAITITI"
+    },
+    {
+      "value": "FEATURE_PAMUKKALE",
+      "label": "FEATURE_PAMUKKALE"
+    },
+    {
+      "value": "FEATURE_PANTANAL",
+      "label": "FEATURE_PANTANAL"
+    },
+    {
+      "value": "FEATURE_PIOPIOTAHI",
+      "label": "FEATURE_PIOPIOTAHI"
+    },
+    {
+      "value": "FEATURE_REEF",
+      "label": "FEATURE_REEF"
+    },
+    {
+      "value": "FEATURE_RORAIMA",
+      "label": "FEATURE_RORAIMA"
+    },
+    {
+      "value": "FEATURE_TORRES_DEL_PAINE",
+      "label": "FEATURE_TORRES_DEL_PAINE"
+    },
+    {
+      "value": "FEATURE_TSINGY",
+      "label": "FEATURE_TSINGY"
+    },
+    {
+      "value": "FEATURE_UBSUNUR_HOLLOW",
+      "label": "FEATURE_UBSUNUR_HOLLOW"
+    },
+    {
+      "value": "FEATURE_ULURU",
+      "label": "FEATURE_ULURU"
+    },
+    {
+      "value": "FEATURE_VESUVIUS",
+      "label": "FEATURE_VESUVIUS"
+    },
+    {
+      "value": "FEATURE_VOLCANIC_SOIL",
+      "label": "FEATURE_VOLCANIC_SOIL"
+    },
+    {
+      "value": "FEATURE_VOLCANO",
+      "label": "FEATURE_VOLCANO"
+    },
+    {
+      "value": "FEATURE_WHITEDESERT",
+      "label": "FEATURE_WHITEDESERT"
+    },
+    {
+      "value": "FEATURE_YOSEMITE",
+      "label": "FEATURE_YOSEMITE"
+    },
+    {
+      "value": "FEATURE_ZHANGYE_DANXIA",
+      "label": "FEATURE_ZHANGYE_DANXIA"
+    }
+  ],
+  "resources": [
+    {
+      "value": "RESOURCE_ALUMINUM",
+      "label": "铝"
+    },
+    {
+      "value": "RESOURCE_AMBER",
+      "label": "琥珀"
+    },
+    {
+      "value": "RESOURCE_ANTIQUITY_SITE",
+      "label": "历史古迹"
+    },
+    {
+      "value": "RESOURCE_BANANAS",
+      "label": "香蕉"
+    },
+    {
+      "value": "RESOURCE_CATTLE",
+      "label": "牛"
+    },
+    {
+      "value": "RESOURCE_CINNAMON",
+      "label": "肉桂"
+    },
+    {
+      "value": "RESOURCE_CITRUS",
+      "label": "柑橘"
+    },
+    {
+      "value": "RESOURCE_CLOVES",
+      "label": "丁香"
+    },
+    {
+      "value": "RESOURCE_COAL",
+      "label": "煤"
+    },
+    {
+      "value": "RESOURCE_COCOA",
+      "label": "可可豆"
+    },
+    {
+      "value": "RESOURCE_COFFEE",
+      "label": "咖啡"
+    },
+    {
+      "value": "RESOURCE_COPPER",
+      "label": "铜"
+    },
+    {
+      "value": "RESOURCE_COSMETICS",
+      "label": "化妆品"
+    },
+    {
+      "value": "RESOURCE_COTTON",
+      "label": "棉花"
+    },
+    {
+      "value": "RESOURCE_CRABS",
+      "label": "螃蟹"
+    },
+    {
+      "value": "RESOURCE_DEER",
+      "label": "鹿"
+    },
+    {
+      "value": "RESOURCE_DIAMONDS",
+      "label": "钻石"
+    },
+    {
+      "value": "RESOURCE_DYES",
+      "label": "染料"
+    },
+    {
+      "value": "RESOURCE_FISH",
+      "label": "鱼"
+    },
+    {
+      "value": "RESOURCE_FURS",
+      "label": "皮草"
+    },
+    {
+      "value": "RESOURCE_GYPSUM",
+      "label": "石膏"
+    },
+    {
+      "value": "RESOURCE_HONEY",
+      "label": "蜂蜜"
+    },
+    {
+      "value": "RESOURCE_HORSES",
+      "label": "马"
+    },
+    {
+      "value": "RESOURCE_INCENSE",
+      "label": "熏香"
+    },
+    {
+      "value": "RESOURCE_IRON",
+      "label": "铁"
+    },
+    {
+      "value": "RESOURCE_IVORY",
+      "label": "象牙"
+    },
+    {
+      "value": "RESOURCE_JADE",
+      "label": "玉"
+    },
+    {
+      "value": "RESOURCE_JEANS",
+      "label": "牛仔裤"
+    },
+    {
+      "value": "RESOURCE_MAIZE",
+      "label": "玉米"
+    },
+    {
+      "value": "RESOURCE_MARBLE",
+      "label": "大理石"
+    },
+    {
+      "value": "RESOURCE_MERCURY",
+      "label": "水银"
+    },
+    {
+      "value": "RESOURCE_NITER",
+      "label": "硝石"
+    },
+    {
+      "value": "RESOURCE_OIL",
+      "label": "石油"
+    },
+    {
+      "value": "RESOURCE_OLIVES",
+      "label": "橄榄"
+    },
+    {
+      "value": "RESOURCE_PEARLS",
+      "label": "珍珠"
+    },
+    {
+      "value": "RESOURCE_PERFUME",
+      "label": "香水"
+    },
+    {
+      "value": "RESOURCE_RICE",
+      "label": "大米"
+    },
+    {
+      "value": "RESOURCE_SALT",
+      "label": "盐"
+    },
+    {
+      "value": "RESOURCE_SHEEP",
+      "label": "羊"
+    },
+    {
+      "value": "RESOURCE_SHIPWRECK",
+      "label": "海难遗址"
+    },
+    {
+      "value": "RESOURCE_SILK",
+      "label": "丝绸"
+    },
+    {
+      "value": "RESOURCE_SILVER",
+      "label": "银"
+    },
+    {
+      "value": "RESOURCE_SPICES",
+      "label": "香料"
+    },
+    {
+      "value": "RESOURCE_STONE",
+      "label": "石头"
+    },
+    {
+      "value": "RESOURCE_SUGAR",
+      "label": "糖"
+    },
+    {
+      "value": "RESOURCE_TEA",
+      "label": "茶叶"
+    },
+    {
+      "value": "RESOURCE_TOBACCO",
+      "label": "烟草"
+    },
+    {
+      "value": "RESOURCE_TOYS",
+      "label": "玩具"
+    },
+    {
+      "value": "RESOURCE_TRUFFLES",
+      "label": "松露"
+    },
+    {
+      "value": "RESOURCE_TURTLES",
+      "label": "海龟"
+    },
+    {
+      "value": "RESOURCE_URANIUM",
+      "label": "铀"
+    },
+    {
+      "value": "RESOURCE_WHALES",
+      "label": "鲸鱼"
+    },
+    {
+      "value": "RESOURCE_WHEAT",
+      "label": "小麦"
+    },
+    {
+      "value": "RESOURCE_WINE",
+      "label": "葡萄酒"
+    }
+  ]
+}

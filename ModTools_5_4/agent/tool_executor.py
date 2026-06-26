@@ -23,6 +23,7 @@ class ToolExecutor:
         self._requirement_types: dict = {}
         self._collection_types: list[str] = []
         self._entity_schemas: dict = {}
+        self._reference_enums: dict = {}
         self._load_knowledge()
 
     def _load_knowledge(self) -> None:
@@ -40,6 +41,10 @@ class ToolExecutor:
             with open(ct_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 self._collection_types = data.get("collection_types", [])
+        enum_path = _KNOWLEDGE_DIR / "reference_enums.json"
+        if enum_path.exists():
+            with open(enum_path, "r", encoding="utf-8") as f:
+                self._reference_enums = json.load(f)
 
     def execute(self, tool_name: str, params: dict) -> dict:
         method = getattr(self, f"_exec_{tool_name}", None)
@@ -275,6 +280,20 @@ class ToolExecutor:
             "comment": info.get("c", ""),
             "params": info.get("pn", []),
             "param_types": info.get("p", {}),
+        }
+
+    def _exec_get_enum_values(self, params: dict) -> dict:
+        enum_type = params.get("enum_type", "")
+        values = self._reference_enums.get(enum_type)
+        if not values:
+            return {"error": f"未知枚举类型: {enum_type}，可选: {list(self._reference_enums.keys())}"}
+        # Return first 30, with note about total count
+        total = len(values)
+        return {
+            "enum_type": enum_type,
+            "total": total,
+            "values": values[:30],
+            "note": f"共{total}项，仅展示前30项" if total > 30 else "",
         }
 
     # ── Propose tools ──

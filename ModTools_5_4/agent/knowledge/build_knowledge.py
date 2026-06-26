@@ -89,6 +89,52 @@ def build_requirement_types_compact():
     print(f"Wrote {len(compact)} requirement types to {out_path}")
 
 
+def _load_enum_file(rel_path: str) -> dict[str, str]:
+    """Parse an enum txt file from AI制作Mod: ENUM_NAME | Chinese_Label or ENUM_NAME."""
+    path = PROJECT_ROOT.parent.parent / "AI制作Mod" / rel_path
+    if not path.exists():
+        return {}
+    result = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "|" in line:
+            key, label = line.split("|", 1)
+            key = key.strip()
+            label = label.strip()
+            if key:
+                result[key] = label
+        else:
+            if line and not line.startswith("#"):
+                result[line.strip()] = ""
+    return result
+
+
+def build_reference_enums():
+    """Extract key enum values from AI制作Mod reference/enums/."""
+    terrain_enums = _load_enum_file("reference/enums/TerrainType.txt")
+    feature_enums = _load_enum_file("reference/enums/FeatureType.txt")
+    resource_enums = _load_enum_file("reference/enums/ResourceType.txt")
+
+    out = {
+        "terrains": [
+            {"value": k, "label": v or k} for k, v in terrain_enums.items()
+        ],
+        "features": [
+            {"value": k, "label": v or k} for k, v in feature_enums.items()
+        ],
+        "resources": [
+            {"value": k, "label": v or k} for k, v in resource_enums.items()
+        ],
+    }
+    path = KNOWLEDGE_OUT / "reference_enums.json"
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=2)
+    print(f"Wrote {len(terrain_enums)} terrains, {len(feature_enums)} features, "
+          f"{len(resource_enums)} resources to {path}")
+
+
 def build_entity_schemas():
     """Extract entity table schemas from entity_table_form.py schema builders.
 
@@ -281,6 +327,7 @@ def main():
     build_collection_types()
     build_effect_types_compact()
     build_requirement_types_compact()
+    build_reference_enums()
     build_entity_schemas()
     print("Done.")
 

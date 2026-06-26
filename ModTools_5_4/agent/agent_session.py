@@ -76,11 +76,10 @@ class AgentSession(QObject):
         tool_calls = message.get("tool_calls", [])
 
         if tool_calls:
-            # Model wants to call tools
             msg = ChatMessage.assistant(content="", tool_calls=tool_calls)
             self._messages.append(msg)
-            self.thinking.emit(f"调用 {len(tool_calls)} 个工具...")
 
+            tool_details = []
             for tc in tool_calls:
                 func = tc.get("function", {})
                 name = func.get("name", "")
@@ -89,15 +88,35 @@ class AgentSession(QObject):
                     args = json.loads(args_str)
                 except json.JSONDecodeError:
                     args = {}
-                logger.info("Tool call: %s(%s)", name, args)
+                args_brief = ", ".join(
+                    f"{k}={repr(v)[:40]}" for k, v in args.items()
+                ) or "无参数"
+                logger.info("Tool call %d: %s(%s)", self._tool_iteration + 1, name, args)
                 result = self._executor.execute(name, args)
                 result_str = json.dumps(result, ensure_ascii=False, default=str)
+
+                # Summarize result
+                if "error" in result:
+                    summary = f"❌ {result['error']}"
+                elif "results" in result:
+                    summary = f"找到 {len(result['results'])} 个结果"
+                elif "entries" in result:
+                    summary = f"返回 {result.get('count', len(result['entries']))} 个条目"
+                elif "count" in result:
+                    summary = f"{result['count']} 个条目"
+                elif "data" in result:
+                    summary = "获取到数据"
+                else:
+                    summary = "完成"
+
+                self.thinking.emit(f"[{self._tool_iteration + 1}/{MAX_TOOL_ITERATIONS}] {name}({args_brief}) → {summary}")
+                tool_details.append(f"🔧 `{name}`: {summary}")
+
                 self._messages.append(ChatMessage.tool(
                     content=result_str,
                     tool_call_id=tc.get("id", name),
                     name=name,
                 ))
-                # Check if this is a propose tool
                 from .tools import TOOL_DEFS
                 for td in TOOL_DEFS:
                     if td.name == name and td.requires_preview:
@@ -106,7 +125,11 @@ class AgentSession(QObject):
 
             self._tool_iteration += 1
             if self._tool_iteration >= MAX_TOOL_ITERATIONS:
-                self.error_occurred.emit("工具调用次数过多，可能陷入循环。请尝试更具体的描述。")
+                self.error_occurred.emit(
+                    f"已达到最大工具调用次数({MAX_TOOL_ITERATIONS})。\n"
+                    f"最后调用：{tool_details[-1] if tool_details else '无'}\n"
+                    f"请尝试更具体的描述，或检查是否需要先创建前置实体。"
+                )
                 return
 
             self._call_llm()

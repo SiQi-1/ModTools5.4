@@ -4,20 +4,19 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+import os
+import subprocess
 from typing import Callable
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFont, QTextCursor
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QTextEdit,
-    QPushButton, QLabel, QLineEdit, QSplitter, QFrame, QDialog,
+    QPushButton, QLabel, QPlainTextEdit, QSplitter, QFrame, QDialog,
     QFormLayout, QComboBox, QDialogButtonBox, QTreeWidget, QTreeWidgetItem,
     QGroupBox, QSizePolicy,
 )
-
-from ...agent.agent_session import AgentSession
-import os
-import subprocess
 
 from ...app.settings_store import load_agent_settings, save_agent_settings
 from ...app.user_paths import settings_file_path
@@ -261,26 +260,46 @@ class AgentChatPanel(QWidget):
         self._splitter.addWidget(self._proposal_container)
         self._proposal_container.setMaximumHeight(0)
 
-        # Input area
-        input_layout = QHBoxLayout()
+        # Input area — multi-line with auto-grow
+        input_layout = QVBoxLayout()
         input_layout.setContentsMargins(10, 6, 10, 6)
+        input_layout.setSpacing(4)
 
-        self._input_field = QLineEdit()
-        self._input_field.setPlaceholderText("输入需求，如'创建一个+5战斗力的单位能力'...")
-        self._input_field.returnPressed.connect(self._handle_send)
+        self._input_field = QPlainTextEdit()
+        self._input_field.setPlaceholderText("输入需求，如'创建一个+5战斗力的单位能力'...\nCtrl+Enter 发送，Enter 换行")
+        self._input_field.setMaximumHeight(120)
+        self._input_field.setMinimumHeight(36)
+        self._input_field.setTabChangesFocus(True)
+        # Ctrl+Enter to send
+        self._input_field.installEventFilter(self)
         input_layout.addWidget(self._input_field)
 
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        hint = QLabel("Ctrl+Enter 发送")
+        hint.setStyleSheet("color: #888; font-size: 11px;")
+        btn_row.addWidget(hint)
         self._send_btn = QPushButton("发送")
         self._send_btn.clicked.connect(self._handle_send)
         self._send_btn.setFixedWidth(60)
-        input_layout.addWidget(self._send_btn)
+        btn_row.addWidget(self._send_btn)
+        input_layout.addLayout(btn_row)
 
         main_layout.addLayout(input_layout)
 
         self.setMinimumWidth(PANEL_MIN_WIDTH)
 
+    def eventFilter(self, obj, event):
+        from PyQt6.QtCore import QEvent
+        if obj is self._input_field and event.type() == QEvent.Type.KeyPress:
+            if (event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter) \
+               and (event.modifiers() & Qt.KeyboardModifier.ControlModifier):
+                self._handle_send()
+                return True
+        return super().eventFilter(obj, event)
+
     def _handle_send(self):
-        text = self._input_field.text().strip()
+        text = self._input_field.toPlainText().strip()
         if not text:
             return
         self._input_field.setEnabled(False)
@@ -288,6 +307,7 @@ class AgentChatPanel(QWidget):
         self._status_label.setText("⏳ 思考中...")
         self._status_label.setStyleSheet("color: #f39c12;")
 
+        self._input_field.clear()
         self._remove_proposal_card()
         self._append_message("user", text)
         self._agent.send_user_message(text)
@@ -324,7 +344,7 @@ class AgentChatPanel(QWidget):
                              f"[提案] {description}\n请查看下方预览卡片并确认操作。")
 
     def _on_thinking(self, msg: str):
-        self._append_message("assistant", f"🔧 {msg}")
+        self._append_message("thinking", msg)
 
     def _on_error(self, msg: str):
         self._input_field.setEnabled(True)
@@ -355,12 +375,93 @@ class AgentChatPanel(QWidget):
         cursor.movePosition(QTextCursor.MoveOperation.End)
 
         if role == "user":
-            display.append(f"👤 **你**：{content}")
+            display.append(f"<b style='color:#2c3e50;'>👤 你</b><br>{self._escape_html(content)}")
         elif role == "assistant":
             if not content:
                 return
-            display.append(f"🤖 **助手**：{content}")
+            html_body = self._md_to_html(content)
+            display.append(f"<b style='color:#2980b9;'>🤖 助手</b><br>{html_body}")
+        elif role == "thinking":
+            display.append(
+                f"<span style='color:#888; font-style:italic;'>🔧 {self._escape_html(content)}</span>")
         display.ensureCursorVisible()
+
+    @staticmethod
+    def _escape_html(text: str) -> str:
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    @staticmethod
+    def _md_to_html(text: str) -> str:
+        """Convert basic Markdown to HTML for QTextEdit rendering."""
+        # Escape HTML first, then selectively un-escape our own tags
+        html = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        # Code blocks (```...```)
+        html = re.sub(r'```(\w*)\n?(.*?)```', r'<pre style="background:#f0f0f0; padding:8px; border-radius:4px;"><code>\2</code></pre>', html, flags=re.DOTALL)
+        # Inline code (`...`)
+        html = re.sub(r'`([^`]+)`', r'<code style="background:#f0f0f0; padding:1px 4px; border-radius:2px;">\1</code>', html)
+
+        # Bold (**...**)
+        html = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', html)
+
+        # Headings (###, ##, #)
+        html = re.sub(r'^### (.+)$', r'<h4 style="margin:8px 0 4px;">\1</h4>', html, flags=re.MULTILINE)
+        html = re.sub(r'^## (.+)$', r'<h3 style="margin:10px 0 4px;">\1</h3>', html, flags=re.MULTILINE)
+        html = re.sub(r'^# (.+)$', r'<h2 style="margin:12px 0 4px;">\1</h2>', html, flags=re.MULTILINE)
+
+        # Horizontal rules (---)
+        html = re.sub(r'^---$', r'<hr style="border:none; border-top:1px solid #ddd;">', html, flags=re.MULTILINE)
+
+        # Tables (simple pipe-based)
+        lines = html.split("\n")
+        in_table = False
+        table_buffer = []
+        out_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("|") and stripped.endswith("|"):
+                cells = [c.strip() for c in stripped[1:-1].split("|")]
+                # Skip separator row (|----|----|)
+                if all(re.fullmatch(r':?-{2,}:?', c) for c in cells if c):
+                    continue
+                if not in_table:
+                    in_table = True
+                table_buffer.append(cells)
+            else:
+                if in_table:
+                    # Flush table
+                    out_lines.append('<table style="border-collapse:collapse; margin:6px 0;">')
+                    for i, row in enumerate(table_buffer):
+                        tag = "th" if i == 0 else "td"
+                        style = "border:1px solid #ddd; padding:4px 10px;"
+                        if i == 0:
+                            style += " background:#f5f5f5; font-weight:bold;"
+                        row_html = "<tr>" + "".join(
+                            f'<{tag} style="{style}">{c}</{tag}>' for c in row
+                        ) + "</tr>"
+                        out_lines.append(row_html)
+                    out_lines.append("</table>")
+                    table_buffer = []
+                    in_table = False
+                out_lines.append(line)
+        if in_table and table_buffer:
+            out_lines.append('<table style="border-collapse:collapse; margin:6px 0;">')
+            for i, row in enumerate(table_buffer):
+                tag = "th" if i == 0 else "td"
+                style = "border:1px solid #ddd; padding:4px 10px;"
+                if i == 0:
+                    style += " background:#f5f5f5; font-weight:bold;"
+                row_html = "<tr>" + "".join(
+                    f'<{tag} style="{style}">{c}</{tag}>' for c in row
+                ) + "</tr>"
+                out_lines.append(row_html)
+            out_lines.append("</table>")
+        html = "\n".join(out_lines)
+
+        # Newlines to <br>
+        html = html.replace("\n", "<br>")
+
+        return html
 
     def _clear_chat(self):
         self._chat_display.clear()

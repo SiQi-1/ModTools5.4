@@ -326,11 +326,38 @@ class ToolExecutor:
         if section_name in FLAT_SECTIONS:
             td = data.get("table_data")
             if isinstance(td, dict) and td:
-                # Model wrongly put fields in table_data — move them to top level
                 for k, v in td.items():
                     if k not in data:
                         data[k] = v
                 del data["table_data"]
+
+        # Auto-correct common field name mistakes inside start_bias
+        sb = data.get("start_bias")
+        if isinstance(sb, dict) and sb:
+            # terrain_types → terrains
+            if "terrain_types" in sb and "terrains" not in sb:
+                sb["terrains"] = sb.pop("terrain_types")
+            if "terrain_type" in sb and "terrains" not in sb:
+                sb["terrains"] = sb.pop("terrain_type")
+            # feature_types → features
+            if "feature_types" in sb and "features" not in sb:
+                sb["features"] = sb.pop("feature_types")
+            if "feature_type" in sb and "features" not in sb:
+                sb["features"] = sb.pop("feature_type")
+            # resource_types → resources
+            if "resource_types" in sb and "resources" not in sb:
+                sb["resources"] = sb.pop("resource_types")
+            if "resource_type" in sb and "resources" not in sb:
+                sb["resources"] = sb.pop("resource_type")
+            # rivers bool → river_enabled + river_tier
+            if "rivers" in sb and "river_enabled" not in sb:
+                sb["river_enabled"] = bool(sb.pop("rivers"))
+                sb.setdefault("river_tier", 3)
+            if "river" in sb and "river_enabled" not in sb:
+                sb["river_enabled"] = bool(sb.pop("river"))
+                sb.setdefault("river_tier", 3)
+            # Remove coast (not a real start_bias field)
+            sb.pop("coast", None)
 
         # Validate field names against known schema
         schema_key = self._section_to_schema_key(section_name)

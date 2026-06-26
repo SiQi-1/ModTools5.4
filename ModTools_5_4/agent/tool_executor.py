@@ -290,6 +290,27 @@ class ToolExecutor:
         if "abbr" not in data:
             data["abbr"] = data.get("name", "NEW")
 
+        # Validate field names against known schema
+        schema_key = self._section_to_schema_key(section_name)
+        schema = self._entity_schemas.get(schema_key, {})
+        valid_fields = {"name", "abbr", "table_name", "table_data", "images", "subtables",
+                        "policies_xp1", "policy_government_exclusive", "projects_mode",
+                        "projects_xp1", "projects_xp2", "project_building_costs",
+                        "project_great_person_points", "project_resource_costs",
+                        "project_yield_conversions", "project_prereqs",
+                        "class_data", "unit_data", "individuals"}
+        for f in schema.get("fields", []):
+            valid_fields.add(f["key"])
+
+        unknown = [k for k in data if k not in valid_fields]
+        if unknown:
+            known_sample = ", ".join(sorted(valid_fields - {"name", "abbr", "images"})[:15])
+            return {
+                "error": f"字段名不匹配！你使用了不存在或错误的字段：{unknown}。\n"
+                         f"该实体({section_name})的有效字段包括：{known_sample}...\n"
+                         f"请调用 get_entity_schema('{section_name}') 确认字段名后重新提案。"
+            }
+
         sections = self._sections_provider()
         current = sections.get(section_name)
         current_count = len(current) if isinstance(current, list) else 0
@@ -302,6 +323,17 @@ class ToolExecutor:
             "insert_at_index": current_count,
             "preview": {"before": f"（新建，当前{section_name}有{current_count}个条目）", "after": data},
         }
+
+    @staticmethod
+    def _section_to_schema_key(section: str) -> str:
+        return {
+            "文明": "Civilizations", "领袖": "Leaders",
+            "区域": "Districts", "建筑": "Buildings",
+            "单位": "Units", "改良设施": "Improvements",
+            "总督": "Governors", "伟人": "GreatPeople",
+            "政策卡": "Policies", "项目": "Projects",
+            "信仰": "Beliefs", "议程": "Agendas",
+        }.get(section, section)
 
     def _exec_propose_edit_entity(self, params: dict) -> dict:
         section_name = params.get("section_name", "")

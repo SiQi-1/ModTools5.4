@@ -6733,6 +6733,8 @@ class WorkspacePage(BasePage):
         self._rebuild_tree()
         new_index = len(entries) - 1
         self._select_section_item(section_name, new_index)
+        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
+        QApplication.processEvents()  # Ensure tree selection signal fires
 
     def _apply_edit_entity(self, proposal: dict) -> None:
         section_name = proposal["section_name"]
@@ -6746,6 +6748,7 @@ class WorkspacePage(BasePage):
         entries[entry_index] = current
         self._rebuild_tree()
         self._select_section_item(section_name, entry_index)
+        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
 
     def _apply_add_modifier(self, proposal: dict) -> None:
         self._sync_workspace_sections_from_editors()
@@ -6758,13 +6761,11 @@ class WorkspacePage(BasePage):
         reqsets = proposal.get("reqsets", [])
         requirements = proposal.get("requirements", [])
 
-        # Merge into existing payload lists
         owners = list(payload.get("owners", []))
         modifiers = list(payload.get("modifiers", []))
         existing_reqsets = list(payload.get("requirement_sets", []))
         existing_reqs = list(payload.get("requirements", []))
 
-        # Add owner if not exists
         existing_owner = next(
             (o for o in owners
              if o.get("table_name") == owner.get("table_name")
@@ -6786,14 +6787,9 @@ class WorkspacePage(BasePage):
             owner_entry["bound_modifier_ids"] = [modifier.get("modifier_id", "")]
             owners.append(owner_entry)
 
-        # Add modifier
         modifiers.append(modifier)
-
-        # Add reqsets
         for rs in reqsets:
             existing_reqsets.append(rs)
-
-        # Add requirements
         for req in requirements:
             existing_reqs.append(req)
 
@@ -6805,6 +6801,7 @@ class WorkspacePage(BasePage):
         self._save_modifier_payload_to_project(payload)
         self._modifier_workspace.import_project_payload(payload)
         self._modifier_workspace.sync_owners_from_sections(self._project.sections)
+        self._rebuild_tree()
 
     def _apply_delete_entity(self, proposal: dict) -> None:
         section_name = proposal["section_name"]
@@ -6813,6 +6810,7 @@ class WorkspacePage(BasePage):
         if isinstance(entries, list) and 0 <= entry_index < len(entries):
             del entries[entry_index]
         self._rebuild_tree()
+        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
 
     def _handle_section_item_changed(self, section: str, index: int, payload: dict[str, object]) -> None:
         entries = self._project.sections.get(section)

@@ -42,14 +42,7 @@ class AgentSession(QObject):
     def _build_tools_list(self) -> None:
         from .tools import TOOL_DEFS
         for td in TOOL_DEFS:
-            self._tools.append({
-                "type": "function",
-                "function": {
-                    "name": td.name,
-                    "description": td.description,
-                    "parameters": td.parameters,
-                },
-            })
+            self._tools.append(td.to_openai_dict_legacy())
 
     def reset(self) -> None:
         self._messages.clear()

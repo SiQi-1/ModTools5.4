@@ -46,11 +46,13 @@ class ToolDef:
         return {"type": "function", "function": func}
 
     def to_openai_dict_legacy(self) -> dict:
-        """Legacy format without strict mode (for models that don't support it)."""
+        """Format with additionalProperties constraint but without strict mode."""
+        params = dict(self.parameters)
+        _enforce_object_constraints(params)
         return {"type": "function", "function": {
             "name": self.name,
             "description": self.description,
-            "parameters": self.parameters,
+            "parameters": params,
         }}
 
 

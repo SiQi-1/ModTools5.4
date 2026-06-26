@@ -451,14 +451,32 @@ class ToolExecutor:
             if rt and rt not in self._requirement_types:
                 warnings.append(f"RequirementType '{rt}' 在知识库中未找到，请确认是否正确")
 
-        # Generate IDs if not provided
-        if "modifier_id" not in modifier:
+        # Ensure ASCII-only IDs (no Chinese characters)
+        def _asciify_id(id_str: str) -> str:
+            if not id_str:
+                return id_str
+            if any('一' <= c <= '鿿' or '　' <= c <= '〿' for c in id_str):
+                # Contains Chinese — replace with safe version
+                safe = _safe_id(description)
+                warnings.append(f"ID '{id_str}' 包含中文字符，已自动替换为 '{safe}'。ID必须纯英文(A-Z,0-9,_)")
+                return safe
+            return id_str
+
+        if "modifier_id" in modifier:
+            modifier["modifier_id"] = _asciify_id(str(modifier["modifier_id"]))
+        else:
             modifier["modifier_id"] = f"MODIFIER_{_safe_id(description)}"
-        for i, rs in enumerate(reqsets):
-            if "requirement_set_id" not in rs:
-                rs["requirement_set_id"] = f"REQSET_{_safe_id(description)}{'_' + str(i) if i else ''}"
+
+        for rs in reqsets:
+            if "requirement_set_id" in rs:
+                rs["requirement_set_id"] = _asciify_id(str(rs["requirement_set_id"]))
+            else:
+                rs["requirement_set_id"] = f"REQSET_{_safe_id(description)}"
+
         for req in requirements:
-            if "requirement_id" not in req:
+            if "requirement_id" in req:
+                req["requirement_id"] = _asciify_id(str(req["requirement_id"]))
+            else:
                 req["requirement_id"] = f"REQ_{_safe_id(description)}"
 
         return {
@@ -498,14 +516,12 @@ class ToolExecutor:
 
 
 def _safe_id(text: str) -> str:
-    """Convert a Chinese description to a safe ID fragment."""
-    import re
-    # Extract alphanumeric parts, or just use uppercase hex
-    parts = re.findall(r"[A-Za-z0-9一-鿿]+", text)
-    if not parts:
-        return "MODIFIER"
-    result = "_".join(parts[:3]).upper().replace(" ", "_")
-    # If result is all Chinese, use a short hash
-    if any("一" <= c <= "鿿" for c in result[:10]) and not any(c.isascii() for c in result if c != "_"):
-        result = "MOD_" + "_".join(f"{ord(c):04X}" for c in text[:4] if c.isalpha())
-    return result[:40]
+    """Convert a Chinese description to an ASCII-safe ID fragment."""
+    import re, hashlib
+    # Extract alphanumeric words
+    ascii_parts = re.findall(r"[A-Za-z0-9]+", text)
+    if ascii_parts:
+        return "_".join(ascii_parts[:4]).upper()[:40]
+    # No ASCII — use short hash of the text
+    h = hashlib.md5(text.encode("utf-8")).hexdigest()[:8].upper()
+    return f"MOD_{h}"

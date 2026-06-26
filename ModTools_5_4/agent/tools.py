@@ -221,13 +221,20 @@ _tool(
 
 _tool(
     "get_enum_values",
-    "获取某个枚举类型的可选值列表。用于了解字段可以填写哪些值。"
-    "可用于填充起始偏好(start_bias)的地形/地貌/资源，或其他下拉选项。",
+    "获取某个枚举类型的可选值列表，支持按分类排除。"
+    "用于填充起始偏好(start_bias)的地形/地貌/资源，或验证某个值是否存在。\n\n"
+    "注意：填起始偏好时，features应排除'自然奇观'类（调用时传exclude_categories=['自然奇观']），"
+    "因为这些不用于出生地偏好。resources按需选择。",
     {
         "enum_type": {
             "type": "string",
-            "description": "枚举类型名称",
             "enum": ["terrains", "features", "resources"],
+            "description": "枚举类型",
+        },
+        "exclude_categories": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "排除这些分类的值。如填起始偏好features时排除['自然奇观']",
         },
     },
     required=["enum_type"],

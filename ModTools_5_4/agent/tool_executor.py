@@ -284,16 +284,28 @@ class ToolExecutor:
 
     def _exec_get_enum_values(self, params: dict) -> dict:
         enum_type = params.get("enum_type", "")
+        exclude_categories = params.get("exclude_categories", [])
         values = self._reference_enums.get(enum_type)
         if not values:
             return {"error": f"未知枚举类型: {enum_type}，可选: {list(self._reference_enums.keys())}"}
-        # Return first 30, with note about total count
+
+        # Filter by category exclusion
+        if exclude_categories:
+            values = [v for v in values if v.get("category", "") not in exclude_categories]
+
         total = len(values)
+        # Show categories summary
+        cats = {}
+        for v in values:
+            cats[v.get("category", "")] = cats.get(v.get("category", ""), 0) + 1
+        cat_summary = ", ".join(f"{k}({v})" for k, v in sorted(cats.items()))
+
         return {
             "enum_type": enum_type,
             "total": total,
+            "categories": cat_summary,
             "values": values[:30],
-            "note": f"共{total}项，仅展示前30项" if total > 30 else "",
+            "note": f"共{total}项，仅展示前30项。可传exclude_categories排除不需要的分类" if total > 30 else "",
         }
 
     # ── Propose tools ──

@@ -89,25 +89,31 @@ def build_requirement_types_compact():
     print(f"Wrote {len(compact)} requirement types to {out_path}")
 
 
-def _load_enum_file(rel_path: str) -> dict[str, str]:
-    """Parse an enum txt file from AI制作Mod: ENUM_NAME | Chinese_Label or ENUM_NAME."""
+def _load_enum_file(rel_path: str) -> dict[str, dict]:
+    """Parse an enum txt file: ENUM_NAME | Chinese_Label.
+    Returns dict[value] = {label, category} where category is from preceding # comment line.
+    """
     path = PROJECT_ROOT.parent.parent / "AI制作Mod" / rel_path
     if not path.exists():
         return {}
     result = {}
+    current_category = ""
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
-        if not line or line.startswith("#"):
+        if not line:
             continue
+        if line.startswith("#"):
+            current_category = line.lstrip("# ").strip()
+            continue
+        label = ""
         if "|" in line:
             key, label = line.split("|", 1)
             key = key.strip()
             label = label.strip()
-            if key:
-                result[key] = label
         else:
-            if line and not line.startswith("#"):
-                result[line.strip()] = ""
+            key = line.strip()
+        if key:
+            result[key] = {"label": label or key, "category": current_category}
     return result
 
 
@@ -117,16 +123,16 @@ def build_reference_enums():
     feature_enums = _load_enum_file("reference/enums/FeatureType.txt")
     resource_enums = _load_enum_file("reference/enums/ResourceType.txt")
 
+    def _format(enum_dict: dict) -> list[dict]:
+        return [
+            {"value": k, "label": v["label"], "category": v["category"]}
+            for k, v in enum_dict.items()
+        ]
+
     out = {
-        "terrains": [
-            {"value": k, "label": v or k} for k, v in terrain_enums.items()
-        ],
-        "features": [
-            {"value": k, "label": v or k} for k, v in feature_enums.items()
-        ],
-        "resources": [
-            {"value": k, "label": v or k} for k, v in resource_enums.items()
-        ],
+        "terrains": _format(terrain_enums),
+        "features": _format(feature_enums),
+        "resources": _format(resource_enums),
     }
     path = KNOWLEDGE_OUT / "reference_enums.json"
     with open(path, "w", encoding="utf-8") as f:

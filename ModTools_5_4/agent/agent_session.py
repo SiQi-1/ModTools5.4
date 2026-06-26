@@ -128,8 +128,12 @@ class AgentSession(QObject):
                 self.error_occurred.emit(
                     f"已达到最大工具调用次数({MAX_TOOL_ITERATIONS})。\n"
                     f"最后调用：{tool_details[-1] if tool_details else '无'}\n"
-                    f"请尝试更具体的描述，或检查是否需要先创建前置实体。"
+                    f"请尝试更具体的描述。"
                 )
+                return
+
+            # If any proposal tools were called, STOP and show preview to user
+            if self._pending_proposal is not None:
                 return
 
             self._call_llm()

@@ -254,6 +254,7 @@ class ToolExecutor:
             "文明": "Civilizations", "领袖": "Leaders",
             "区域": "Districts", "建筑": "Buildings",
             "单位": "Units", "改良设施": "Improvements",
+            "总督": "Governors", "伟人": "GreatPeople",
             "政策卡": "Policies", "项目": "Projects",
             "信仰": "Beliefs", "议程": "Agendas",
         }

@@ -169,6 +169,27 @@ def build_entity_schemas():
                 {"key": "CapitalName", "label": "首都名", "field_type": "text", "required": False},
             ],
         },
+        "Governors": {
+            "table_name": "Governors",
+            "fields": [
+                {"key": "GovernorType", "label": "总督类型", "field_type": "text", "required": True},
+                {"key": "Name", "label": "名称", "field_type": "text", "required": True},
+                {"key": "Description", "label": "描述", "field_type": "text", "required": True},
+                {"key": "IdentityPressure", "label": "身份压力", "field_type": "int", "required": False},
+                {"key": "TransitionStrength", "label": "过渡强度", "field_type": "int", "required": False},
+            ],
+        },
+        "GreatPeople": {
+            "table_name": "GreatPersonClasses",
+            "fields": [
+                {"key": "GreatPersonClassType", "label": "伟人类型", "field_type": "text", "required": True},
+                {"key": "Name", "label": "名称", "field_type": "text", "required": True},
+                {"key": "Description", "label": "描述", "field_type": "text", "required": False},
+                {"key": "UnitType", "label": "关联单位", "field_type": "text", "required": False},
+                {"key": "PseudoYieldType", "label": "伟人点数类型", "field_type": "text", "required": False},
+                {"key": "MaxPlayerInstances", "label": "最大数量", "field_type": "int", "required": False},
+            ],
+        },
     }
     schemas.update(manual_schemas)
 

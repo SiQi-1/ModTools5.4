@@ -2190,5 +2190,81 @@
         "required": false
       }
     ]
+  },
+  "Governors": {
+    "table_name": "Governors",
+    "fields": [
+      {
+        "key": "GovernorType",
+        "label": "总督类型",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Name",
+        "label": "名称",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Description",
+        "label": "描述",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "IdentityPressure",
+        "label": "身份压力",
+        "field_type": "int",
+        "required": false
+      },
+      {
+        "key": "TransitionStrength",
+        "label": "过渡强度",
+        "field_type": "int",
+        "required": false
+      }
+    ]
+  },
+  "GreatPeople": {
+    "table_name": "GreatPersonClasses",
+    "fields": [
+      {
+        "key": "GreatPersonClassType",
+        "label": "伟人类型",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Name",
+        "label": "名称",
+        "field_type": "text",
+        "required": true
+      },
+      {
+        "key": "Description",
+        "label": "描述",
+        "field_type": "text",
+        "required": false
+      },
+      {
+        "key": "UnitType",
+        "label": "关联单位",
+        "field_type": "text",
+        "required": false
+      },
+      {
+        "key": "PseudoYieldType",
+        "label": "伟人点数类型",
+        "field_type": "text",
+        "required": false
+      },
+      {
+        "key": "MaxPlayerInstances",
+        "label": "最大数量",
+        "field_type": "int",
+        "required": false
+      }
+    ]
   }
 }

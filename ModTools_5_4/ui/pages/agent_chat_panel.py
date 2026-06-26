@@ -302,7 +302,7 @@ class AgentChatPanel(QWidget):
         self._status_label.setStyleSheet("color: #27ae60;")
         # Replace the placeholder with actual text
         cursor = self._chat_display.textCursor()
-        cursor.moveOperation(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+        cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         if not text:
             text = "（工具调用完成，等待预览...）"
         cursor.insertText(text + "\n\n")

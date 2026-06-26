@@ -2129,35 +2129,36 @@
   },
   "Civilizations": {
     "table_name": "Civilizations",
-    "note": "文明编辑器字段（ModTools5.4内部格式，非原始SQL列名）",
+    "note": "文明编辑器字段（扁平格式，字段在data顶层，不要放table_data里！）",
     "fields": [
       {
         "key": "civilization_name",
         "label": "文明名称",
         "field_type": "text",
         "required": true,
-        "desc": "中文名，如'中华文明'"
+        "desc": "中文名，如'中华'"
       },
       {
         "key": "civilization_description",
-        "label": "文明描述",
+        "label": "文明全称",
         "field_type": "text",
-        "required": true,
-        "desc": "百科中显示的文明描述"
+        "required": false,
+        "desc": "自动生成为 文明名称+后缀，如'中华帝国'。一般无需手动填"
       },
       {
         "key": "civilization_adjective",
-        "label": "文明形容词",
+        "label": "形容词",
         "field_type": "text",
         "required": true,
-        "desc": "如'中华的'、'罗马的'"
+        "desc": "如'中华的'"
       },
       {
         "key": "description_suffix",
-        "label": "描述后缀",
+        "label": "全称后缀",
         "field_type": "text",
         "required": false,
-        "desc": "通常为'帝国'，如'中华帝国'"
+        "default": "帝国",
+        "desc": "如填'帝国'，则全称='中华帝国'"
       },
       {
         "key": "level",
@@ -2170,8 +2171,7 @@
           "CIVILIZATION_LEVEL_TRIBE",
           "CIVILIZATION_LEVEL_FREE_CITIES"
         ],
-        "default": "CIVILIZATION_LEVEL_FULL_CIV",
-        "desc": "完整文明/城邦/部落/自由城市"
+        "default": "CIVILIZATION_LEVEL_FULL_CIV"
       },
       {
         "key": "ethnicity",
@@ -2193,61 +2193,67 @@
         "field_type": "int",
         "required": false,
         "default": 10,
-        "desc": "1=严格按序，值越大越随机，建议10-30"
+        "desc": "1=严格按序，10=前十中随机"
       },
       {
         "key": "trait_name",
         "label": "特质名称",
         "field_type": "text",
-        "required": true
+        "required": false,
+        "desc": "如'中华特质'"
       },
       {
         "key": "trait_description",
         "label": "特质描述",
         "field_type": "text",
-        "required": true
+        "required": false
       },
       {
         "key": "trait_bindings",
         "label": "特质绑定",
         "field_type": "array",
         "required": false,
-        "desc": "绑定其他实体的特质，如特色建筑/单位/区域"
+        "default": [],
+        "desc": "绑定到其他实体的特质条目列表，[]表示空"
       },
       {
         "key": "icon_image_name",
         "label": "图标名",
         "field_type": "text",
         "required": false,
-        "desc": "图标资源名，如ICON_CIVILIZATION_SIQI_X"
+        "desc": "如ICON_CIVILIZATION_SIQI_X"
       },
       {
         "key": "images",
-        "label": "图片数据",
+        "label": "图片",
         "field_type": "object",
         "required": false,
-        "desc": "图标/画像等图片资源路径映射，{}表示空"
+        "default": {},
+        "desc": "图标图片数据，{}表示空"
       },
       {
         "key": "city_info",
-        "label": "城市名信息",
+        "label": "城市名设置",
         "field_type": "object",
         "required": false,
-        "desc": "城市名列表，{}表示空"
+        "default": {},
+        "desc": "城市名配置，{}表示空/默认"
       },
       {
         "key": "citizen_info",
-        "label": "市民名信息",
+        "label": "市民名设置",
         "field_type": "object",
         "required": false,
-        "desc": "市民名列表，{}表示空"
+        "default": {},
+        "desc": "市民名配置，{}表示空/默认"
       },
       {
         "key": "start_bias",
         "label": "起始偏好",
         "field_type": "object",
         "required": false,
-        "desc": "地形/资源/河流起始偏好，{}表示无偏好"
+        "default": {},
+        "desc": "出生地偏好。格式: {\"terrains\":[],\"features\":[],\"resources\":[],\"river_enabled\":false,\"river_tier\":1}。\nterrain示例: TERRAIN_GRASS, TERRAIN_PLAINS, TERRAIN_DESERT, TERRAIN_TUNDRA, TERRAIN_GRASS_HILLS等\nfeature示例: FEATURE_FOREST, FEATURE_JUNGLE, FEATURE_MARSH, FEATURE_OASIS, FEATURE_FLOODPLAINS等\nresource示例: RESOURCE_IRON, RESOURCE_HORSES, RESOURCE_COAL, RESOURCE_OIL, RESOURCE_URANIUM等\ntier: 1(最强偏好)~5(最弱偏好)"
       }
     ]
   },

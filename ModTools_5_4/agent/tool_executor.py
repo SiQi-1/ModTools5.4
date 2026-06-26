@@ -350,15 +350,20 @@ class ToolExecutor:
                 sb.setdefault("river_tier", 3)
             sb.pop("coast", None)
 
-            # Convert simple string arrays to BiasRowsEditor format:
-            # ["TERRAIN_GRASS"] → [{"selector_data": {"type": "TERRAIN_GRASS"}, "tier": 1}]
+            # Convert simple string arrays to BiasRowsEditor format
             for key in ("terrains", "features", "resources"):
                 arr = sb.get(key)
                 if isinstance(arr, list) and arr and isinstance(arr[0], str):
-                    sb[key] = [
-                        {"selector_data": {"type": v}, "tier": 1}
-                        for v in arr
-                    ]
+                    if key == "resources":
+                        sb[key] = [
+                            {"selector_data": {"resource_type": v, "display": v}, "tier": 1}
+                            for v in arr
+                        ]
+                    else:
+                        sb[key] = [
+                            {"selector_data": {"type": v}, "tier": 1}
+                            for v in arr
+                        ]
 
         # Validate field names against known schema
         schema_key = self._section_to_schema_key(section_name)

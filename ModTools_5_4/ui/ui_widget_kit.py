@@ -4676,6 +4676,17 @@ class ResourceSearchSelectorTemplate(BaseTemplateWidget):
         self._selected_type = normalized or None
         return {"resource_type": self._selected_type, "display": normalized}
 
+    def set_current_value(self, value: str | None) -> None:
+        if value is None:
+            self._selected_type = None
+            self._line_edit.clear()
+        else:
+            normalized = self._normalize_resource_type(str(value))
+            self._selected_type = normalized
+            self._line_edit.blockSignals(True)
+            self._line_edit.setText(normalized or "")
+            self._line_edit.blockSignals(False)
+
     def summary_text(self) -> str:
         if self._selected_type:
             return self._selected_type

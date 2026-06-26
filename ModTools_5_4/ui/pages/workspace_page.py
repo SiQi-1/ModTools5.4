@@ -6729,12 +6729,20 @@ class WorkspacePage(BasePage):
             self._project.sections[section_name] = entries
         if "name" not in data:
             data["name"] = self._next_entry_display_name(section_name)
+
+        # Stage 1: append raw agent data
         entries.append(data)
+
+        # Stage 2: normalize through editor cycle (auto-fix all widget-specific formats)
+        normalized = self._section_item_workspace.normalize_entry(section_name, data)
+        if normalized:
+            entries[-1] = normalized
+
         self._rebuild_tree()
         new_index = len(entries) - 1
         self._select_section_item(section_name, new_index)
         self._modifier_workspace.sync_owners_from_sections(self._project.sections)
-        QApplication.processEvents()  # Ensure tree selection signal fires
+        QApplication.processEvents()
 
     def _apply_edit_entity(self, proposal: dict) -> None:
         section_name = proposal["section_name"]

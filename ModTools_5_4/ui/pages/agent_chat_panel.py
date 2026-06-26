@@ -13,7 +13,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFont, QTextCursor
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QTextEdit,
-    QPushButton, QLabel, QPlainTextEdit, QSplitter, QFrame, QDialog,
+    QPushButton, QLabel, QLineEdit, QPlainTextEdit, QSplitter, QFrame, QDialog,
     QFormLayout, QComboBox, QDialogButtonBox, QTreeWidget, QTreeWidgetItem,
     QGroupBox, QSizePolicy,
 )

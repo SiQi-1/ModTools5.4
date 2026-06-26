@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 
 from ...app.settings_store import load_agent_settings, save_agent_settings
 from ...app.user_paths import settings_file_path
+from ...agent.agent_session import AgentSession
 from ...agent.llm_backend import LlmBackend, PROVIDERS
 from ...agent.tool_executor import ToolExecutor
 from ...agent.system_prompt import build_system_prompt
@@ -279,6 +280,13 @@ class AgentChatPanel(QWidget):
         hint = QLabel("Ctrl+Enter 发送")
         hint.setStyleSheet("color: #888; font-size: 11px;")
         btn_row.addWidget(hint)
+        self._cancel_btn = QPushButton("取消")
+        self._cancel_btn.clicked.connect(self._handle_cancel)
+        self._cancel_btn.setFixedWidth(50)
+        self._cancel_btn.setVisible(False)
+        self._cancel_btn.setStyleSheet("QPushButton { color: #c0392b; }")
+        btn_row.addWidget(self._cancel_btn)
+
         self._send_btn = QPushButton("发送")
         self._send_btn.clicked.connect(self._handle_send)
         self._send_btn.setFixedWidth(60)
@@ -289,6 +297,12 @@ class AgentChatPanel(QWidget):
 
         self.setMinimumWidth(PANEL_MIN_WIDTH)
 
+        # Timer for updating elapsed time display
+        self._elapsed_timer = QTimer(self)
+        self._elapsed_timer.setInterval(1000)
+        self._elapsed_timer.timeout.connect(self._tick_elapsed)
+        self._elapsed_seconds = 0
+
     def eventFilter(self, obj, event):
         from PyQt6.QtCore import QEvent
         if obj is self._input_field and event.type() == QEvent.Type.KeyPress:
@@ -298,13 +312,31 @@ class AgentChatPanel(QWidget):
                 return True
         return super().eventFilter(obj, event)
 
+    def _tick_elapsed(self):
+        self._elapsed_seconds += 1
+        self._status_label.setText(f"⏳ 等待响应... {self._elapsed_seconds}s")
+
+    def _handle_cancel(self):
+        self._agent.reset()
+        self._input_field.setEnabled(True)
+        self._send_btn.setEnabled(True)
+        self._cancel_btn.setVisible(False)
+        self._elapsed_timer.stop()
+        self._status_label.setText("⏹ 已取消")
+        self._status_label.setStyleSheet("color: #888;")
+        self._append_message("thinking", "请求已取消。")
+        # Worker will be abandoned; Qt thread cleanup handles it
+
     def _handle_send(self):
         text = self._input_field.toPlainText().strip()
         if not text:
             return
         self._input_field.setEnabled(False)
         self._send_btn.setEnabled(False)
-        self._status_label.setText("⏳ 思考中...")
+        self._cancel_btn.setVisible(True)
+        self._elapsed_seconds = 0
+        self._elapsed_timer.start()
+        self._status_label.setText("⏳ 连接中... 0s")
         self._status_label.setStyleSheet("color: #f39c12;")
 
         self._input_field.clear()
@@ -320,9 +352,11 @@ class AgentChatPanel(QWidget):
         pass
 
     def _on_response_finished(self, text: str):
+        self._elapsed_timer.stop()
         self._input_field.setEnabled(True)
         self._send_btn.setEnabled(True)
-        self._status_label.setText("✅ 就绪")
+        self._cancel_btn.setVisible(False)
+        self._status_label.setText(f"✅ 就绪 ({self._elapsed_seconds}s)")
         self._status_label.setStyleSheet("color: #27ae60;")
         # Replace the placeholder with actual text
         cursor = self._chat_display.textCursor()
@@ -347,9 +381,11 @@ class AgentChatPanel(QWidget):
         self._append_message("thinking", msg)
 
     def _on_error(self, msg: str):
+        self._elapsed_timer.stop()
         self._input_field.setEnabled(True)
         self._send_btn.setEnabled(True)
-        self._status_label.setText("❌ 错误")
+        self._cancel_btn.setVisible(False)
+        self._status_label.setText(f"❌ 错误 ({self._elapsed_seconds}s)")
         self._status_label.setStyleSheet("color: #c0392b;")
         self._append_message("assistant", f"❌ 错误：{msg}")
 

@@ -162,18 +162,8 @@ class LlmBackend(QObject):
             payload["temperature"] = 1.0
 
         if tools:
-            if self._is_ollama:
-                payload["tools"] = tools
-            else:
-                # For DeepSeek, apply strict mode to tools
-                if self.provider == "deepseek":
-                    from .tools import TOOL_DEFS
-                    strict_tools = []
-                    for td in TOOL_DEFS:
-                        strict_tools.append(td.to_openai_dict(strict=True))
-                    payload["tools"] = strict_tools
-                else:
-                    payload["tools"] = [t for t in tools]
+            payload["tools"] = [t for t in tools]
+            if not self._is_ollama:
                 payload["tool_choice"] = "auto"
 
         headers = {}

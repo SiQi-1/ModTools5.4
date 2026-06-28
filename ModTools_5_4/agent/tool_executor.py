@@ -488,7 +488,7 @@ class ToolExecutor:
             "section_name": section_name,
             "entry_index": entry_index,
             "description": description,
-            "data": data,
+            "data": merged,  # Return merged version with auto-generated tags
             "preview": {"before": current, "after": merged},
         }
 

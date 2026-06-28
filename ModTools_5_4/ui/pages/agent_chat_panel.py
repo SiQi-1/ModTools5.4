@@ -30,6 +30,16 @@ logger = logging.getLogger(__name__)
 PANEL_MIN_WIDTH = 320
 PANEL_DEFAULT_WIDTH = 420
 
+_SMALL_BTN_STYLE = (
+    "QPushButton { padding: 2px 4px; font-size: 12px; border-radius: 4px; }"
+    "QPushButton:hover { background-color: #e8e8e8; }"
+)
+
+
+def _mark_small_btn(btn: QPushButton) -> None:
+    btn.setStyleSheet(_SMALL_BTN_STYLE)
+    btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
 
 class _ProposalCard(QFrame):
     apply_clicked = pyqtSignal(dict)
@@ -223,17 +233,20 @@ class AgentChatPanel(QWidget):
         self._header_settings = QPushButton("⚙")
         self._header_settings.setFixedSize(24, 24)
         self._header_settings.clicked.connect(self._show_settings)
+        _mark_small_btn(self._header_settings)
         header_bar.addWidget(self._header_settings)
 
         self._header_clear = QPushButton("清空")
-        self._header_clear.setFixedSize(36, 24)
+        self._header_clear.setFixedSize(40, 24)
         self._header_clear.clicked.connect(self._clear_chat)
+        _mark_small_btn(self._header_clear)
         header_bar.addWidget(self._header_clear)
 
         self._collapse_btn = QPushButton("▶")
         self._collapse_btn.setFixedSize(24, 24)
         self._collapse_btn.clicked.connect(self._toggle_collapse)
         self._collapse_btn.setToolTip("折叠AI助手")
+        _mark_small_btn(self._collapse_btn)
         header_bar.addWidget(self._collapse_btn)
 
         self._header_bar_layout = header_bar
@@ -295,14 +308,18 @@ class AgentChatPanel(QWidget):
         btn_row.addWidget(hint)
         self._cancel_btn = QPushButton("取消")
         self._cancel_btn.clicked.connect(self._handle_cancel)
-        self._cancel_btn.setFixedWidth(50)
+        self._cancel_btn.setFixedSize(50, 28)
         self._cancel_btn.setVisible(False)
-        self._cancel_btn.setStyleSheet("QPushButton { color: #c0392b; }")
+        _mark_small_btn(self._cancel_btn)
+        self._cancel_btn.setStyleSheet(
+            _SMALL_BTN_STYLE + "QPushButton { color: #c0392b; font-weight: bold; }"
+        )
         btn_row.addWidget(self._cancel_btn)
 
         self._send_btn = QPushButton("发送")
         self._send_btn.clicked.connect(self._handle_send)
-        self._send_btn.setFixedWidth(60)
+        self._send_btn.setFixedSize(60, 28)
+        _mark_small_btn(self._send_btn)
         btn_row.addWidget(self._send_btn)
         input_layout.addLayout(btn_row)
 

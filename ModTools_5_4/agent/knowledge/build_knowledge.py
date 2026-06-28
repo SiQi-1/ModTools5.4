@@ -117,6 +117,21 @@ def _load_enum_file(rel_path: str) -> dict[str, dict]:
     return result
 
 
+def build_diplo_scenes():
+    """Extract diplomacy scene list from group_workspace's LEADER_DIPLO_SCENES."""
+    import sys
+    sys.path.insert(0, str(PROJECT_ROOT.parent))
+    try:
+        from ModTools_5_4.ui.pages.group_workspace import LEADER_DIPLO_SCENES
+        scenes = [{"label": label, "template": tmpl} for label, tmpl in LEADER_DIPLO_SCENES]
+        path = KNOWLEDGE_OUT / "diplo_scenes.json"
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"scenes": scenes}, f, ensure_ascii=False, indent=2)
+        print(f"Wrote {len(scenes)} diplomacy scenes to {path}")
+    except ImportError as e:
+        print(f"WARNING: Could not import LEADER_DIPLO_SCENES: {e}")
+
+
 def build_reference_enums():
     """Extract key enum values from AI制作Mod reference/enums/."""
     terrain_enums = _load_enum_file("reference/enums/TerrainType.txt")
@@ -352,6 +367,7 @@ def main():
     build_effect_types_compact()
     build_requirement_types_compact()
     build_reference_enums()
+    build_diplo_scenes()
     build_entity_schemas()
     print("Done.")
 

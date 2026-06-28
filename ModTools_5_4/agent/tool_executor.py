@@ -27,6 +27,7 @@ class ToolExecutor:
         self._collection_types: list[str] = []
         self._entity_schemas: dict = {}
         self._reference_enums: dict = {}
+        self._diplo_scenes: list[dict] = []
         self._load_knowledge()
 
     def _load_knowledge(self) -> None:
@@ -48,6 +49,11 @@ class ToolExecutor:
         if enum_path.exists():
             with open(enum_path, "r", encoding="utf-8") as f:
                 self._reference_enums = json.load(f)
+        diplo_path = _KNOWLEDGE_DIR / "diplo_scenes.json"
+        if diplo_path.exists():
+            with open(diplo_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self._diplo_scenes = data.get("scenes", [])
 
     def execute(self, tool_name: str, params: dict) -> dict:
         method = getattr(self, f"_exec_{tool_name}", None)
@@ -350,7 +356,7 @@ class ToolExecutor:
                         tag = str(entry.get("tag", "")).strip()
                         # If tag is missing/wrong but label is provided, auto-generate
                         if not tag and entry.get("label"):
-                            template = _diplo_label_to_template(str(entry["label"]))
+                            template = self._diplo_label_to_template(str(entry["label"]))
                             if template and abbr:
                                 entry["tag"] = f"LOC_DIPLO_{template.replace('XXX', abbr)}"
 
@@ -538,39 +544,15 @@ class ToolExecutor:
         }
 
 
-def _diplo_label_to_template(label: str) -> str:
+def _diplo_label_to_template(self, label: str) -> str:
     """Map a Chinese diplomacy scene label to its template string."""
-    mapping = {
-        "当你第一次遇到AI": "FIRST_MEET_LEADER_XXX_ANY",
-        "当你第一次遇到AI并且TA邀请你参观城市": "FIRST_MEET_VISIT_RECIPIENT_LEADER_XXX_ANY",
-        "当你第一次遇到AI并且你邀请TA参观城市": "FIRST_MEET_NEAR_INITIATOR_POSITIVE_LEADER_XXX_ANY",
-        "当你第一次遇到AI并且TA请求分享首都位置": "FIRST_MEET_NO_MANS_INFO_EXCHANGE_LEADER_XXX_ANY",
-        "一般打招呼用": "GREETING_LEADER_XXX_ANY",
-        "你接受AI的交易": "MAKE_DEAL_AI_ACCEPT_DEAL_LEADER_XXX_ANY",
-        "你拒绝AI的交易": "MAKE_DEAL_AI_REFUSE_DEAL_LEADER_XXX_ANY",
-        "AI接受你的交易": "ACCEPT_MAKE_DEAL_FROM_AI_LEADER_XXX_ANY",
-        "AI拒绝你的交易": "REJECT_MAKE_DEAL_FROM_AI_LEADER_XXX_ANY",
-        "AI同意你的索取": "AI_ACCEPT_DEMAND_LEADER_XXX_ANY",
-        "AI拒绝你的索取": "AI_REFUSE_DEMAND_LEADER_XXX_ANY",
-        "当你同意AI的索取": "HUMAN_ACCEPT_DEMAND_FROM_AI_LEADER_XXX_ANY",
-        "当你拒绝AI的索取": "HUMAN_REFUSE_DEMAND_FROM_AI_LEADER_XXX_ANY",
-        "当AI同意你的代表团": "ACCEPT_DELEGATION_FROM_HUMAN_LEADER_XXX_ANY",
-        "当AI拒绝你的代表团": "REJECT_DELEGATION_FROM_HUMAN_LEADER_XXX_ANY",
-        "当AI派遣代表团的时候": "DELEGATION_FROM_AI_LEADER_XXX_ANY",
-        "你对AI宣布友谊获得允许的时候": "ACCEPT_DECLARE_FRIEND_FROM_HUMAN_LEADER_XXX_ANY",
-        "你对AI宣布友谊被拒绝的时候": "REJECT_DECLARE_FRIEND_FROM_HUMAN_LEADER_XXX_ANY",
-        "当AI对你宣布友谊的时候": "DECLARE_FRIEND_FROM_AI_LEADER_XXX_ANY",
-        "当你同意AI对你宣布友谊": "ACCEPT_DECLARE_FRIEND_FROM_AI_LEADER_XXX_ANY",
-        "当你拒绝AI对你宣布友谊": "REJECT_DECLARE_FRIEND_FROM_AI_LEADER_XXX_ANY",
-        "当AI前来警告你的时候": "WARNING_LEADER_XXX_ANY",
-        "当你前去警告AI的时候": "WARNING_FROM_AI_LEADER_XXX_ANY",
-    }
-    # Try exact match first, then partial
-    if label in mapping:
-        return mapping[label]
-    for key, tmpl in mapping.items():
-        if key in label or label in key:
-            return tmpl
+    for scene in self._diplo_scenes:
+        if scene["label"] == label:
+            return scene["template"]
+    # Fuzzy match
+    for scene in self._diplo_scenes:
+        if scene["label"] in label or label in scene["label"]:
+            return scene["template"]
     return ""
 
 

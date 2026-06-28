@@ -467,6 +467,8 @@ class AgentChatPanel(QWidget):
     def _on_preview_ready(self, proposal: dict, description: str):
         if self._is_cancelled():
             return
+        self._elapsed_timer.stop()
+        self._cancel_btn.setVisible(False)
         self._remove_proposal_card()
         card = _ProposalCard(proposal, description)
         card.apply_clicked.connect(self._handle_apply)
@@ -497,7 +499,13 @@ class AgentChatPanel(QWidget):
             self._on_apply_proposal(proposal)
             self._append_message("assistant", "✅ 变更已应用。")
             self._remove_proposal_card()
-            # Continue the agent loop for multi-step requests
+            # Continue agent loop — restart progress indicator
+            self._elapsed_seconds = 0
+            self._elapsed_timer.start()
+            self._status_label.setText("⏳ 继续下一步...")
+            self._status_label.setStyleSheet("color: #f39c12;")
+            self._cancelled = False
+            self._cancel_btn.setVisible(True)
             self._agent.accept_proposal()
         except Exception as e:
             self._append_message("assistant", f"❌ 应用变更失败：{e}")

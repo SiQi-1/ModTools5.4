@@ -286,7 +286,14 @@ def build_entity_schemas():
                 {"key": "bindings", "label": "特质绑定", "field_type": "array", "required": False,
                  "desc": "绑定其他实体的特质列表"},
                 {"key": "diplomacy", "label": "外交文本", "field_type": "array", "required": False,
-                 "desc": "外交场景文本列表"},
+                 "desc": "外交场景文本列表。每项格式: {\"label\":\"场景名\", \"text\":\"外交台词\"}\n"
+                         "场景名从以下选择(共23个)：当第一次遇到AI、一般打招呼用、"
+                         "你接受AI的交易、你拒绝AI的交易、AI接受你的交易、AI拒绝你的交易、"
+                         "AI同意你的索取、AI拒绝你的索取、当你同意AI的索取、当你拒绝AI的索取、"
+                         "当AI同意你的代表团、当AI拒绝你的代表团、当AI派遣代表团的时候、"
+                         "你对AI宣布友谊获得允许的时候、你对AI宣布友谊被拒绝的时候、"
+                         "当AI对你宣布友谊的时候、当你同意AI对你宣布友谊、当你拒绝AI对你宣布友谊、"
+                         "当AI前来警告你的时候、当你前去警告AI的时候。tag字段自动生成无需填写。"},
                 {"key": "images", "label": "图片数据", "field_type": "object", "required": False,
                  "desc": "6张图片（加载前景/背景、外交肖像/背景等）"},
             ],

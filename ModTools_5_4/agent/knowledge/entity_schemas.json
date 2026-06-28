@@ -1,6 +1,8 @@
 {
   "Districts": {
     "table_name": "Districts",
+    "format": "table_data",
+    "section": "区域",
     "fields": [
       {
         "key": "Name",
@@ -353,20 +355,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": [
-      {
-        "first_key": "PlunderType",
-        "second_key": "PlunderAmount"
-      },
-      {
-        "first_key": "CostProgressionModel",
-        "second_key": "CostProgressionParam1"
-      }
     ]
   },
   "Buildings": {
     "table_name": "Buildings",
+    "format": "table_data",
+    "section": "建筑",
     "fields": [
       {
         "key": "Name",
@@ -773,11 +767,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": []
+    ]
   },
   "Units": {
     "table_name": "Units",
+    "format": "table_data",
+    "section": "单位",
     "fields": [
       {
         "key": "Name",
@@ -1373,11 +1368,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": []
+    ]
   },
   "Improvements": {
     "table_name": "Improvements",
+    "format": "table_data",
+    "section": "改良设施",
     "fields": [
       {
         "key": "Name",
@@ -1802,16 +1798,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": [
-      {
-        "first_key": "PlunderType",
-        "second_key": "PlunderAmount"
-      }
     ]
   },
   "Policies": {
     "table_name": "Policies",
+    "format": "table_data",
+    "section": "政策卡",
     "fields": [
       {
         "key": "Name",
@@ -1876,11 +1868,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": []
+    ]
   },
   "Projects": {
     "table_name": "Projects",
+    "format": "table_data",
+    "section": "项目",
     "fields": [
       {
         "key": "Name",
@@ -2062,16 +2055,12 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": [
-      {
-        "first_key": "CostProgressionModel",
-        "second_key": "CostProgressionParam1"
-      }
     ]
   },
   "Beliefs": {
     "table_name": "Beliefs",
+    "format": "table_data",
+    "section": "信仰",
     "fields": [
       {
         "key": "Name",
@@ -2100,11 +2089,12 @@
         "required": false,
         "template_key": "belief_class"
       }
-    ],
-    "linked_groups": []
+    ]
   },
   "Agendas": {
     "table_name": "Agendas",
+    "format": "table_data",
+    "section": "议程",
     "fields": [
       {
         "key": "Name",
@@ -2124,59 +2114,102 @@
         "required": false,
         "template_key": null
       }
-    ],
-    "linked_groups": []
+    ]
   },
   "Civilizations": {
     "table_name": "Civilizations",
-    "note": "文明编辑器字段（扁平格式，字段在data顶层，不要放table_data里！）",
+    "format": "flat",
+    "section": "文明",
     "fields": [
       {
-        "key": "civilization_name",
-        "label": "文明名称",
+        "key": "name",
+        "label": "name",
         "field_type": "text",
-        "required": true,
-        "desc": "中文名，如'中华'"
+        "default": "",
+        "required": true
+      },
+      {
+        "key": "abbr",
+        "label": "abbr",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "type",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "civilization_name",
+        "label": "civilization_name",
+        "field_type": "text",
+        "default": "",
+        "required": true
       },
       {
         "key": "civilization_description",
-        "label": "文明全称",
+        "label": "civilization_description",
         "field_type": "text",
+        "default": "",
         "required": false,
-        "desc": "自动生成为 文明名称+后缀，如'中华帝国'。一般无需手动填"
+        "desc": "自动生成=名称+后缀，一般无需手动填"
       },
       {
         "key": "civilization_adjective",
-        "label": "形容词",
+        "label": "civilization_adjective",
         "field_type": "text",
-        "required": true,
-        "desc": "如'中华的'"
+        "default": "",
+        "required": true
       },
       {
         "key": "description_suffix",
-        "label": "全称后缀",
+        "label": "description_suffix",
         "field_type": "text",
-        "required": false,
         "default": "帝国",
-        "desc": "如填'帝国'，则全称='中华帝国'"
+        "required": false
+      },
+      {
+        "key": "loc_name",
+        "label": "loc_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "loc_description",
+        "label": "loc_description",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "loc_adjective",
+        "label": "loc_adjective",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "level",
-        "label": "文明级别",
+        "label": "level",
         "field_type": "text",
-        "required": true,
+        "default": "CIVILIZATION_LEVEL_FULL_CIV",
+        "required": false,
         "enum": [
           "CIVILIZATION_LEVEL_FULL_CIV",
           "CIVILIZATION_LEVEL_CITY_STATE",
           "CIVILIZATION_LEVEL_TRIBE",
           "CIVILIZATION_LEVEL_FREE_CITIES"
-        ],
-        "default": "CIVILIZATION_LEVEL_FULL_CIV"
+        ]
       },
       {
         "key": "ethnicity",
-        "label": "人种",
+        "label": "ethnicity",
         "field_type": "text",
+        "default": "ETHNICITY_ASIAN",
         "required": false,
         "enum": [
           "ETHNICITY_ASIAN",
@@ -2184,316 +2217,483 @@
           "ETHNICITY_MEDIT",
           "ETHNICITY_SOUTHAM",
           "ETHNICITY_AFRICAN"
-        ],
-        "default": "ETHNICITY_ASIAN"
+        ]
       },
       {
         "key": "city_name_depth",
-        "label": "城市名随机深度",
-        "field_type": "int",
-        "required": false,
+        "label": "city_name_depth",
+        "field_type": "text",
         "default": 10,
+        "required": false,
         "desc": "1=严格按序，10=前十中随机"
       },
       {
         "key": "trait_name",
-        "label": "特质名称",
+        "label": "trait_name",
         "field_type": "text",
-        "required": false,
-        "desc": "如'中华特质'"
+        "default": "",
+        "required": false
       },
       {
         "key": "trait_description",
-        "label": "特质描述",
+        "label": "trait_description",
         "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "trait_bindings",
-        "label": "特质绑定",
-        "field_type": "array",
-        "required": false,
-        "default": [],
-        "desc": "绑定到其他实体的特质条目列表，[]表示空"
+        "label": "trait_bindings",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "icon_image_name",
-        "label": "图标名",
+        "label": "icon_image_name",
         "field_type": "text",
-        "required": false,
-        "desc": "如ICON_CIVILIZATION_SIQI_X"
+        "default": "",
+        "required": false
       },
       {
         "key": "images",
-        "label": "图片",
-        "field_type": "object",
-        "required": false,
-        "default": {},
-        "desc": "图标图片数据，{}表示空"
+        "label": "images",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "city_info",
-        "label": "城市名设置",
-        "field_type": "object",
+        "label": "city_info",
+        "field_type": "text",
+        "default": "",
         "required": false,
-        "default": {},
-        "desc": "三种模式(mode_index): 0=复制现有文明(existing_selection选文明,无需填内容), 1=自定义(custom_entries填城市名列表), 2=随机(random_count填数量,无需填内容)。\n通常用模式1(自定义)：{\"mode_index\":1, \"custom_entries\":[\"长安\",\"洛阳\",\"邺城\",...], \"custom_count\":10}\n或用模式0(复制)：{\"mode_index\":0, \"existing_selection\":\"CIVILIZATION_CHINA\"}"
+        "desc": "三种模式(mode_index): 0=复制/1=自定义/2=随机。通常用1"
       },
       {
         "key": "citizen_info",
-        "label": "市民名设置",
-        "field_type": "object",
+        "label": "citizen_info",
+        "field_type": "text",
+        "default": "",
         "required": false,
-        "default": {},
-        "desc": "三种模式同city_info。自定义时custom_entries格式: {\"name\":\"张三\", \"female\":false, \"modern\":false}\nfemale: false=男/true=女, modern: false=古代/true=现代\n建议每种组合(female×modern)至少各1个，共4-16个名字。\n示例：{\"mode_index\":1, \"custom_entries\":[{\"name\":\"张良\",\"female\":false,\"modern\":false},{\"name\":\"吕雉\",\"female\":true,\"modern\":false}], \"custom_count\":8}"
+        "desc": "同city_info。自定义时entries格式: {name,female,modern}"
       },
       {
         "key": "start_bias",
-        "label": "起始偏好",
-        "field_type": "object",
+        "label": "start_bias",
+        "field_type": "text",
+        "default": "",
         "required": false,
-        "default": {},
-        "desc": "出生地偏好。格式: {\"terrains\":[],\"features\":[],\"resources\":[],\"river_enabled\":false,\"river_tier\":1}。\nterrain示例: TERRAIN_GRASS, TERRAIN_PLAINS, TERRAIN_DESERT, TERRAIN_TUNDRA, TERRAIN_GRASS_HILLS等\nfeature示例: FEATURE_FOREST, FEATURE_JUNGLE, FEATURE_MARSH, FEATURE_OASIS, FEATURE_FLOODPLAINS等\nresource示例: RESOURCE_IRON, RESOURCE_HORSES, RESOURCE_COAL, RESOURCE_OIL, RESOURCE_URANIUM等\ntier: 1(最强偏好)~5(最弱偏好)"
+        "desc": "出生地偏好。用get_enum_values查可选值。terrains/features/resources是数组(每项{selector_data:{type:VALUE},tier:1})"
       }
-    ]
+    ],
+    "note": "文明编辑器字段（扁平格式，字段在data顶层，不要放table_data里！）"
   },
   "Leaders": {
     "table_name": "Leaders",
-    "note": "领袖编辑器字段（ModTools5.4内部格式）",
+    "format": "flat",
+    "section": "领袖",
     "fields": [
       {
-        "key": "leader_name",
-        "label": "领袖名称",
+        "key": "name",
+        "label": "name",
         "field_type": "text",
-        "required": true,
-        "desc": "中文名，如'秦始皇'"
+        "default": "",
+        "required": true
+      },
+      {
+        "key": "abbr",
+        "label": "abbr",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "type",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "leader_name",
+        "label": "leader_name",
+        "field_type": "text",
+        "default": "",
+        "required": true
       },
       {
         "key": "sex",
-        "label": "性别",
+        "label": "sex",
         "field_type": "text",
-        "required": true,
+        "default": "Male",
+        "required": false,
         "enum": [
           "Male",
           "Female"
-        ],
-        "default": "Male"
+        ]
       },
       {
         "key": "capital_name",
-        "label": "首都名",
+        "label": "capital_name",
         "field_type": "text",
-        "required": false,
-        "desc": "首都中文名"
+        "default": "",
+        "required": false
       },
       {
         "key": "civilization_type",
-        "label": "关联文明类型",
+        "label": "civilization_type",
         "field_type": "text",
-        "required": false,
-        "desc": "如CIVILIZATION_SIQI_X"
+        "default": "",
+        "required": false
       },
       {
         "key": "civilization_name",
-        "label": "关联文明名",
+        "label": "civilization_name",
         "field_type": "text",
-        "required": false,
-        "desc": "关联文明的中文显示名"
+        "default": "",
+        "required": true
       },
       {
         "key": "leader_text",
-        "label": "领袖格言",
+        "label": "leader_text",
         "field_type": "text",
-        "required": false,
-        "desc": "加载画面引语"
+        "default": "",
+        "required": false
       },
       {
         "key": "leader_quote",
-        "label": "百科引言",
+        "label": "leader_quote",
         "field_type": "text",
-        "required": false,
-        "desc": "文明百科中显示的引言"
+        "default": "",
+        "required": false
       },
       {
         "key": "ability_name",
-        "label": "领袖能力名称",
+        "label": "ability_name",
         "field_type": "text",
+        "default": "",
         "required": true
       },
       {
         "key": "ability_description",
-        "label": "领袖能力描述",
+        "label": "ability_description",
         "field_type": "text",
+        "default": "",
         "required": true
       },
       {
         "key": "select_sort_index",
-        "label": "选择界面排序",
-        "field_type": "int",
-        "required": false,
-        "default": 0,
-        "desc": "影响选择界面的排序顺序"
+        "label": "select_sort_index",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "add_diplo_background_curtain",
-        "label": "外交背景幕布",
-        "field_type": "bool",
-        "required": false,
-        "default": false
+        "label": "add_diplo_background_curtain",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "icon_image_name",
-        "label": "图标名",
+        "label": "icon_image_name",
         "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "foreground_image_name",
+        "label": "foreground_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "background_image_name",
+        "label": "background_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "diplo_foreground_image_name",
+        "label": "diplo_foreground_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "diplo_background_image_name",
+        "label": "diplo_background_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "select_foreground_image_name",
+        "label": "select_foreground_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "select_background_image_name",
+        "label": "select_background_image_name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "images",
+        "label": "images",
+        "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "bindings",
-        "label": "特质绑定",
-        "field_type": "array",
-        "required": false,
-        "desc": "绑定其他实体的特质列表"
+        "label": "bindings",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "diplomacy",
-        "label": "外交文本",
-        "field_type": "array",
+        "label": "diplomacy",
+        "field_type": "text",
+        "default": "",
         "required": false,
-        "desc": "外交场景文本列表(共49个场景)。每项格式: {\"label\":\"场景名\", \"text\":\"外交台词\"}\n常用场景: 当第一次遇到AI、一般打招呼用、你接受/拒绝AI的交易、AI接受/拒绝你的交易、AI同意/拒绝你的索取、当你同意/拒绝AI的索取、代表团(接受/拒绝/派遣)、友谊(宣布/被宣布/同意/拒绝)、同盟/边界/军队靠近/定居警告/谴责/宣战/间谍/战败等。\ntag字段自动生成无需填写。尽可能多填几个场景，至少20个。"
-      },
-      {
-        "key": "images",
-        "label": "图片数据",
-        "field_type": "object",
-        "required": false,
-        "desc": "6张图片（加载前景/背景、外交肖像/背景等）"
+        "desc": "外交场景文本(49个场景)。先调get_diplo_scenes获取精确label，再填text"
       }
-    ]
+    ],
+    "note": "领袖编辑器字段（扁平格式）"
   },
   "Governors": {
     "table_name": "Governors",
-    "note": "总督编辑器字段（ModTools5.4内部格式）",
+    "format": "flat",
+    "section": "总督",
     "fields": [
       {
-        "key": "GovernorType",
-        "label": "总督类型",
-        "field_type": "text",
-        "required": true,
-        "desc": "如GOVERNOR_SIQI_X"
-      },
-      {
         "key": "name",
-        "label": "总督名称",
+        "label": "name",
         "field_type": "text",
+        "default": "",
         "required": true
       },
       {
-        "key": "description",
-        "label": "描述",
+        "key": "code",
+        "label": "code",
         "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "GovernorType",
+        "label": "GovernorType",
+        "field_type": "text",
+        "default": "",
+        "required": true
+      },
+      {
+        "key": "Name",
+        "label": "Name",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "Description",
+        "label": "Description",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "Title",
+        "label": "Title",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "ShortTitle",
+        "label": "ShortTitle",
+        "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "IdentityPressure",
-        "label": "身份压力",
-        "field_type": "int",
-        "required": false,
-        "default": 0,
-        "desc": "身份压力的数值"
+        "label": "IdentityPressure",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "TransitionStrength",
-        "label": "过渡强度",
-        "field_type": "int",
-        "required": false,
-        "default": 0
+        "label": "TransitionStrength",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
-        "key": "new_trait_type",
-        "label": "使用独立Trait",
-        "field_type": "bool",
-        "required": false,
-        "default": false,
-        "desc": "是否为此总督创建独立的TraitType"
+        "key": "AssignCityState",
+        "label": "AssignCityState",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "TraitType",
-        "label": "特质类型",
+        "label": "TraitType",
         "field_type": "text",
-        "required": false,
-        "desc": "关联的TraitType，如TRAIT_GOVERNOR_SIQI_X"
+        "default": "",
+        "required": false
       },
       {
-        "key": "trait_type",
-        "label": "特质类型(备用键)",
+        "key": "new_trait_type",
+        "label": "new_trait_type",
         "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "assign_to_major",
+        "label": "assign_to_major",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "cannot_assign",
+        "label": "cannot_assign",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "Image",
+        "label": "Image",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "PortraitImage",
+        "label": "PortraitImage",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "PortraitImageSelected",
+        "label": "PortraitImageSelected",
+        "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "icon_image_name",
-        "label": "图标名",
+        "label": "icon_image_name",
         "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "icon_fill_image_name",
-        "label": "填充图标名",
+        "label": "icon_fill_image_name",
         "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "icon_slot_image_name",
-        "label": "槽位图标名",
+        "label": "icon_slot_image_name",
         "field_type": "text",
+        "default": "",
         "required": false
       },
       {
         "key": "images",
-        "label": "图片数据",
-        "field_type": "object",
-        "required": false,
-        "desc": "5张图片（图标填充/槽位/画像等）"
-      }
-    ]
-  },
-  "GreatPeople": {
-    "table_name": "GreatPersonClasses",
-    "note": "伟人编辑器字段，含class_data和unit_data两个子对象",
-    "fields": [
-      {
-        "key": "GreatPersonClassType",
-        "label": "伟人类型",
+        "label": "images",
         "field_type": "text",
-        "required": true,
-        "desc": "如GREAT_PERSON_CLASS_SIQI_X"
+        "default": "",
+        "required": false
       },
       {
-        "key": "name",
-        "label": "名称",
+        "key": "promotions",
+        "label": "promotions",
         "field_type": "text",
+        "default": "",
+        "required": false
+      }
+    ],
+    "note": "总督编辑器字段（扁平格式）"
+  },
+  "GreatPeople": {
+    "table_name": "GreatPeople",
+    "format": "flat",
+    "section": "伟人",
+    "fields": [
+      {
+        "key": "name",
+        "label": "name",
+        "field_type": "text",
+        "default": "",
         "required": true
       },
       {
+        "key": "abbr",
+        "label": "abbr",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "type",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "import_locked",
+        "label": "import_locked",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
         "key": "class_data",
-        "label": "伟人类别数据",
-        "field_type": "object",
-        "required": false,
-        "desc": "包含：GreatPersonClassType, Name, PseudoYieldType, IconString, ActionIcon, MaxPlayerInstances等"
+        "label": "class_data",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "unit_data",
-        "label": "关联单位数据",
-        "field_type": "object",
-        "required": false,
-        "desc": "包含：UnitType, Name, BaseMoves, Cost, FormationClass, Domain, TraitType, icon/portrait图片等"
+        "label": "unit_data",
+        "field_type": "text",
+        "default": "",
+        "required": false
+      },
+      {
+        "key": "images",
+        "label": "images",
+        "field_type": "text",
+        "default": "",
+        "required": false
       },
       {
         "key": "individuals",
-        "label": "伟人个体列表",
-        "field_type": "array",
-        "required": false,
-        "desc": "每个个体可以是激活类(activation)或巨作类(greatwork)模式"
+        "label": "individuals",
+        "field_type": "text",
+        "default": "",
+        "required": false
       }
-    ]
+    ],
+    "note": "伟人编辑器字段。含class_data和unit_data嵌套对象及individuals数组"
   }
 }

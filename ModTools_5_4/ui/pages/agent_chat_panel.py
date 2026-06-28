@@ -232,6 +232,15 @@ class AgentChatPanel(QWidget):
         header_bar.addWidget(self._status_label)
         header_bar.addSpacing(4)
 
+        self._web_search_btn = QPushButton("🌐")
+        self._web_search_btn.setFixedSize(24, 24)
+        self._web_search_btn.setCheckable(True)
+        self._web_search_btn.setChecked(False)
+        self._web_search_btn.setToolTip("联网搜索：关")
+        self._web_search_btn.toggled.connect(self._toggle_web_search)
+        _mark_small_btn(self._web_search_btn)
+        header_bar.addWidget(self._web_search_btn)
+
         self._header_settings = QPushButton("⚙")
         self._header_settings.setFixedSize(24, 24)
         self._header_settings.clicked.connect(self._show_settings)
@@ -330,6 +339,13 @@ class AgentChatPanel(QWidget):
 
         self.setMinimumWidth(PANEL_MIN_WIDTH)
         self._collapsed = False
+        self._web_search_enabled = False
+
+    def _toggle_web_search(self, checked: bool) -> None:
+        self._web_search_enabled = checked
+        self._web_search_btn.setToolTip(f"联网搜索：{'开' if checked else '关'}")
+        self._web_search_btn.setText("🔍" if checked else "🌐")
+        self._agent.set_web_search_enabled(checked)
 
     def _toggle_collapse(self):
         self._collapsed = not self._collapsed
@@ -339,6 +355,7 @@ class AgentChatPanel(QWidget):
             self.setMinimumWidth(0)
             self._header_title.setVisible(False)
             self._status_label.setVisible(False)
+            self._web_search_btn.setVisible(False)
             self._header_settings.setVisible(False)
             self._header_clear.setVisible(False)
             self._collapse_btn.setText("◀")
@@ -348,6 +365,7 @@ class AgentChatPanel(QWidget):
             self.setMinimumWidth(PANEL_MIN_WIDTH)
             self._header_title.setVisible(True)
             self._status_label.setVisible(True)
+            self._web_search_btn.setVisible(True)
             self._header_settings.setVisible(True)
             self._header_clear.setVisible(True)
             self._collapse_btn.setText("▶")

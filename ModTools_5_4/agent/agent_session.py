@@ -37,11 +37,19 @@ class AgentSession(QObject):
         self._pending_proposal: dict | None = None
         self._accumulated_response = ""
         self._tool_iteration = 0
+        self._web_search_enabled = False
+        self._build_tools_list()
+
+    def set_web_search_enabled(self, enabled: bool) -> None:
+        self._web_search_enabled = enabled
+        self._tools.clear()
         self._build_tools_list()
 
     def _build_tools_list(self) -> None:
         from .tools import TOOL_DEFS
         for td in TOOL_DEFS:
+            if not self._web_search_enabled and td.name == "search_web":
+                continue
             self._tools.append(td.to_openai_dict_legacy())
 
     def accept_proposal(self) -> None:
@@ -96,6 +104,9 @@ class AgentSession(QObject):
                     args = json.loads(args_str)
                 except json.JSONDecodeError:
                     args = {}
+                if name == "search_web":
+                    query_str = str(args.get("query", ""))
+                    self.thinking.emit(f"🌐 正在联网搜索: {query_str}...")
                 args_brief = ", ".join(
                     f"{k}={repr(v)[:40]}" for k, v in args.items()
                 ) or "无参数"

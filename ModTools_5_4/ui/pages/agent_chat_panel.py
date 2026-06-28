@@ -345,6 +345,11 @@ class AgentChatPanel(QWidget):
         self._collapsed = False
         self._web_search_enabled = False
 
+        self._elapsed_timer = QTimer(self)
+        self._elapsed_timer.setInterval(1000)
+        self._elapsed_timer.timeout.connect(self._tick_elapsed)
+        self._elapsed_seconds = 0
+
     def _toggle_web_search(self, checked: bool) -> None:
         self._web_search_enabled = checked
         self._web_search_btn.setToolTip(f"联网搜索：{'开启' if checked else '关闭'}")
@@ -372,12 +377,6 @@ class AgentChatPanel(QWidget):
             self._collapse_btn.setText("▶")
             self._collapse_btn.setToolTip("折叠AI助手")
         self.collapseToggled.emit(self._collapsed)
-
-        # Timer for updating elapsed time display
-        self._elapsed_timer = QTimer(self)
-        self._elapsed_timer.setInterval(1000)
-        self._elapsed_timer.timeout.connect(self._tick_elapsed)
-        self._elapsed_seconds = 0
 
     def eventFilter(self, obj, event):
         from PyQt6.QtCore import QEvent

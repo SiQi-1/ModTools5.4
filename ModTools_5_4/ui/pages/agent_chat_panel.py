@@ -206,35 +206,37 @@ class AgentChatPanel(QWidget):
 
         # Header bar
         header_bar = QHBoxLayout()
-        header_bar.setContentsMargins(10, 6, 10, 6)
-        title = QLabel("AI 助手")
+        header_bar.setContentsMargins(4, 4, 4, 4)
+        self._header_title = QLabel("AI 助手")
         title_font = QFont()
         title_font.setBold(True)
-        title.setFont(title_font)
-        header_bar.addWidget(title)
+        self._header_title.setFont(title_font)
+        header_bar.addWidget(self._header_title)
         header_bar.addStretch()
 
         provider_label = PROVIDERS.get(self._llm_backend.provider, {}).get("label", self._llm_backend.provider)
-        self._status_label = QLabel(f"⚪ {provider_label}")
-        self._status_label.setStyleSheet("color: #888;")
-        header_bar.addWidget(self._status_label)
-        header_bar.addSpacing(8)
+        self._header_status = QLabel(f"⚪ {provider_label}")
+        self._header_status.setStyleSheet("color: #888;")
+        header_bar.addWidget(self._header_status)
+        header_bar.addSpacing(4)
 
-        settings_btn = QPushButton("⚙")
-        settings_btn.setFixedSize(28, 28)
-        settings_btn.clicked.connect(self._show_settings)
-        header_bar.addWidget(settings_btn)
+        self._header_settings = QPushButton("⚙")
+        self._header_settings.setFixedSize(24, 24)
+        self._header_settings.clicked.connect(self._show_settings)
+        header_bar.addWidget(self._header_settings)
 
-        clear_btn = QPushButton("清空")
-        clear_btn.setFixedSize(40, 28)
-        clear_btn.clicked.connect(self._clear_chat)
-        header_bar.addWidget(clear_btn)
+        self._header_clear = QPushButton("清空")
+        self._header_clear.setFixedSize(36, 24)
+        self._header_clear.clicked.connect(self._clear_chat)
+        header_bar.addWidget(self._header_clear)
 
-        self._collapse_btn = QPushButton("◀")
-        self._collapse_btn.setFixedSize(28, 28)
+        self._collapse_btn = QPushButton("▶")
+        self._collapse_btn.setFixedSize(24, 24)
         self._collapse_btn.clicked.connect(self._toggle_collapse)
+        self._collapse_btn.setToolTip("折叠AI助手")
         header_bar.addWidget(self._collapse_btn)
 
+        self._header_bar_layout = header_bar
         main_layout.addLayout(header_bar)
 
         # Wrapper for collapsible content
@@ -313,8 +315,24 @@ class AgentChatPanel(QWidget):
     def _toggle_collapse(self):
         self._collapsed = not self._collapsed
         self._content_wrapper.setVisible(not self._collapsed)
-        self._collapse_btn.setText("▶" if self._collapsed else "◀")
-        self.setMinimumWidth(PANEL_MIN_WIDTH if not self._collapsed else 0)
+        if self._collapsed:
+            self.setMaximumWidth(28)
+            self.setMinimumWidth(28)
+            self._header_title.setVisible(False)
+            self._header_status.setVisible(False)
+            self._header_settings.setVisible(False)
+            self._header_clear.setVisible(False)
+            self._collapse_btn.setText("◀")
+            self._collapse_btn.setToolTip("展开AI助手")
+        else:
+            self.setMaximumWidth(16777215)
+            self.setMinimumWidth(PANEL_MIN_WIDTH)
+            self._header_title.setVisible(True)
+            self._header_status.setVisible(True)
+            self._header_settings.setVisible(True)
+            self._header_clear.setVisible(True)
+            self._collapse_btn.setText("▶")
+            self._collapse_btn.setToolTip("折叠AI助手")
 
         # Timer for updating elapsed time display
         self._elapsed_timer = QTimer(self)

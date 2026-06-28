@@ -459,7 +459,20 @@ class ToolExecutor:
             return {"error": f"条目不存在: {section_name}[{entry_index}]"}
         current = dict(entries[entry_index])
         merged = dict(current)
-        merged.update(data)
+        # Deep-merge diplomacy: combine existing + new by label, don't replace
+        if "diplomacy" in data and isinstance(data.get("diplomacy"), list):
+            existing_diplo = list(merged.get("diplomacy", [])) if isinstance(merged.get("diplomacy"), list) else []
+            existing_labels = {d.get("label") for d in existing_diplo if isinstance(d, dict)}
+            for d in data["diplomacy"]:
+                if isinstance(d, dict) and d.get("label") not in existing_labels:
+                    existing_diplo.append(d)
+                    existing_labels.add(d.get("label"))
+            merged["diplomacy"] = existing_diplo
+            # Remove diplomacy from data so update doesn't overwrite
+            data_without_diplo = {k: v for k, v in data.items() if k != "diplomacy"}
+            merged.update(data_without_diplo)
+        else:
+            merged.update(data)
 
         # Auto-fix diplomacy tags for leader edits — must use leader short_type, not abbr
         if section_name == "领袖":

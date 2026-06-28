@@ -395,8 +395,19 @@ class AgentChatPanel(QWidget):
         self._elapsed_seconds += 1
         self._status_label.setText(f"⏳ 等待响应... {self._elapsed_seconds}s")
 
+    def _is_cancelled(self) -> bool:
+        return getattr(self, "_cancelled", False)
+
     def _handle_cancel(self):
+        self._cancelled = True
         self._agent.reset()
+        worker = self._llm_backend._worker
+        if worker is not None and worker.isRunning():
+            try:
+                worker.terminate()
+                worker.wait(1000)
+            except Exception:
+                pass
         self._input_field.setEnabled(True)
         self._send_btn.setEnabled(True)
         self._cancel_btn.setVisible(False)
@@ -404,12 +415,12 @@ class AgentChatPanel(QWidget):
         self._status_label.setText("⏹ 已取消")
         self._status_label.setStyleSheet("color: #888;")
         self._append_message("thinking", "请求已取消。")
-        # Worker will be abandoned; Qt thread cleanup handles it
 
     def _handle_send(self):
         text = self._input_field.toPlainText().strip()
         if not text:
             return
+        self._cancelled = False
         self._input_field.setEnabled(False)
         self._send_btn.setEnabled(False)
         self._cancel_btn.setVisible(True)
@@ -431,6 +442,8 @@ class AgentChatPanel(QWidget):
         pass
 
     def _on_response_finished(self, text: str):
+        if self._is_cancelled():
+            return
         self._elapsed_timer.stop()
         self._input_field.setEnabled(True)
         self._send_btn.setEnabled(True)
@@ -445,6 +458,8 @@ class AgentChatPanel(QWidget):
         cursor.insertText(text + "\n\n")
 
     def _on_preview_ready(self, proposal: dict, description: str):
+        if self._is_cancelled():
+            return
         self._remove_proposal_card()
         card = _ProposalCard(proposal, description)
         card.apply_clicked.connect(self._handle_apply)
@@ -460,6 +475,8 @@ class AgentChatPanel(QWidget):
         self._append_message("thinking", msg)
 
     def _on_error(self, msg: str):
+        if self._is_cancelled():
+            return
         self._elapsed_timer.stop()
         self._input_field.setEnabled(True)
         self._send_btn.setEnabled(True)

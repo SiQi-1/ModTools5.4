@@ -195,6 +195,24 @@ def _build_entity_type(shared: dict[str, object], *, head: str, midfix_code: str
     return "_".join(parts)
 
 
+def _inject_diplomacy_by_label(editor, diplo: list[dict]) -> None:
+    """Set diplomacy table text by matching scene labels, bypassing tag case issues."""
+    label_to_text: dict[str, str] = {}
+    for entry in diplo:
+        if isinstance(entry, dict):
+            lbl = str(entry.get("label", "")).strip()
+            txt = str(entry.get("text", "")).strip()
+            if lbl and txt:
+                label_to_text[lbl] = txt
+    if not label_to_text:
+        return
+    for row, (scene_label, _template) in enumerate(LEADER_DIPLO_SCENES):
+        if scene_label in label_to_text:
+            text_item = editor._diplomacy_table.item(row, 1)
+            if text_item is not None:
+                text_item.setText(label_to_text[scene_label])
+
+
 def _first_non_empty_value(data: dict[str, object]) -> str:
     for value in data.values():
         text = _safe_text(value)
@@ -3830,6 +3848,10 @@ class SectionItemWorkspacePanel(QWidget):
             if section == "文明":
                 result = self._civilization_editor.export_entry()
             elif section == "领袖":
+                # Manually inject diplomacy text by label matching (tag auto-gen may differ in case)
+                diplo = data.get("diplomacy")
+                if isinstance(diplo, list) and diplo:
+                    _inject_diplomacy_by_label(self._leader_editor, diplo)
                 result = self._leader_editor.export_entry()
             elif section == "区域":
                 result = self._district_editor.export_entry()

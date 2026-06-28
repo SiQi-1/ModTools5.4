@@ -461,6 +461,7 @@ class WorkspacePage(BasePage):
             workspace_params_changed_callback=self._handle_basic_workspace_params_changed,
             refresh_project_config_callback=self._handle_refresh_project_config_from_basic,
             custom_project_files_provider=self._custom_project_files_for_actions,
+            has_custom_unit_abilities_getter=lambda: bool(self._modifier_custom_unit_abilities()),
         )
         self._art_workspace = ArtWorkspacePanel()
 
@@ -548,7 +549,7 @@ class WorkspacePage(BasePage):
         )
         self._agent_chat_panel.setVisible(False)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._workspace_splitter = splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setObjectName("workspaceMainSplitter")
         splitter.setChildrenCollapsible(False)
         splitter.setHandleWidth(8)
@@ -559,6 +560,8 @@ class WorkspacePage(BasePage):
         splitter.setStretchFactor(1, 1)
         splitter.setStretchFactor(2, 0)
         splitter.setSizes([300, 680, 420])
+
+        self._agent_chat_panel.collapseToggled.connect(self._on_agent_collapse_toggled)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(8, 8, 8, 8)
@@ -2762,7 +2765,7 @@ class WorkspacePage(BasePage):
             )
             existing_unit_types.add(unit_type)
 
-        if not unit_entries:
+        if not unit_entries and not self._modifier_custom_unit_abilities():
             return "-- Units.sql\n-- 暂无单位数据", "-- UnitAbility.sql\n-- 暂无单位能力数据", "-- Text.sql\n-- 暂无单位文本数据"
 
         schema = build_units_main_schema()
@@ -6701,6 +6704,16 @@ class WorkspacePage(BasePage):
             "individuals": [],
         }
 
+    def _on_agent_collapse_toggled(self, collapsed: bool) -> None:
+        sizes = self._workspace_splitter.sizes()
+        if collapsed:
+            sizes[1] = sizes[1] + sizes[2] - 28
+            sizes[2] = 28
+        else:
+            sizes[1] = sizes[1] - 420 + sizes[2]
+            sizes[2] = 420
+        self._workspace_splitter.setSizes(sizes)
+
     def toggle_agent_chat_panel(self) -> None:
         visible = not self._agent_chat_panel.isVisible()
         self._agent_chat_panel.setVisible(visible)
@@ -9300,12 +9313,16 @@ class WorkspacePage(BasePage):
         _apply_single_data("议程", "Agendas", agenda_data_sql)
 
         unit_fmt = self._get_group_preview_format("单位")
-        if self._should_emit_optional_section_file("单位"):
+        has_units = self._should_emit_optional_section_file("单位")
+        has_custom_abilities = bool(self._modifier_custom_unit_abilities())
+        if has_units or has_custom_abilities:
             if unit_fmt == "xml":
-                files[f"Data/{output_base}_Units.xml"] = self._sql_preview_to_xml(unit_sql)
+                if has_units:
+                    files[f"Data/{output_base}_Units.xml"] = self._sql_preview_to_xml(unit_sql)
                 files[f"Data/{output_base}_UnitAbilities.xml"] = self._sql_preview_to_xml(ability_sql)
             else:
-                files[f"Data/{output_base}_Units.sql"] = unit_sql
+                if has_units:
+                    files[f"Data/{output_base}_Units.sql"] = unit_sql
                 files[f"Data/{output_base}_UnitAbilities.sql"] = ability_sql
 
         great_people_fmt = self._get_group_preview_format("伟人")

@@ -174,6 +174,8 @@ class _ProposalCard(QFrame):
 
 
 class AgentChatPanel(QWidget):
+    collapseToggled = pyqtSignal(bool)  # True=collapsed, False=expanded
+
     def __init__(self, sections_provider: Callable[[], dict[str, object]],
                  on_apply_proposal: Callable[[dict], None],
                  parent: QWidget | None = None):
@@ -334,7 +336,7 @@ class AgentChatPanel(QWidget):
         self._content_wrapper.setVisible(not self._collapsed)
         if self._collapsed:
             self.setMaximumWidth(28)
-            self.setMinimumWidth(28)
+            self.setMinimumWidth(0)
             self._header_title.setVisible(False)
             self._header_status.setVisible(False)
             self._header_settings.setVisible(False)
@@ -350,6 +352,7 @@ class AgentChatPanel(QWidget):
             self._header_clear.setVisible(True)
             self._collapse_btn.setText("▶")
             self._collapse_btn.setToolTip("折叠AI助手")
+        self.collapseToggled.emit(self._collapsed)
 
         # Timer for updating elapsed time display
         self._elapsed_timer = QTimer(self)

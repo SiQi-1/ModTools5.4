@@ -230,17 +230,28 @@ class AgentChatPanel(QWidget):
         clear_btn.clicked.connect(self._clear_chat)
         header_bar.addWidget(clear_btn)
 
+        self._collapse_btn = QPushButton("◀")
+        self._collapse_btn.setFixedSize(28, 28)
+        self._collapse_btn.clicked.connect(self._toggle_collapse)
+        header_bar.addWidget(self._collapse_btn)
+
         main_layout.addLayout(header_bar)
+
+        # Wrapper for collapsible content
+        self._content_wrapper = QWidget()
+        content_layout = QVBoxLayout(self._content_wrapper)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
 
         # Separator
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
         sep.setFrameShadow(QFrame.Shadow.Sunken)
-        main_layout.addWidget(sep)
+        content_layout.addWidget(sep)
 
         # Splitter: chat history + preview area
         self._splitter = QSplitter(Qt.Orientation.Vertical)
-        main_layout.addWidget(self._splitter, 1)
+        content_layout.addWidget(self._splitter, 1)
 
         # Chat area
         chat_widget = QWidget()
@@ -293,9 +304,17 @@ class AgentChatPanel(QWidget):
         btn_row.addWidget(self._send_btn)
         input_layout.addLayout(btn_row)
 
-        main_layout.addLayout(input_layout)
+        content_layout.addLayout(input_layout)
+        main_layout.addWidget(self._content_wrapper, 1)
 
         self.setMinimumWidth(PANEL_MIN_WIDTH)
+        self._collapsed = False
+
+    def _toggle_collapse(self):
+        self._collapsed = not self._collapsed
+        self._content_wrapper.setVisible(not self._collapsed)
+        self._collapse_btn.setText("▶" if self._collapsed else "◀")
+        self.setMinimumWidth(PANEL_MIN_WIDTH if not self._collapsed else 0)
 
         # Timer for updating elapsed time display
         self._elapsed_timer = QTimer(self)

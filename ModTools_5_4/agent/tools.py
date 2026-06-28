@@ -240,6 +240,23 @@ _tool(
     required=["enum_type"],
 )
 
+_tool(
+    "search_web",
+    "联网搜索信息。用于搜索城市名、市民名、外交文本等需要外部知识的内容。"
+    "搜索结果可用于填充城市名列表、市民名列表、外交场景文本等。",
+    {
+        "query": {
+            "type": "string",
+            "description": "搜索关键词，如'秦汉时期城市名'、'日本战国武将名'、'外交辞令示例'",
+        },
+        "limit": {
+            "type": "integer",
+            "description": "最多返回条数，默认5",
+        },
+    },
+    required=["query"],
+)
+
 
 # ── Propose tools (require preview) ──
 

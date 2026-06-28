@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from typing import Callable
 
@@ -308,6 +311,12 @@ class ToolExecutor:
             "note": f"共{total}项，仅展示前30项。可传exclude_categories排除不需要的分类" if total > 30 else "",
         }
 
+    def _exec_search_web(self, params: dict) -> dict:
+        query = params.get("query", "")
+        limit = params.get("limit", 5)
+        results = _web_search(query, limit)
+        return {"query": query, "results": results}
+
     # ── Propose tools ──
 
     def _exec_propose_add_entity(self, params: dict) -> dict:
@@ -517,11 +526,46 @@ class ToolExecutor:
 
 def _safe_id(text: str) -> str:
     """Convert a Chinese description to an ASCII-safe ID fragment."""
-    import re, hashlib
-    # Extract alphanumeric words
+    import hashlib
     ascii_parts = re.findall(r"[A-Za-z0-9]+", text)
     if ascii_parts:
         return "_".join(ascii_parts[:4]).upper()[:40]
-    # No ASCII — use short hash of the text
     h = hashlib.md5(text.encode("utf-8")).hexdigest()[:8].upper()
     return f"MOD_{h}"
+
+
+def _web_search(query: str, limit: int = 5) -> list[dict]:
+    """Simple web search using DuckDuckGo Lite (no API key needed)."""
+    try:
+        q = urllib.parse.quote(query)
+        url = f"https://lite.duckduckgo.com/lite/?q={q}"
+        req = urllib.request.Request(url, headers={"User-Agent": "ModTools5.4/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            html = resp.read().decode("utf-8", errors="replace")
+        # Extract result snippets from DDG Lite HTML
+        results = []
+        # Match result links and snippets
+        pattern = re.compile(
+            r'<a[^>]*class="result-link"[^>]*href="([^"]*)"[^>]*>(.*?)</a>.*?'
+            r'<td class="result-snippet"[^>]*>(.*?)</td>',
+            re.DOTALL,
+        )
+        matches = pattern.findall(html)
+        for href, title, snippet in matches[:limit]:
+            title_clean = re.sub(r'<[^>]+>', '', title).strip()
+            snippet_clean = re.sub(r'<[^>]+>', '', snippet).strip()
+            results.append({
+                "title": title_clean,
+                "snippet": snippet_clean,
+                "url": href,
+            })
+        if not results:
+            # Fallback: try to extract any text
+            text = re.sub(r'<[^>]+>', ' ', html)
+            text = re.sub(r'\s+', ' ', text)
+            if len(text) > 500:
+                results.append({"title": "搜索结果摘要", "snippet": text[:500], "url": url})
+        return results
+    except Exception as e:
+        logger.warning("Web search failed for '%s': %s", query, e)
+        return [{"title": "搜索失败", "snippet": str(e), "url": ""}]

@@ -346,19 +346,26 @@ class ToolExecutor:
                         data[k] = v
                 del data["table_data"]
 
-        # Auto-fix diplomacy tags for leaders
+        # Auto-fix diplomacy tags: use type's short_type, not raw abbr
         if section_name == "领袖":
             diplo = data.get("diplomacy")
             if isinstance(diplo, list):
-                abbr = str(data.get("abbr", "")).strip()
+                type_text = str(data.get("type") or "").strip()
+                if type_text.startswith("LEADER_"):
+                    short_type = type_text[len("LEADER_"):]
+                else:
+                    short_type = type_text
+                if not short_type:
+                    prefix = str(data.get("prefix1") or "").strip()
+                    ldr_abbr = str(data.get("abbr") or "").strip()
+                    short_type = f"{prefix}_{ldr_abbr}" if prefix and ldr_abbr else ldr_abbr
                 for entry in diplo:
                     if isinstance(entry, dict):
                         tag = str(entry.get("tag", "")).strip()
-                        # If tag is missing/wrong but label is provided, auto-generate
-                        if not tag and entry.get("label"):
+                        if not tag and entry.get("label") and short_type:
                             template = self._diplo_label_to_template(str(entry["label"]))
-                            if template and abbr:
-                                entry["tag"] = f"LOC_DIPLO_{template.replace('XXX', abbr)}"
+                            if template:
+                                entry["tag"] = f"LOC_DIPLO_{template.replace('XXX', short_type)}"
 
         # Auto-correct common field name mistakes inside start_bias
         sb = data.get("start_bias")
@@ -453,6 +460,28 @@ class ToolExecutor:
         current = dict(entries[entry_index])
         merged = dict(current)
         merged.update(data)
+
+        # Auto-fix diplomacy tags for leader edits — must use leader short_type, not abbr
+        if section_name == "领袖":
+            diplo = merged.get("diplomacy")
+            if isinstance(diplo, list):
+                type_text = str(merged.get("type") or "").strip()
+                if type_text.startswith("LEADER_"):
+                    short_type = type_text[len("LEADER_"):]
+                else:
+                    short_type = type_text
+                if not short_type:
+                    # Fallback: construct from shared params prefix + abbr
+                    shared_prefix = str(merged.get("prefix1") or "").strip()
+                    abbr = str(merged.get("abbr") or "").strip()
+                    short_type = f"{shared_prefix}_{abbr}" if shared_prefix and abbr else abbr
+                for entry in diplo:
+                    if isinstance(entry, dict):
+                        tag = str(entry.get("tag", "")).strip()
+                        if not tag and entry.get("label") and short_type:
+                            template = self._diplo_label_to_template(str(entry["label"]))
+                            if template:
+                                entry["tag"] = f"LOC_DIPLO_{template.replace('XXX', short_type)}"
 
         return {
             "action": "edit_entity",

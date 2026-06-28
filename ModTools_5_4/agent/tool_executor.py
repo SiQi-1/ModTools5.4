@@ -323,6 +323,10 @@ class ToolExecutor:
         results = _web_search(query, limit)
         return {"query": query, "results": results}
 
+    def _exec_get_diplo_scenes(self, params: dict) -> dict:
+        labels = [s["label"] for s in self._diplo_scenes]
+        return {"count": len(labels), "scenes": labels}
+
     # ── Propose tools ──
 
     def _exec_propose_add_entity(self, params: dict) -> dict:

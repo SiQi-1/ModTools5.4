@@ -6766,7 +6766,9 @@ class WorkspacePage(BasePage):
             return
         current = dict(entries[entry_index])
         current.update(data)
-        entries[entry_index] = current
+        # Normalize through editor to fix widget formats (diplomacy tags, etc.)
+        normalized = self._section_item_workspace.normalize_entry(section_name, current)
+        entries[entry_index] = normalized or current
         self._rebuild_tree()
         self._select_section_item(section_name, entry_index)
         self._modifier_workspace.sync_owners_from_sections(self._project.sections)

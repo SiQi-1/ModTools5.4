@@ -543,17 +543,15 @@ class ToolExecutor:
             "preview": {"deleted_entry": current.get("name", str(entry_index))},
         }
 
-
-def _diplo_label_to_template(self, label: str) -> str:
-    """Map a Chinese diplomacy scene label to its template string."""
-    for scene in self._diplo_scenes:
-        if scene["label"] == label:
-            return scene["template"]
-    # Fuzzy match
-    for scene in self._diplo_scenes:
-        if scene["label"] in label or label in scene["label"]:
-            return scene["template"]
-    return ""
+    def _diplo_label_to_template(self, label: str) -> str:
+        """Map a Chinese diplomacy scene label to its template string."""
+        for scene in self._diplo_scenes:
+            if scene["label"] == label:
+                return scene["template"]
+        for scene in self._diplo_scenes:
+            if scene["label"] in label or label in scene["label"]:
+                return scene["template"]
+        return ""
 
 
 def _safe_id(text: str) -> str:

@@ -227,9 +227,9 @@ class AgentChatPanel(QWidget):
         header_bar.addStretch()
 
         provider_label = PROVIDERS.get(self._llm_backend.provider, {}).get("label", self._llm_backend.provider)
-        self._header_status = QLabel(f"⚪ {provider_label}")
-        self._header_status.setStyleSheet("color: #888;")
-        header_bar.addWidget(self._header_status)
+        self._status_label = QLabel(f"⚪ {provider_label}")
+        self._status_label.setStyleSheet("color: #888;")
+        header_bar.addWidget(self._status_label)
         header_bar.addSpacing(4)
 
         self._header_settings = QPushButton("⚙")
@@ -295,7 +295,7 @@ class AgentChatPanel(QWidget):
         input_layout.setSpacing(4)
 
         self._input_field = QPlainTextEdit()
-        self._input_field.setPlaceholderText("输入需求，如'创建一个+5战斗力的单位能力'...\nCtrl+Enter 发送，Enter 换行")
+        self._input_field.setPlaceholderText("输入需求，如'创建一个+5战斗力的单位能力'...\nEnter 发送，Ctrl+Enter 换行")
         self._input_field.setMaximumHeight(120)
         self._input_field.setMinimumHeight(36)
         self._input_field.setTabChangesFocus(True)
@@ -305,7 +305,7 @@ class AgentChatPanel(QWidget):
 
         btn_row = QHBoxLayout()
         btn_row.addStretch()
-        hint = QLabel("Ctrl+Enter 发送")
+        hint = QLabel("Enter 发送 · Ctrl+Enter 换行")
         hint.setStyleSheet("color: #888; font-size: 11px;")
         btn_row.addWidget(hint)
         self._cancel_btn = QPushButton("取消")
@@ -338,7 +338,7 @@ class AgentChatPanel(QWidget):
             self.setMaximumWidth(28)
             self.setMinimumWidth(0)
             self._header_title.setVisible(False)
-            self._header_status.setVisible(False)
+            self._status_label.setVisible(False)
             self._header_settings.setVisible(False)
             self._header_clear.setVisible(False)
             self._collapse_btn.setText("◀")
@@ -347,7 +347,7 @@ class AgentChatPanel(QWidget):
             self.setMaximumWidth(16777215)
             self.setMinimumWidth(PANEL_MIN_WIDTH)
             self._header_title.setVisible(True)
-            self._header_status.setVisible(True)
+            self._status_label.setVisible(True)
             self._header_settings.setVisible(True)
             self._header_clear.setVisible(True)
             self._collapse_btn.setText("▶")
@@ -363,9 +363,13 @@ class AgentChatPanel(QWidget):
     def eventFilter(self, obj, event):
         from PyQt6.QtCore import QEvent
         if obj is self._input_field and event.type() == QEvent.Type.KeyPress:
-            if (event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter) \
-               and (event.modifiers() & Qt.KeyboardModifier.ControlModifier):
-                self._handle_send()
+            if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+                if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+                    # Ctrl+Enter: insert newline
+                    self._input_field.insertPlainText("\n")
+                else:
+                    # Enter: send
+                    self._handle_send()
                 return True
         return super().eventFilter(obj, event)
 

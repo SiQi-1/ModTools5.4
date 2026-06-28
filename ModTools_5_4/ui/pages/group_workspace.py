@@ -196,7 +196,7 @@ def _build_entity_type(shared: dict[str, object], *, head: str, midfix_code: str
 
 
 def _inject_diplomacy_by_label(editor, diplo: list[dict]) -> None:
-    """Set diplomacy table text by matching scene labels, bypassing tag case issues."""
+    """Set diplomacy table text by fuzzy-matching scene labels."""
     label_to_text: dict[str, str] = {}
     for entry in diplo:
         if isinstance(entry, dict):
@@ -207,10 +207,20 @@ def _inject_diplomacy_by_label(editor, diplo: list[dict]) -> None:
     if not label_to_text:
         return
     for row, (scene_label, _template) in enumerate(LEADER_DIPLO_SCENES):
+        matched_text = None
+        # 1) Exact match
         if scene_label in label_to_text:
+            matched_text = label_to_text[scene_label]
+        else:
+            # 2) Fuzzy: agent label contains scene label or vice versa
+            for agent_lbl, txt in label_to_text.items():
+                if scene_label in agent_lbl or agent_lbl in scene_label:
+                    matched_text = txt
+                    break
+        if matched_text:
             text_item = editor._diplomacy_table.item(row, 1)
             if text_item is not None:
-                text_item.setText(label_to_text[scene_label])
+                text_item.setText(matched_text)
 
 
 def _first_non_empty_value(data: dict[str, object]) -> str:

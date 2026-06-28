@@ -195,6 +195,19 @@ def _build_entity_type(shared: dict[str, object], *, head: str, midfix_code: str
     return "_".join(parts)
 
 
+def _diplo_label_similarity(a: str, b: str) -> float:
+    """How similar are two Chinese diplomacy labels (0.0 to 1.0)."""
+    if a == b:
+        return 1.0
+    if a in b or b in a:
+        return 0.9
+    # Count shared characters
+    sa, sb = set(a), set(b)
+    if not sa or not sb:
+        return 0.0
+    return len(sa & sb) / max(len(sa), len(sb))
+
+
 def _inject_diplomacy_by_label(editor, diplo: list[dict]) -> None:
     """Set diplomacy table text by fuzzy-matching scene labels."""
     label_to_text: dict[str, str] = {}
@@ -207,16 +220,18 @@ def _inject_diplomacy_by_label(editor, diplo: list[dict]) -> None:
     if not label_to_text:
         return
     for row, (scene_label, _template) in enumerate(LEADER_DIPLO_SCENES):
-        matched_text = None
         # 1) Exact match
         if scene_label in label_to_text:
             matched_text = label_to_text[scene_label]
         else:
-            # 2) Fuzzy: agent label contains scene label or vice versa
+            # 2) Find best fuzzy match by character similarity
+            best_score = 0.5  # minimum threshold
+            matched_text = None
             for agent_lbl, txt in label_to_text.items():
-                if scene_label in agent_lbl or agent_lbl in scene_label:
+                score = _diplo_label_similarity(scene_label, agent_lbl)
+                if score > best_score:
+                    best_score = score
                     matched_text = txt
-                    break
         if matched_text:
             text_item = editor._diplomacy_table.item(row, 1)
             if text_item is not None:

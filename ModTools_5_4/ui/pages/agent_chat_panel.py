@@ -393,7 +393,14 @@ class AgentChatPanel(QWidget):
 
     def _tick_elapsed(self):
         self._elapsed_seconds += 1
-        self._status_label.setText(f"⏳ 等待响应... {self._elapsed_seconds}s")
+        if self._elapsed_seconds < 3:
+            self._status_label.setText(f"⏳ 连接中... {self._elapsed_seconds}s")
+        elif self._elapsed_seconds < 15:
+            self._status_label.setText(f"⏳ 思考中... {self._elapsed_seconds}s")
+        elif self._elapsed_seconds < 30:
+            self._status_label.setText(f"⏳ 生成中... {self._elapsed_seconds}s")
+        else:
+            self._status_label.setText(f"⏳ 仍在处理... {self._elapsed_seconds}s (未卡死)")
 
     def _is_cancelled(self) -> bool:
         return getattr(self, "_cancelled", False)
@@ -426,7 +433,7 @@ class AgentChatPanel(QWidget):
         self._cancel_btn.setVisible(True)
         self._elapsed_seconds = 0
         self._elapsed_timer.start()
-        self._status_label.setText("⏳ 连接中... 0s")
+        self._status_label.setText("⏳ 连接中...")
         self._status_label.setStyleSheet("color: #f39c12;")
 
         self._input_field.clear()

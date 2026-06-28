@@ -15,7 +15,7 @@ from .tool_executor import ToolExecutor
 logger = logging.getLogger(__name__)
 
 MAX_TOOL_ITERATIONS = 20
-MAX_HISTORY_MESSAGES = 30
+MAX_HISTORY_MESSAGES = 40
 
 
 class AgentSession(QObject):
@@ -173,6 +173,24 @@ class AgentSession(QObject):
         self._prune_history()
 
     def _prune_history(self) -> None:
+        # Trim long tool result messages to avoid wasting context
+        for msg in self._messages:
+            if msg.role == "tool" and len(msg.content) > 2000:
+                try:
+                    result = json.loads(msg.content)
+                    # Summarize based on result type
+                    if "results" in result:
+                        result["results"] = result["results"][:10]
+                        result["_trimmed"] = True
+                    elif "entries" in result:
+                        result["entries"] = result["entries"][:10]
+                        result["_trimmed"] = True
+                    elif "data" in result and isinstance(result["data"], dict):
+                        result["data"] = {"_summary": f"{len(str(result['data']))} bytes"}
+                    msg.content = json.dumps(result, ensure_ascii=False)
+                except Exception:
+                    msg.content = msg.content[:2000]
+
         system_msgs = [m for m in self._messages if m.role == "system"]
         other_msgs = [m for m in self._messages if m.role != "system"]
         if len(other_msgs) > MAX_HISTORY_MESSAGES:

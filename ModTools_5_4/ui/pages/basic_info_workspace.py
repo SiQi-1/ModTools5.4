@@ -785,6 +785,7 @@ class BasicInfoWorkspacePanel(QWidget):
         workspace_params_changed_callback=None,
         refresh_project_config_callback=None,
         custom_project_files_provider=None,
+        has_custom_unit_abilities_getter=None,
     ) -> None:
         super().__init__()
         self.setObjectName("basicInfoWorkspacePanel")
@@ -796,6 +797,7 @@ class BasicInfoWorkspacePanel(QWidget):
         self._workspace_params_changed_callback = workspace_params_changed_callback
         self._refresh_project_config_callback = refresh_project_config_callback
         self._custom_project_files_provider = custom_project_files_provider
+        self._has_custom_unit_abilities_getter = has_custom_unit_abilities_getter
         self._suspend_workspace_params_signal = True
         self._delete_requests: list[str] = []
 
@@ -1349,6 +1351,15 @@ class BasicInfoWorkspacePanel(QWidget):
         files: list[str] = []
         optional_sections = {"区域", "建筑", "单位", "改良设施", "伟人", "总督", "项目", "信仰", "政策卡", "议程"}
 
+        def _has_custom_unit_abilities() -> bool:
+            getter = self._has_custom_unit_abilities_getter
+            if callable(getter):
+                try:
+                    return bool(getter())
+                except Exception:
+                    return False
+            return False
+
         def _should_include_section(section: str) -> bool:
             if section not in optional_sections:
                 return True
@@ -1369,6 +1380,10 @@ class BasicInfoWorkspacePanel(QWidget):
                 files.append(f"Data/{file_token}_UnitAbilities.{ext}")
             if section == "伟人":
                 files.append(f"Data/{file_token}_GreatWorks.{ext}")
+
+        if not _should_include_section("单位") and _has_custom_unit_abilities():
+            ext = self._group_format("单位")
+            files.append(f"Data/{file_token}_UnitAbilities.{ext}")
 
         files.append(f"Data/{file_token}_Modifiers.sql")
         files.append(f"Data/{file_token}_Moments.sql")

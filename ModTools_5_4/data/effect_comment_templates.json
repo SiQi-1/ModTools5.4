@@ -3039,10 +3039,10 @@
     }
   },
   "EFFECT_ADJUST_UNIT_HEALING_MODIFIERS": {
-    "comment": "{Type}恢复{+:Amount}%",
+    "comment": "驻扎恢复{+:Amount}",
     "params": {
       "Amount": "signed",
-      "Type": "text"
+      "Type": "skip"
     }
   },
   "EFFECT_ADJUST_UNIT_HEALING_RELIGION_MODIFIERS": {
@@ -3053,7 +3053,7 @@
     }
   },
   "EFFECT_ADJUST_UNIT_HIDDEN_VISIBILITY": {
-    "comment": "隐藏可见度",
+    "comment": "对一环外的单位保持隐匿",
     "params": {
       "Hidden": "bool_hide"
     }

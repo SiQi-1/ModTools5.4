@@ -45,7 +45,6 @@ from .base_page import BasePage
 from .art_workspace import ArtWorkspacePanel
 from .basic_info_workspace import BasicInfoWorkspacePanel
 from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
-from .agent_chat_panel import AgentChatPanel
 from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel
 from .modifier_workspace import ModifierWorkspacePanel
 from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDialog, _ImprovementSearchDialog, _UnitSearchDialog
@@ -543,25 +542,15 @@ class WorkspacePage(BasePage):
         right_layout.addWidget(self._workspace_stack, 1)
         right_container.setLayout(right_layout)
 
-        self._agent_chat_panel = AgentChatPanel(
-            sections_provider=self._workspace_sections_snapshot_for_selectors,
-            on_apply_proposal=self._handle_apply_agent_proposal,
-        )
-        self._agent_chat_panel.setVisible(False)
-
-        self._workspace_splitter = splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setObjectName("workspaceMainSplitter")
         splitter.setChildrenCollapsible(False)
         splitter.setHandleWidth(8)
         splitter.addWidget(left_container)
         splitter.addWidget(right_container)
-        splitter.addWidget(self._agent_chat_panel)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
-        splitter.setStretchFactor(2, 0)
-        splitter.setSizes([300, 680, 420])
-
-        self._agent_chat_panel.collapseToggled.connect(self._on_agent_collapse_toggled)
+        splitter.setSizes([300, 900])
 
         layout = QVBoxLayout()
         layout.setContentsMargins(8, 8, 8, 8)
@@ -6704,136 +6693,6 @@ class WorkspacePage(BasePage):
             "individuals": [],
         }
 
-    def _on_agent_collapse_toggled(self, collapsed: bool) -> None:
-        sizes = self._workspace_splitter.sizes()
-        if collapsed:
-            sizes[1] = sizes[1] + sizes[2] - 28
-            sizes[2] = 28
-        else:
-            sizes[1] = sizes[1] - 420 + sizes[2]
-            sizes[2] = 420
-        self._workspace_splitter.setSizes(sizes)
-
-    def toggle_agent_chat_panel(self) -> None:
-        visible = not self._agent_chat_panel.isVisible()
-        self._agent_chat_panel.setVisible(visible)
-        if visible:
-            self._agent_chat_panel._input_field.setFocus()
-
-    def _handle_apply_agent_proposal(self, proposal: dict) -> None:
-        action = proposal.get("action", "")
-        if action == "add_entity":
-            self._apply_add_entity(proposal)
-        elif action == "edit_entity":
-            self._apply_edit_entity(proposal)
-        elif action == "add_modifier":
-            self._apply_add_modifier(proposal)
-        elif action == "delete_entity":
-            self._apply_delete_entity(proposal)
-        else:
-            raise ValueError(f"Unknown proposal action: {action}")
-
-    def _apply_add_entity(self, proposal: dict) -> None:
-        section_name = proposal["section_name"]
-        data = proposal["data"]
-        entries = self._project.sections.get(section_name)
-        if not isinstance(entries, list):
-            entries = []
-            self._project.sections[section_name] = entries
-        if "name" not in data:
-            data["name"] = self._next_entry_display_name(section_name)
-
-        # Stage 1: append raw agent data
-        entries.append(data)
-
-        # Stage 2: normalize through editor cycle (auto-fix all widget-specific formats)
-        normalized = self._section_item_workspace.normalize_entry(section_name, data)
-        if normalized:
-            entries[-1] = normalized
-
-        self._rebuild_tree()
-        new_index = len(entries) - 1
-        self._select_section_item(section_name, new_index)
-        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
-        QApplication.processEvents()
-
-    def _apply_edit_entity(self, proposal: dict) -> None:
-        section_name = proposal["section_name"]
-        entry_index = proposal["entry_index"]
-        data = proposal["data"]
-        entries = self._project.sections.get(section_name)
-        if not isinstance(entries, list) or entry_index >= len(entries):
-            return
-        current = dict(entries[entry_index])
-        current.update(data)
-        # Normalize through editor to fix widget formats (diplomacy tags, etc.)
-        normalized = self._section_item_workspace.normalize_entry(section_name, current)
-        entries[entry_index] = normalized or current
-        self._rebuild_tree()
-        self._select_section_item(section_name, entry_index)
-        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
-
-    def _apply_add_modifier(self, proposal: dict) -> None:
-        self._sync_workspace_sections_from_editors()
-        payload = self._load_modifier_payload_from_project()
-        if not isinstance(payload, dict):
-            payload = {}
-
-        owner = proposal["owner"]
-        modifier = proposal["modifier"]
-        reqsets = proposal.get("reqsets", [])
-        requirements = proposal.get("requirements", [])
-
-        owners = list(payload.get("owners", []))
-        modifiers = list(payload.get("modifiers", []))
-        existing_reqsets = list(payload.get("requirement_sets", []))
-        existing_reqs = list(payload.get("requirements", []))
-
-        existing_owner = next(
-            (o for o in owners
-             if o.get("table_name") == owner.get("table_name")
-             and o.get("type_name") == owner.get("type_name")),
-            None,
-        )
-        if existing_owner:
-            bindings = list(existing_owner.get("owner_bindings", []))
-            mod_id = modifier.get("modifier_id", "")
-            if mod_id and not any(b.get("modifier_id") == mod_id for b in bindings):
-                bindings.append({"modifier_id": mod_id, "attachment_target_type": ""})
-                existing_owner["owner_bindings"] = bindings
-        else:
-            owner_entry = dict(owner)
-            owner_entry["owner_bindings"] = [
-                {"modifier_id": modifier.get("modifier_id", ""), "attachment_target_type": ""}
-            ]
-            owner_entry.setdefault("bound_modifier_ids", [])
-            owner_entry["bound_modifier_ids"] = [modifier.get("modifier_id", "")]
-            owners.append(owner_entry)
-
-        modifiers.append(modifier)
-        for rs in reqsets:
-            existing_reqsets.append(rs)
-        for req in requirements:
-            existing_reqs.append(req)
-
-        payload["owners"] = owners
-        payload["modifiers"] = modifiers
-        payload["requirement_sets"] = existing_reqsets
-        payload["requirements"] = existing_reqs
-
-        self._save_modifier_payload_to_project(payload)
-        self._modifier_workspace.import_project_payload(payload)
-        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
-        self._rebuild_tree()
-
-    def _apply_delete_entity(self, proposal: dict) -> None:
-        section_name = proposal["section_name"]
-        entry_index = proposal["entry_index"]
-        entries = self._project.sections.get(section_name)
-        if isinstance(entries, list) and 0 <= entry_index < len(entries):
-            del entries[entry_index]
-        self._rebuild_tree()
-        self._modifier_workspace.sync_owners_from_sections(self._project.sections)
 
     def _handle_section_item_changed(self, section: str, index: int, payload: dict[str, object]) -> None:
         entries = self._project.sections.get(section)

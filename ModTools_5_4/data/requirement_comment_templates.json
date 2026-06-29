@@ -1092,7 +1092,7 @@
     "params": {}
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_OWNER": {
-    "comment": "邻接己方领土",
+    "comment": "邻接所有者{MinDistance}到{MaxDistance}环内",
     "params": {
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned"

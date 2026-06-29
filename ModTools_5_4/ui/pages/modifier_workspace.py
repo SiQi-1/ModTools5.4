@@ -1909,6 +1909,11 @@ class HomePage(BasePage):
         self._modifier_preview_text = preview_text
         preview_layout.addWidget(preview_text)
 
+        gen_btn = QPushButton("一键模版")
+        gen_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        gen_btn.clicked.connect(self._handle_gen_modifier_preview_text)
+        preview_layout.addWidget(gen_btn, 0, Qt.AlignmentFlag.AlignLeft)
+
         preview_tip = QLabel("提示：仅在 EffectType = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER 时生效。")
         preview_tip.setWordWrap(True)
         preview_tip.setStyleSheet("color: #64748b;")
@@ -1922,6 +1927,22 @@ class HomePage(BasePage):
     @staticmethod
     def _supports_modifier_preview_string(effect_type: str | None) -> bool:
         return str(effect_type or "").strip().upper() == "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER"
+
+    def _handle_gen_modifier_preview_text(self) -> None:
+        if self._modifier_preview_text is None:
+            return
+        params = self._collect_param_rows()
+        for param in params:
+            name = str(param.get("name") or "").strip()
+            if not name or name.lower() == "description":
+                continue
+            if name.upper() == "KEY":
+                placeholder = "{Property}"
+            else:
+                placeholder = f"{{1_{name}}}"
+            self._modifier_preview_text.setPlainText(f"+{placeholder} 来自")
+            return
+        self._modifier_preview_text.setPlainText("+{ 来自")
 
     def _sync_modifier_preview_editor_visibility(self) -> None:
         if self._modifier_preview_container is None:
@@ -5162,11 +5183,15 @@ class HomePage(BasePage):
 
     def _build_modifier_comment_auto(self) -> str:
         template_comment = self._build_auto_comment_from_template()
-        if template_comment:
-            return template_comment
         reqset_comment = self._resolve_modifier_reqset_comment()
+        if template_comment:
+            return self._join_comment_parts(reqset_comment, template_comment)
         param_comment = self._build_param_comment_from_rows(self._collect_param_rows())
         return self._join_comment_parts(reqset_comment, param_comment)
+
+    def _join_comment_parts(self, left: str, right: str) -> str:
+        parts = [str(left or "").strip(), str(right or "").strip()]
+        return " — ".join(part for part in parts if part)
 
     def _handle_open_template_editor(self) -> None:
         effect_type = self._effect_type_combo.currentText().strip() if self._effect_type_combo else ""
@@ -5296,7 +5321,7 @@ class HomePage(BasePage):
             if lowered in {"true", "false"}:
                 return name_upper if lowered == "true" else f"NO_{name_upper}"
             if re.fullmatch(r"-?\d+(\.\d+)?", text):
-                return self._normalize_numeric_text(text)
+                return self._normalize_numeric_text(text).replace("-", "N")
             if "_" in text_up:
                 # whitelist prefixes that should keep everything after the first token
                 whitelist = ("TERRAIN", "FEATURE", "TECHNOLOGY", "CIVIC", "RESOURCE")
@@ -5313,7 +5338,7 @@ class HomePage(BasePage):
         if isinstance(raw, bool):
             return name_upper if raw else f"NO_{name_upper}"
         if isinstance(raw, (int, float)):
-            return self._normalize_numeric_text(f"{raw:.6f}")
+            return self._normalize_numeric_text(f"{raw:.6f}").replace("-", "N")
         return name_upper
 
     @staticmethod
@@ -5394,10 +5419,6 @@ class HomePage(BasePage):
         if amount_text:
             return f"{amount_text} {desc_text}".strip()
         return desc_text
-
-    def _join_comment_parts(self, left: str, right: str) -> str:
-        parts = [str(left or "").strip(), str(right or "").strip()]
-        return " ".join(part for part in parts if part)
 
     def _reqset_suffix_fragment(self, reqset_id: str, prefix1: str, prefix2: str) -> str:
         text = str(reqset_id or "").strip().upper()

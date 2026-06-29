@@ -1,13 +1,13 @@
 {
   "version": "beta-3",
   "art_consumers": {
-    "WorldView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Cultures.artdef"],
-    "StrategicView_Translate": ["Buildings.artdef", "Landmarks.artdef"],
+    "WorldView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Cultures.artdef", "Districts.artdef", "Improvements.artdef"],
+    "StrategicView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Districts.artdef", "Improvements.artdef"],
     "Units": ["Cultures.artdef", "Units.artdef", "Landmarks.artdef"],
-    "Landmarks": ["Cultures.artdef", "Landmarks.artdef"],
+    "Landmarks": ["Cultures.artdef", "Landmarks.artdef", "Improvements.artdef"],
     "Cultures": ["Cultures.artdef"],
     "LeaderFallback": ["FallbackLeaders.artdef"],
-    "Audio": ["Leaders.artdef", "Landmarks.artdef"],
+    "Audio": ["Leaders.artdef", "Landmarks.artdef", "Districts.artdef", "Units.artdef", "Improvements.artdef"],
     "LeaderLighting": ["Leaders.artdef"],
     "Leaders": ["Leaders.artdef"],
     "UILensAsset": ["Overlay.artdef"],
@@ -23,10 +23,10 @@
     "Terrains": ["Landmarks.artdef"],
     "Features": ["Landmarks.artdef"],
     "Resources": ["Landmarks.artdef"],
-    "Improvements": ["Landmarks.artdef"],
+    "Improvements": ["Landmarks.artdef", "Improvements.artdef"],
     "VFX": ["Landmarks.artdef"],
-    "IndirectGrid": ["Landmarks.artdef"],
-    "UnitSimulation": ["Landmarks.artdef"]
+    "IndirectGrid": ["Landmarks.artdef", "Improvements.artdef"],
+    "UnitSimulation": ["Landmarks.artdef", "Improvements.artdef"]
   },
   "libraries": {
     "LeaderFallback": ["LeaderFallbacks"],

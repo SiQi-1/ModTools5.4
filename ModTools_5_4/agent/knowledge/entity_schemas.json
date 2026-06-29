@@ -2246,7 +2246,9 @@
         "label": "trait_bindings",
         "field_type": "text",
         "default": "",
-        "required": false
+        "required": false,
+        "agent_skip": true,
+        "desc": "特质绑定（搜索选择+多条目，建议跳过）"
       },
       {
         "key": "icon_image_name",
@@ -2457,7 +2459,9 @@
         "label": "bindings",
         "field_type": "text",
         "default": "",
-        "required": false
+        "required": false,
+        "agent_skip": true,
+        "desc": "特质绑定列表（搜索选择+多条目，建议跳过）"
       },
       {
         "key": "diplomacy",
@@ -2627,7 +2631,9 @@
         "label": "promotions",
         "field_type": "text",
         "default": "",
-        "required": false
+        "required": false,
+        "agent_skip": true,
+        "desc": "总督晋升树（可视化节点编辑器，agent无法填写，需手动编辑）"
       }
     ],
     "note": "总督编辑器字段（扁平格式）"
@@ -2691,9 +2697,21 @@
         "label": "individuals",
         "field_type": "text",
         "default": "",
-        "required": false
+        "required": false,
+        "agent_skip": true,
+        "desc": "伟人个体列表（每个个体有独立编辑器，agent无法填写，需手动编辑）"
       }
     ],
     "note": "伟人编辑器字段。含class_data和unit_data嵌套对象及individuals数组"
+  },
+  "_meta": {
+    "skip_fields": {
+      "adjacency": "相邻加成编辑器（复杂嵌套UI，agent无法填写，需手动编辑）",
+      "subtables": "子表编辑器（多行动态表格，agent无法填写，需手动编辑）",
+      "promotions": "总督晋升树（可视化节点编辑器，agent无法填写，需手动编辑）",
+      "individuals": "伟人个体列表（每个个体有独立编辑器，agent无法填写，需手动编辑）",
+      "trait_bindings": "特质绑定（搜索选择+多条目，建议跳过）",
+      "bindings": "特质绑定列表（搜索选择+多条目，建议跳过）"
+    }
   }
 }

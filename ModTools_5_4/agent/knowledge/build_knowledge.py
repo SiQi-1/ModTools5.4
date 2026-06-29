@@ -195,6 +195,16 @@ def _extract_table_fields(schema_name: str) -> list[dict]:
 # ─── Manual overlay (descriptions, enums, notes) ─────────────────
 
 _MANUAL_OVERLAY: dict[str, dict] = {
+    # ── Agent level notes on which complex fields to skip ──
+    "_skip_fields": {
+        "adjacency": "相邻加成编辑器（复杂嵌套UI，agent无法填写，需手动编辑）",
+        "subtables": "子表编辑器（多行动态表格，agent无法填写，需手动编辑）",
+        "promotions": "总督晋升树（可视化节点编辑器，agent无法填写，需手动编辑）",
+        "individuals": "伟人个体列表（每个个体有独立编辑器，agent无法填写，需手动编辑）",
+        "trait_bindings": "特质绑定（搜索选择+多条目，建议跳过）",
+        "bindings": "特质绑定列表（搜索选择+多条目，建议跳过）",
+    },
+
     "Civilizations": {
         "note": "文明编辑器字段（扁平格式，字段在data顶层，不要放table_data里！）",
         "field_meta": {
@@ -287,10 +297,22 @@ def build_entity_schemas():
                 if f["key"] in _FLAT_REQUIRED:
                     f["required"] = True
 
+    # Inject skip warnings for complex UI fields
+    skip_fields = _MANUAL_OVERLAY.get("_skip_fields", {})
+    for schema_key, schema in schemas.items():
+        for f in schema["fields"]:
+            if f["key"] in skip_fields:
+                f["agent_skip"] = True
+                f["desc"] = skip_fields[f["key"]]
+
+    # Add skip reference as metadata key
+    schemas["_meta"] = {"skip_fields": skip_fields}
+
     out_path = KNOWLEDGE_OUT / "entity_schemas.json"
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(schemas, f, ensure_ascii=False, indent=2)
-    total_fields = sum(len(s["fields"]) for s in schemas.values())
+    entity_schemas = {k: v for k, v in schemas.items() if isinstance(v, dict) and "fields" in v}
+    total_fields = sum(len(s["fields"]) for s in entity_schemas.values())
     print(f"Wrote {len(schemas)} entity schemas ({total_fields} fields total) to {out_path}")
 
 

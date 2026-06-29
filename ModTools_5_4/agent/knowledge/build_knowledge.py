@@ -197,12 +197,18 @@ def _extract_table_fields(schema_name: str) -> list[dict]:
 _MANUAL_OVERLAY: dict[str, dict] = {
     # ── Agent level notes on which complex fields to skip ──
     "_skip_fields": {
-        "adjacency": "相邻加成编辑器（复杂嵌套UI，agent无法填写，需手动编辑）",
         "subtables": "子表编辑器（多行动态表格，agent无法填写，需手动编辑）",
         "promotions": "总督晋升树（可视化节点编辑器，agent无法填写，需手动编辑）",
         "individuals": "伟人个体列表（每个个体有独立编辑器，agent无法填写，需手动编辑）",
         "trait_bindings": "特质绑定（搜索选择+多条目，建议跳过）",
         "bindings": "特质绑定列表（搜索选择+多条目，建议跳过）",
+    },
+
+    "_field_descriptions": {
+        "adjacency": "相邻加成。格式: [{\"id\":\"ADJACENCY_DISTRICT\",\"yield_change\":2,"
+                      "\"yield_type\":\"YIELD_SCIENCE\"}, ...]\n"
+                      "existing模式(用游戏已有id): 只需id+yield_change+yield_type\n"
+                      "custom模式(自定义): id+yield_type+yield_change+description+source_type",
     },
 
     "Civilizations": {
@@ -297,13 +303,16 @@ def build_entity_schemas():
                 if f["key"] in _FLAT_REQUIRED:
                     f["required"] = True
 
-    # Inject skip warnings for complex UI fields
+    # Inject skip warnings and field descriptions
     skip_fields = _MANUAL_OVERLAY.get("_skip_fields", {})
+    descriptions = _MANUAL_OVERLAY.get("_field_descriptions", {})
     for schema_key, schema in schemas.items():
         for f in schema["fields"]:
             if f["key"] in skip_fields:
                 f["agent_skip"] = True
                 f["desc"] = skip_fields[f["key"]]
+            if f["key"] in descriptions and not f.get("desc"):
+                f["desc"] = descriptions[f["key"]]
 
     # Add skip reference as metadata key
     schemas["_meta"] = {"skip_fields": skip_fields}

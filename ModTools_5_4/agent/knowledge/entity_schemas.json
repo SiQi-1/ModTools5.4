@@ -2706,7 +2706,6 @@
   },
   "_meta": {
     "skip_fields": {
-      "adjacency": "相邻加成编辑器（复杂嵌套UI，agent无法填写，需手动编辑）",
       "subtables": "子表编辑器（多行动态表格，agent无法填写，需手动编辑）",
       "promotions": "总督晋升树（可视化节点编辑器，agent无法填写，需手动编辑）",
       "individuals": "伟人个体列表（每个个体有独立编辑器，agent无法填写，需手动编辑）",

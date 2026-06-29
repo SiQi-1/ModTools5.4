@@ -39,7 +39,11 @@ class ToolExecutor:
             path = _KNOWLEDGE_DIR / fname
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f:
-                    setattr(self, target, json.load(f))
+                    data = json.load(f)
+                if target == "_entity_schemas":
+                    data = {k: v for k, v in data.items()
+                            if not k.startswith("_") and isinstance(v, dict) and "fields" in v}
+                setattr(self, target, data)
         ct_path = _KNOWLEDGE_DIR / "collection_types.json"
         if ct_path.exists():
             with open(ct_path, "r", encoding="utf-8") as f:
@@ -371,6 +375,10 @@ class ToolExecutor:
                             if template:
                                 entry["tag"] = f"LOC_DIPLO_{template.replace('XXX', short_type)}"
 
+        # Normalize adjacency for Districts/Buildings
+        if section_name in ("区域", "建筑"):
+            data = self._normalize_adjacency(data)
+
         # Auto-correct common field name mistakes inside start_bias
         sb = data.get("start_bias")
         if isinstance(sb, dict) and sb:
@@ -588,6 +596,46 @@ class ToolExecutor:
             "description": description,
             "preview": {"deleted_entry": current.get("name", str(entry_index))},
         }
+
+    @staticmethod
+    def _normalize_adjacency(data: dict) -> dict:
+        """Convert agent-friendly adjacency format to AdjacencyEditorWidget payload."""
+        adj = data.get("adjacency")
+        if not isinstance(adj, list):
+            return data
+        # Each item can be:
+        # 1) {"id": "ADJACENCY_DISTRICT", "yield_change": 2} → existing mode
+        # 2) {"id": "MY_ADJACENCY", "yield_type": "YIELD_SCIENCE", "yield_change": 2,
+        #      "description": "...", "source_type": "FEATURE_FOREST"} → custom mode
+        normalized = []
+        for item in adj:
+            if not isinstance(item, dict):
+                continue
+            item_id = str(item.get("id") or item.get("identifier") or "").strip()
+            if not item_id:
+                continue
+            # Determine mode
+            if item.get("source_type") or item.get("source_detail") or item.get("description"):
+                normalized.append({
+                    "mode": "custom",
+                    "id": item_id,
+                    "yield_type": str(item.get("yield_type", "YIELD_SCIENCE")),
+                    "yield_change": int(item.get("yield_change", 1)),
+                    "tiles_required": int(item.get("tiles_required", 0)),
+                    "description": str(item.get("description", "")),
+                    "source_type": str(item.get("source_type", "")),
+                    "source_detail": str(item.get("source_detail", "")),
+                })
+            else:
+                normalized.append({
+                    "mode": "existing",
+                    "id": item_id,
+                    "yield_type": str(item.get("yield_type", "")),
+                    "yield_change": int(item.get("yield_change", 1)),
+                    "tiles_required": int(item.get("tiles_required", 0)),
+                })
+        data["adjacency"] = normalized
+        return data
 
     def _diplo_label_to_template(self, label: str) -> str:
         """Map a Chinese diplomacy scene label to its template string."""

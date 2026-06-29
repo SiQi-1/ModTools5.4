@@ -101,7 +101,7 @@ def main():
         ("效果类型", len(te._effect_types), 700, 800),
         ("条件类型", len(te._requirement_types), 260, 300),
         ("集合类型", len(te._collection_types), 55, 70),
-        ("实体Schema", len(te._entity_schemas), 8, 12),
+        ("实体Schema", len(te._entity_schemas), 10, 15),
     ]
     for label, actual, lo, hi in checks:
         if lo <= actual <= hi:

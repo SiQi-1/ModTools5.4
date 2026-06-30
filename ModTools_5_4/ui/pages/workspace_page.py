@@ -12,6 +12,8 @@ import struct
 from xml.dom import minidom
 from xml.etree import ElementTree
 
+from PIL import Image
+
 from PyQt6.QtCore import Qt, QRectF
 from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPixmap
 from PyQt6.QtWidgets import (
@@ -8607,12 +8609,35 @@ class WorkspacePage(BasePage):
         lines.append("")
         return "\n".join(lines)
 
+    @staticmethod
+    def _lanczos_downscale(pil_img, target_w: int, target_h: int):
+        """Multi-step LANCZOS downscale: halve until within 2x of target."""
+        w, h = pil_img.width, pil_img.height
+        while w > target_w * 2 or h > target_h * 2:
+            w = max(1, w // 2)
+            h = max(1, h // 2)
+            pil_img = pil_img.resize((w, h), Image.LANCZOS)
+        return pil_img.resize((target_w, target_h), Image.LANCZOS)
+
+    @staticmethod
+    def _pil_to_qpixmap(pil_img) -> QPixmap:
+        if pil_img.mode != "RGBA":
+            pil_img = pil_img.convert("RGBA")
+        data = pil_img.tobytes("raw", "RGBA")
+        qimage = QImage(data, pil_img.width, pil_img.height, QImage.Format.Format_RGBA8888)
+        return QPixmap.fromImage(qimage)
+
     def _render_state_image(self, state: dict[str, object], target_size: tuple[int, int]) -> QImage | None:
         path = str(state.get("path") or "").strip()
         if not path:
             return None
-        pixmap = QPixmap(path)
-        if pixmap.isNull():
+        # Load with Pillow for high-quality LANCZOS scaling
+        try:
+            src_img = Image.open(path).convert("RGBA")
+        except Exception:
+            return None
+        pix_w, pix_h = src_img.size
+        if pix_w <= 0 or pix_h <= 0:
             return None
 
         target_w = max(1, int(target_size[0]))
@@ -8677,8 +8702,8 @@ class WorkspacePage(BasePage):
         except (TypeError, ValueError):
             offset_y = 0.0
 
-        pix_w = max(1, pixmap.width())
-        pix_h = max(1, pixmap.height())
+        pix_w = max(1, pix_w)
+        pix_h = max(1, pix_h)
         min_scale = max(base_w / pix_w, base_h / pix_h)
         if scale < min_scale:
             scale = min_scale
@@ -8688,12 +8713,22 @@ class WorkspacePage(BasePage):
         ratio_x = target_w / base_w
         ratio_y = target_h / base_h
 
+        # Pre-scale source with Pillow LANCZOS (multi-step) for high quality
+        draw_w = int(round(pix_w * scale * ratio_x))
+        draw_h = int(round(pix_h * scale * ratio_y))
+        draw_w = max(1, draw_w)
+        draw_h = max(1, draw_h)
+        scaled_pil = self._lanczos_downscale(src_img, draw_w, draw_h)
+        scaled_pixmap = self._pil_to_qpixmap(scaled_pil)
+
+        draw_x = int(round(offset_x * ratio_x))
+        draw_y = int(round(offset_y * ratio_y))
+
         image = QImage(target_w, target_h, QImage.Format.Format_ARGB32)
         image.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(image)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
 
         if add_black_border:
             inset = _circle_inset_px(target_w, target_h)
@@ -8721,11 +8756,8 @@ class WorkspacePage(BasePage):
             path.addEllipse(cx - clip_radius, cy - clip_radius, clip_radius * 2.0, clip_radius * 2.0)
             painter.setClipPath(path)
 
-        draw_x = offset_x * ratio_x
-        draw_y = offset_y * ratio_y
-        draw_w = pixmap.width() * scale * ratio_x
-        draw_h = pixmap.height() * scale * ratio_y
-        painter.drawPixmap(int(round(draw_x)), int(round(draw_y)), int(round(draw_w)), int(round(draw_h)), pixmap)
+        # Draw pre-scaled pixmap at 1:1 — no further scaling by QPainter
+        painter.drawPixmap(draw_x, draw_y, scaled_pixmap)
         painter.end()
         return image
 

@@ -1,11 +1,13 @@
 {
   "EFFECT_ACTIVATE_VOLCANOES": {
     "comment": "激活火山",
-    "params": {}
+    "params": {},
+    "name_template": "ACTIVATE_VOLCANOES"
   },
   "EFFECT_ADD_BELIEF": {
     "comment": "添加信仰",
-    "params": {}
+    "params": {},
+    "name_template": "ADD_BELIEF"
   },
   "EFFECT_ADD_CULTURE_BOMB_TRIGGER": {
     "comment": "文化炸弹：{DistrictType}",
@@ -13,14 +15,16 @@
       "CaptureOwnedTerritory": "skip",
       "DistrictType": "text",
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADD_CULTURE_BOMB_TRIGGER_{DistrictType}"
   },
   "EFFECT_ADD_DIPLOMATIC_ACTION_OVERRIDE": {
     "comment": "外交覆盖：{CivicType}",
     "params": {
       "CivicType": "text",
       "DiplomaticAction": "text"
-    }
+    },
+    "name_template": "ADD_DIPLO_ACTION_OVERRIDE_{CivicType}"
   },
   "EFFECT_ADD_DIPLOMATIC_COMBAT_MODIFIER": {
     "comment": "外交战斗{+:Amount}",
@@ -29,7 +33,8 @@
       "DiplomaticYieldSource": "text",
       "ReligiousOnly": "bool_hide",
       "TurnsActive": "text"
-    }
+    },
+    "name_template": "ADD_DIPLO_COMBAT_{:Amount}"
   },
   "EFFECT_ADD_DIPLOMATIC_MOVEMENT_MODIFIER": {
     "comment": "外交移动{+:Amount}",
@@ -37,7 +42,8 @@
       "Amount": "signed",
       "DiplomaticYieldSource": "text",
       "TurnsActive": "text"
-    }
+    },
+    "name_template": "ADD_DIPLO_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADD_DIPLOMATIC_YIELD_MODIFIER": {
     "comment": "{YieldType}外交{+:Amount}",
@@ -47,7 +53,8 @@
       "StackWithOtherDiploYieldModifiers": "bool_hide",
       "TurnsActive": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADD_DIPLO_{YieldType}_{:Amount}"
   },
   "EFFECT_ADD_DIPLO_VISIBILITY": {
     "comment": "外交能见度{+:Amount}",
@@ -55,13 +62,15 @@
       "Amount": "signed",
       "Source": "text",
       "SourceType": "text"
-    }
+    },
+    "name_template": "ADD_DIPLO_VISIBILITY_{:Amount}"
   },
   "EFFECT_ADD_EXPENDED_GREAT_PERSON_TILES": {
     "comment": "伟人消耗地块{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADD_EXPENDED_GREAT_PERSON_TILES_{:Amount}"
   },
   "EFFECT_ADD_PLAYER_BELIEF_YIELD": {
     "comment": "信条{YieldType}{+:Amount}",
@@ -70,29 +79,34 @@
       "BeliefYieldType": "text",
       "PerXItems": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADD_BELIEF_{YieldType}_{:Amount}"
   },
   "EFFECT_ADD_PLAYER_FAVOR": {
     "comment": "外交支持{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADD_FAVOR_{:Amount}"
   },
   "EFFECT_ADD_PLAYER_PROJECT_AVAILABILITY": {
     "comment": "可用项目：{ProjectType}",
     "params": {
       "ProjectType": "text"
-    }
+    },
+    "name_template": "ADD_PROJECT_AVAILABILITY_{ProjectType}"
   },
   "EFFECT_ADD_PLAYER_SEQUESTERED_CARBON": {
     "comment": "碳封存{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADD_SEQUESTERED_CARBON_{:Amount}"
   },
   "EFFECT_ADD_PLAYER_UPGRADE_MILITARY_FORMATION_ON_CITY_CONQUEST": {
     "comment": "征服城市升级编制",
-    "params": {}
+    "params": {},
+    "name_template": "ADD_UPGRADE_MILITARY_FORMATION_CONQUEST"
   },
   "EFFECT_ADD_RELIGIOUS_BELIEF_YIELD": {
     "comment": "{DistrictType}信条产出{+:Amount}",
@@ -102,13 +116,15 @@
       "DistrictType": "text",
       "PerXItems": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADD_RELIGIOUS_BELIEF_{YieldType}_{:Amount}"
   },
   "EFFECT_ADD_RELIGIOUS_BUILDING": {
     "comment": "添加宗教建筑：{BuildingType}",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ADD_RELIGIOUS_BUILDING_{BuildingType}"
   },
   "EFFECT_ADD_RELIGIOUS_BUILDING_MULTIPLIER": {
     "comment": "宗教建筑{YieldType}加成",
@@ -116,21 +132,25 @@
       "Founder": "bool_hide",
       "Multiplier": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADD_RELIGIOUS_BUILDING_{YieldType}_{:Multiplier}"
   },
   "EFFECT_ADD_RELIGIOUS_UNIT": {
     "comment": "添加宗教单位：{UnitType}",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADD_RELIGIOUS_UNIT_{UnitType}"
   },
   "EFFECT_ADJUST_ACCUMULATING_BONUS": {
     "comment": "累积加成调整",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ACCUMULATING_BONUS"
   },
   "EFFECT_ADJUST_ACTIVE_BUILDING_PRODUCTION": {
     "comment": "激活建筑生产力调整",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ACTIVE_BUILDING_PRODUCTION"
   },
   "EFFECT_ADJUST_ADDITIONAL_PILLAGING": {
     "comment": "额外掠夺{+:Amount}",
@@ -138,108 +158,126 @@
       "Amount": "signed",
       "ImprovementType": "text",
       "PlunderType": "text"
-    }
+    },
+    "name_template": "ADJUST_ADDITIONAL_PILLAGING_{:Amount}"
   },
   "EFFECT_ADJUST_ADD_AMENITY_PER_ADJACENT_LUXURY": {
     "comment": "相邻奢侈加宜居度",
     "params": {
       "AddAmenity": "text"
-    }
+    },
+    "name_template": "ADJUST_AMENITY_PER_ADJACENT_LUXURY"
   },
   "EFFECT_ADJUST_ADJACENT_CITY_RIVER_BUILDING_PRODUCTION": {
     "comment": "沿河建筑生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ADJACENT_RIVER_BUILDING_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ADJACENT_CITY_RIVER_DISTRICT_PRODUCTION": {
     "comment": "沿河区域生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ADJACENT_RIVER_DISTRICT_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ADJACENT_LEVIED_UNIT_COMBAT_BONUS": {
     "comment": "相邻征召单位战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ADJACENT_LEVIED_UNIT_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_ALLIANCE_PLAYER_STRENGTH_MODIFIER": {
     "comment": "联盟玩家强度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALLIANCE_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_COMMON_ENEMY_MODIFIER": {
     "comment": "共同敌人联盟点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALLIANCE_POINTS_COMMON_ENEMY_{:Amount}"
   },
   "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_MODIFIER": {
     "comment": "联盟点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALLIANCE_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_ALLIANCE_POINTS_FOR_TRADE_MODIFIER": {
     "comment": "贸易联盟点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALLIANCE_POINTS_TRADE_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_BUILDINGS_PURCHASE_COST": {
     "comment": "建筑购买费用{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_BUILDINGS_PURCHASE_COST_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_BUILDING_PRODUCTION_MODIFIER": {
     "comment": "建筑生产力修正{+:Amount}",
     "params": {
       "Amount": "signed",
       "IsWonder": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ALL_BUILDING_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_DISTRICTS_CULTURE_BOMB": {
     "comment": "所有区域文化炸弹",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ALL_DISTRICTS_CULTURE_BOMB"
   },
   "EFFECT_ADJUST_ALL_DISTRICTS_PRODUCTION": {
     "comment": "区域生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_DISTRICTS_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_DISTRICTS_PURCHASE_COST": {
     "comment": "区域购买费用{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_DISTRICTS_PURCHASE_COST_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_DISTRICT_PRODUCTION_MODIFIER": {
     "comment": "建造区域生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_DISTRICT_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_GREAT_WORKS_TOURISM_MODIFIER": {
     "comment": "巨作旅游业绩修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_GREAT_WORKS_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_GREAT_WORKS_YIELDS_MODIFIER": {
     "comment": "巨作产出修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_GREAT_WORKS_YIELDS_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_PROJECTS_PRODUCTION": {
     "comment": "项目生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_PROJECTS_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_UNITS_PURCHASE_COST": {
     "comment": "{UnitDomain}购买费用{+:Amount}",
@@ -247,44 +285,51 @@
       "Amount": "signed",
       "IncludeCivilian": "bool_hide",
       "UnitDomain": "text"
-    }
+    },
+    "name_template": "ADJUST_ALL_UNITS_PURCHASE_COST_{:Amount}"
   },
   "EFFECT_ADJUST_ALL_UNIT_PRODUCTION_MODIFIER": {
     "comment": "单位生产力修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_UNIT_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_ATTACKER_STRENGTH_MODIFIER": {
     "comment": "攻击方战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ATTACKER_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_AUTO_THEMED_BUILDINGS_WITH_X_SLOTS": {
     "comment": "自动主题展位{+:Amount}",
     "params": {
       "Amount": "signed",
       "IsWonder": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_AUTO_THEMED_X_SLOTS_{:Amount}"
   },
   "EFFECT_ADJUST_BANNED_DIPLOMATIC_ACTIONS": {
-    "comment": "禁用{DiplomaticActionType}",
+    "comment": "{Banned?禁用:可用}{DiplomaticActionType}",
     "params": {
       "Banned": "bool_hide",
       "DiplomaticActionType": "text"
-    }
+    },
+    "name_template": "ADJUST_BANNED_DIPLO_ACTION_{DiplomaticActionType}"
   },
   "EFFECT_ADJUST_BANNED_DIPLOMATIC_ACTIONS_SPECIFIC_CIVILIZATION": {
     "comment": "对{CivilizationType}禁用",
     "params": {
       "CivilizationType": "text",
       "DiplomaticActionType": "text"
-    }
+    },
+    "name_template": "ADJUST_BANNED_DIPLO_ACTION_{CivilizationType}"
   },
   "EFFECT_ADJUST_BONUS_RATE": {
     "comment": "加成速率调整",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_BONUS_RATE"
   },
   "EFFECT_ADJUST_BUILDING_FEATURE_YIELD_CHANGE": {
     "comment": "{FeatureType}{YieldType}{+:Amount}",
@@ -292,13 +337,15 @@
       "Amount": "signed",
       "FeatureType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_BUILDING_{FeatureType}_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_HOUSING": {
     "comment": "建筑住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_BUILDING_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_PRODUCTION": {
     "comment": "{BuildingType}生产力{+:Amount}",
@@ -306,20 +353,23 @@
       "Amount": "signed",
       "BuildingType": "text",
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_{BuildingType}_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_PURCHASE_COST": {
     "comment": "{BuildingType}购买费用{+:Amount}",
     "params": {
       "Amount": "signed",
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ADJUST_{BuildingType}_PURCHASE_COST_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES": {
     "comment": "传教次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_BUILDING_SPREAD_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_YIELD_CHANGE": {
     "comment": "{BuildingType}{YieldType}{+:Amount}",
@@ -328,7 +378,8 @@
       "BuildingType": "text",
       "CityStatesOnly": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_{BuildingType}_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_YIELD_MODIFIER": {
     "comment": "{BuildingType}{YieldType}修正{+:Amount}",
@@ -336,7 +387,8 @@
       "Amount": "signed",
       "BuildingType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_{BuildingType}_{YieldType}_MODIFIER_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT": {
     "comment": "{DistrictType}{YieldType}修正{+:Amount}",
@@ -344,43 +396,50 @@
       "Amount": "signed",
       "DistrictType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_{DistrictType}_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CAN_FAITH_PURCHASE_DISTRICTS": {
     "comment": "可信仰购买区域",
     "params": {
       "CanPurchase": "text"
-    }
+    },
+    "name_template": "ADJUST_CAN_FAITH_PURCHASE_DISTRICTS"
   },
   "EFFECT_ADJUST_CITIES_FRESHWATER_HOUSING_BONUS": {
     "comment": "淡水住房加成",
     "params": {
       "HasBonus": "text"
-    }
+    },
+    "name_template": "ADJUST_FRESHWATER_HOUSING_BONUS"
   },
   "EFFECT_ADJUST_CITIES_HAS_URBAN_DEFENSES": {
     "comment": "城市防御值",
     "params": {
       "DefenseValue": "text"
-    }
+    },
+    "name_template": "ADJUST_URBAN_DEFENSES"
   },
   "EFFECT_ADJUST_CITY_AIR_DEFENSE_BONUS": {
     "comment": "城市防空{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CITY_AIR_DEFENSE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ALLOWED_IMPROVEMENT": {
     "comment": "允许{ImprovementType}",
     "params": {
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADJUST_ALLOWED_IMPROVEMENT_{ImprovementType}"
   },
   "EFFECT_ADJUST_CITY_ALLOWED_INCOMING_REGIONAL_STACKING": {
     "comment": "允许{YieldType}区域叠加",
     "params": {
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_ALLOWED_REGIONAL_STACKING_{YieldType}"
   },
   "EFFECT_ADJUST_CITY_ALL_MILITARY_UNITS_PRODUCTION": {
     "comment": "军事单位生产力{+:Amount}",
@@ -389,123 +448,143 @@
       "EndEra": "text",
       "PromotionClass": "text",
       "StartEra": "text"
-    }
+    },
+    "name_template": "ADJUST_MILITARY_UNITS_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ALL_YIELDS_CHANGE": {
     "comment": "全产出{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALL_YIELDS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ALWAYS_LOYAL": {
     "comment": "永远忠诚",
     "params": {
       "AlwaysLoyal": "text"
-    }
+    },
+    "name_template": "ADJUST_ALWAYS_LOYAL"
   },
   "EFFECT_ADJUST_CITY_AMENITIES_FROM_CITY_STATES": {
     "comment": "城邦宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_AMENITIES_CITY_STATES_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_AMENITIES_FROM_GOVERNORS": {
     "comment": "总督宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_AMENITIES_GOVERNORS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_AMENITIES_FROM_GREAT_PEOPLE": {
     "comment": "伟人宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_AMENITIES_GREAT_PEOPLE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_AMENITIES_FROM_RELIGION": {
     "comment": "宗教宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_AMENITIES_RELIGION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_APPEAL": {
     "comment": "魅力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_APPEAL_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ATTACKS_PER_TURN": {
     "comment": "每回合攻击次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ATTACKS_PER_TURN_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_CAN_PURCHASE_DISTRICTS": {
     "comment": "可用金币购买区域",
     "params": {
       "CanPurchase": "text"
-    }
+    },
+    "name_template": "ADJUST_CAN_PURCHASE_DISTRICTS"
   },
   "EFFECT_ADJUST_CITY_COMBAT_BONUS": {
     "comment": "城市战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CITY_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_CORPS_ARMY_PRODUCTION": {
     "comment": "{UnitDomain}军团生产力{+:Amount}",
     "params": {
       "Amount": "signed",
       "UnitDomain": "text"
-    }
+    },
+    "name_template": "ADJUST_CORPS_ARMY_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_CULTURE_BORDER_EXPANSION": {
     "comment": "城市边界扩张{+:Amount}%速度",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CULTURE_BORDER_EXPANSION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ENTERTAINMENT": {
     "comment": "娱乐度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ENTERTAINMENT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_ENTERTAINMENT_FROM_WONDER_ADJACENT_TO_LAKE": {
     "comment": "{BuildingType}邻湖娱乐",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ADJUST_WONDER_ADJACENT_LAKE_ENTERTAINMENT_{BuildingType}"
   },
   "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION": {
     "comment": "额外累积{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_ACCUMULATION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION_FOR_STRATEGIC_DIVERSITY": {
     "comment": "战略多样性累积{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_ACCUMULATION_STRATEGIC_DIVERSITY_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_EXTRA_ACCUMULATION_SPECIFIC_RESOURCE": {
     "comment": "{ResourceType}额外累积{+:Amount}",
     "params": {
       "Amount": "signed",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_ACCUMULATION_{ResourceType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_EXTRA_AMENITY_FOR_LUXURY_DIVERSITY": {
     "comment": "奢侈多样性宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_AMENITY_LUXURY_DIVERSITY_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_EXTRA_DISTRICTS": {
     "comment": "额外区域{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_DISTRICTS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_FREE_POWER": {
     "comment": "{YieldType}免费电力{+:Amount}",
@@ -513,19 +592,22 @@
       "Amount": "signed",
       "SourceType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_FREE_POWER_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_FRIENDLY_COMBAT_BONUS": {
     "comment": "友方战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FRIENDLY_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_GOLD_FROM_CITIZENS": {
     "comment": "市民金币{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GOLD_CITIZENS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_GREATWORK_YIELD": {
     "comment": "{GreatWorkObjectType}{YieldType}{+:YieldChange}",
@@ -534,25 +616,29 @@
       "ScalingFactor": "text",
       "YieldChange": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_GREATWORK_{YieldType}_{:YieldChange}"
   },
   "EFFECT_ADJUST_CITY_GREAT_PERSON_POINTS_MODIFIER": {
     "comment": "伟人点数修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GREAT_PERSON_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_GREEN_ENERGY_TOURISM": {
     "comment": "绿色能源旅游{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GREEN_ENERGY_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_GROWTH": {
     "comment": "城市增长{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GROWTH_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HAPPINESS_GREAT_PERSON": {
     "comment": "{GreatPersonClassType}幸福度{+:Amount}",
@@ -560,7 +646,8 @@
       "Amount": "signed",
       "GreatPersonClassType": "text",
       "HappinessType": "text"
-    }
+    },
+    "name_template": "ADJUST_HAPPINESS_{GreatPersonClassType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HAPPINESS_YIELD": {
     "comment": "{HappinessType}{YieldType}{+:Amount}",
@@ -568,227 +655,265 @@
       "Amount": "signed",
       "HappinessType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_HAPPINESS_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HIT_POINTS": {
     "comment": "城市生命值{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HIT_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HOUSING_FROM_GREAT_PEOPLE": {
     "comment": "伟人提供住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HOUSING_GREAT_PEOPLE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HOUSING_FROM_GREAT_WORKS": {
     "comment": "巨作提供住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HOUSING_GREAT_WORKS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_HOUSING_PER_DISTRICT": {
     "comment": "每区域住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HOUSING_PER_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_IDENTITY_PER_CITIZEN": {
     "comment": "每市民忠诚度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IDENTITY_PER_CITIZEN_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_IDENTITY_PER_TURN": {
     "comment": "每回合忠诚度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IDENTITY_PER_TURN_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_IDENTITY_PRESSURE": {
     "comment": "忠诚度压力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IDENTITY_PRESSURE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_IGNORE_STRATEGIC_RESOURCE_REQUIREMENTS": {
-    "comment": "忽略战略资源需求",
+    "comment": "{Ignore?忽略:正常}战略资源需求",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_STRATEGIC_RESOURCE_REQUIREMENTS"
   },
   "EFFECT_ADJUST_CITY_IMPROVEMENT_TOURISM": {
     "comment": "改良设施旅游{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_INNER_DEFENSE": {
     "comment": "内层防御{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_INNER_DEFENSE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_NATIONAL_PARK_TOURISM": {
     "comment": "国家公园旅游{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NATIONAL_PARK_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_NO_CULTURE_BORDER_EXPANSION": {
     "comment": "无文化边界扩张",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_NO_CULTURE_BORDER_EXPANSION"
   },
   "EFFECT_ADJUST_CITY_OUTER_DEFENSE": {
     "comment": "外层防御{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_OUTER_DEFENSE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_POPULATION": {
     "comment": "人口{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POPULATION_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_POPULATION_UNIT_CREATED": {
     "comment": "人口造{UnitType}",
     "params": {
       "Amount": "signed",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_POPULATION_UNIT_CREATED_{UnitType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_PREVENT_BYPASS_OUTER_DEFENSES": {
     "comment": "防止绕过外墙",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_PREVENT_BYPASS_OUTER_DEFENSES"
   },
   "EFFECT_ADJUST_CITY_PREVENT_MELEE_ATTACK_OUTER_DEFENSES": {
     "comment": "防止近战攻击外墙",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_PREVENT_MELEE_ATTACK_OUTER_DEFENSES"
   },
   "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING": {
     "comment": "建筑生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PRODUCTION_BUILDING_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT": {
     "comment": "区域生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PRODUCTION_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_PRODUCTION_UNIT": {
     "comment": "单位生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PRODUCTION_UNIT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_PROPERTY": {
     "comment": "城市属性{+:Amount}",
     "params": {
       "Amount": "signed",
       "Key": "skip"
-    }
+    },
+    "name_template": "ADJUST_PROPERTY_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RANGED_STRIKE": {
     "comment": "远程攻击{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RANGED_STRIKE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RELIGION_EXTRA_PROMOTIONS": {
     "comment": "宗教额外晋升{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_EXTRA_PROMOTIONS_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RELIGION_IGNORE_COMBAT": {
     "comment": "无视宗教战斗",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_IGNORE_COMBAT"
   },
   "EFFECT_ADJUST_CITY_RELIGION_IGNORE_PRESSURE": {
     "comment": "无视宗教压力",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_IGNORE_PRESSURE"
   },
   "EFFECT_ADJUST_CITY_RELIGION_ON_CAPTURE": {
     "comment": "占领保留宗教",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_ON_CAPTURE"
   },
   "EFFECT_ADJUST_CITY_RELIGION_PRESSURE": {
     "comment": "宗教压力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_PRESSURE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RELIGIOUS_COMBAT_BONUS": {
     "comment": "宗教战斗{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RELIGIOUS_HEAL": {
     "comment": "宗教治疗{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_HEAL_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_REQUIRED_POWER": {
     "comment": "所需电力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_REQUIRED_POWER_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_RESOURCE_HARVEST_BONUS": {
     "comment": "资源收获加成{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RESOURCE_HARVEST_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_SETTLER_CONSUME_POP": {
     "comment": "开拓者消耗人口",
     "params": {
       "Enabled": "text"
-    }
+    },
+    "name_template": "ADJUST_SETTLER_CONSUME_POP"
   },
   "EFFECT_ADJUST_CITY_SIEGE_PROTECTION": {
     "comment": "围城保护",
     "params": {
       "Protected": "text"
-    }
+    },
+    "name_template": "ADJUST_SIEGE_PROTECTION"
   },
   "EFFECT_ADJUST_CITY_SPY_BONUS": {
     "comment": "间谍加成{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPY_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_STATE_TRADE_ROUTE_DISTRICT_YIELD": {
     "comment": "城邦商路区域{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_CITY_STATE_TRADE_ROUTE_DISTRICT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_STATE_TRADE_ROUTE_FLAT_YIELD": {
     "comment": "城邦商路基础{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_CITY_STATE_TRADE_ROUTE_FLAT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_STRATEGIC_RESOURCE_REQUIREMENT_MODIFIER": {
     "comment": "战略资源需求修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_STRATEGIC_RESOURCE_REQUIREMENT_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TOURISM": {
     "comment": "{ImprovementType}旅游业绩",
@@ -798,120 +923,136 @@
       "ImprovementType": "text",
       "Religious": "bool_hide",
       "ScalingFactor": "text"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_{ImprovementType}"
   },
   "EFFECT_ADJUST_CITY_TOURISM_LATE_ERAS": {
     "comment": "后期时代旅游修正",
     "params": {
       "MinimumEra": "text",
       "Modifier": "text"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_LATE_ERAS"
   },
   "EFFECT_ADJUST_CITY_TOURISM_PER_FEATURE": {
     "comment": "地貌旅游{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_PER_FEATURE_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_FOR_DOMESTIC": {
     "comment": "国内商路{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_DOMESTIC_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_FOR_INTERNATIONAL": {
     "comment": "国际商路{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_LUXURY_RESOURCE_FOR_INTERNATIONAL": {
     "comment": "国际商路目的地奢侈{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_DEST_LUXURY_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_STRATEGIC_RESOURCE_FOR_DOMESTIC": {
     "comment": "国内商路目的地战略{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_DEST_STRATEGIC_DOMESTIC_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_DESTINATION_STRATEGIC_RESOURCE_FOR_INTERNATIONAL": {
     "comment": "国际商路目的地战略{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_DEST_STRATEGIC_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_BONUS_RESOURCE_FOR_DOMESTIC": {
     "comment": "国内商路本地加成{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_LOCAL_BONUS_DOMESTIC_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_BONUS_RESOURCE_FOR_INTERNATIONAL": {
     "comment": "国际商路本地加成{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_LOCAL_BONUS_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_LUXURY_RESOURCE_FOR_INTERNATIONAL": {
     "comment": "国际商路本地奢侈{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_LOCAL_LUXURY_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_TRADE_ROUTE_YIELD_PER_LOCAL_STRATEGIC_RESOURCE_FOR_INTERNATIONAL": {
     "comment": "国际商路本地战略{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_LOCAL_STRATEGIC_INTERNATIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_UNIT_MAX_LEVEL": {
     "comment": "单位最高等级调整",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_UNIT_MAX_LEVEL"
   },
   "EFFECT_ADJUST_CITY_YIELD_CHANGE": {
     "comment": "城市{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_CITY_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_FROM_FOREIGN_TRADE_ROUTES_PASSING_THROUGH": {
     "comment": "外国商路途经{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_FOREIGN_TRADE_PASSING_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_FROM_POWERED_BUILDING": {
     "comment": "通电建筑{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_POWERED_BUILDING_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_MODIFIER": {
-    "comment": "城市{YieldType}修正{+:Amount}",
+    "comment": "城市{+:Amount}%{YieldType}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
     }
   },
   "EFFECT_ADJUST_CITY_YIELD_MODIFIER_FROM_FAITH": {
-    "comment": "信仰{YieldType}修正{+:Amount}",
+    "comment": "城市获得等同于信仰值产出{Amount}%的{YieldType}",
     "params": {
-      "Amount": "signed",
+      "Amount": "unsigned",
       "YieldType": "text"
     }
   },
@@ -920,35 +1061,40 @@
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_GOVERNOR_TITLE_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_DISTRICT": {
     "comment": "每区域{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_DISTRICT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_FLOOD": {
     "comment": "每次洪水{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_FLOOD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_MAJOR_TRADE_PARTNER": {
     "comment": "每个贸易伙伴{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_TRADE_PARTNER_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_POPULATION": {
     "comment": "每人口{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_POPULATION_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_CLASS_CITIES_IMPROVEMENT": {
     "comment": "特定改良{YieldType}{+:Amount}",
@@ -956,7 +1102,8 @@
       "Amount": "signed",
       "ImprovementType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_TERRAIN_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_TYPE": {
     "comment": "{TerrainType}地格{YieldType}{+:Amount}",
@@ -964,179 +1111,207 @@
       "Amount": "signed",
       "TerrainType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_CITY_{YieldType}_PER_{TerrainType}_{:Amount}"
   },
   "EFFECT_ADJUST_CIVIC_BOOST": {
     "comment": "市政鼓舞{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CIVIC_BOOST_{:Amount}"
   },
   "EFFECT_ADJUST_CO2_GENERATION_REDUCTION": {
     "comment": "{ResourceUsageType}CO2排放{+:Amount}",
     "params": {
       "Amount": "signed",
       "ResourceUsageType": "text"
-    }
+    },
+    "name_template": "ADJUST_CO2_REDUCTION_{ResourceUsageType}_{:Amount}"
   },
   "EFFECT_ADJUST_CORPS_ARMY_MODIFIED_STRENGTH": {
-    "comment": "军团/军队战斗力{+:Amount}",
+    "comment": "{Corps?军团:军队}战斗力{+:Amount}",
     "params": {
       "Amount": "signed",
       "Corps": "bool_hide",
       "Domain": "text"
-    }
+    },
+    "name_template": "ADJUST_CORPS_ARMY_STRENGTH_{Domain}_{:Amount}"
   },
   "EFFECT_ADJUST_CORPS_ARMY_PREREQ": {
-    "comment": "军团/军队前置{CivicType}",
+    "comment": "{Corps?军团:军队}前置{CivicType}",
     "params": {
       "CivicType": "text",
       "Corps": "bool_hide",
       "Domain": "text"
-    }
+    },
+    "name_template": "ADJUST_CORPS_ARMY_PREREQ_{Domain}_{CivicType}"
   },
   "EFFECT_ADJUST_CULTURE_BOMB_CONVERTS_CITY": {
-    "comment": "文化炸弹转化城市",
+    "comment": "文化炸弹{ConvertsCity?转化:不转化}城市",
     "params": {
       "ConvertsCity": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_CULTURE_BOMB_CONVERT_CITY"
   },
   "EFFECT_ADJUST_DEFENDER_STRENGTH_MODIFIER": {
     "comment": "防御战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DEFENDER_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_DIPLOMATIC_ACTION_PREFERENCE": {
-    "comment": "外交行动偏好：{Action}",
+    "comment": "外交行动{Favored?偏好:不偏好}：{Action}",
     "params": {
       "Action": "text",
       "Favored": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_DIPLO_ACTION_{Action}"
   },
   "EFFECT_ADJUST_DISABLE_HEALING": {
-    "comment": "禁止恢复",
+    "comment": "{Disable?禁止:允许}恢复",
     "params": {
       "Disable": "bool_hide",
       "Foreign": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_DISABLE_HEALING"
   },
   "EFFECT_ADJUST_DISABLE_INFLUENCE": {
-    "comment": "禁止影响力",
+    "comment": "{Disable?禁止:允许}影响力",
     "params": {
       "Disable": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_DISABLE_INFLUENCE"
   },
   "EFFECT_ADJUST_DISABLE_PATRONAGE": {
     "comment": "禁止赞助",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_DISABLE_PATRONAGE"
   },
   "EFFECT_ADJUST_DISABLE_SETTLING": {
-    "comment": "禁止建造城市",
+    "comment": "{Disabled?禁止:允许}建造城市",
     "params": {
       "Disabled": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_DISABLE_SETTLING"
   },
   "EFFECT_ADJUST_DISTRICT_ADJACENT_NATURAL_WONDER_PRODUCTION": {
     "comment": "奇观相邻{FeatureType}生产力{+:Amount}",
     "params": {
       "Amount": "signed",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_NW_PRODUCTION_{FeatureType}_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_AMENITY": {
     "comment": "区域宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_ATTACK_RANGE": {
     "comment": "区域攻击范围",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_DISTRICT_ATTACK_RANGE"
   },
   "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE": {
     "comment": "区域基础{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_BASE_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_BUILDING_PRODUCTION": {
     "comment": "区域建筑生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_BUILDING_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_EXTRA_ENTERTAINMENT": {
     "comment": "区域额外娱乐{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_EXTRA_ENTERTAINMENT_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_ENTERTAINMENT": {
     "comment": "区域额外范围娱乐{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_REGIONAL_ENTERTAINMENT_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_RANGE": {
     "comment": "区域效果范围{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_REGIONAL_RANGE_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_YIELD": {
     "comment": "区域额外范围{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_REGIONAL_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS": {
     "comment": "区域{GreatPersonClassType}点数{+:Amount}",
     "params": {
       "Amount": "signed",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{GreatPersonClassType}_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_HOUSING": {
     "comment": "区域住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_PREREQ": {
     "comment": "区域前置：{TechType}",
     "params": {
       "DistrictType": "text",
       "TechType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_PREREQ_{DistrictType}_{TechType}"
   },
   "EFFECT_ADJUST_DISTRICT_PRODUCTION": {
     "comment": "{DistrictType}生产力{+:Amount}",
     "params": {
       "Amount": "signed",
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_TOURISM_ADJACENCY_YIELD_MOFIFIER": {
     "comment": "区域相邻旅游{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_TOURISM_ADJ_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE": {
     "comment": "区域旅游业绩{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_WITHIN_ONE_HEX_ESPIONAGE_DEFENSE_BONUS": {
     "comment": "区域一格外反间谍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_ESPIONAGE_DEFENSE_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS": {
     "comment": "{DistrictType}相邻加成为{YieldTypeToGrant}",
@@ -1144,7 +1319,8 @@
       "DistrictType": "text",
       "YieldTypeToGrant": "text",
       "YieldTypeToMirror": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{DistrictType}_ADJ_{YieldTypeToGrant}"
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_APPEAL": {
     "comment": "{DistrictType}基于魅力{YieldType}",
@@ -1154,52 +1330,60 @@
       "RequiredAppeal": "unsigned",
       "YieldChange": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{DistrictType}_APPEAL_{YieldType}"
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_CHANGE": {
     "comment": "区域{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER": {
     "comment": "区域{YieldType}修正{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{YieldType}_MODIFIER_{:Amount}"
   },
   "EFFECT_ADJUST_DUPLICATE_FIRST_INFLUENCE_TOKEN": {
     "comment": "首个影响力令牌翻倍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DUPLICATE_FIRST_INFLUENCE_{:Amount}"
   },
   "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_RIVAL_GOVERNMENT": {
     "comment": "不同政体影响力翻倍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DUPLICATE_INFLUENCE_RIVAL_GOV_{:Amount}"
   },
   "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_SAME_RELIGION": {
     "comment": "同宗教影响力翻倍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DUPLICATE_INFLUENCE_SAME_RELIGION_{:Amount}"
   },
   "EFFECT_ADJUST_DUPLICATE_INFLUENCE_TOKEN_WHEN_TRADE_ROUTE_TO": {
     "comment": "贸易路线影响力翻倍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DUPLICATE_INFLUENCE_TRADE_ROUTE_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_ACCUMALATION_TERRAIN": {
     "comment": "{TerrainType}额外积累{+:Amount}",
     "params": {
       "Amount": "signed",
       "TerrainType": "text"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_ACCUM_{TerrainType}_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_GREAT_WORK_SLOTS": {
     "comment": "{BuildingType}额外{GreatWorkSlotType}槽位{+:Amount}",
@@ -1207,153 +1391,177 @@
       "Amount": "signed",
       "BuildingType": "text",
       "GreatWorkSlotType": "text"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_SLOTS_{BuildingType}_{GreatWorkSlotType}_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_HEAL_GOVERNOR": {
     "comment": "总督额外恢复{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_HEAL_GOVERNOR_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_STARTING_POPULATION_OFF_HOME_CONTINENT": {
     "comment": "非本土大陆额外人口{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_START_POP_OFF_CONTINENT_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_UNIT_COPY": {
     "comment": "额外{UnitType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_UNIT_{UnitType}_{:Amount}"
   },
   "EFFECT_ADJUST_EXTRA_UNIT_COPY_TAG": {
     "comment": "额外{Tag}单位{+:Amount}",
     "params": {
       "Amount": "signed",
       "Tag": "text"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_UNIT_TAG_{Tag}_{:Amount}"
   },
   "EFFECT_ADJUST_FEATURE_APPEAL_MODIFIER": {
     "comment": "{FeatureType}魅力{+:Amount}",
     "params": {
       "Amount": "signed",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_FEATURE_APPEAL_{FeatureType}_{:Amount}"
   },
   "EFFECT_ADJUST_FEATURE_NO_IMPROVEMENT_APPEAL_GOVERNOR": {
     "comment": "未改良地貌魅力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NO_IMPROVEMENT_APPEAL_{:Amount}"
   },
   "EFFECT_ADJUST_FEATURE_PREREQ": {
     "comment": "{FeatureType}前置{CivicType}",
     "params": {
       "CivicType": "text",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_FEATURE_PREREQ_{FeatureType}_{CivicType}"
   },
   "EFFECT_ADJUST_FLAT_BONUS": {
     "comment": "{BonusType}固定加成{+:Amount}",
     "params": {
       "Amount": "signed",
       "BonusType": "text"
-    }
+    },
+    "name_template": "ADJUST_FLAT_BONUS_{BonusType}_{:Amount}"
   },
   "EFFECT_ADJUST_FOLLOWER_YIELD_MODIFIER": {
     "comment": "信徒{YieldType}修正{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_FOLLOWER_{YieldType}_MODIFIER_{:Amount}"
   },
   "EFFECT_ADJUST_FORBID_LAND_ROUTE": {
     "comment": "禁止陆地贸易路线",
     "params": {
       "Domestic": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_FORBID_LAND_ROUTE"
   },
   "EFFECT_ADJUST_FREE_CIVIC_BOOST_FIRST_TRADING_POST_EACH_CIV": {
     "comment": "首次商站市政加速{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_CIVIC_BOOST_TRADE_POST_{:Amount}"
   },
   "EFFECT_ADJUST_FREE_CIVIC_BOOST_WONDER_ERA": {
     "comment": "奇观时代市政加速{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_CIVIC_BOOST_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_FREE_TECH_BOOST_FIRST_TRADING_POST_EACH_CIV": {
     "comment": "首次商站科技加速{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_TECH_BOOST_TRADE_POST_{:Amount}"
   },
   "EFFECT_ADJUST_FREE_TECH_BOOST_WONDER_ERA": {
     "comment": "奇观时代科技加速{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_TECH_BOOST_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_FULL_ACCESS_ONE_STRATEGIC": {
     "comment": "完全获得一种战略资源",
     "params": {
       "Access": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_FULL_STRATEGIC_ACCESS"
   },
   "EFFECT_ADJUST_GAINS_ALL_FOLLOWER_BELIEFS": {
     "comment": "获得所有信徒信条",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_GAIN_ALL_FOLLOWER_BELIEFS"
   },
   "EFFECT_ADJUST_GAINS_FOUNDER_BELIEF_MAJORITY_RELIGION": {
     "comment": "获得主流宗教创立者信条",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_GAIN_FOUNDER_BELIEFS"
   },
   "EFFECT_ADJUST_GAME_REALISM_SETTING": {
     "comment": "游戏真实感设置",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_GAME_REALISM"
   },
   "EFFECT_ADJUST_GLOBAL_WMD_STOCKPILE": {
     "comment": "全球核武储备{+:Amount}",
     "params": {
       "Amount": "signed",
       "TargetOnly": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_WMD_STOCKPILE_{:Amount}"
   },
   "EFFECT_ADJUST_GOLD_DISPERSAL": {
     "comment": "掠夺{Improvement}金币{+:Amount}",
     "params": {
       "Amount": "signed",
       "Improvement": "text"
-    }
+    },
+    "name_template": "ADJUST_GOLD_DISPERSAL_{Improvement}_{:Amount}"
   },
   "EFFECT_ADJUST_GOVERNMENT_SLOTS": {
     "comment": "{GovernmentSlotType}槽位{+:Amount}",
     "params": {
       "Amount": "signed",
       "GovernmentSlotType": "text"
-    }
+    },
+    "name_template": "ADJUST_GOVERNMENT_SLOTS_{GovernmentSlotType}_{:Amount}"
   },
   "EFFECT_ADJUST_GOVERNOR_ALLIANCE_POINTS": {
     "comment": "总督同盟点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GOVERNOR_ALLIANCE_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_GOVERNOR_GRIEVENCE_SCORE": {
     "comment": "不满值每{Turns}回合{+:Score}",
     "params": {
       "Score": "signed",
       "Turns": "unsigned"
-    }
+    },
+    "name_template": "ADJUST_GOVERNOR_GRIEVENCE_{:Score}_PER_{Turns}"
   },
   "EFFECT_ADJUST_GOVERNOR_IDENTITY_PRESSURE": {
     "comment": "总督忠诚度压力{+:Amount}",
@@ -1362,35 +1570,40 @@
       "DomesticCities": "bool_hide",
       "ForeignCities": "bool_hide",
       "OncePerCity": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_GOVERNOR_IDENTITY_PRESSURE_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PEOPLE_POINTS_PER_KILL": {
     "comment": "击杀获得{GreatPersonClassType}点数{+:Amount}",
     "params": {
       "Amount": "signed",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "ADJUST_{GreatPersonClassType}_POINTS_PER_KILL_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PEOPLE_POINTS_PER_KILL_BY_DEFEATED_STRENGTH": {
     "comment": "击杀按战力获{GreatPersonClassType}点数",
     "params": {
       "Amount": "signed",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "ADJUST_{GreatPersonClassType}_POINTS_KILL_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PERSON_GUARANTEE": {
     "comment": "确保{EraType}{GreatPersonClassType}",
     "params": {
       "EraType": "text",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "ADJUST_GP_GUARANTEE_{EraType}_{GreatPersonClassType}"
   },
   "EFFECT_ADJUST_GREAT_PERSON_PATRONAGE_DISCOUNT_PERCENT": {
     "comment": "伟人赞助{YieldType}折扣{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_GP_PATRONAGE_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PERSON_POINTS": {
     "comment": "{GreatPersonClassType}{YieldType}点数{+:Amount}",
@@ -1398,278 +1611,326 @@
       "Amount": "signed",
       "GreatPersonClassType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_{GreatPersonClassType}_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PERSON_POINTS_PERCENT": {
     "comment": "{GreatPersonClassType}点数{+:Amount}%",
     "params": {
       "Amount": "signed",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "ADJUST_{GreatPersonClassType}_POINTS_PERCENT_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_PERSON_POINTS_REFUND_PERCENT": {
     "comment": "伟人点数返还{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GP_POINTS_REFUND_{:Amount}"
   },
   "EFFECT_ADJUST_GREAT_WORK_OBJECT_NO_TOURISM": {
-    "comment": "杰作无旅游业绩",
+    "comment": "杰作{NoTourism?无:有}旅游业绩",
     "params": {
       "NoTourism": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_GREAT_WORK_NO_TOURISM"
   },
   "EFFECT_ADJUST_GREAT_WORK_OBJECT_TOURISM_MODIFIER": {
     "comment": "杰作旅游业绩修正{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GREAT_WORK_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_HEAL_CHARGES": {
     "comment": "治疗充能{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HEAL_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_IDENTITY_PER_TURN_FROM_NEARBY_GREAT_WORKS": {
     "comment": "附近杰作忠诚度{+:Amount}",
     "params": {
       "Amount": "signed",
       "ForeignCities": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IDENTITY_NEARBY_GW_{:Amount}"
   },
   "EFFECT_ADJUST_IGNORE_IDENTITY_PRESSURE": {
-    "comment": "无视忠诚度压力",
+    "comment": "{Ignore?无视:正常}忠诚度压力",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_IDENTITY_PRESSURE"
   },
   "EFFECT_ADJUST_IMPROVEMENT_AMENITY": {
     "comment": "改良设施宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_IMPROVEMENT_GOODY_HUT": {
     "comment": "{ImprovementType}变为{GoodyHutImprovementType}",
     "params": {
       "GoodyHutImprovementType": "text",
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_TO_GOODY_{ImprovementType}"
   },
   "EFFECT_ADJUST_IMPROVEMENT_HOUSING": {
     "comment": "改良设施住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_IMPROVEMENT_VALID_TERRAIN": {
     "comment": "{ImprovementType}可在{TerrainType}建造",
     "params": {
       "ImprovementType": "text",
       "TerrainType": "text"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_{ImprovementType}_ON_{TerrainType}"
   },
   "EFFECT_ADJUST_INFLUENCE_POINTS_PER_TURN": {
     "comment": "每回合影响力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_INFLUENCE_PER_TURN_{:Amount}"
   },
   "EFFECT_ADJUST_INQUISITION_START_CHARGES": {
     "comment": "审判初始充能{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_INQUISITION_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_LOYALTY_FROM_GREAT_WORKS_CITIZENS": {
     "comment": "杰作提供忠诚度",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_LOYALTY_GREAT_WORKS"
   },
   "EFFECT_ADJUST_MODIFIED_FREE_POWER_IN_CITY": {
     "comment": "城市免费电力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_POWER_{:Amount}"
   },
   "EFFECT_ADJUST_MOST_ADVANCED_STRATEGIC_RESOURCE_COUNT": {
     "comment": "最先进战略资源{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ADVANCED_STRATEGIC_{:Amount}"
   },
   "EFFECT_ADJUST_MULTIPLY_TREASURY": {
     "comment": "国库金币倍率{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_MULTIPLY_TREASURY_{:Amount}"
   },
   "EFFECT_ADJUST_NATURAL_WONDER_AMENITY": {
     "comment": "自然奇观宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NW_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_NATURAL_WONDER_RELIC": {
     "comment": "自然奇观遗物{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NW_RELIC_{:Amount}"
   },
   "EFFECT_ADJUST_NO_FRESH_WATER_HOUSING": {
     "comment": "无水住房加成",
     "params": {
       "NoHousing": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_NO_FRESH_WATER_HOUSING"
   },
   "EFFECT_ADJUST_NO_GREAT_PERSON_POINTS": {
     "comment": "无伟人点数",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_NO_GP_POINTS"
   },
   "EFFECT_ADJUST_NUMBER_ALLIES_UNIT_COMBAT_BONUS": {
     "comment": "每盟军战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PER_ALLY_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_NUM_UNITS_SUPPORTED": {
     "comment": "{BuildingType}支持单位{+:Amount}",
     "params": {
       "Amount": "signed",
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ADJUST_UNITS_SUPPORTED_{BuildingType}_{:Amount}"
   },
   "EFFECT_ADJUST_OWNED_BONUS_RESOURCE_EXTRA_AMENITIES": {
     "comment": "加成资源额外宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_BONUS_RESOURCE_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_OWNED_LUXURY_EXTRA_AMENITIES": {
     "comment": "奢侈资源额外宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_LUXURY_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ADD_CHOP_YIELD": {
     "comment": "砍伐获得{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_CHOP_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ADJUST_ENVOYS_NON_SPECIALTY": {
     "comment": "非专业使者{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NON_SPECIALTY_ENVOYS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ALLIANCE_FAVOR_MULTIPLIER": {
     "comment": "同盟外交支持倍率",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ALLIANCE_FAVOR_MULTIPLIER"
   },
   "EFFECT_ADJUST_PLAYER_ALLIED_WAR_DISCOUNT": {
     "comment": "同盟战争折扣{+:Discount}",
     "params": {
       "Discount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ALLIED_WAR_DISCOUNT_{:Discount}"
   },
   "EFFECT_ADJUST_PLAYER_ALL_ALLIANCES_PROVIDE_SHARED_VIS": {
-    "comment": "所有同盟共享视野",
+    "comment": "所有同盟{ShareVis?共享视野:正常}",
     "params": {
       "ShareVis": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ALL_ALLIANCES_SHARED_VIS"
   },
   "EFFECT_ADJUST_PLAYER_ALWAYS_ALLOW_COMMEMORATION_QUEST_COUNT": {
     "comment": "纪念任务数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_COMMEMORATION_QUESTS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ALWAYS_FULL_RELIGIOUS_TOURISM": {
     "comment": "始终完全宗教旅游",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_FULL_RELIGIOUS_TOURISM"
   },
   "EFFECT_ADJUST_PLAYER_ALWAYS_LOYAL_COASTAL_HOME_CONTINENT": {
     "comment": "本土大陆沿海始终忠诚",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_LOYAL_COASTAL_HOME_CONTINENT"
   },
   "EFFECT_ADJUST_PLAYER_ANYONE_PLUNDER_FAVOR": {
     "comment": "掠夺获外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_PLUNDER_FAVOR"
   },
   "EFFECT_ADJUST_PLAYER_ANYONE_TRADE_TO_FAVOR": {
     "comment": "贸易获外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_TRADE_FAVOR"
   },
   "EFFECT_ADJUST_PLAYER_AUTO_THEMED_BUILDING": {
     "comment": "{BuildingType}自动主题化",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ADJUST_AUTO_THEMED_{BuildingType}"
   },
   "EFFECT_ADJUST_PLAYER_BAN_CHOP": {
-    "comment": "禁止砍伐",
+    "comment": "{NoRemove?禁止:允许}砍伐",
     "params": {
       "NoRemove": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_BAN_CHOP"
   },
   "EFFECT_ADJUST_PLAYER_BAN_CITY_PRODUCTION": {
-    "comment": "禁止城市生产",
+    "comment": "{BanDistrictBuildings?禁止:允许}城市生产",
     "params": {
       "BanDistrictBuildings": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_BAN_CITY_PRODUCTION"
   },
   "EFFECT_ADJUST_PLAYER_BAN_POLICY": {
     "comment": "禁止{PolicyType}政策",
     "params": {
       "PolicyType": "text"
-    }
+    },
+    "name_template": "ADJUST_BAN_POLICY_{PolicyType}"
   },
   "EFFECT_ADJUST_PLAYER_BAN_RESOURCE": {
     "comment": "禁止资源",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_BAN_RESOURCE"
   },
   "EFFECT_ADJUST_PLAYER_BAN_UNIT_PRODUCTION_YIELD": {
     "comment": "禁止单位产出",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_BAN_UNIT_PRODUCTION"
   },
   "EFFECT_ADJUST_PLAYER_BID_COST_MODIFIER": {
     "comment": "竞标成本修正",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_BID_COST_MODIFIER"
   },
   "EFFECT_ADJUST_PLAYER_BLOCK_UNIT_ENTRY": {
     "comment": "禁止{UnitType}进入",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_BLOCK_UNIT_{UnitType}"
   },
   "EFFECT_ADJUST_PLAYER_BUFF_UNIT_PRODUCTION_YIELD": {
     "comment": "单位生产力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_BUILDING_FAVOR": {
     "comment": "{BuildingType}外交支持{+:Favor}",
     "params": {
       "BuildingType": "text",
       "Favor": "signed"
-    }
+    },
+    "name_template": "ADJUST_BUILDING_FAVOR_{BuildingType}_{:Favor}"
   },
   "EFFECT_ADJUST_PLAYER_CAPITAL": {
     "comment": "首都{ProjectType}",
     "params": {
       "ProjectType": "text"
-    }
+    },
+    "name_template": "ADJUST_CAPITAL_PROJECT_{ProjectType}"
   },
   "EFFECT_ADJUST_PLAYER_CITY_TILES": {
     "comment": "城市地块{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CITY_TILES_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_COUNTER_SPY_YIELD_AWARD_PER_LEVEL": {
     "comment": "反间谍每{PerXLevels}级{YieldType}{+:Amount}",
@@ -1677,11 +1938,13 @@
       "Amount": "signed",
       "PerXLevels": "unsigned",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_COUNTER_SPY_{YieldType}_{:Amount}_PER_{PerXLevels}"
   },
   "EFFECT_ADJUST_PLAYER_CULTURAL_IDENTITY_PRESSURE_RADIUS_FROM_CAPITAL": {
     "comment": "首都文化忠诚半径",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_CULTURAL_IDENTITY_RADIUS"
   },
   "EFFECT_ADJUST_PLAYER_DIPLOMATIC_VICTORY_POINTS": {
     "comment": "外交胜利点数{+:Amount}",
@@ -1689,13 +1952,15 @@
       "Amount": "signed",
       "Tooltip": "skip",
       "VictoryResolution": "skip"
-    }
+    },
+    "name_template": "ADJUST_DIPLO_VICTORY_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_DISTRICT_AIR_SLOTS": {
     "comment": "区域空军槽位{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_AIR_SLOTS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_DISTRICT_AND_BUILDINGS_CREATE_UNIT_WITH_ABILITY_BY_CLASS": {
     "comment": "{DistrictType}生成{UnitAbilityType}单位",
@@ -1703,14 +1968,16 @@
       "DistrictType": "text",
       "UnitAbilityType": "text",
       "UnitPromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_CREATE_{UnitAbilityType}_{UnitPromotionClass}"
   },
   "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_UNIT": {
     "comment": "{DistrictType}生成{UnitType}",
     "params": {
       "DistrictType": "text",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_CREATE_{UnitType}"
   },
   "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_YIELD": {
     "comment": "{DistrictType}产出{YieldType}{+:Amount}",
@@ -1721,177 +1988,207 @@
       "MustReplaceImprovement": "bool_hide",
       "YieldBasedOnAppeal": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_{DistrictType}_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_EMBARKED_UNIT_MOVEMENT": {
     "comment": "海运单位移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EMBARKED_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_EMBARK_UNIT_PASS": {
     "comment": "{UnitType}可海运",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_EMBARK_{UnitType}"
   },
   "EFFECT_ADJUST_PLAYER_EMERGENCY_FAVOR_MODIFIER": {
     "comment": "紧急事件外交支持{+:Amount}",
     "params": {
       "Amount": "signed",
       "Member": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_EMERGENCY_FAVOR_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ENFORCE_BORDERS": {
     "comment": "强制关闭边境",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_ENFORCE_BORDERS"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_AERODROME_BUILDING_CONSTRUCTED": {
     "comment": "建机场建筑时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_AERODROME_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_ARMY_KILLED": {
     "comment": "击杀陆军时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_ARMY_KILL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_ARTIFACT_EXTRACTED": {
     "comment": "提取文物时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_ARTIFACT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CITY_RELIGION_CONVERSION": {
     "comment": "转化宗教城市时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_CONVERT_CITY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CIVIC_BOOST": {
     "comment": "市政鼓舞时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_CIVIC_BOOST_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CONTINENT_DISCOVERED": {
     "comment": "发现大陆时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_DISCOVER_CONTINENT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CORPS_KILLED": {
     "comment": "击杀军团时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_CORPS_KILL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CULTURE_BUILDING_CONSTRUCTED": {
     "comment": "建文化建筑时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_CULTURE_BUILDING_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CURRENT_CIVIC": {
     "comment": "每项市政时代分",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ERA_SCORE_CURRENT_CIVIC"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CURRENT_TECH": {
     "comment": "每项科技时代分",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ERA_SCORE_CURRENT_TECH"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_DISTRICT_CONSTRUCTED": {
     "comment": "建区域时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_GREAT_PERSON_EARNED": {
     "comment": "获得伟人时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_GP_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_INDUSTRIAL_BUILDING_CONSTRUCTED": {
     "comment": "建工业建筑时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_INDUSTRIAL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NATURAL_WONDER_DISCOVERED": {
     "comment": "发现奇观时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_DISCOVER_NW_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_KILLED_BY_GDR": {
     "comment": "GDR击杀时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_GDR_KILL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_SEA_KILLED": {
     "comment": "击杀海军时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_SEA_KILL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_PRIDE_MOMENT": {
     "comment": "骄傲时刻时代分{+:Amount}",
     "params": {
       "Amount": "signed",
       "MinScore": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_PRIDE_MOMENT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_SCIENCE_BUILDING_CONSTRUCTED": {
     "comment": "建科技建筑时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_SCIENCE_BUILDING_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_SPY_SUCCESSFUL_MISSION": {
     "comment": "间谍成功任务时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_SPY_MISSION_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_TECH_BOOST": {
     "comment": "科技尤里卡时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_TECH_BOOST_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_TRADE_ROUTE_COMPLETED": {
     "comment": "完成商路时代分{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ERA_SCORE_TRADE_ROUTE_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_UNIT_PROMOTION_EARNED": {
     "comment": "单位晋升时代分",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ERA_SCORE_PROMOTION"
   },
   "EFFECT_ADJUST_PLAYER_EXTRA_FAVOR_PER_TURN": {
     "comment": "每回合外交支持{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXTRA_FAVOR_PER_TURN_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_FAITH_FROM_DISPERSAL": {
     "comment": "掠夺获得信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAITH_DISPERSAL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_FAITH_PEACEFUL_FOUNDERS": {
     "comment": "和平创立者信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAITH_PEACEFUL_FOUNDERS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_FAVOR_REFUND_FOR_SUCCESSFUL_RESOLUTION": {
     "comment": "{ResolutionType}决议返还{+:Percent}%外交支持",
@@ -1899,119 +2196,139 @@
       "Percent": "signed",
       "ResolutionType": "text",
       "WhichEffect": "text"
-    }
+    },
+    "name_template": "ADJUST_FAVOR_REFUND_{ResolutionType}_{:Percent}"
   },
   "EFFECT_ADJUST_PLAYER_FEAUTE_REQUIRED_FOR_SPECIALTY_DISTRICTS": {
     "comment": "专业区域需要地貌{FeatureType}",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_FEATURE_REQUIRED_DISTRICTS_{FeatureType}"
   },
   "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED": {
     "comment": "专业区域建成时获得免费建筑",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_FREE_BUILDING_DISTRICT_CONSTRUCTED"
   },
   "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED_EXCEPT": {
     "comment": "专业区域建成时免费建筑({DistrictType}除外)",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_FREE_BUILDING_EXCEPT_{DistrictType}"
   },
   "EFFECT_ADJUST_PLAYER_FREE_GREAT_PERSON_POINTS": {
     "comment": "免费伟人点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FREE_GREAT_PERSON_POINTS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_FREE_RESOURCE_IMPORT": {
     "comment": "免费进口{ResourceType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "ADJUST_FREE_RESOURCE_IMPORT_{ResourceType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_FREE_RESOURCE_IMPORT_EXTRACTION": {
     "comment": "免费提取进口{ResourceType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "ADJUST_FREE_RESOURCE_EXTRACTION_{ResourceType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_GOLD_INTEREST_PERCENT": {
     "comment": "金币利息百分比",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_GOLD_INTEREST_PERCENT"
   },
   "EFFECT_ADJUST_PLAYER_GOVERNMENT_SLOT_TYPE": {
     "comment": "政体槽位类型：{GovernmentSlotType}",
     "params": {
       "GovernmentSlotType": "text"
-    }
+    },
+    "name_template": "ADJUST_GOVERNMENT_SLOT_{GovernmentSlotType}"
   },
   "EFFECT_ADJUST_PLAYER_GOVERNMENT_SLOT_TYPE_GRANT_FAVOR": {
     "comment": "{GovernmentSlotType}槽位提供{+:Amount}外交支持",
     "params": {
       "Amount": "signed",
       "GovernmentSlotType": "text"
-    }
+    },
+    "name_template": "ADJUST_SLOT_FAVOR_{GovernmentSlotType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_GOVERNOR_FAVOR": {
     "comment": "总督外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_GOVERNOR_FAVOR"
   },
   "EFFECT_ADJUST_PLAYER_GOVERNOR_POINTS": {
     "comment": "总督点数{+:Delta}",
     "params": {
       "Delta": "signed"
-    }
+    },
+    "name_template": "ADJUST_GOVERNOR_POINTS_{:Delta}"
   },
   "EFFECT_ADJUST_PLAYER_GREATPERSON_FAVOR_MODIFIER": {
     "comment": "伟人外交支持修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GREATPERSON_FAVOR_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_GRIEVANCE_DECAY": {
     "comment": "不满衰减{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GRIEVANCE_DECAY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_GRIEVANCE_GENERATION": {
     "comment": "不满产生{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GRIEVANCE_GENERATION_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_HEALING_FROM_DISPERSAL": {
     "comment": "解散单位回复{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HEALING_DISPERSAL_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_IDENTITY_PER_TURN_FOR_DOMESTIC_TRADE_ROUTE_ORIGIN": {
     "comment": "国内商路起始每回合认同{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_IDENTITY_DOMESTIC_TRADE_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_IMMEDIATE_TRADING_POST": {
-    "comment": "立即建立商站",
+    "comment": "{ImmediateTradingPost?立即:正常}建立商站",
     "params": {
       "ImmediateTradingPost": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IMMEDIATE_TRADING_POST"
   },
   "EFFECT_ADJUST_PLAYER_IMPROVED_ROUTE_LEVEL": {
     "comment": "道路等级提升为{ImprovedRouteLevel}",
     "params": {
       "ImprovedRouteLevel": "text"
-    }
+    },
+    "name_template": "ADJUST_IMPROVED_ROUTE_{ImprovedRouteLevel}"
   },
   "EFFECT_ADJUST_PLAYER_INTERNATIONAL_TRADE_ROUTE_YIELD_MODIFIER": {
     "comment": "国际商路{YieldType}{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_INTERNATIONAL_TRADE_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_INTERNATIONAL_TRADE_ROUTE_YIELD_PER_IMPROVEMENT_IN_ORIGIN_CITY": {
     "comment": "起始城每处{ImprovementType}国际商路{+:Amount}{YieldType}",
@@ -2019,74 +2336,87 @@
       "Amount": "signed",
       "ImprovementType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ORIGIN_IMPROVEMENT_{ImprovementType}_{YieldType}"
   },
   "EFFECT_ADJUST_PLAYER_JOINTWAR_EXPERIENCE": {
     "comment": "联合作战经验{+:Range}",
     "params": {
       "Range": "signed"
-    }
+    },
+    "name_template": "ADJUST_JOINTWAR_EXPERIENCE_{:Range}"
   },
   "EFFECT_ADJUST_PLAYER_JOINTWAR_PLUNDER": {
     "comment": "联合作战劫掠{+:Multiplier}%",
     "params": {
       "Multiplier": "signed"
-    }
+    },
+    "name_template": "ADJUST_JOINTWAR_PLUNDER_{:Multiplier}"
   },
   "EFFECT_ADJUST_PLAYER_LEVIED_UNIT_UPGRADE_DISCOUNT_PERCENT": {
     "comment": "征召单位升级折扣{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_LEVIED_UPGRADE_DISCOUNT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_LEVY_DISCOUNT_PERCENT": {
     "comment": "征召折扣{+:Percent}%",
     "params": {
       "Percent": "signed"
-    }
+    },
+    "name_template": "ADJUST_LEVY_DISCOUNT_{:Percent}"
   },
   "EFFECT_ADJUST_PLAYER_LOYALTY_MARTIAL_LAW_MODIFIER": {
     "comment": "戒严令忠诚度修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_MARTIAL_LAW_LOYALTY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_MAX_WARMONGER_PERCENT": {
     "comment": "最大战狂百分比{+:MaxPercent}",
     "params": {
       "MaxPercent": "signed"
-    }
+    },
+    "name_template": "ADJUST_MAX_WARMONGER_{:MaxPercent}"
   },
   "EFFECT_ADJUST_PLAYER_NO_CAP_RESOURCE": {
     "comment": "资源无上限",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_NO_CAP_RESOURCE"
   },
   "EFFECT_ADJUST_PLAYER_NO_OCCUPATION_PENALTIES": {
-    "comment": "无占领惩罚",
+    "comment": "{NoPenalties?无:有}占领惩罚",
     "params": {
       "NoPenalties": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_NO_OCCUPATION_PENALTIES"
   },
   "EFFECT_ADJUST_PLAYER_OPEN_BORDERS_FROM_INFLUENCE": {
     "comment": "影响力可获开放边界",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_OPEN_BORDERS_INFLUENCE"
   },
   "EFFECT_ADJUST_PLAYER_OTHER_GOVERNMENT_INTOLERANCE": {
     "comment": "异政体不容忍×{IntoleranceMultiplier}",
     "params": {
       "IntoleranceMultiplier": "text",
       "SameEraIntoleranceFlatBonus": "signed"
-    }
+    },
+    "name_template": "ADJUST_GOVERNMENT_INTOLERANCE_{IntoleranceMultiplier}"
   },
   "EFFECT_ADJUST_PLAYER_OVERALL_TOURISM_REDUCTION": {
     "comment": "全域旅游减少{Modifier}",
     "params": {
       "Modifier": "text"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_REDUCTION_{Modifier}"
   },
   "EFFECT_ADJUST_PLAYER_POLICY_FAVOR": {
     "comment": "政策外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_POLICY_FAVOR"
   },
   "EFFECT_ADJUST_PLAYER_POST_COMBAT_LOYALTY": {
     "comment": "战后忠诚度{+:Amount}",
@@ -2094,234 +2424,273 @@
       "AdditionalGoldenAge": "bool_hide",
       "AffectLocal": "bool_hide",
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POST_COMBAT_LOYALTY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_POST_PILLAGE_LOYALTY": {
     "comment": "劫掠后忠诚度{+:Amount}",
     "params": {
       "AffectLocal": "bool_hide",
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POST_PILLAGE_LOYALTY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_PREVENT_HARVEST_RESOURCE": {
     "comment": "禁止收获资源",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_PREVENT_HARVEST_RESOURCE"
   },
   "EFFECT_ADJUST_PLAYER_PROGRESS_DIFF_TRADE_BONUS": {
     "comment": "科技市政领先商路加成",
     "params": {
       "TechCivicsPerYield": "text"
-    }
+    },
+    "name_template": "ADJUST_PROGRESS_DIFF_TRADE_{TechCivicsPerYield}"
   },
   "EFFECT_ADJUST_PLAYER_PROPERTY": {
     "comment": "属性修正{+:Amount}",
     "params": {
       "Amount": "signed",
       "Key": "skip"
-    }
+    },
+    "name_template": "ADJUST_PROPERTY_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_RANDOM_CIVIC_BOOST_GOODY_HUT": {
     "comment": "部落村庄给予市政鼓舞{+:Amount}",
     "params": {
       "Amount": "signed",
       "Source": "text"
-    }
+    },
+    "name_template": "ADJUST_GOODY_HUT_CIVIC_BOOST_{Source}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_RANDOM_EVENT_AVOID": {
     "comment": "避免随机事件：{RandomEventType}",
     "params": {
       "RandomEventType": "text"
-    }
+    },
+    "name_template": "ADJUST_RANDOM_EVENT_AVOID_{RandomEventType}"
   },
   "EFFECT_ADJUST_PLAYER_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT": {
     "comment": "部落村庄给予科技触发{+:Amount}",
     "params": {
       "Amount": "signed",
       "Source": "text"
-    }
+    },
+    "name_template": "ADJUST_GOODY_HUT_TECH_BOOST_{Source}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_RELIGIOUS_TOURISM_REDUCTION": {
     "comment": "宗教旅游减少{Modifier}",
     "params": {
       "Modifier": "text"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_TOURISM_REDUCTION_{Modifier}"
   },
   "EFFECT_ADJUST_PLAYER_RESOURCE_ACCUMULATION_MODIFIER": {
     "comment": "{ResourceType}积累修正{+:Amount}%",
     "params": {
       "Amount": "signed",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "ADJUST_RESOURCE_ACCUMULATION_{ResourceType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_RESOURCE_STOCKPILE_CAP": {
     "comment": "资源储备上限{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RESOURCE_STOCKPILE_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_ROCK_BAND_UNIT_ALBUM_SALES": {
     "comment": "摇滚乐队专辑销售{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ROCK_BAND_ALBUM_SALES_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_SCIENCE_VICTORY_POINTS": {
     "comment": "科技胜利点数",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_SCIENCE_VICTORY_POINTS"
   },
   "EFFECT_ADJUST_PLAYER_SCIENCE_VICTORY_POINTS_PER_TURN": {
     "comment": "每回合科技胜利点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SCIENCE_VICTORY_POINTS_PER_TURN_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_SEND_INFLUENCE_TOKEN_FAVOR_BY_BONUS_TYPE": {
     "comment": "按加成类型获得使节外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_INFLUENCE_TOKEN_FAVOR_BONUS"
   },
   "EFFECT_ADJUST_PLAYER_SEND_TRADE_ROUTE_FAVOR_BY_BONUS_TYPE": {
     "comment": "按加成类型获得商路外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_TRADE_ROUTE_FAVOR_BONUS"
   },
   "EFFECT_ADJUST_PLAYER_SKIP_FREE_CITY_STEP": {
-    "comment": "跳过自由城市阶段",
+    "comment": "{Skip?跳过:正常}自由城市阶段",
     "params": {
       "Skip": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_SKIP_FREE_CITY_STEP"
   },
   "EFFECT_ADJUST_PLAYER_SPECIALTY_DISTRICT_CANNOT_BE_BUILT_ADJACENT_TO_CITY": {
     "comment": "专业区域不可毗邻城市",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_DISTRICT_CANNOT_ADJACENT_CITY"
   },
   "EFFECT_ADJUST_PLAYER_SPECIFIC_DISTRICT_GRANT_ENVOYS": {
     "comment": "{DistrictType}授予{+:Amount}使者",
     "params": {
       "Amount": "signed",
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_GRANT_ENVOYS_{DistrictType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_SPY_BONUS": {
     "comment": "间谍加成{+:Amount}",
     "params": {
       "Amount": "signed",
       "Offense": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_SPY_BONUS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_STEAL_TECH_BOOSTS": {
     "comment": "窃取科技触发{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_STEAL_TECH_BOOSTS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER": {
     "comment": "{+:Amount}战斗力",
     "params": {
       "Amount": "signed",
       "Key": "skip"
-    }
+    },
+    "name_template": "ADJUST_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_SUZERAIN_BONUS_DISABLED": {
     "comment": "禁用宗主国加成",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_SUZERAIN_BONUS_DISABLED"
   },
   "EFFECT_ADJUST_PLAYER_SUZERAIN_FAVOR_BY_BONUS_TYPE": {
     "comment": "按加成类型获得宗主国外交支持",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_SUZERAIN_FAVOR_BONUS"
   },
   "EFFECT_ADJUST_PLAYER_SUZERAIN_FAVOR_MULTIPLIER": {
     "comment": "宗主国外交支持倍率{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SUZERAIN_FAVOR_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TARGET_CITY_SPY_YIELD_PERCENT": {
     "comment": "目标城市间谍{YieldType}{+:Percent}%",
     "params": {
       "Percent": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TARGET_CITY_SPY_YIELD_{YieldType}_{:Percent}"
   },
   "EFFECT_ADJUST_PLAYER_TERRAIN_WORK_IMPASSABLE_MODIFIER": {
     "comment": "{TerrainType}不可通行修正",
     "params": {
       "Ignore": "bool_hide",
       "TerrainType": "text"
-    }
+    },
+    "name_template": "ADJUST_TERRAIN_IMPASSABLE_{TerrainType}"
   },
   "EFFECT_ADJUST_PLAYER_TOKEN_ON_FIRST_MEETING": {
     "comment": "首次相遇获使者",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_TOKEN_FIRST_MEETING"
   },
   "EFFECT_ADJUST_PLAYER_TOKEN_ON_TRADE_ROUTE_STARTED": {
     "comment": "商路开启获使者",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_TOKEN_TRADE_ROUTE_STARTED"
   },
   "EFFECT_ADJUST_PLAYER_TOURISM": {
     "comment": "旅游业绩{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TOURISM_FAVOR": {
     "comment": "旅游提供{+:Favor}外交支持",
     "params": {
       "Favor": "signed",
       "Tourism": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_FAVOR_{:Favor}"
   },
   "EFFECT_ADJUST_PLAYER_TOURISM_FROM_NATIONAL_PARKS": {
     "comment": "国家公园旅游业绩{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_NATIONAL_PARKS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_GAIN_TILES_EN_ROUTE": {
     "comment": "商路获得地块半径{+:GainTileRadius}",
     "params": {
       "GainTileRadius": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_GAIN_TILES_{:GainTileRadius}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_BY_CITY_STATE_BONUS_TYPE_MODIFIER": {
     "comment": "城邦加成商路修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_CITY_STATE_BONUS_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_CAPACITY_ON_MEETING": {
     "comment": "首次相遇获商路容量{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_CAPACITY_ON_MEETING_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_DESTINATION_YIELD_FOR_ALLY_ROUTE": {
     "comment": "同盟商路目的地{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_DEST_ALLY_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_DESTINATION_YIELD_FOR_SUZERAIN_ROUTE": {
     "comment": "宗主商路目的地{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_DEST_SUZERAIN_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_ORIGIN_YIELD_FOR_ALLY_ROUTE": {
     "comment": "同盟商路起始地{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ORIGIN_ALLY_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_ORIGIN_YIELD_FOR_SUZERAIN_ROUTE": {
     "comment": "宗主商路起始地{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ORIGIN_SUZERAIN_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_RELIGIOUS_PRESSURE": {
     "comment": "商路宗教压力{+:Amount}",
@@ -2329,13 +2698,15 @@
       "Amount": "signed",
       "Destination": "bool_hide",
       "Origin": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_TRADE_RELIGIOUS_PRESSURE_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_TOURISM_MODIFIER": {
     "comment": "商路旅游修正{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_TOURISM_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_MODIFIER": {
     "comment": "商路{YieldType}{+:Amount}%",
@@ -2344,14 +2715,16 @@
       "Destination": "bool_hide",
       "Origin": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_FOLLOWER": {
     "comment": "信教每人口商路{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_PER_FOLLOWER_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_IMPROVEMENT_IN_TARGET_CITY": {
     "comment": "目标城每处{ImprovementType}商路{+:Amount}{YieldType}",
@@ -2361,28 +2734,32 @@
       "ImprovementType": "text",
       "Origin": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_TARGET_IMPROVEMENT_{ImprovementType}_{YieldType}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_PATH_TILE": {
     "comment": "商路每格{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_PER_PATH_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_POST_IN_FOREIGN_CITY": {
     "comment": "外国城商站{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_FOREIGN_POST_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_POST_IN_OWN_CITY": {
     "comment": "本城商站{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_OWN_POST_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_TERRAIN_FOR_DOMESTIC": {
     "comment": "国内商路途经{TerrainType}{YieldType}{+:Amount}",
@@ -2391,163 +2768,188 @@
       "Origin": "bool_hide",
       "TerrainType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_DOMESTIC_TERRAIN_{TerrainType}_{YieldType}"
   },
   "EFFECT_ADJUST_PLAYER_TRADE_ROUTE_YIELD_PER_TERRAIN_FOR_INTERNATIONAL": {
-    "comment": "国际商路途经{TerrainType}{YieldType}{+:Amount}",
+    "comment": "国际贸易路线从{Origin?出发地:目的地}城市的每个{TerrainType}获得{+:Amount}{YieldType}",
     "params": {
       "Amount": "signed",
-      "Origin": "bool_hide",
+      "Origin": "bool_true",
       "TerrainType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "TRADE_ROUTE_{TerrainType}_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_BUILD_DISABLED": {
     "comment": "禁用{UnitType}建造",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_UNIT_BUILD_DISABLED_{UnitType}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_DISTRICT_PERCENT": {
     "comment": "单位区域生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_PROJECT_PERCENT": {
     "comment": "单位项目生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_PROJECT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_DISCOUNT_PERCENT": {
     "comment": "单位升级折扣{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_UPGRADE_DISCOUNT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_RESOURCE_COST_DISCOUNT": {
     "comment": "单位升级资源消耗折扣{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_UPGRADE_RESOURCE_DISCOUNT_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_UNIT_WONDER_PERCENT": {
     "comment": "单位奇观生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_VALID_BUILDING": {
     "comment": "有效建筑",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_VALID_BUILDING"
   },
   "EFFECT_ADJUST_PLAYER_VALID_IMPROVEMENT": {
     "comment": "有效改良：{ImprovementType}",
     "params": {
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADJUST_VALID_IMPROVEMENT_{ImprovementType}"
   },
   "EFFECT_ADJUST_PLAYER_VALID_UNIT_BUILD": {
     "comment": "可建造单位：{UnitType}",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_VALID_UNIT_BUILD_{UnitType}"
   },
   "EFFECT_ADJUST_PLAYER_WARMONGER_MULTIPLIER": {
     "comment": "战狂倍率{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_WARMONGER_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_WMD_COUNT": {
     "comment": "{Type}数量{+:Amount}",
     "params": {
       "Amount": "signed",
       "Type": "text"
-    }
+    },
+    "name_template": "ADJUST_WMD_COUNT_{Type}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_WMD_MAINTENANCE_MODIFIER": {
     "comment": "WMD维护费修正{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_WMD_MAINTENANCE_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_YIELD_CHANGE": {
     "comment": "{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_TRIBUTARY": {
     "comment": "每个附庸{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_TRIBUTARY_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_USED_INFLUENCE_TOKEN": {
     "comment": "每消耗使节{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_INFLUENCE_TOKEN_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_YIELD_MODIFIER_PER_EARNED_GREAT_PERSON": {
     "comment": "每位伟人{YieldType}{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_GREAT_PERSON_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLAYER_YIELD_MODIFIER_PER_TRIBUTARY": {
     "comment": "每个附庸{YieldType}{+:Amount}%",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_TRIBUTARY_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLOT_PURCHASE_COST": {
     "comment": "地块购买费用{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PLOT_PURCHASE_COST_{:Amount}"
   },
   "EFFECT_ADJUST_PLOT_PURCHASE_COST_TERRAIN": {
     "comment": "{TerrainType}地块购买费用{+:Amount}",
     "params": {
       "Amount": "signed",
       "TerrainType": "text"
-    }
+    },
+    "name_template": "ADJUST_PLOT_PURCHASE_TERRAIN_{TerrainType}_{:Amount}"
   },
   "EFFECT_ADJUST_PLOT_YIELD": {
     "comment": "地块{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_PLOT_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_POLICY_AMENITY": {
     "comment": "政策宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POLICY_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_POLICY_HOUSING": {
     "comment": "政策住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POLICY_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_POPULATION_AFTER_CONQUEST": {
     "comment": "征服后人口保留{+:Percent}%",
     "params": {
       "Percent": "signed"
-    }
+    },
+    "name_template": "ADJUST_POPULATION_CONQUEST_{:Percent}"
   },
   "EFFECT_ADJUST_PREVENT_STRUCTURAL_DAMAGE": {
-    "comment": "防止建筑损伤",
+    "comment": "{Prevent?保护:不保护}城市不受灾难影响",
     "params": {
       "Prevent": "bool_hide"
     }
@@ -2557,56 +2959,65 @@
     "params": {
       "Amount": "signed",
       "ProjectType": "text"
-    }
+    },
+    "name_template": "ADJUST_PROJECT_PRODUCTION_{ProjectType}_{:Amount}"
   },
   "EFFECT_ADJUST_RANDOM_EVENT_MODIFIED_DAMAGE_OPPOSING_PLAYER": {
     "comment": "{RandomEventType}事件伤害对手{+:Amount}",
     "params": {
       "Amount": "signed",
       "RandomEventType": "text"
-    }
+    },
+    "name_template": "ADJUST_RANDOM_EVENT_DAMAGE_{RandomEventType}_{:Amount}"
   },
   "EFFECT_ADJUST_RANDOM_EVENT_NO_UNIT_DAMAGE": {
-    "comment": "{RandomEventType}事件无单位伤害",
+    "comment": "{RandomEventType}事件{NoDamage?无:有}单位伤害",
     "params": {
       "NoDamage": "bool_hide",
       "RandomEventType": "text"
-    }
+    },
+    "name_template": "ADJUST_RANDOM_EVENT_NO_DAMAGE_{RandomEventType}"
   },
   "EFFECT_ADJUST_RELIGION_AMENITIES_FOR_MINIMUM_FOLLOWERS": {
     "comment": "{Followers}信徒提供{+:Amenities}宜居度",
     "params": {
       "Amenities": "signed",
       "Followers": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_AMENITIES_FOLLOWERS_{:Amenities}"
   },
   "EFFECT_ADJUST_RELIGION_ANYONE_CONDEMNS_FAVOR": {
     "comment": "受谴责时外交支持{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_CONDEMN_FAVOR_{:Amount}"
   },
   "EFFECT_ADJUST_RELIGION_BUILDING_DISCOUNT": {
     "comment": "宗教建筑折扣{+:Discount}%",
     "params": {
       "Discount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGION_BUILDING_DISCOUNT_{:Discount}"
   },
   "EFFECT_ADJUST_RELIGION_CONDEMN_PROHIBITED": {
     "comment": "禁止审判",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_CONDEMN_PROHIBITED"
   },
   "EFFECT_ADJUST_RELIGIOUS_COMBAT_LOSS": {
     "comment": "宗教战斗损失减免{+:ReductionPercent}%",
     "params": {
       "ReductionPercent": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_COMBAT_LOSS_{:ReductionPercent}"
   },
   "EFFECT_ADJUST_RELIGIOUS_SPREAD_DISTANCE": {
     "comment": "宗教传播距离{+:DistanceChange}",
     "params": {
       "DistanceChange": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_SPREAD_DISTANCE_{:DistanceChange}"
   },
   "EFFECT_ADJUST_RELIGIOUS_SPREAD_STRENGTH": {
     "comment": "宗教传播强度×{SpreadMultiplier}",
@@ -2614,44 +3025,51 @@
       "EnhancingTechType": "text",
       "SpreadMultiplier": "signed",
       "TechEnabledSpreadMultiplier": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_SPREAD_STRENGTH_{EnhancingTechType}"
   },
   "EFFECT_ADJUST_RESOURCE_POWER_PROVIDED_GOVERNOR": {
     "comment": "总督提供资源电力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RESOURCE_POWER_GOVERNOR_{:Amount}"
   },
   "EFFECT_ADJUST_RESOURCE_YIELD_BY_COUNT": {
     "comment": "资源数量提供{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_RESOURCE_YIELD_COUNT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_RIVER_DISTRICT_PRODUCTION": {
     "comment": "沿河区域生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RIVER_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_RIVER_WONDER_PRODUCTION": {
     "comment": "沿河奇观生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RIVER_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_SPACE_RACE_PROJECTS_PRODUCTION": {
     "comment": "太空竞赛项目生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPACE_RACE_{:Amount}"
   },
   "EFFECT_ADJUST_TECHNOLOGY_BOOST": {
     "comment": "科技触发{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TECHNOLOGY_BOOST_{:Amount}"
   },
   "EFFECT_ADJUST_TERRAIN_YIELD_FROM_ADJACENT_IMPROVEMENTS": {
     "comment": "毗邻{ImprovementType}的{TerrainType}{YieldType}{+:Amount}",
@@ -2660,26 +3078,30 @@
       "ImprovementType": "text",
       "TerrainType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TERRAIN_ADJACENT_IMPROVEMENT_{ImprovementType}_{YieldType}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_CAPACITY": {
     "comment": "商路容量{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_CAPACITY_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_WATER_RANGE": {
     "comment": "水上商路范围{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRADE_WATER_RANGE_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD": {
     "comment": "商路{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_CHANGE": {
     "comment": "商路{YieldType}{+:Amount}",
@@ -2688,7 +3110,8 @@
       "AffectOrigin": "bool_hide",
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_DOMESTIC": {
     "comment": "国内商路{YieldType}{+:Amount}",
@@ -2696,7 +3119,8 @@
       "Amount": "signed",
       "Intercontinental": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_DOMESTIC_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_INTERNATIONAL": {
     "comment": "国际商路{YieldType}{+:Amount}",
@@ -2704,7 +3128,8 @@
       "Amount": "signed",
       "Intercontinental": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_INTERNATIONAL_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FROM_OTHERS": {
     "comment": "来自他国商路{YieldType}{+:Amount}",
@@ -2712,21 +3137,24 @@
       "Amount": "signed",
       "Domestic": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_FROM_OTHERS_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_DOMESTIC": {
     "comment": "国内商路每专业区域{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_DOMESTIC_PER_DISTRICT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_INTERNATIONAL": {
     "comment": "国际商路每专业区域{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_INTL_PER_DISTRICT_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRADE_ROUTE_YIELD_TO_OTHERS": {
     "comment": "至他国商路{YieldType}{+:Amount}",
@@ -2734,522 +3162,609 @@
       "Amount": "signed",
       "Domestic": "bool_hide",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_YIELD_TO_OTHERS_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRAIT_AMENITY": {
     "comment": "特质宜居度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TRAIT_AMENITY_{:Amount}"
   },
   "EFFECT_ADJUST_UNITS_RELIGIOUS_STRENGTH_BY_RELIGION_TYPE": {
     "comment": "按宗教类型宗教战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_RELIGIOUS_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ADVANCED_COASTAL_RAID": {
-    "comment": "高级沿海劫掠",
+    "comment": "{UseAdvancedCoastalRaid?高级:普通}沿海劫掠",
     "params": {
       "UseAdvancedCoastalRaid": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ADVANCED_COASTAL_RAID"
   },
   "EFFECT_ADJUST_UNIT_ADVANCED_PILLAGING": {
-    "comment": "高级劫掠",
+    "comment": "{UseAdvancedPillaging?高级能力:普通}劫掠",
     "params": {
       "UseAdvancedPillaging": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ADVANCED_PILLAGING"
   },
   "EFFECT_ADJUST_UNIT_AGAINST_DISTRICT_COMBAT_BONUS": {
     "comment": "对区域战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_AGAINST_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ANTI_AIR_STRENGTH": {
     "comment": "防空战力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_ANTI_AIR_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ATTACK_AND_MOVE": {
-    "comment": "攻击后可移动",
+    "comment": "攻击后{CanMove?可移动:不可移动}",
     "params": {
       "CanMove": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ATTACK_AND_MOVE"
   },
   "EFFECT_ADJUST_UNIT_ATTACK_EXPERIENCE_MODIFIER": {
     "comment": "攻击经验修正{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_ATTACK_EXPERIENCE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ATTACK_RANGE": {
     "comment": "攻击范围{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_ATTACK_RANGE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_BARBARIAN_COMBAT": {
     "comment": "对蛮族战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_BARBARIAN_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_BOOST_ALL_SPIES": {
-    "comment": "全部间谍加成{+:Amount}",
+    "comment": "全部间谍{Defense?防守:进攻}加成{+:Amount}",
     "params": {
       "Amount": "signed",
       "Defense": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_UNIT_BOOST_ALL_SPIES_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_BUILD_CHARGES": {
     "comment": "建造次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UNIT_BUILD_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_BYPASS_COMBAT_UNIT": {
-    "comment": "绕过战斗单位",
+    "comment": "{Bypass?可绕过:不可绕过}战斗单位",
     "params": {
       "Bypass": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_BYPASS_COMBAT_UNIT"
   },
   "EFFECT_ADJUST_UNIT_BYPASS_WALLS": {
     "comment": "绕过城墙",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_BYPASS_WALLS"
   },
   "EFFECT_ADJUST_UNIT_BYPASS_WALLS_PROMOTION_CLASS": {
     "comment": "{PromotionClass}绕过城墙",
     "params": {
       "PromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_BYPASS_WALLS_{PromotionClass}"
   },
   "EFFECT_ADJUST_UNIT_CANNOT_ATTACK": {
     "comment": "禁止攻击",
     "params": {
       "Disable": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_UNIT_CANNOT_ATTACK"
   },
   "EFFECT_ADJUST_UNIT_CLEAR_TERRAIN_START_MOVEMENT": {
     "comment": "清除地貌起始移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_CLEAR_TERRAIN_START_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_COMBAT_CAPTURE": {
     "comment": "战斗俘获单位",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_COMBAT_CAPTURE"
   },
   "EFFECT_ADJUST_UNIT_COMBAT_STRENGTH": {
     "comment": "战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_COMBAT_STRENGTH_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_COMBAT_UNIT_CAPTURE": {
     "comment": "俘获{UnitType}",
     "params": {
       "CanCapture": "bool_hide",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_COMBAT_UNIT_CAPTURE_{UnitType}"
   },
   "EFFECT_ADJUST_UNIT_CONVERTS_BARBARIANS": {
-    "comment": "转化蛮族单位",
+    "comment": "{Converts?可转化:不可转化}蛮族单位",
     "params": {
       "Converts": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_CONVERTS_BARBARIANS"
   },
   "EFFECT_ADJUST_UNIT_DAMAGE": {
     "comment": "造成伤害{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_DAMAGE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_DIPLO_VISIBILITY_COMBAT_MODIFIER": {
     "comment": "外交能见度战斗力{+:Amount}",
     "params": {
       "Amount": "signed",
       "DeltaWithOpponent": "signed"
-    }
+    },
+    "name_template": "ADJUST_DIPLO_VISIBILITY_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_DISASTER_CHARGES": {
     "comment": "调整天灾充能次数",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_DISASTER_CHARGES"
   },
   "EFFECT_ADJUST_UNIT_DOMAIN_PRODUCTION": {
     "comment": "{Domain}单位生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "Domain": "text"
-    }
+    },
+    "name_template": "ADJUST_{Domain}_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK": {
-    "comment": "启用攻城",
+    "comment": "{Enable?启用:禁用}攻城",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ADJUST_ENABLE_WALL_ATTACK"
   },
   "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_PROMOTION_CLASS": {
     "comment": "{PromotionClass}单位可攻城",
     "params": {
       "PromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_WALL_ATTACK_{PromotionClass}"
   },
   "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_PROMOTION_CLASS": {
     "comment": "{PromotionClass}单位全局可攻城",
     "params": {
       "PromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_WALL_ATTACK_WHOLE_GAME_{PromotionClass}"
   },
   "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION": {
     "comment": "同宗教单位全局可攻城",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION"
   },
   "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION_PROMOTION_CLASS": {
     "comment": "{PromotionClass}同宗教单位全局可攻城",
     "params": {
       "PromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_WALL_ATTACK_SAME_RELIGION_{PromotionClass}"
   },
   "EFFECT_ADJUST_UNIT_ENEMY_TERRITORY_START_MOVEMENT": {
     "comment": "敌方领土起始移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ENEMY_TERRITORY_START_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ENTER_FOREIGN_LANDS": {
-    "comment": "允许进入外国领土",
+    "comment": "{Enter?允许进入:不允许进入}外国领土",
     "params": {
       "Enter": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ENTER_FOREIGN_LANDS"
   },
   "EFFECT_ADJUST_UNIT_ERA_STRENGTH_MODIFIER": {
     "comment": "按时代调整战斗力",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_ERA_STRENGTH_MODIFIER"
   },
   "EFFECT_ADJUST_UNIT_ESCAPE_BOOST": {
     "comment": "逃脱加成{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ESCAPE_BOOST_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ESCORT_MOBILITY": {
-    "comment": "获得护送移动力",
+    "comment": "{EscortMobility?获得护送移动力:正常}",
     "params": {
       "EscortMobility": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_ESCORT_MOBILITY"
   },
   "EFFECT_ADJUST_UNIT_EVICT_PERCENT": {
     "comment": "驱逐概率{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EVICT_PERCENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_EXERT_ZOC": {
-    "comment": "施加控制区",
+    "comment": "{Exert?施加控制区:正常}",
     "params": {
       "Exert": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_EXERT_ZOC"
   },
   "EFFECT_ADJUST_UNIT_EXPERIENCE_LEVEL": {
     "comment": "经验等级{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXPERIENCE_LEVEL_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_EXPERIENCE_MODIFIER": {
     "comment": "经验获取{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_EXPERIENCE_MODIFIER_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_EXTRACT_SEA_ARTIFACTS": {
-    "comment": "提取海洋文物",
+    "comment": "{Extract?提取海洋文物:正常}",
     "params": {
       "Extract": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_EXTRACT_SEA_ARTIFACTS"
   },
   "EFFECT_ADJUST_UNIT_FAITH_ON_DISTRICT_PLUNDER": {
     "comment": "劫掠区域获得信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAITH_ON_DISTRICT_PLUNDER_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_FAITH_ON_IMPROVEMENT_PLUNDER": {
     "comment": "劫掠设施获得信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAITH_ON_IMPROVEMENT_PLUNDER_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_FIGHT_WHILE_EMBARKED": {
-    "comment": "登船状态下可战斗",
+    "comment": "登船状态下{CanFight?可战斗:不可战斗}",
     "params": {
       "CanFight": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_FIGHT_WHILE_EMBARKED"
   },
   "EFFECT_ADJUST_UNIT_FLANKING_BONUS_MODIFIER": {
     "comment": "夹击加成{+:Percent}%",
     "params": {
       "Percent": "signed"
-    }
+    },
+    "name_template": "ADJUST_FLANKING_BONUS_{:Percent}"
   },
   "EFFECT_ADJUST_UNIT_FORCE_RETREAT": {
-    "comment": "强制撤退",
+    "comment": "{ForceRetreat?强制撤退:正常}",
     "params": {
       "ForceRetreat": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_FORCE_RETREAT"
   },
   "EFFECT_ADJUST_UNIT_FOREIGN_SPREAD_MODIFIER": {
     "comment": "境外宗教传播{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FOREIGN_SPREAD_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_COMBAT": {
     "comment": "友方领土战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FRIENDLY_TERRITORY_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_START_MOVEMENT": {
     "comment": "友方领土起始移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FRIENDLY_TERRITORY_START_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_GRANT_EXPERIENCE": {
     "comment": "授予经验值{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GRANT_EXPERIENCE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_GREAT_PERSON_CHARGES": {
     "comment": "伟人使用次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_GREAT_PERSON_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_HEAL": {
     "comment": "恢复生命值{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HEAL_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_HEALING_MODIFIERS": {
     "comment": "驻扎恢复{+:Amount}",
     "params": {
       "Amount": "signed",
       "Type": "skip"
-    }
+    },
+    "name_template": "ADJUST_HEALING_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_HEALING_RELIGION_MODIFIERS": {
     "comment": "{Type}宗教恢复{+:Amount}%",
     "params": {
       "Amount": "signed",
       "Type": "text"
-    }
+    },
+    "name_template": "ADJUST_HEALING_RELIGION_{Type}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_HIDDEN_VISIBILITY": {
-    "comment": "对一环外的单位保持隐匿",
+    "comment": "{Hidden?对一环外的单位保持隐匿:正常}",
     "params": {
       "Hidden": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_HIDDEN_VISIBILITY"
   },
   "EFFECT_ADJUST_UNIT_HOLY_CITIES_COMBAT_MODIFIER": {
     "comment": "圣城附近战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_HOLY_CITIES_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_CLIFF_WALLS": {
-    "comment": "无视悬崖城墙",
+    "comment": "{Ignore?无视:正常}悬崖城墙",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_CLIFF_WALLS"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_RANGED_VS_DISTRICT_PENALTY": {
-    "comment": "无视远程攻城减益",
+    "comment": "{Ignore?无视:正常}远程攻城减益",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_RANGED_VS_DISTRICT_PENALTY"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_RESOURCE_MAINTENANCE": {
-    "comment": "无视资源维护费",
+    "comment": "{Ignore?无视:正常}资源维护费",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_RESOURCE_MAINTENANCE"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_RIVERS": {
-    "comment": "无视河流",
+    "comment": "{Ignore?无视:正常}河流",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_RIVERS"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_SHORES": {
-    "comment": "无视海岸",
+    "comment": "{Ignore?无视:正常}海岸",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_SHORES"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_STRATEGIC_RESOURCE_LEVIED": {
     "comment": "征召兵无视战略资源",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_IGNORE_STRATEGIC_RESOURCE_LEVIED"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_TERRAIN_COST": {
-    "comment": "无视{Type}移动力消耗",
+    "comment": "{Ignore?无视:正常}{Type}移动力消耗",
     "params": {
       "Ignore": "bool_hide",
       "Type": "text"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_TERRAIN_COST_{Type}"
   },
   "EFFECT_ADJUST_UNIT_IGNORE_ZOC": {
-    "comment": "无视控制区",
+    "comment": "{Ignore?无视:正常}控制区",
     "params": {
       "Ignore": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_IGNORE_ZOC"
   },
   "EFFECT_ADJUST_UNIT_INITIATION_YIELD": {
     "comment": "{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_INITIATION_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_INITIATION_YIELD_POPULATION": {
     "comment": "每人口{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_INITIATION_{YieldType}_POP_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_JUMP_ABILITY": {
     "comment": "跳跃距离{Range}",
     "params": {
       "Range": "unsigned"
-    }
+    },
+    "name_template": "ADJUST_JUMP_ABILITY_{Range}"
   },
   "EFFECT_ADJUST_UNIT_LAND_VICTORY_SPREAD": {
-    "comment": "陆战胜后传播宗教",
+    "comment": "{LandVictorySpread?陆战胜后传播宗教:正常}",
     "params": {
       "LandVictorySpread": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_LAND_VICTORY_SPREAD"
   },
   "EFFECT_ADJUST_UNIT_MAINTENANCE_DISCOUNT": {
     "comment": "维护费折扣{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_MAINTENANCE_DISCOUNT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_MILITARY_FORMATION": {
     "comment": "阵型{MilitaryFormationType}",
     "params": {
       "MilitaryFormationType": "text"
-    }
+    },
+    "name_template": "ADJUST_MILITARY_FORMATION_{MilitaryFormationType}"
   },
   "EFFECT_ADJUST_UNIT_MILITARY_POLICIES_COMBAT_MODIFIER": {
     "comment": "军事政策战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_MILITARY_POLICIES_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_MOVEMENT": {
     "comment": "移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_MOVE_AND_ATTACK": {
-    "comment": "移动后可攻击",
+    "comment": "移动后{CanAttack?可攻击:不可攻击}",
     "params": {
       "CanAttack": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_MOVE_AND_ATTACK"
   },
   "EFFECT_ADJUST_UNIT_NATURAL_WONDER_DEFERRED_CHARGES": {
     "comment": "自然奇观延迟充能{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NATURAL_WONDER_DEFERRED_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_NEIGHBOR_COMBAT_MODIFIER": {
     "comment": "相邻单位战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NEIGHBOR_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_NO_BARB_XP_LIMIT": {
-    "comment": "抗蛮无经验上限",
+    "comment": "抗蛮{NoLimit?无经验上限:正常经验上限}",
     "params": {
       "NoLimit": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_NO_BARB_XP_LIMIT"
   },
   "EFFECT_ADJUST_UNIT_NO_FOREIGN_SPREAD": {
-    "comment": "禁止境外传播宗教",
+    "comment": "{NoSpread?禁止境外传播宗教:正常}",
     "params": {
       "NoSpread": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_NO_FOREIGN_SPREAD"
   },
   "EFFECT_ADJUST_UNIT_NO_REDUCTION_DAMAGE": {
-    "comment": "无视伤害减免",
+    "comment": "{NoReduction?无视伤害减免:正常}",
     "params": {
       "NoReduction": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_NO_REDUCTION_DAMAGE"
   },
   "EFFECT_ADJUST_UNIT_NUM_ATTACKS": {
     "comment": "攻击次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_NUM_ATTACKS_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_OWNER": {
     "comment": "转移归属至{NewOwner}",
     "params": {
       "NewOwner": "text"
-    }
+    },
+    "name_template": "ADJUST_OWNER_{NewOwner}"
   },
   "EFFECT_ADJUST_UNIT_PARADROP_ABILITY": {
-    "comment": "获得空降能力",
+    "comment": "{CanDrop?获得空降能力:正常}",
     "params": {
       "CanDrop": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_PARADROP_ABILITY"
   },
   "EFFECT_ADJUST_UNIT_PER_LUXURY_ATTACK_MODIFIER": {
     "comment": "每种奢侈品战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PER_LUXURY_ATTACK_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PER_UNUSED_MOVEMENT_COMBAT_BONUS": {
     "comment": "每剩余移动力战斗力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PER_UNUSED_MOVEMENT_COMBAT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PILLAGE_DISTRICT_MODIFIER": {
     "comment": "劫掠区域收益{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PILLAGE_DISTRICT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PILLAGE_IMPROVEMENT_MODIFIER": {
     "comment": "劫掠设施收益{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PILLAGE_IMPROVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PLUNDER_YIELDS": {
     "comment": "掠夺产出{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_PLUNDER_YIELDS_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_POST_COMBAT_HEAL": {
     "comment": "战后恢复{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POST_COMBAT_HEAL_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_POST_COMBAT_YIELD": {
     "comment": "击败单位获得{YieldType}（{+:PercentDefeatedStrength}%战斗力）",
@@ -3257,176 +3772,204 @@
       "OnlyWhenDefeatedEarlierEraUnit": "bool_hide",
       "PercentDefeatedStrength": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_POST_COMBAT_{YieldType}_{:PercentDefeatedStrength}"
   },
   "EFFECT_ADJUST_UNIT_POST_TOURISM_BOMB_LOYALTY": {
     "comment": "旅游业绩炸弹忠诚度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_POST_TOURISM_BOMB_LOYALTY_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PRODUCTION": {
     "comment": "{UnitType}生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_UNIT_PRODUCTION_{UnitType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PROMOTE_NO_FINISH_MOVES": {
-    "comment": "晋升不结束回合",
+    "comment": "{NoFinishMoves?晋升不结束回合:正常}",
     "params": {
       "NoFinishMoves": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_PROMOTE_NO_FINISH_MOVES"
   },
   "EFFECT_ADJUST_UNIT_PROPERTY": {
     "comment": "属性值{+:Amount}",
     "params": {
       "Amount": "signed",
       "Key": "skip"
-    }
+    },
+    "name_template": "ADJUST_PROPERTY_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_PURCHASE_COST": {
     "comment": "{UnitType}购买费用{+:Amount}%",
     "params": {
       "Amount": "signed",
       "UnitType": "text"
-    }
+    },
+    "name_template": "ADJUST_UNIT_PURCHASE_COST_{UnitType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_RAIDING": {
-    "comment": "海岸劫掠收益{+:Bonus}",
+    "comment": "海岸劫掠收益{+:Bonus}{CanRaid?可劫掠:不可劫掠}",
     "params": {
       "Bonus": "signed",
       "CanRaid": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_RAIDING_{:Bonus}"
   },
   "EFFECT_ADJUST_UNIT_RELIC_UPON_DEATH": {
     "comment": "死亡掉落圣遗物",
     "params": {
       "RelicSource": "text"
-    }
+    },
+    "name_template": "ADJUST_RELIC_UPON_DEATH_{RelicSource}"
   },
   "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_DISTRICT": {
     "comment": "{DistrictType}表演等级+{Amount}",
     "params": {
       "Amount": "signed",
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_ROCK_BAND_LEVEL_{DistrictType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_IMPROVEMENT": {
     "comment": "{ImprovementType}表演等级+{Amount}",
     "params": {
       "Amount": "signed",
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADJUST_ROCK_BAND_LEVEL_{ImprovementType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATIONAL_PARK": {
     "comment": "国家公园表演等级+{Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ROCK_BAND_LEVEL_NATIONAL_PARK_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATURAL_WONDER": {
     "comment": "自然奇观表演等级+{Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_ROCK_BAND_LEVEL_NATURAL_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_ROCK_BAND_TOURISM_BOMB_VALUE_PEACE": {
     "comment": "和平时期旅游业绩炸弹{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_PEACE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SEA_MOVEMENT": {
     "comment": "海洋移动力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SEA_MOVEMENT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SEE_HIDDEN": {
-    "comment": "侦测隐形单位",
+    "comment": "{SeeHidden?侦测隐形单位:正常}",
     "params": {
       "SeeHidden": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_SEE_HIDDEN"
   },
   "EFFECT_ADJUST_UNIT_SEE_THROUGH_FEATURES": {
-    "comment": "透过地貌视野",
+    "comment": "{CanSee?透过地貌视野:正常}",
     "params": {
       "CanSee": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_SEE_THROUGH_FEATURES"
   },
   "EFFECT_ADJUST_UNIT_SEE_THROUGH_TERRAIN": {
-    "comment": "透过地形视野",
+    "comment": "{CanSee?透过地形视野:正常}",
     "params": {
       "CanSee": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_SEE_THROUGH_TERRAIN"
   },
   "EFFECT_ADJUST_UNIT_SIGHT": {
     "comment": "视野{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SIGHT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SPREAD_CHARGES": {
     "comment": "宗教传播次数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPREAD_CHARGES_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ADJACENT_LEVEL_BOOST": {
     "comment": "反间谍相邻等级{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_COUNTERSPY_ADJACENT_LEVEL_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ENTIRE_CITY": {
-    "comment": "反间谍覆盖全城",
+    "comment": "{EntireCity?反间谍覆盖全城:正常}",
     "params": {
       "EntireCity": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_COUNTERSPY_ENTIRE_CITY"
   },
   "EFFECT_ADJUST_UNIT_SPY_ESTABLISH_TIME": {
     "comment": "间谍建立时间{+:ReductionPercent}%",
     "params": {
       "ReductionPercent": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPY_ESTABLISH_TIME_{:ReductionPercent}"
   },
   "EFFECT_ADJUST_UNIT_SPY_OFFENSIVE_OPERATION_TIME": {
     "comment": "间谍攻击行动时间{+:ReductionPercent}%",
     "params": {
       "ReductionPercent": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPY_OFFENSIVE_OP_TIME_{:ReductionPercent}"
   },
   "EFFECT_ADJUST_UNIT_SPY_OPERATION_CHANCE": {
-    "comment": "{OperationType}成功率{+:Amount}%",
+    "comment": "{OperationType}{Offensive?进攻:防守}成功率{+:Amount}%",
     "params": {
       "Amount": "signed",
       "Offensive": "bool_hide",
       "OperationType": "text"
-    }
+    },
+    "name_template": "ADJUST_SPY_OP_CHANCE_{OperationType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SPY_OPERATION_TIME": {
     "comment": "{OperationType}时间{+:ReductionPercent}%",
     "params": {
       "OperationType": "text",
       "ReductionPercent": "signed"
-    }
+    },
+    "name_template": "ADJUST_SPY_OP_TIME_{OperationType}_{:ReductionPercent}"
   },
   "EFFECT_ADJUST_UNIT_STRENGTH_FROM_CITY_CULTURAL_IDENTITY": {
     "comment": "城市文化影响提供战斗力",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_STRENGTH_FROM_CITY_CULTURAL_IDENTITY"
   },
   "EFFECT_ADJUST_UNIT_STRENGTH_REDUCTION_FOR_DAMAGE_MODIFIER": {
     "comment": "受伤减战力系数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_STRENGTH_REDUCTION_FOR_DAMAGE_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_SUPPORT_BONUS_MODIFIER": {
     "comment": "支援加成{+:Percent}%",
     "params": {
       "Percent": "signed"
-    }
+    },
+    "name_template": "ADJUST_SUPPORT_BONUS_{:Percent}"
   },
   "EFFECT_ADJUST_UNIT_TAG_ERA_PRODUCTION": {
     "comment": "{EraType}时代{UnitPromotionClass}生产力{+:Amount}%",
@@ -3434,94 +3977,109 @@
       "Amount": "signed",
       "EraType": "text",
       "UnitPromotionClass": "text"
-    }
+    },
+    "name_template": "ADJUST_TAG_ERA_PRODUCTION_{UnitPromotionClass}_{EraType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_CONVERT_CITY": {
     "comment": "旅游业绩炸弹转化城市",
     "params": {
       "Convert": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_CONVERT_CITY"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_DISTRICT": {
     "comment": "{DistrictType}旅游业绩炸弹{+:Amount}",
     "params": {
       "Amount": "signed",
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_{DistrictType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_IMPROVEMENT": {
     "comment": "{ImprovementType}旅游业绩炸弹{+:Amount}",
     "params": {
       "Amount": "signed",
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_{ImprovementType}_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATIONAL_PARK": {
     "comment": "国家公园旅游业绩炸弹{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_NATIONAL_PARK_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATURAL_WONDER": {
     "comment": "自然奇观旅游业绩炸弹{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_NATURAL_WONDER_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_TOURISM_BOMB_RANGE": {
     "comment": "旅游业绩炸弹范围{Range}",
     "params": {
       "Modifier": "text",
       "Range": "unsigned"
-    }
+    },
+    "name_template": "ADJUST_TOURISM_BOMB_RANGE_{Modifier}"
   },
   "EFFECT_ADJUST_UNIT_TRADE_ROUTE_PLUNDER_IMMUNITY": {
     "comment": "{DomainType}商路免遭劫掠",
     "params": {
       "DomainType": "text"
-    }
+    },
+    "name_template": "ADJUST_TRADE_ROUTE_PLUNDER_IMMUNITY_{DomainType}"
   },
   "EFFECT_ADJUST_UNIT_UPGRADE_GOODY_HUT": {
     "comment": "升级获得部落村庄{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_UPGRADE_GOODY_HUT_{:Amount}"
   },
   "EFFECT_ADJUST_UNIT_VALID_TERRAIN": {
-    "comment": "{TerrainType}地形有效",
+    "comment": "{TerrainType}地形{Valid?有效:无效}",
     "params": {
       "TerrainType": "text",
       "Valid": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_VALID_TERRAIN_{TerrainType}"
   },
   "EFFECT_ADJUST_UNIT_WATER_DAMAGE_PROTECTION": {
     "comment": "免疫水害",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_WATER_DAMAGE_PROTECTION"
   },
   "EFFECT_ADJUST_UNIT_WMD_PROTECTION": {
     "comment": "免疫核武器",
     "params": {
       "Blast": "bool_hide",
       "Fallout": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_WMD_PROTECTION"
   },
   "EFFECT_ADJUST_UNIT_YIELD_PER_TOURISM_BOMB": {
     "comment": "每次旅游业绩炸弹获得{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_PER_TOURISM_BOMB_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_VALID_FEATURES_DISTRICTS": {
     "comment": "{DistrictType}可建在{FeatureType}上",
     "params": {
       "DistrictType": "text",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_VALID_FEATURES_DISTRICTS_{DistrictType}_{FeatureType}"
   },
   "EFFECT_ADJUST_VALID_FEATURES_WONDERS": {
     "comment": "奇观可建在任何地貌上",
-    "params": {}
+    "params": {},
+    "name_template": "ADJUST_VALID_FEATURES_WONDERS"
   },
   "EFFECT_ADJUST_WAR_WEARINESS": {
     "comment": "厌战度{+:Amount}",
@@ -3530,157 +4088,184 @@
       "Domestic": "bool_hide",
       "Enemy": "bool_hide",
       "Overall": "bool_hide"
-    }
+    },
+    "name_template": "ADJUST_WAR_WEARINESS_{:Amount}"
   },
   "EFFECT_ADJUST_WATER_HOUSING": {
     "comment": "水源住房{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_WATER_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_WONDER_ADJACENT_NATURAL_WONDER_PRODUCTION": {
     "comment": "相邻{FeatureType}奇观生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "ADJUST_ADJACENT_NATURAL_WONDER_{FeatureType}_{:Amount}"
   },
   "EFFECT_ADJUST_WONDER_ERA_PRODUCTION": {
-    "comment": "{StartEra}至{EndEra}奇观生产力{+:Amount}%",
+    "comment": "{StartEra}至{EndEra}{IsWonder?奇观:非奇观}生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "EndEra": "text",
       "IsWonder": "bool_hide",
       "StartEra": "text"
-    }
+    },
+    "name_template": "ADJUST_WONDER_ERA_PRODUCTION_{StartEra}_{EndEra}_{:Amount}"
   },
   "EFFECT_ADJUST_WONDER_PRODUCTION": {
     "comment": "建造奇观生产力{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_WONDER_PRODUCTION_{:Amount}"
   },
   "EFFECT_ADJUST_WONDER_YIELD_CHANGE": {
     "comment": "奇观{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_WONDER_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_YIELD_BY_NUMBER_OF_RESOURCES": {
     "comment": "每种资源{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_BY_RESOURCES_{YieldType}_{:Amount}"
   },
   "EFFECT_ADOPT_ALLY_FOUNDED_RELIGIONS": {
-    "comment": "接纳盟友创立的宗教",
+    "comment": "{Adopt?可接纳:不可接纳}盟友创立的宗教",
     "params": {
       "Adopt": "bool_hide"
-    }
+    },
+    "name_template": "ADOPT_ALLY_FOUNDED_RELIGIONS"
   },
   "EFFECT_ALLIANCE_CULTURE_SHARING": {
     "comment": "同盟文化共享{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_CULTURE_SHARING_{:Amount}"
   },
   "EFFECT_ALLIANCE_ENVOY_POINTS_FROM_ALLY_TRIBUTARIES": {
     "comment": "同盟城邦使者点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_ENVOY_TRIBUTARIES_{:Amount}"
   },
   "EFFECT_ALLIANCE_GRANT_SHARED_VIS": {
     "comment": "同盟共享视野",
-    "params": {}
+    "params": {},
+    "name_template": "ALLIANCE_GRANT_SHARED_VIS"
   },
   "EFFECT_ALLIANCE_PRESSURE_FROM_NO_ALLY_RELIGION": {
     "comment": "非同盟宗教压力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_RELIGION_PRESSURE_NO_ALLY_{:Amount}"
   },
   "EFFECT_ALLIANCE_RESEARCH_AGREEMENT": {
     "comment": "同盟研究协定{+:Amount}%",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_RESEARCH_AGREEMENT_{:Amount}"
   },
   "EFFECT_ALLIANCE_SCIENCE_SHARING": {
     "comment": "同盟科研共享{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_SCIENCE_SHARING_{:Amount}"
   },
   "EFFECT_ALLIANCE_SHARE_SUZERAIN": {
     "comment": "同盟共享宗主国加成",
-    "params": {}
+    "params": {},
+    "name_template": "ALLIANCE_SHARE_SUZERAIN"
   },
   "EFFECT_ALLIANCE_TOURISM_SHARING": {
     "comment": "同盟旅游业绩共享{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ALLIANCE_TOURISM_SHARING_{:Amount}"
   },
   "EFFECT_ALLIANCE_YIELD_INCOME_FROM_ALLY_RELIGION": {
     "comment": "同盟宗教提供{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ALLIANCE_YIELD_ALLY_RELIGION_{YieldType}_{:Amount}"
   },
   "EFFECT_ATTACH_MODIFIER": {
     "comment": "附加{ModifierId}",
     "params": {
       "ModifierId": "modifier_ref"
-    }
+    },
+    "name_template": "ATTACH_MODIFIER"
   },
   "EFFECT_ATTACH_MODIFIER_IF_PROMOTION_CLASS_MATCHES": {
     "comment": "晋升等级{+:Amount}时附加修饰器",
     "params": {
       "Amount": "signed",
       "ModifierId": "modifier_ref"
-    }
+    },
+    "name_template": "ATTACH_MODIFIER_IF_PROMOTION_CLASS_{:Amount}"
   },
   "EFFECT_ATTACH_MODIFIER_TO_MINORCIVBONUSTYPE": {
     "comment": "附加城邦加成修饰器",
     "params": {
       "ModifierId": "skip"
-    }
+    },
+    "name_template": "ATTACH_MODIFIER_TO_MINORCIVBONUSTYPE"
   },
   "EFFECT_ATTACH_MODIFIER_TO_PLAYERTYPE": {
     "comment": "附加玩家修饰器",
     "params": {
       "ModifierId": "skip"
-    }
+    },
+    "name_template": "ATTACH_MODIFIER_TO_PLAYERTYPE"
   },
   "EFFECT_ATTACH_UNIT_MODIFIER": {
     "comment": "附加单位修饰器",
-    "params": {}
+    "params": {},
+    "name_template": "ATTACH_UNIT_MODIFIER"
   },
   "EFFECT_BECOME_CITY_SUZERAIN": {
     "comment": "成为城市宗主国",
     "params": {
       "RemoveOthers": "bool_hide"
-    }
+    },
+    "name_template": "BECOME_CITY_SUZERAIN"
   },
   "EFFECT_CHANGE_UNIT_OPERATION_AVAILABILITY": {
     "comment": "改变单位行动可用性",
-    "params": {}
+    "params": {},
+    "name_template": "CHANGE_UNIT_OPERATION_AVAILABILITY"
   },
   "EFFECT_CITY_GRANT_RANDOM_RESOURCE_PRODUCT": {
     "comment": "城市随机获得资源产物",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_RANDOM_RESOURCE_PRODUCT"
   },
   "EFFECT_CITY_RECOMMISSION_REACTOR": {
     "comment": "城市重启核反应堆",
-    "params": {}
+    "params": {},
+    "name_template": "RECOMMISSION_REACTOR"
   },
   "EFFECT_CITY_REMOVE_OTHER_RELIGIONS": {
     "comment": "移除城市其他宗教",
-    "params": {}
+    "params": {},
+    "name_template": "REMOVE_OTHER_RELIGIONS"
   },
   "EFFECT_DIPLOMACY_AGENDA_ANGEVIN_EMPIRE": {
     "comment": "安茹帝国议程：人口比较",
@@ -3690,7 +4275,8 @@
       "LowPopulationThreshold": "unsigned",
       "StatementKey": "skip",
       "TopRankingDiploMod": "signed"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_ANGEVIN_EMPIRE"
   },
   "EFFECT_DIPLOMACY_AGENDA_ARCHIPELAGIC_STATE": {
     "comment": "群岛议程：岛屿规模",
@@ -3703,29 +4289,34 @@
       "MaxTilesSmallIsland": "unsigned",
       "ReductionTurns": "unsigned",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_ARCHIPELAGIC_STATE"
   },
   "EFFECT_DIPLOMACY_AGENDA_AYYUBID_DYNASTY": {
     "comment": "阿尤布王朝议程",
-    "params": {}
+    "params": {},
+    "name_template": "DIPLOMACY_AGENDA_AYYUBID_DYNASTY"
   },
   "EFFECT_DIPLOMACY_AGENDA_BLACK_QUEEN": {
     "comment": "黑皇后议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_BLACK_QUEEN"
   },
   "EFFECT_DIPLOMACY_AGENDA_BULL_MOOSE": {
     "comment": "公牛麋鹿议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_BULL_MOOSE"
   },
   "EFFECT_DIPLOMACY_AGENDA_BUSHIDO": {
     "comment": "武士道议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_BUSHIDO"
   },
   "EFFECT_DIPLOMACY_AGENDA_CANADIAN_EXPEDITIONARY": {
     "comment": "加拿大远征议程：竞技排名",
@@ -3735,7 +4326,8 @@
       "StatementKey": "skip",
       "TopPercentage": "unsigned",
       "TopRankingDiploMod": "signed"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_CANADIAN_EXPEDITIONARY"
   },
   "EFFECT_DIPLOMACY_AGENDA_END_TO_SUFFERING": {
     "comment": "终结苦难议程：圣地和城市比例",
@@ -3747,17 +4339,20 @@
       "StatementKey": "skip",
       "TargetHolySitePercentage": "unsigned",
       "TargetLargeCityPercentage": "unsigned"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_END_TO_SUFFERING"
   },
   "EFFECT_DIPLOMACY_AGENDA_ENVIRONMENT": {
     "comment": "环保议程",
-    "params": {}
+    "params": {},
+    "name_template": "DIPLOMACY_AGENDA_ENVIRONMENT"
   },
   "EFFECT_DIPLOMACY_AGENDA_ETHIOPIAN_HIGHLANDS": {
     "comment": "埃塞俄比亚高地议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_ETHIOPIAN_HIGHLANDS"
   },
   "EFFECT_DIPLOMACY_AGENDA_EXPLOITATIVE": {
     "comment": "开发议程",
@@ -3775,7 +4370,8 @@
       "TileImprovementHighThreshold": "skip",
       "TileImprovementLowThreshold": "skip",
       "TileImprovementPreferenceValue": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_EXPLOITATIVE"
   },
   "EFFECT_DIPLOMACY_AGENDA_FLAT_EARTHER": {
     "comment": "地平论者议程",
@@ -3787,7 +4383,8 @@
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_FLAT_EARTHER"
   },
   "EFFECT_DIPLOMACY_AGENDA_HORN_CHEST_LOINS": {
     "comment": "财富议程",
@@ -3799,7 +4396,8 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_HORN_CHEST_LOINS"
   },
   "EFFECT_DIPLOMACY_AGENDA_HORSE_LORD": {
     "comment": "{PromotionClass1}与{PromotionClass2}骑兵议程",
@@ -3811,7 +4409,8 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_HORSE_LORD"
   },
   "EFFECT_DIPLOMACY_AGENDA_KAITIAKITANGA": {
     "comment": "守护议程",
@@ -3822,13 +4421,15 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_KAITIAKITANGA"
   },
   "EFFECT_DIPLOMACY_AGENDA_KUBLAI_PAX": {
     "comment": "忽必烈和平议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_KUBLAI_PAX"
   },
   "EFFECT_DIPLOMACY_AGENDA_LAST_VIKING_KING": {
     "comment": "最后维京王议程",
@@ -3838,7 +4439,8 @@
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip",
       "TopMilitaryBonus": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_LAST_VIKING_KING"
   },
   "EFFECT_DIPLOMACY_AGENDA_LAWGIVER": {
     "comment": "立法者议程",
@@ -3849,7 +4451,8 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_LAWGIVER"
   },
   "EFFECT_DIPLOMACY_AGENDA_LORD_OF_MINES": {
     "comment": "矿主议程",
@@ -3860,13 +4463,15 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_LORD_OF_MINES"
   },
   "EFFECT_DIPLOMACY_AGENDA_MAGNIFICENCES": {
     "comment": "宏伟议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_MAGNIFICENCES"
   },
   "EFFECT_DIPLOMACY_AGENDA_OPPORTUNIST": {
     "comment": "机会主义者议程",
@@ -3876,7 +4481,8 @@
       "RecentSurpriseWarBonus": "skip",
       "StatementKey": "skip",
       "SurpriseWarDegradeTurns": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_OPPORTUNIST"
   },
   "EFFECT_DIPLOMACY_AGENDA_OPTIMUS_PRINCEPS": {
     "comment": "第一公民议程",
@@ -3886,14 +4492,16 @@
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip",
       "TopTerritoryBonus": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_OPTIMUS_PRINCEPS"
   },
   "EFFECT_DIPLOMACY_AGENDA_PARANOID": {
     "comment": "偏执狂议程",
     "params": {
       "HiddenAgenda": "bool_hide",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_PARANOID"
   },
   "EFFECT_DIPLOMACY_AGENDA_PATRON_OF_ARTS": {
     "comment": "艺术赞助人议程",
@@ -3903,7 +4511,8 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_PATRON_OF_ARTS"
   },
   "EFFECT_DIPLOMACY_AGENDA_PERPETUALLY_ON_GUARD": {
     "comment": "枕戈待旦议程",
@@ -3911,13 +4520,15 @@
       "PenaltyPerOccupiedCity": "skip",
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_PERPETUALLY_ON_GUARD"
   },
   "EFFECT_DIPLOMACY_AGENDA_QUEEN_OF_NILE": {
     "comment": "尼罗河女王议程",
     "params": {
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_QUEEN_OF_NILE"
   },
   "EFFECT_DIPLOMACY_AGENDA_RAVEN_BANNER": {
     "comment": "渡鸦旗帜议程",
@@ -3927,7 +4538,8 @@
       "StatementKey": "skip",
       "TopPercentage": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_RAVEN_BANNER"
   },
   "EFFECT_DIPLOMACY_AGENDA_SHORT_LIFE_GLORY": {
     "comment": "短命荣耀议程",
@@ -3938,7 +4550,8 @@
       "NotAtWarPenalty": "skip",
       "SinceWarPenaltyTurns": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_SHORT_LIFE_GLORY"
   },
   "EFFECT_DIPLOMACY_AGENDA_SIMON_BOLIVAR": {
     "comment": "西蒙·玻利瓦尔议程",
@@ -3949,11 +4562,13 @@
       "ScorePerStep": "skip",
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_SIMON_BOLIVAR"
   },
   "EFFECT_DIPLOMACY_AGENDA_TRIEU_DEFENDER": {
     "comment": "赵妪守卫议程",
-    "params": {}
+    "params": {},
+    "name_template": "DIPLOMACY_AGENDA_TRIEU_DEFENDER"
   },
   "EFFECT_DIPLOMACY_AGENDA_TURTLER": {
     "comment": "龟缩者议程",
@@ -3963,7 +4578,8 @@
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_TURTLER"
   },
   "EFFECT_DIPLOMACY_AGENDA_WITH_SHIELD_OR_ON_IT": {
     "comment": "携盾归来议程",
@@ -3981,7 +4597,8 @@
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_SHIELD_ON_IT"
   },
   "EFFECT_DIPLOMACY_AGENDA_ZEALOT": {
     "comment": "狂热者议程",
@@ -3990,7 +4607,8 @@
       "HiddenAgenda": "bool_hide",
       "StatementKey": "skip",
       "TopRankingDiploMod": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_ZEALOT"
   },
   "EFFECT_DIPLOMACY_ARCHAEOLOGY": {
     "comment": "考古外交",
@@ -4001,7 +4619,8 @@
       "MessageThrottle": "skip",
       "ModifierPerTransgression": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_ARCHAEOLOGY"
   },
   "EFFECT_DIPLOMACY_BROKEN_PLEDGE": {
     "comment": "违背誓约外交",
@@ -4011,7 +4630,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_BROKEN_PLEDGE"
   },
   "EFFECT_DIPLOMACY_BROKEN_PROMISE": {
     "comment": "违背承诺外交",
@@ -4021,7 +4641,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_BROKEN_PROMISE"
   },
   "EFFECT_DIPLOMACY_CULTURAL_ID": {
     "comment": "文化认同外交",
@@ -4031,7 +4652,8 @@
       "ScorePerCity": "skip",
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_CULTURAL_ID"
   },
   "EFFECT_DIPLOMACY_ESPIONAGE": {
     "comment": "间谍外交",
@@ -4044,7 +4666,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_ESPIONAGE"
   },
   "EFFECT_DIPLOMACY_FORCE_INCURSION": {
     "comment": "武力入侵外交",
@@ -4052,7 +4675,8 @@
       "IncrementValue": "skip",
       "InitialValue": "skip",
       "ReductionValue": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_FORCE_INCURSION"
   },
   "EFFECT_DIPLOMACY_GOVERNMENTS": {
     "comment": "政体外交",
@@ -4060,7 +4684,8 @@
       "IncrementTurns": "skip",
       "IncrementValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_GOVERNMENTS"
   },
   "EFFECT_DIPLOMACY_KEPT_PLEDGE": {
     "comment": "遵守誓约外交",
@@ -4071,7 +4696,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_KEPT_PLEDGE"
   },
   "EFFECT_DIPLOMACY_KEPT_PROMISE": {
     "comment": "遵守承诺外交",
@@ -4082,7 +4708,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_KEPT_PROMISE"
   },
   "EFFECT_DIPLOMACY_NEW_WARMONGER": {
     "comment": "新战狂外交",
@@ -4091,7 +4718,8 @@
       "PercentOfGrievances": "skip",
       "ReductionTurns": "skip",
       "ReductionValue": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_NEW_WARMONGER"
   },
   "EFFECT_DIPLOMACY_NO_PLEDGE": {
     "comment": "无誓约外交",
@@ -4101,7 +4729,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_NO_PLEDGE"
   },
   "EFFECT_DIPLOMACY_NO_PROMISE": {
     "comment": "无承诺外交",
@@ -4111,7 +4740,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_NO_PROMISE"
   },
   "EFFECT_DIPLOMACY_ONE_SIDED_TRADES": {
     "comment": "不平等贸易外交",
@@ -4121,7 +4751,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "TradeValuePerModifierPoint": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_ONE_SIDED_TRADES"
   },
   "EFFECT_DIPLOMACY_RANDOM": {
     "comment": "随机外交",
@@ -4129,7 +4760,8 @@
       "DifficultyOffset": "skip",
       "ReductionTurns": "skip",
       "ReductionValue": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_RANDOM"
   },
   "EFFECT_DIPLOMACY_SETTLED_CITIES": {
     "comment": "定居城市外交",
@@ -4141,7 +4773,8 @@
       "ReductionTurns": "skip",
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_SETTLED_CITIES"
   },
   "EFFECT_DIPLOMACY_SIMPLE_EFFECT": {
     "comment": "简单外交效果",
@@ -4159,7 +4792,8 @@
       "ReductionValue": "skip",
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_SIMPLE_EFFECT"
   },
   "EFFECT_DIPLOMACY_THIRD_PARTY_EFFECTS": {
     "comment": "第三方效果：{EffectType}",
@@ -4170,14 +4804,16 @@
       "InitialValue": "skip",
       "MaxEffectMagnitude": "skip",
       "SimpleModifierDescription": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_THIRD_PARTY_EFFECTS_{EffectType}"
   },
   "EFFECT_DIPLOMACY_THIRD_PARTY_WARMONGER": {
     "comment": "第三方战狂外交",
     "params": {
       "LowerLimit": "skip",
       "PercentOfGrievancesDelta": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_THIRD_PARTY_WARMONGER"
   },
   "EFFECT_DIPLOMACY_TRADE_RELATIONS": {
     "comment": "贸易关系外交",
@@ -4188,19 +4824,22 @@
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip",
       "TradeBonus": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_TRADE_RELATIONS"
   },
   "EFFECT_DISABLE_PLAYER_GRIEVANCE_DECAY": {
-    "comment": "禁用玩家不满衰减",
+    "comment": "{Disable?禁用:启用}玩家不满衰减",
     "params": {
       "Disable": "bool_hide"
-    }
+    },
+    "name_template": "DISABLE_PLAYER_GRIEVANCE_DECAY"
   },
   "EFFECT_DISTRICT_ADD_NAVAL_UNIT": {
     "comment": "区域添加海军单位：{DistrictType}",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ADD_DISTRICT_NAVAL_UNIT_{DistrictType}"
   },
   "EFFECT_DISTRICT_ADJACENCY": {
     "comment": "{DistrictType}{YieldType}相邻加成{+:Amount}",
@@ -4210,51 +4849,60 @@
       "DistrictType": "text",
       "TilesRequired": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_DISTRICT_ADJACENCY_{YieldType}_{:Amount}"
   },
   "EFFECT_DO_NOTHING": {
     "comment": "空效果",
-    "params": {}
+    "params": {},
+    "name_template": "DO_NOTHING"
   },
   "EFFECT_ENABLE_BUILDING_FAITH_PURCHASE": {
     "comment": "启用信仰购买建筑：{DistrictType}",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "ENABLE_BUILDING_FAITH_PURCHASE_{DistrictType}"
   },
   "EFFECT_ENABLE_RELIGION_AUTO_SPREAD": {
-    "comment": "启用宗教自动传播",
+    "comment": "{Enable?启用:禁用}宗教自动传播",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ENABLE_RELIGION_AUTO_SPREAD"
   },
   "EFFECT_ENABLE_RELIGION_AWARDS_ENVOY": {
-    "comment": "启用宗教授予使者",
+    "comment": "{Enable?启用:禁用}宗教授予使者",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "ENABLE_RELIGION_AWARDS_ENVOY"
   },
   "EFFECT_ENABLE_RELIGION_AWARDS_ENVOY_RELIGIOUS_PRESSURE": {
     "comment": "宗教使者压力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ENABLE_RELIGIOUS_ENVOY_PRESSURE_{:Amount}"
   },
   "EFFECT_ENABLE_SPECIFIC_BUILDING_FAITH_PURCHASE": {
     "comment": "启用信仰购买{BuildingType}",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "ENABLE_BUILDING_FAITH_PURCHASE_{BuildingType}"
   },
   "EFFECT_ENABLE_UNIT_FAITH_PURCHASE": {
     "comment": "启用信仰购买单位：{Tag}",
     "params": {
       "Tag": "text"
-    }
+    },
+    "name_template": "ENABLE_UNIT_FAITH_PURCHASE_{Tag}"
   },
   "EFFECT_EXPLORE_ENTIRE_MAP": {
     "comment": "探索全图",
-    "params": {}
+    "params": {},
+    "name_template": "EXPLORE_ENTIRE_MAP"
   },
   "EFFECT_FEATURE_ADJACENCY": {
     "comment": "{FeatureType}{DistrictType}{YieldType}相邻加成{+:Amount}",
@@ -4265,53 +4913,62 @@
       "FeatureType": "text",
       "TilesRequired": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_FEATURE_ADJACENCY_{YieldType}_{:Amount}"
   },
   "EFFECT_GOVERNOR_ADJUST_CITY_COPY_LUXURIES_FOR_IMPORT": {
     "comment": "总督复制奢侈资源进口",
-    "params": {}
+    "params": {},
+    "name_template": "GOVERNOR_COPY_LUXURIES_IMPORT"
   },
   "EFFECT_GOVERNOR_ADJUST_CITY_COPY_STRATEGICS_FOR_IMPORT": {
     "comment": "总督复制战略资源进口",
-    "params": {}
+    "params": {},
+    "name_template": "GOVERNOR_COPY_STRATEGICS_IMPORT"
   },
   "EFFECT_GOVERNOR_ADJUST_CITY_TOKENS_GRANTED": {
     "comment": "总督使者数量{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GOVERNOR_TOKENS_{:Amount}"
   },
   "EFFECT_GOVERNOR_ADJUST_CITY_TOKENS_GRANTED_MODIFIER": {
     "comment": "总督使者效率{+:Percent}%",
     "params": {
       "Percent": "signed"
-    }
+    },
+    "name_template": "GOVERNOR_TOKENS_MODIFIER_{:Percent}"
   },
   "EFFECT_GOVERNOR_ADJUST_IDENITITY_PER_TITLE": {
     "comment": "总督头衔影响力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GOVERNOR_IDENTITY_{:Amount}"
   },
   "EFFECT_GRANT_ABILITY": {
     "comment": "授予能力：{AbilityType}",
     "params": {
       "AbilityType": "text",
       "ModifierId": "modifier_ref"
-    }
+    },
+    "name_template": "GRANT_ABILITY_{AbilityType}"
   },
   "EFFECT_GRANT_AIR_SLOTS": {
     "comment": "授予飞机槽位{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_AIR_SLOTS_{:Amount}"
   },
   "EFFECT_GRANT_ALL_TECHNOLOGY_BOOST_BY_ERA": {
     "comment": "授予{StartEraType}至{EndEraType}科技加速",
     "params": {
       "EndEraType": "text",
       "StartEraType": "text"
-    }
+    },
+    "name_template": "GRANT_TECH_BOOST_{StartEraType}_{EndEraType}"
   },
   "EFFECT_GRANT_BOOST_WITH_GREAT_PERSON": {
     "comment": "伟人加速：{GreatPersonClass}",
@@ -4319,43 +4976,51 @@
       "GreatPersonClass": "text",
       "OtherPlayers": "skip",
       "TechBoost": "skip"
-    }
+    },
+    "name_template": "GRANT_BOOST_GREAT_PERSON_{GreatPersonClass}"
   },
   "EFFECT_GRANT_BUILDING_IN_CITY": {
     "comment": "授予城市免费建筑",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_BUILDING_IN_CITY"
   },
   "EFFECT_GRANT_BUILDING_IN_CITY_IGNORE": {
     "comment": "授予城市{BuildingType}（忽略前提）",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "GRANT_BUILDING_IGNORE_{BuildingType}"
   },
   "EFFECT_GRANT_CHEAPEST_BUILDING_IN_CITY": {
     "comment": "授予城市最便宜建筑x{Amount}",
     "params": {
       "Amount": "unsigned"
-    }
+    },
+    "name_template": "GRANT_CHEAPEST_BUILDING_{Amount}"
   },
   "EFFECT_GRANT_CITY_LOYALTY": {
     "comment": "授予城市忠诚度{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_CITY_LOYALTY_{:Amount}"
   },
   "EFFECT_GRANT_CITY_OWNER_INFLUENCE_TOKEN_WONDER": {
     "comment": "奇观授予使者{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_INFLUENCE_WONDER_{:Amount}"
   },
   "EFFECT_GRANT_CITY_ROAD_TO_CAPITAL": {
-    "comment": "授予城市通往首都道路",
-    "params": {}
+    "comment": "城市自动生成通往首都的道路",
+    "params": {},
+    "name_template": "CITY_ROAD_TO_CAPITAL"
   },
   "EFFECT_GRANT_CITY_TRADING_POST": {
     "comment": "授予城市贸易站",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_CITY_TRADING_POST"
   },
   "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST": {
     "comment": "建筑造价返还{YieldType}{+:BuildingProductionPercent}%",
@@ -4363,165 +5028,192 @@
       "BuildingProductionPercent": "signed",
       "IncludeWonder": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_BUILDING_COST_{YieldType}_{:BuildingProductionPercent}"
   },
   "EFFECT_GRANT_CITY_YIELD_PERCENT_UNIT_CREATED_COST": {
     "comment": "单位造价返还{YieldType}{+:UnitProductionPercent}%",
     "params": {
       "UnitProductionPercent": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_COST_{YieldType}_{:UnitProductionPercent}"
   },
   "EFFECT_GRANT_COMBAT_ADJACENCY": {
     "comment": "授予相邻战斗力加成",
     "params": {
       "Enable": "bool_true"
-    }
+    },
+    "name_template": "GRANT_COMBAT_ADJACENCY"
   },
   "EFFECT_GRANT_FOUND_FOREIGN_CITY_TRADE_ROUTE_CAPACITY": {
     "comment": "授予外国城市商路容量{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_FOREIGN_TRADE_CAPACITY_{:Amount}"
   },
   "EFFECT_GRANT_FREE_ENVOYS_HERE": {
     "comment": "授予免费使者{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_FREE_ENVOYS_{:Amount}"
   },
   "EFFECT_GRANT_FREE_RESOURCE_EXTRACTED": {
     "comment": "提取{ResourceType}时获得{Amount}份",
     "params": {
       "Amount": "unsigned",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "GRANT_RESOURCE_EXTRACTED_{ResourceType}_{Amount}"
   },
   "EFFECT_GRANT_FREE_RESOURCE_FROM_UNIT_PLOT": {
     "comment": "单位所在格获得{Amount}份资源",
     "params": {
       "Amount": "unsigned"
-    }
+    },
+    "name_template": "GRANT_RESOURCE_UNIT_PLOT_{Amount}"
   },
   "EFFECT_GRANT_FREE_RESOURCE_IN_CITY": {
     "comment": "授予城市{Amount}份{ResourceType}",
     "params": {
       "Amount": "unsigned",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "GRANT_RESOURCE_CITY_{ResourceType}_{Amount}"
   },
   "EFFECT_GRANT_FREE_RESOURCE_VISIBILITY": {
     "comment": "授予{ResourceType}资源视野",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "GRANT_RESOURCE_VISIBILITY_{ResourceType}"
   },
   "EFFECT_GRANT_GOLDEN_AGE_TRADE_ROUTE_CAPACITY": {
     "comment": "黄金时代商路容量{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_GOLDEN_AGE_TRADE_{:Amount}"
   },
   "EFFECT_GRANT_GREAT_PERSON_CLASS_IN_CITY": {
     "comment": "授予城市{GreatPersonClassType}伟人点数{+:Amount}",
     "params": {
       "Amount": "signed",
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "GRANT_GREAT_PERSON_{GreatPersonClassType}_{:Amount}"
   },
   "EFFECT_GRANT_HEAL_AFTER_ACTION": {
     "comment": "行动后恢复生命",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_HEAL_AFTER_ACTION"
   },
   "EFFECT_GRANT_INFLUENCE_TOKEN": {
     "comment": "授予影响力点数{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_INFLUENCE_TOKEN_{:Amount}"
   },
   "EFFECT_GRANT_INFLUENCE_TOKEN_LEVY_MILITARY": {
     "comment": "征召军队授予影响力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_INFLUENCE_LEVY_{:Amount}"
   },
   "EFFECT_GRANT_PLAYER_FAITH_FROM_HARVEST": {
     "comment": "收获时授予信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_FAITH_HARVEST_{:Amount}"
   },
   "EFFECT_GRANT_PLAYER_FAITH_FROM_REMOVE_FEATURE": {
     "comment": "移除地貌时授予信仰{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_FAITH_REMOVE_FEATURE_{:Amount}"
   },
   "EFFECT_GRANT_PLAYER_FREE_RESOURCE_EXTRACTED": {
     "comment": "提取{ResourceType}时获得{Amount}份",
     "params": {
       "Amount": "unsigned",
       "ResourceType": "text"
-    }
+    },
+    "name_template": "GRANT_RESOURCE_EXTRACTED_{ResourceType}_{Amount}"
   },
   "EFFECT_GRANT_PLAYER_RANDOM_CIVIC": {
     "comment": "授予{Amount}个随机市政",
     "params": {
       "Amount": "unsigned"
-    }
+    },
+    "name_template": "GRANT_RANDOM_CIVIC_{Amount}"
   },
   "EFFECT_GRANT_PLAYER_RANDOM_TECHNOLOGY": {
     "comment": "授予{Amount}个随机科技",
     "params": {
       "Amount": "unsigned"
-    }
+    },
+    "name_template": "GRANT_RANDOM_TECH_{Amount}"
   },
   "EFFECT_GRANT_PLAYER_RELIGIOUS_PRESSURE_GREAT_PERSON_ACTIVATED": {
     "comment": "伟人激活时宗教压力{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_RELIGIOUS_PRESSURE_GP_{:Amount}"
   },
   "EFFECT_GRANT_PLAYER_SPECIFIC_TECHNOLOGY": {
     "comment": "授予{TechType}科技",
     "params": {
       "TechType": "text"
-    }
+    },
+    "name_template": "GRANT_TECH_{TechType}"
   },
   "EFFECT_GRANT_PLAYER_SPECIFIC_TECH_BOOST_GREAT_PERSON": {
     "comment": "伟人加速{TechType}",
     "params": {
       "GrantTechIfBoosted": "skip",
       "TechType": "text"
-    }
+    },
+    "name_template": "GRANT_GREAT_PERSON_TECH_{TechType}"
   },
   "EFFECT_GRANT_PLAYER_YIELD_PERCENT_UNIT_COST": {
     "comment": "单位造价返还{YieldType}{+:UnitCostPercent}%",
     "params": {
       "UnitCostPercent": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_COST_{YieldType}_{:UnitCostPercent}"
   },
   "EFFECT_GRANT_PLOT": {
     "comment": "授予地块",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_PLOT"
   },
   "EFFECT_GRANT_PRODUCTION_IN_CITY": {
     "comment": "授予城市生产力{+:Amount}",
     "params": {
       "Amount": "signed",
       "KeepOverflow": "skip"
-    }
+    },
+    "name_template": "GRANT_PRODUCTION_{:Amount}"
   },
   "EFFECT_GRANT_PROMOTION": {
     "comment": "授予{PromotionType}晋升",
     "params": {
       "PromotionType": "text"
-    }
+    },
+    "name_template": "GRANT_PROMOTION_{PromotionType}"
   },
   "EFFECT_GRANT_RANDOM_BASE_PROMOTION": {
     "comment": "授予随机基础晋升",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_RANDOM_PROMOTION"
   },
   "EFFECT_GRANT_RANDOM_CIVIC_BOOST_BY_ERA": {
     "comment": "授予{Amount}个{StartEraType}至{EndEraType}市政加速",
@@ -4529,14 +5221,16 @@
       "Amount": "unsigned",
       "EndEraType": "text",
       "StartEraType": "text"
-    }
+    },
+    "name_template": "GRANT_CIVIC_BOOST_{StartEraType}_{EndEraType}"
   },
   "EFFECT_GRANT_RANDOM_CIVIC_BOOST_ON_NEW_ERA": {
     "comment": "新时代授予{Amount}个随机市政加速",
     "params": {
       "Amount": "unsigned",
       "ApplyImmediately": "skip"
-    }
+    },
+    "name_template": "GRANT_CIVIC_NEW_ERA_{Amount}"
   },
   "EFFECT_GRANT_RANDOM_TECHNOLOGY_BOOST_BY_ERA": {
     "comment": "授予{Amount}个{StartEraType}至{EndEraType}科技加速",
@@ -4544,66 +5238,76 @@
       "Amount": "unsigned",
       "EndEraType": "text",
       "StartEraType": "text"
-    }
+    },
+    "name_template": "GRANT_TECH_BOOST_{StartEraType}_{EndEraType}"
   },
   "EFFECT_GRANT_RANDOM_TECHNOLOGY_BOOST_ON_NEW_ERA": {
     "comment": "新时代授予{Amount}个随机科技加速",
     "params": {
       "Amount": "unsigned",
       "ApplyImmediately": "skip"
-    }
+    },
+    "name_template": "GRANT_TECH_NEW_ERA_{Amount}"
   },
   "EFFECT_GRANT_RELIC": {
     "comment": "授予{Amount}个{RelicSource}遗物",
     "params": {
       "Amount": "unsigned",
       "RelicSource": "text"
-    }
+    },
+    "name_template": "GRANT_RELIC_{RelicSource}_{Amount}"
   },
   "EFFECT_GRANT_RELIGIOUS_PRESSURE_BURST": {
     "comment": "范围{Range}宗教压力爆发{+:Amount}",
     "params": {
       "Amount": "signed",
       "Range": "unsigned"
-    }
+    },
+    "name_template": "GRANT_RELIGIOUS_BURST_{:Amount}_{Range}"
   },
   "EFFECT_GRANT_ROUTE_IN_RADIUS": {
     "comment": "半径{Radius}内授予{RouteType}道路",
     "params": {
       "Radius": "unsigned",
       "RouteType": "text"
-    }
+    },
+    "name_template": "GRANT_ROUTE_{RouteType}_{Radius}"
   },
   "EFFECT_GRANT_SPY": {
     "comment": "授予间谍{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_SPY_{:Amount}"
   },
   "EFFECT_GRANT_STRENGTH_PER_ADJACENT_UNIT_TYPE": {
     "comment": "每相邻{UnitType}{+:Amount}力",
     "params": {
       "Amount": "signed",
       "UnitType": "text"
-    }
+    },
+    "name_template": "GRANT_STRENGTH_ADJACENT_{UnitType}_{:Amount}"
   },
   "EFFECT_GRANT_TOURISM_PER_EXCESS_LUXURIES": {
     "comment": "每多余奢侈品旅游业绩{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "GRANT_TOURISM_EXCESS_LUXURIES_{:Amount}"
   },
   "EFFECT_GRANT_UNIT_BY_CLASS": {
     "comment": "授予{UnitPromotionClassType}单位",
     "params": {
       "UnitPromotionClassType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_CLASS_{UnitPromotionClassType}"
   },
   "EFFECT_GRANT_UNIT_BY_DOMAIN": {
     "comment": "授予{UnitDomain}单位",
     "params": {
       "UnitDomain": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_DOMAIN_{UnitDomain}"
   },
   "EFFECT_GRANT_UNIT_IN_CITY": {
     "comment": "授予城市{Amount}个{UnitType}",
@@ -4611,7 +5315,8 @@
       "AllowUniqueOverride": "skip",
       "Amount": "unsigned",
       "UnitType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_{UnitType}_{Amount}"
   },
   "EFFECT_GRANT_UNIT_IN_EACH_DISTRICT": {
     "comment": "各区域授予{UnitType}",
@@ -4619,20 +5324,23 @@
       "IgnoreDefensible": "skip",
       "UniqueOverride": "skip",
       "UnitType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_EACH_DISTRICT_{UnitType}"
   },
   "EFFECT_GRANT_UNIT_OF_CLASS_AND_APPLY_ABILITY": {
     "comment": "授予{UnitPromotionClassType}并附加能力",
     "params": {
       "ModifierId": "modifier_ref",
       "UnitPromotionClassType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_CLASS_ABILITY_{UnitPromotionClassType}"
   },
   "EFFECT_GRANT_UNIT_TYPE_UNLIMITED_PROMOTION_CHOICES": {
     "comment": "{UnitType}无限晋升选择",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_UNLIMITED_PROMOTION_{UnitType}"
   },
   "EFFECT_GRANT_UNIT_WITH_EXPERIENCE": {
     "comment": "授予{UnitType}附带经验",
@@ -4640,7 +5348,8 @@
       "Experience": "skip",
       "UniqueOverride": "skip",
       "UnitType": "text"
-    }
+    },
+    "name_template": "GRANT_UNIT_EXPERIENCE_{UnitType}"
   },
   "EFFECT_GRANT_UNIT_YIELD_ADJACENT_FEATURES": {
     "comment": "相邻{FeatureType}产出{YieldType}{+:Amount}",
@@ -4648,14 +5357,16 @@
       "Amount": "signed",
       "FeatureType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_ADJACENT_FEATURE_{YieldType}_{:Amount}"
   },
   "EFFECT_GRANT_UNIT_YIELD_ADJACENT_NATURAL_WONDERS": {
     "comment": "相邻自然奇观产出{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_ADJACENT_WONDER_{YieldType}_{:Amount}"
   },
   "EFFECT_GRANT_UNIT_YIELD_ADJACENT_TERRAINS": {
     "comment": "相邻{TerrainType}产出{YieldType}{+:Amount}",
@@ -4663,7 +5374,8 @@
       "Amount": "signed",
       "TerrainType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_ADJACENT_TERRAIN_{YieldType}_{:Amount}"
   },
   "EFFECT_GRANT_YIELD": {
     "comment": "授予{YieldType}{+:Amount}",
@@ -4671,7 +5383,8 @@
       "Amount": "signed",
       "Scale": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_YIELD_{YieldType}_{:Amount}"
   },
   "EFFECT_GRANT_YIELD_BASED_ON_CURRENT_YIELD_RATE": {
     "comment": "基于{YieldToBaseOn}授予{YieldToGrant}",
@@ -4679,18 +5392,21 @@
       "Multiplier": "skip",
       "YieldToBaseOn": "text",
       "YieldToGrant": "text"
-    }
+    },
+    "name_template": "GRANT_YIELD_BASED_{YieldToBaseOn}_{YieldToGrant}"
   },
   "EFFECT_GRANT_YIELD_PER_EXCESS_LUXURIES": {
     "comment": "每多余奢侈品{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_YIELD_LUXURIES_{YieldType}_{:Amount}"
   },
   "EFFECT_GRANT_YIELD_PER_FEATURE_IN_CITY": {
     "comment": "城市地貌产出加成",
-    "params": {}
+    "params": {},
+    "name_template": "GRANT_YIELD_PER_FEATURE"
   },
   "EFFECT_GRANT_YIELD_PER_GREAT_WORK_IN_CITY": {
     "comment": "每{GreatWorkObjectType}杰作{YieldType}{+:Amount}",
@@ -4698,7 +5414,8 @@
       "Amount": "signed",
       "GreatWorkObjectType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "GRANT_GREAT_WORK_{GreatWorkObjectType}_{:Amount}"
   },
   "EFFECT_IMPROVEMENT_ADJACENCY": {
     "comment": "{ImprovementType}相邻{DistrictType}{YieldType}{+:Amount}",
@@ -4709,47 +5426,55 @@
       "ImprovementType": "text",
       "TilesRequired": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_IMPROVEMENT_ADJACENCY_{YieldType}_{:Amount}"
   },
   "EFFECT_KILL_EMERGENCY_TARGET_SPIES_IN_CITY": {
     "comment": "消灭城市内紧急目标间谍",
-    "params": {}
+    "params": {},
+    "name_template": "KILL_EMERGENCY_TARGET_SPIES"
   },
   "EFFECT_MAP_REMOVE_CLIFFS_IN_DIRECTION": {
     "comment": "移除方向半径{Radius}内悬崖",
     "params": {
       "Radius": "unsigned"
-    }
+    },
+    "name_template": "REMOVE_CLIFFS_{Radius}"
   },
   "EFFECT_MOUNTAIN_PORTAL": {
     "comment": "山脉传送门",
-    "params": {}
+    "params": {},
+    "name_template": "MOUNTAIN_PORTAL"
   },
   "EFFECT_PLAYER_ADJUST_FAVOR_FROM_DELEGATIONS": {
     "comment": "代表团外交支持{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAVOR_DELEGATIONS_{:Amount}"
   },
   "EFFECT_PLAYER_ADJUST_FAVOR_FROM_EMBASSIES": {
     "comment": "大使馆外交支持{+:Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ADJUST_FAVOR_EMBASSIES_{:Amount}"
   },
   "EFFECT_PLAYER_ADJUST_YIELD_FROM_DELEGATIONS": {
     "comment": "代表团{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_DELEGATIONS_{YieldType}_{:Amount}"
   },
   "EFFECT_PLAYER_ADJUST_YIELD_FROM_EMBASSIES": {
     "comment": "大使馆{YieldType}{+:Amount}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_YIELD_EMBASSIES_{YieldType}_{:Amount}"
   },
   "EFFECT_PLAYER_DIPLOMACY_AGENDA_COMPARE_ARMY_SIZE": {
     "comment": "比较军队规模议程",
@@ -4759,25 +5484,29 @@
       "MaxSteps": "skip",
       "MinUnitsNeeded": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_COMPARE_ARMY_SIZE"
   },
   "EFFECT_PLAYER_DIPLOMACY_AGENDA_DISTRICT_SPREAD": {
     "comment": "区域分布议程",
     "params": {
       "SimpleModifierDescription": "skip",
       "StatementKey": "skip"
-    }
+    },
+    "name_template": "DIPLOMACY_AGENDA_DISTRICT_SPREAD"
   },
   "EFFECT_PLAYER_SEND_GOLD_TO_EMERGENCIES_OF_TYPE": {
     "comment": "向{EmergencyType}紧急事件捐助{+:Amount}金币",
     "params": {
       "Amount": "signed",
       "EmergencyType": "text"
-    }
+    },
+    "name_template": "SEND_GOLD_EMERGENCY_{EmergencyType}_{:Amount}"
   },
   "EFFECT_PURCHASE_PRODUCTION_IN_CITY": {
     "comment": "金币购买城市生产力",
-    "params": {}
+    "params": {},
+    "name_template": "PURCHASE_CITY_PRODUCTION"
   },
   "EFFECT_REPLACE_PLAYER_GOVERNMENT_SLOT_TYPE": {
     "comment": "替换政体槽位：{ReplacedGovernmentSlotType}→{AddedGovernmentSlotType}",
@@ -4785,11 +5514,13 @@
       "AddedGovernmentSlotType": "text",
       "ReplacedGovernmentSlotType": "text",
       "ReplacesAll": "skip"
-    }
+    },
+    "name_template": "REPLACE_GOVERNMENT_SLOT_{ReplacedGovernmentSlotType}_{AddedGovernmentSlotType}"
   },
   "EFFECT_RESTORE_UNIT_MOVEMENT": {
     "comment": "恢复单位移动力",
-    "params": {}
+    "params": {},
+    "name_template": "RESTORE_UNIT_MOVEMENT"
   },
   "EFFECT_RIVER_ADJACENCY": {
     "comment": "{DistrictType}河流相邻{YieldType}{+:Amount}",
@@ -4798,13 +5529,15 @@
       "Description": "skip",
       "DistrictType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_RIVER_ADJACENCY_{YieldType}_{:Amount}"
   },
   "EFFECT_SETTLED_FOREIGN_CONTINENT_UNIT_CLASS": {
     "comment": "异大陆定居{UnitPromotionClassType}",
     "params": {
       "UnitPromotionClassType": "text"
-    }
+    },
+    "name_template": "SETTLE_FOREIGN_CONTINENT_{UnitPromotionClassType}"
   },
   "EFFECT_TERRAIN_ADJACENCY": {
     "comment": "{TerrainType}{DistrictType}{YieldType}相邻加成{+:Amount}",
@@ -4815,11 +5548,13 @@
       "TerrainType": "text",
       "TilesRequired": "skip",
       "YieldType": "text"
-    }
+    },
+    "name_template": "ADJUST_TERRAIN_ADJACENCY_{YieldType}_{:Amount}"
   },
   "EFFECT_TRADE_ROUTE_CANCEL": {
     "comment": "取消商路",
-    "params": {}
+    "params": {},
+    "name_template": "TRADE_ROUTE_CANCEL"
   },
   "EFFECT_TRADE_ROUTE_DISABLE": {
     "comment": "禁用商路",
@@ -4827,34 +5562,40 @@
       "Domestic": "bool_hide",
       "InternationalMajors": "bool_hide",
       "InternationalMinors": "bool_hide"
-    }
+    },
+    "name_template": "TRADE_ROUTE_DISABLE"
   },
   "EFFECT_TREAT_CAPITAL_AS_HOLY_CITY": {
     "comment": "首都视为圣城",
     "params": {
       "Value": "skip"
-    }
+    },
+    "name_template": "TREAT_CAPITAL_AS_HOLY_CITY"
   },
   "EFFECT_TREAT_HOLY_SITE_AS_HOLY_CITY": {
     "comment": "圣地视为圣城",
     "params": {
       "Value": "skip"
-    }
+    },
+    "name_template": "TREAT_HOLY_SITE_HOLY_CITY"
   },
   "EFFECT_TRIGGER_GAME_MECHANIC": {
     "comment": "触发游戏机制：{MechanicName}",
     "params": {
       "MechanicName": "text"
-    }
+    },
+    "name_template": "TRIGGER_GAME_MECHANIC_{MechanicName}"
   },
   "EFFECT_UNIT_TELEPORT": {
     "comment": "单位传送",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_TELEPORT"
   },
   "EFFECT_UNIT_TRANSFER_CITY_AS_GIFT_AND_APPLY_MODIFIER": {
     "comment": "单位移交城市并附加修饰器",
     "params": {
       "ModifierId": "modifier_ref"
-    }
+    },
+    "name_template": "UNIT_TRANSFER_CITY_GIFT"
   }
 }

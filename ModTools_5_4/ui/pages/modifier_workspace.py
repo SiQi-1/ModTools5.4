@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence
 
-from PyQt6.QtCore import Qt, QTimer, QStringListModel
+from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -28,6 +28,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QLayout,
     QLineEdit,
     QListWidget,
     QListWidgetItem,
@@ -56,6 +57,73 @@ from .base_page import BasePage
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+class FlowLayout(QLayout):
+    """Simple flow-layout: wraps child widgets to next row on overflow."""
+    def __init__(self, parent: QWidget | None = None, margin: int = 0, spacing: int = 4) -> None:
+        super().__init__(parent)
+        self.setContentsMargins(margin, margin, margin, margin)
+        self.setSpacing(spacing)
+        self._items: list = []
+
+    def addItem(self, item) -> None:  # type: ignore[override]
+        self._items.append(item)
+
+    def count(self) -> int:
+        return len(self._items)
+
+    def itemAt(self, index: int):
+        return self._items[index] if 0 <= index < len(self._items) else None
+
+    def takeAt(self, index: int):
+        if 0 <= index < len(self._items):
+            return self._items.pop(index)
+        return None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    def heightForWidth(self, width: int) -> int:
+        return self._do_layout(QRect(0, 0, width, 0), test_only=True)
+
+    def setGeometry(self, rect: QRect) -> None:  # type: ignore[override]
+        super().setGeometry(rect)
+        self._do_layout(rect, test_only=False)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        m = self.contentsMargins()
+        return QSize(m.left() + m.right() + self.spacing(), m.top() + m.bottom() + self.spacing())
+
+    def _do_layout(self, rect: QRect, test_only: bool) -> int:
+        m = self.contentsMargins()
+        effective = rect.adjusted(m.left(), m.top(), -m.right(), -m.bottom())
+        x = effective.x()
+        y = effective.y()
+        line_height = 0
+        spacing = self.spacing()
+        for item in self._items:
+            wid = item.widget()
+            if wid is None:
+                continue
+            size_hint = wid.sizeHint()
+            next_x = x + size_hint.width() + spacing
+            if next_x - spacing > effective.right() and line_height > 0:
+                x = effective.x()
+                y += line_height + spacing
+                line_height = 0
+                next_x = x + size_hint.width() + spacing
+            if not test_only:
+                wid.setGeometry(QRect(QPoint(x, y), size_hint))
+            x = next_x
+            line_height = max(line_height, size_hint.height())
+        return y + line_height - rect.y() + m.bottom()
 
 
 class ReqsetComboBox(QComboBox):
@@ -143,6 +211,7 @@ BOOLEAN_PARAM_KEYS = {
     "Disable",
     "Intercontinental",
     "NoDamage",
+    "Prevent",
 }
 
 INT_PARAM_KEYS = {
@@ -700,6 +769,744 @@ class CommentTemplateEditDialog(QDialog):
         self._on_save(self._effect_type, {"comment": comment, "params": params})
         self.accept()
 
+
+class BatchGenerateDialog(QDialog):
+    """批量生成修改器 — 严格参照修改器编辑区 UI 样式。"""
+
+    def __init__(self, home: "HomePage", parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("批量生成修改器")
+        self.setMinimumSize(720, 500)
+        self.setWindowFlags(
+            self.windowFlags()
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowMinimizeButtonHint
+        )
+        self._home = home
+
+        self._effect_type = home._effect_type_combo.currentText().strip() if home._effect_type_combo else ""
+        self._modifier_type = home._modifier_type_combo.currentText().strip() if home._modifier_type_combo else ""
+        self._collection_type = home._collection_type_combo.currentText().strip() if home._collection_type_combo else ""
+
+        self._param_value_sets: Dict[str, set[str]] = {}
+        self._param_cards: Dict[str, Dict[str, QWidget]] = {}
+        self._owner_reqset_ids: set[str] = set()
+        self._subject_reqset_ids: set[str] = set()
+        self._selected_owner_keys: set[str] = set()
+        self._preview_table: QTableWidget | None = None
+        self._params_container: QWidget | None = None
+        self._ms_group: QWidget | None = None
+        self._current_params: Dict[str, object] = {}
+        self._params_spec: Dict[str, str] = {}
+
+        self._build_ui()
+        self._rebuild_params()
+
+    def mouseDoubleClickEvent(self, event) -> None:  # type: ignore[override]
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
+        super().mouseDoubleClickEvent(event)
+
+    # ---- helpers -----------------------------------------------------------
+
+    @staticmethod
+    def _clear_layout(layout: QLayout) -> None:
+        while layout.count():
+            it = layout.takeAt(0)
+            if it is None:
+                continue
+            w = it.widget()
+            if w is not None:
+                w.deleteLater()
+            sub = it.layout()
+            if sub is not None:
+                BatchGenerateDialog._clear_layout(sub)
+
+    def _cbtn(self, text: str, w: int) -> QPushButton:
+        b = QPushButton(text)
+        b.setFixedHeight(20)
+        b.setMinimumWidth(w)
+        b.setMaximumWidth(w)
+        b.setStyleSheet("font-size: 11px; padding: 0px 2px;")
+        return b
+
+    def _combo(self, items: list[str] | None = None) -> QComboBox:
+        c = QComboBox()
+        c.setEditable(True)
+        if items:
+            c.addItems(items)
+        return c
+
+    # ---- UI ----------------------------------------------------------------
+
+    def _build_ui(self) -> None:
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        w = QWidget()
+        w.setMinimumWidth(0)
+        lay = QVBoxLayout(w)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(6)
+
+        # —— 绑定所有者 ——
+        lay.addWidget(QLabel("—— 绑定所有者 ——"))
+        self._owner_tree = QTreeWidget()
+        self._owner_tree.setHeaderLabels(["所有者"])
+        self._owner_tree.setMinimumHeight(180)
+        self._build_owner_tree()
+        lay.addWidget(self._owner_tree)
+
+        # —— 效果器 ——
+        lay.addWidget(QLabel("—— 效果器 ——"))
+
+        # ModifierType
+        mt_row = QHBoxLayout()
+        mt_btn = self._cbtn("搜索", 44)
+        mt_btn.clicked.connect(self._open_mt_search)
+        mt_row.addWidget(mt_btn)
+        mt_row.addWidget(QLabel("ModifierType"))
+        self._mt_combo = self._combo(sorted(self._home._modifier_meta_index.keys()))
+        i = self._mt_combo.findText(self._modifier_type)
+        if i >= 0:
+            self._mt_combo.setCurrentIndex(i)
+        self._mt_combo.currentTextChanged.connect(self._on_mt_changed)
+        mt_row.addWidget(self._mt_combo, 1)
+        lay.addLayout(mt_row)
+
+        # EffectType
+        ef_row = QHBoxLayout()
+        ef_btn = self._cbtn("搜索", 44)
+        ef_btn.clicked.connect(self._open_effect_search)
+        ef_row.addWidget(ef_btn)
+        ef_row.addWidget(QLabel("EffectType"))
+        self._ef_combo = self._combo(self._home._effect_types)
+        idx = self._ef_combo.findText(self._effect_type)
+        if idx >= 0:
+            self._ef_combo.setCurrentIndex(idx)
+        self._ef_combo.currentTextChanged.connect(self._on_effect_changed)
+        ef_row.addWidget(self._ef_combo, 1)
+        lay.addLayout(ef_row)
+
+        # CollectionType
+        cl_row = QHBoxLayout()
+        cl_row.addWidget(QLabel("CollectionType"))
+        self._cl_combo = self._combo(self._home._collection_types)
+        ci = self._cl_combo.findText(self._collection_type)
+        if ci >= 0:
+            self._cl_combo.setCurrentIndex(ci)
+        cl_row.addWidget(self._cl_combo, 1)
+        lay.addLayout(cl_row)
+
+        # —— 参数展开 ——
+        self._params_label = QLabel("—— 参数展开 ——")
+        lay.addWidget(self._params_label)
+        self._params_container = QWidget()
+        self._params_layout = QVBoxLayout(self._params_container)
+        self._params_layout.setContentsMargins(0, 0, 0, 0)
+        self._params_layout.setSpacing(4)
+        lay.addWidget(self._params_container)
+
+        # —— 条件集 ——
+        lay.addWidget(QLabel("—— 条件集 ——"))
+
+        # OwnerRequirementSetId
+        or_row = QHBoxLayout()
+        or_btn = self._cbtn("搜索", 44)
+        or_btn.clicked.connect(self._open_owner_reqset_search)
+        or_row.addWidget(or_btn)
+        or_row.addWidget(QLabel("OwnerReqSet"))
+        self._or_combo = self._combo()
+        self._or_combo.addItem("", "")
+        for rs in self._home._requirement_sets:
+            rid = str(rs.requirement_set_id or "").strip()
+            if rid:
+                self._or_combo.addItem(f"{rid} ({rs.comment})" if rs.comment else rid, rid)
+        or_row.addWidget(self._or_combo, 1)
+        or_add = self._cbtn("+", 28)
+        or_row.addWidget(or_add)
+        or_row.addStretch(1)
+        lay.addLayout(or_row)
+        self._or_flow = FlowLayout(spacing=4)
+        or_cc = QWidget()
+        or_cc.setLayout(self._or_flow)
+        lay.addWidget(or_cc)
+        self._or_cards: Dict[str, QWidget] = {}
+        or_add.clicked.connect(lambda _: self._add_reqset_card(self._or_combo, self._or_flow, self._or_cards, self._owner_reqset_ids))
+
+        # SubjectRequirementSetId
+        sr_row = QHBoxLayout()
+        sr_btn = self._cbtn("搜索", 44)
+        sr_btn.clicked.connect(self._open_subject_reqset_search)
+        sr_row.addWidget(sr_btn)
+        sr_row.addWidget(QLabel("SubjectReqSet"))
+        self._sr_combo = self._combo()
+        self._sr_combo.addItem("", "")
+        for rs in self._home._requirement_sets:
+            rid = str(rs.requirement_set_id or "").strip()
+            if rid:
+                self._sr_combo.addItem(f"{rid} ({rs.comment})" if rs.comment else rid, rid)
+        sr_row.addWidget(self._sr_combo, 1)
+        sr_add = self._cbtn("+", 28)
+        sr_row.addWidget(sr_add)
+        sr_row.addStretch(1)
+        lay.addLayout(sr_row)
+        self._sr_flow = FlowLayout(spacing=4)
+        sr_cc = QWidget()
+        sr_cc.setLayout(self._sr_flow)
+        lay.addWidget(sr_cc)
+        self._sr_cards: Dict[str, QWidget] = {}
+        sr_add.clicked.connect(lambda _: self._add_reqset_card(self._sr_combo, self._sr_flow, self._sr_cards, self._subject_reqset_ids))
+
+        # —— 其他 ——
+        lay.addWidget(QLabel("—— 其他（所有副本共用）——"))
+        flags_row = QHBoxLayout()
+        self._run_once_cb = QCheckBox("RunOnce")
+        self._new_only_cb = QCheckBox("NewOnly")
+        self._permanent_cb = QCheckBox("Permanent")
+        flags_row.addWidget(self._run_once_cb)
+        flags_row.addWidget(self._new_only_cb)
+        flags_row.addWidget(self._permanent_cb)
+        flags_row.addStretch(1)
+        lay.addLayout(flags_row)
+
+        stack_row = QHBoxLayout()
+        stack_row.addWidget(QLabel("OwnerStackLimit"))
+        self._os_spin = QSpinBox()
+        self._os_spin.setRange(-999999, 999999)
+        stack_row.addWidget(self._os_spin)
+        stack_row.addWidget(QLabel("SubjectStackLimit"))
+        self._ss_spin = QSpinBox()
+        self._ss_spin.setRange(-999999, 999999)
+        stack_row.addWidget(self._ss_spin)
+        stack_row.addStretch(1)
+        lay.addLayout(stack_row)
+
+        # —— ModifierString ——
+        self._ms_group = QWidget()
+        ms_gl = QVBoxLayout(self._ms_group)
+        ms_gl.setContentsMargins(0, 0, 0, 0)
+        ms_gl.addWidget(QLabel("—— ModifierString（所有副本共用）——"))
+        self._ms_edit = QLineEdit()
+        self._ms_edit.setPlaceholderText("留空不生成，如：+{1_Amount} 来自")
+        ms_gl.addWidget(self._ms_edit)
+        lay.addWidget(self._ms_group)
+        self._sync_ms_visibility()
+
+        # —— 预览 ——
+        self._preview_label = QLabel("—— 预览 —— 0 条")
+        lay.addWidget(self._preview_label)
+        self._preview_table = QTableWidget(0, 3)
+        self._preview_table.setHorizontalHeaderLabels(["ModifierId", "中文注释", "参数"])
+        self._preview_table.horizontalHeader().setStretchLastSection(True)
+        self._preview_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._preview_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._preview_table.setMinimumHeight(200)
+        lay.addWidget(self._preview_table)
+
+        scroll.setWidget(w)
+        root.addWidget(scroll, 1)
+
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        btns.button(QDialogButtonBox.StandardButton.Ok).setText("生成")
+        btns.accepted.connect(self._handle_generate)
+        btns.rejected.connect(self.reject)
+        root.addWidget(btns)
+
+    # ---- params rebuild ----------------------------------------------------
+
+    def _rebuild_params(self) -> None:
+        if self._params_layout is None:
+            return
+        self._param_value_sets.clear()
+        self._param_cards.clear()
+        self._clear_layout(self._params_layout)
+
+        template = self._home._comment_templates.get(self._effect_type)
+        self._params_spec: Dict[str, str] = (template.get("params") if isinstance(template, dict) else None) or {}
+
+        # Get parameter names from effect_param_map, fallback to template params keys
+        param_names = list(self._params_spec.keys())
+        if not param_names:
+            param_names = self._home._effect_param_map.get(self._effect_type, [])
+
+        self._current_params: Dict[str, object] = {}
+        for name in param_names:
+            name = str(name or "").strip()
+            if name:
+                self._current_params[name] = None  # default empty value
+
+        for pn in self._current_params:
+            self._build_param_row(pn)
+        self._params_layout.addStretch(1)
+        self._refresh_preview()
+
+    def _sync_ms_visibility(self) -> None:
+        if self._ms_group:
+            self._ms_group.setVisible(
+                self._home._supports_modifier_preview_string(self._effect_type)
+            )
+
+    # ---- param row ---------------------------------------------------------
+
+    def _build_param_row(self, param_name: str) -> None:
+        raw = self._home._extract_param_value(self._current_params.get(param_name))
+        row = QHBoxLayout()
+        row.addWidget(QLabel(param_name))
+        cards_flow = FlowLayout(spacing=4)
+
+        if param_name in BOOLEAN_PARAM_KEYS:
+            cb_t = QCheckBox("True")
+            cb_f = QCheckBox("False")
+            if raw:
+                cb_t.setChecked(True)
+            else:
+                cb_f.setChecked(True)
+            row.addWidget(cb_t)
+            row.addWidget(cb_f)
+            row.addStretch(1)
+            self._params_layout.addLayout(row)
+            cc = QWidget()
+            cc.setLayout(cards_flow)
+            self._params_layout.addWidget(cc)
+            self._param_cards[param_name] = {}
+            self._param_value_sets[param_name] = set()
+
+            def _refresh():
+                cards = self._param_cards[param_name]
+                cards.clear()
+                while cards_flow.count():
+                    it = cards_flow.takeAt(0)
+                    if it and it.widget():
+                        it.widget().deleteLater()
+                vs: set[str] = set()
+                if cb_t.isChecked():
+                    vs.add("true")
+                    self._make_card(f"{param_name}=True", param_name, "true", cards_flow, cards, vs)
+                if cb_f.isChecked():
+                    vs.add("false")
+                    self._make_card(f"{param_name}=False", param_name, "false", cards_flow, cards, vs)
+                self._param_value_sets[param_name] = vs
+                self._refresh_preview()
+
+            cb_t.toggled.connect(lambda _: _refresh())
+            cb_f.toggled.connect(lambda _: _refresh())
+            _refresh()
+            return
+
+        if param_name in INT_PARAM_KEYS:
+            spin = QSpinBox()
+            spin.setRange(-999, 9999)
+            v = int(raw) if isinstance(raw, (int, float)) and not isinstance(raw, bool) else 0
+            spin.setValue(v)
+            add_btn = self._cbtn("+", 28)
+            row.addWidget(spin)
+            row.addWidget(add_btn)
+            row.addStretch(1)
+            self._params_layout.addLayout(row)
+            cc = QWidget()
+            cc.setLayout(cards_flow)
+            self._params_layout.addWidget(cc)
+            self._param_cards[param_name] = {}
+            self._param_value_sets[param_name] = set()
+
+            def _add():
+                s = str(spin.value())
+                cards = self._param_cards[param_name]
+                if s in cards:
+                    return
+                self._make_card(f"{param_name}={s}", param_name, s, cards_flow, cards, self._param_value_sets[param_name])
+                self._param_value_sets[param_name].add(s)
+                self._refresh_preview()
+
+            add_btn.clicked.connect(lambda _: _add())
+            return
+
+        # text / template widget
+        selector: QWidget | None = None
+        if param_name == "ModifierId":
+            selector = QComboBox()
+            selector.setEditable(True)
+            selector.addItem("", "")
+            for m in self._home._modifiers:
+                if m.modifier_id:
+                    selector.addItem(m.comment.strip() or m.modifier_id, m.modifier_id)
+        elif param_name == "RequirementSetId":
+            selector = QComboBox()
+            selector.setEditable(True)
+            selector.addItem("", "")
+            for rs in self._home._requirement_sets:
+                if rs.requirement_set_id:
+                    selector.addItem(f"{rs.requirement_set_id} ({rs.comment})" if rs.comment else rs.requirement_set_id, rs.requirement_set_id)
+        else:
+            tk = TEMPLATE_PARAM_MAPPINGS.get(param_name)
+            if tk:
+                try:
+                    w2 = build_template_widget(tk)
+                    if isinstance(w2, BaseTemplateWidget):
+                        w2.setMinimumHeight(36)
+                    selector = w2
+                except Exception:
+                    pass
+        if selector is None:
+            selector = QLineEdit()
+            selector.setPlaceholderText(f"输入 {param_name}")
+        row.addWidget(selector, 1)
+        add_btn = self._cbtn("+", 28)
+        row.addWidget(add_btn)
+        row.addStretch(1)
+        self._params_layout.addLayout(row)
+        cc = QWidget()
+        cc.setLayout(cards_flow)
+        self._params_layout.addWidget(cc)
+        self._param_cards[param_name] = {}
+        self._param_value_sets[param_name] = set()
+
+        def _capture():
+            if isinstance(selector, QComboBox):
+                return selector.currentText().strip(), selector.currentData() or selector.currentText().strip()
+            if isinstance(selector, BaseTemplateWidget):
+                data = selector.export_data()
+                val = ""
+                if isinstance(data, dict):
+                    for v2 in data.values():
+                        val = str(v2) if v2 not in (None, "") else ""
+                        break
+                else:
+                    val = str(data) if data not in (None, "") else ""
+                cn = get_chinese_text_for_tag_or_unknown(f"LOC_{val}_NAME")
+                return (cn if cn and cn != "未知" else val), val
+            if isinstance(selector, QLineEdit):
+                t = selector.text().strip()
+                return t, t
+            return "", ""
+
+        def _add():
+            display, val = _capture()
+            cards = self._param_cards[param_name]
+            if not val or val in cards:
+                return
+            self._make_card(display, param_name, str(val), cards_flow, cards, self._param_value_sets[param_name])
+            self._param_value_sets[param_name].add(str(val))
+            self._refresh_preview()
+
+        add_btn.clicked.connect(lambda _: _add())
+
+    # ---- cards -------------------------------------------------------------
+
+    def _make_card(self, display, param_name, value, flow, cards, val_set):
+        short = str(display or value)
+        if len(short) > 20:
+            short = short[:18] + ".."
+        card = QWidget()
+        card.setStyleSheet("background:#475569; border:1px solid #64748b; border-radius:4px; padding:2px 6px; color:#e2e8f0;")
+        cl = QHBoxLayout(card)
+        cl.setContentsMargins(4, 1, 4, 1)
+        cl.setSpacing(4)
+        cl.addWidget(QLabel(short))
+        btn = QPushButton("×")
+        btn.setFixedSize(20, 20)
+        btn.setStyleSheet("background:transparent; border:none; font-weight:bold;")
+
+        def _remove():
+            cards.pop(value, None)
+            val_set.discard(value)
+            flow.removeWidget(card)
+            card.hide()
+            card.deleteLater()
+            self._refresh_preview()
+
+        btn.clicked.connect(lambda _: _remove())
+        cl.addWidget(btn)
+        cards[value] = card
+        flow.addWidget(card)
+        card.show()
+
+    def _add_reqset_card(self, combo, flow, cards, val_set):
+        rid = combo.currentData() or combo.currentText().strip()
+        if not rid or rid in cards:
+            return
+        short = rid
+        if len(short) > 24:
+            short = short[:22] + ".."
+        card = QWidget()
+        card.setStyleSheet("background:#475569; border:1px solid #64748b; border-radius:4px; padding:2px 6px; color:#e2e8f0;")
+        cl = QHBoxLayout(card)
+        cl.setContentsMargins(4, 1, 4, 1)
+        cl.setSpacing(4)
+        cl.addWidget(QLabel(short))
+        btn = QPushButton("×")
+        btn.setFixedSize(20, 20)
+        btn.setStyleSheet("background:transparent; border:none; font-weight:bold;")
+        def _rm():
+            cards.pop(rid, None)
+            val_set.discard(rid)
+            flow.removeWidget(card)
+            card.hide()
+            card.deleteLater()
+            self._refresh_preview()
+        btn.clicked.connect(lambda _: _rm())
+        cl.addWidget(btn)
+        cards[rid] = card
+        val_set.add(rid)
+        flow.addWidget(card)
+        card.show()
+        self._refresh_preview()
+
+    # ---- combo change ------------------------------------------------------
+
+    def _on_mt_changed(self, text: str) -> None:
+        meta = self._home._modifier_meta_index.get(text)
+        if not meta:
+            return
+        if meta.effect_type:
+            self._ef_combo.setCurrentText(meta.effect_type)
+        if meta.collection_type:
+            self._cl_combo.setCurrentText(meta.collection_type)
+        # Always rebuild — EffectType may be same but params need refresh
+        self._effect_type = (meta.effect_type or "").strip()
+        self._sync_ms_visibility()
+        self._rebuild_params()
+
+    def _on_effect_changed(self, text: str) -> None:
+        self._effect_type = text.strip()
+        self._sync_ms_visibility()
+        self._rebuild_params()
+
+    # ---- dialogs -----------------------------------------------------------
+
+    def _open_mt_search(self) -> None:
+        opts = sorted(self._home._modifier_meta_index.keys())
+        dlg = SearchListDialog("选择 ModifierType", opts, self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.selected():
+            self._mt_combo.setCurrentText(dlg.selected())
+
+    def _open_effect_search(self) -> None:
+        dlg = SearchListDialog("选择 EffectType", self._home._effect_types, self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.selected():
+            self._ef_combo.setCurrentText(dlg.selected())
+
+    def _open_owner_reqset_search(self) -> None:
+        opts = [rs.requirement_set_id for rs in self._home._requirement_sets if rs.requirement_set_id]
+        dlg = SearchListDialog("选择 OwnerRequirementSetId", sorted(opts), self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.selected():
+            self._or_combo.setCurrentText(dlg.selected())
+
+    def _open_subject_reqset_search(self) -> None:
+        opts = [rs.requirement_set_id for rs in self._home._requirement_sets if rs.requirement_set_id]
+        dlg = SearchListDialog("选择 SubjectRequirementSetId", sorted(opts), self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.selected():
+            self._sr_combo.setCurrentText(dlg.selected())
+
+    # ---- owner tree --------------------------------------------------------
+
+    def _build_owner_tree(self) -> None:
+        self._owner_tree.clear()
+        groups: Dict[str, QTreeWidgetItem] = {}
+        for owner in self._home._owners:
+            g = groups.get(owner.table_name)
+            if g is None:
+                g = QTreeWidgetItem([owner.table_name])
+                g.setFlags(g.flags() | Qt.ItemFlag.ItemIsAutoTristate | Qt.ItemFlag.ItemIsUserCheckable)
+                groups[owner.table_name] = g
+                self._owner_tree.addTopLevelItem(g)
+            key = f"{owner.table_name}::{owner.type_name}"
+            child = QTreeWidgetItem([self._home._owner_display_text(owner)])
+            child.setData(0, Qt.ItemDataRole.UserRole, key)
+            child.setFlags(child.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            child.setCheckState(0, Qt.CheckState.Checked if key in self._selected_owner_keys else Qt.CheckState.Unchecked)
+            g.addChild(child)
+        self._owner_tree.expandAll()
+        self._owner_tree.itemChanged.connect(self._on_owner_checked)
+
+    def _on_owner_checked(self, item: QTreeWidgetItem, _col: int) -> None:
+        key = item.data(0, Qt.ItemDataRole.UserRole)
+        if key is None:
+            return
+        if item.checkState(0) == Qt.CheckState.Checked:
+            self._selected_owner_keys.add(str(key))
+        else:
+            self._selected_owner_keys.discard(str(key))
+
+    # ---- preview -----------------------------------------------------------
+
+    def _refresh_preview(self) -> None:
+        if self._preview_table is None:
+            return
+        self._preview_table.setRowCount(0)
+        combos = self._compute_combinations()
+        self._preview_label.setText(f"—— 预览 —— {len(combos)} 条")
+        for row_idx, pv in enumerate(combos):
+            self._preview_table.insertRow(row_idx)
+            self._preview_table.setItem(row_idx, 0, QTableWidgetItem(self._compute_batch_id(pv)))
+            self._preview_table.setItem(row_idx, 1, QTableWidgetItem(self._compute_batch_comment(pv)))
+            self._preview_table.setItem(row_idx, 2, QTableWidgetItem(str(pv)))
+        self._preview_table.resizeColumnsToContents()
+
+    def _compute_combinations(self) -> list[dict[str, object]]:
+        expanded: list[tuple[str, list[object]]] = []
+        for pn, vs in self._param_value_sets.items():
+            if not vs:
+                continue
+            vals: list[object] = []
+            for s in sorted(vs):
+                if s == "true":
+                    vals.append(True)
+                elif s == "false":
+                    vals.append(False)
+                elif pn in INT_PARAM_KEYS:
+                    try:
+                        vals.append(int(s))
+                    except ValueError:
+                        vals.append(s)
+                else:
+                    vals.append(s)
+            if vals:
+                expanded.append((pn, vals))
+
+        if not expanded:
+            return [dict(self._current_params)] if self._current_params else [{}]
+
+        result: list[dict[str, object]] = [dict(self._current_params)] if self._current_params else [{}]
+        for pn, vals in expanded:
+            nxt: list[dict[str, object]] = []
+            for combo in result:
+                for v in vals:
+                    e = dict(combo)
+                    e[pn] = v
+                    nxt.append(e)
+            result = nxt
+        return result
+
+    # ---- name / comment ----------------------------------------------------
+
+    def _compute_batch_id(self, pv: dict[str, object]) -> str:
+        p1 = self._home._prefix_input.text().strip() if self._home._prefix_input else ""
+        p2 = self._home._prefix2_input.text().strip() if self._home._prefix2_input else ""
+        t = self._home._comment_templates.get(self._effect_type)
+        nt = str(t.get("name_template") or "").strip() if isinstance(t, dict) else ""
+        suffix = self._fill_name_template(nt, pv) if nt else self._fallback_suffix(pv)
+        rfs: list[str] = []
+        for rid in sorted(set(self._owner_reqset_ids) | set(self._subject_reqset_ids)):
+            f = self._home._reqset_suffix_fragment(rid, p1, p2)
+            if f:
+                rfs.append(f)
+        parts = ["MODIFIER"]
+        if p1:
+            parts.append(p1)
+        if p2:
+            parts.append(p2)
+        if suffix:
+            parts.append(suffix)
+        parts.extend(rfs)
+        return "_".join(parts)
+
+    def _fill_name_template(self, nt: str, pv: dict[str, object]) -> str:
+        r = nt
+        for ph in re.findall(r"\{:?(\w+)\}", nt):
+            r = r.replace(f"{{:{ph}}}", self._home._param_to_fragment(ph, pv.get(ph)))
+            r = r.replace(f"{{{ph}}}", self._home._param_to_fragment(ph, pv.get(ph)))
+        return r
+
+    def _fallback_suffix(self, pv: dict[str, object]) -> str:
+        mt = self._mt_combo.currentText().strip()
+        mf = self._home._extract_modifier_type_fragment(mt)
+        for pn, pval in pv.items():
+            if pn.lower() == "description":
+                continue
+            pf = self._home._param_to_fragment(pn, pval)
+            if pf:
+                return f"{mf}_{pf}"
+        return mf
+
+    def _compute_batch_comment(self, pv: dict[str, object]) -> str:
+        t = self._home._comment_templates.get(self._effect_type)
+        if not isinstance(t, dict):
+            return ""
+        raw = str(t.get("comment") or "").strip()
+        if not raw:
+            return ""
+        ps = t.get("params") if isinstance(t.get("params"), dict) else {}
+        r = raw
+        for m in re.finditer(r"\{(\w+)\?([^:}]+):([^}]+)\}", r):
+            v = self._home._extract_param_value(pv.get(m.group(1)))
+            r = r.replace(m.group(0), m.group(2) if v else m.group(3))
+        for pn, fmt in ps.items():
+            r = r.replace(f"{{+:{pn}}}", self._home._format_template_param(pn, pv.get(pn), str(fmt or "").strip().lower()))
+            r = r.replace(f"{{{pn}}}", self._home._format_template_param(pn, pv.get(pn), str(fmt or "").strip().lower()))
+        return r
+
+    # ---- generate ----------------------------------------------------------
+
+    def _handle_generate(self) -> None:
+        combos = self._compute_combinations()
+        if not combos:
+            QMessageBox.warning(self, "提示", "没有可生成的组合。")
+            return
+        self._home._persist_current_modifier()
+        created: list = []
+        mt = self._mt_combo.currentText().strip()
+        for pv in combos:
+            mid = self._home._deduplicate_modifier_id(self._compute_batch_id(pv))
+            rec = self._create_record(mid, self._compute_batch_comment(pv), pv, mt)
+            self._home._modifiers.append(rec)
+            self._home._append_modifier_row(rec)
+            created.append(rec)
+        if self._selected_owner_keys:
+            for owner in self._home._owners:
+                k = f"{owner.table_name}::{owner.type_name}"
+                if k in self._selected_owner_keys:
+                    rows = self._home._owner_binding_rows(owner)
+                    for rec in created:
+                        if not any(r.get("modifier_id") == rec.modifier_id for r in rows):
+                            rows.append({"modifier_id": rec.modifier_id, "attachment_target_type": ""})
+                    self._home._set_owner_binding_rows(owner, rows)
+        if self._ms_group and self._ms_group.isVisible():
+            ms = self._ms_edit.text().strip()
+            if ms:
+                for rec in created:
+                    rec.preview_text = ms
+        self._home._refresh_owner_tree()
+        self.accept()
+        QMessageBox.information(self, "完成", f"已生成 {len(created)} 个修改器。")
+
+    def _create_record(self, mod_id: str, comment: str, pv: dict[str, object], mt: str):
+        ci = self._home._current_modifier_index
+        if 0 <= ci < len(self._home._modifiers):
+            src = self._home._modifiers[ci]
+        elif self._home._modifiers:
+            src = self._home._modifiers[-1]
+        else:
+            return ModifierRecord(
+                modifier_id=mod_id, modifier_type=mt, comment=comment,
+                effect_type=self._effect_type,
+                parameters=[{"name": str(k), "value": v} for k, v in pv.items()],
+            )
+        params = []
+        for pn, v in pv.items():
+            found = any(
+                isinstance(p, dict) and p.get("name") == pn
+                for p in (getattr(src, 'parameters', []) or [])
+            )
+            params.append({"name": pn, "value": v} if not found else {"name": pn, "value": v})
+        return type(src)(
+            modifier_id=mod_id, modifier_type=mt, comment=comment,
+            owner_reqset=getattr(src, 'owner_reqset', None),
+            subject_reqset=getattr(src, 'subject_reqset', None),
+            run_once=self._run_once_cb.isChecked(),
+            new_only=self._new_only_cb.isChecked(),
+            permanent=self._permanent_cb.isChecked(),
+            owner_stack_limit=self._os_spin.value(),
+            subject_stack_limit=self._ss_spin.value(),
+            effect_type=self._effect_type,
+            collection_type=self._cl_combo.currentText().strip() or getattr(src, 'collection_type', None),
+            parameters=params, preview_text="",
+        )
 
 class HomePage(BasePage):
     page_id = "home"
@@ -1676,9 +2483,12 @@ class HomePage(BasePage):
         copy_btn.clicked.connect(self._handle_duplicate_modifier)
         del_btn = QPushButton("删除")
         del_btn.clicked.connect(self._handle_delete_modifier)
+        batch_btn = QPushButton("批量生成")
+        batch_btn.clicked.connect(self._handle_open_batch_generate)
         button_row.addWidget(add_btn)
         button_row.addWidget(copy_btn)
         button_row.addWidget(del_btn)
+        button_row.addWidget(batch_btn)
         button_row.addStretch(1)
         layout.addLayout(button_row)
 
@@ -2876,6 +3686,11 @@ class HomePage(BasePage):
         self._refresh_owner_binding_table()
 
     # -------------------- Modifier Handlers --------------------
+    def _handle_open_batch_generate(self) -> None:
+        self._persist_current_modifier()
+        dlg = BatchGenerateDialog(self, parent=self)
+        dlg.exec()
+
     def _handle_add_modifier(self) -> None:
         self._persist_current_modifier()
         modifier_id = self._deduplicate_modifier_id(self._build_modifier_id_default())
@@ -5042,10 +5857,22 @@ class HomePage(BasePage):
     def _build_modifier_id_auto(self) -> str:
         prefix1 = self._prefix_input.text().strip() if self._prefix_input else ""
         prefix2 = self._prefix2_input.text().strip() if self._prefix2_input else ""
+        reqset_fragment = self._extract_modifier_reqset_fragment(prefix1, prefix2)
+        template_suffix = self._build_modifier_id_from_template()
+        if template_suffix:
+            parts = ["MODIFIER"]
+            if prefix1:
+                parts.append(prefix1)
+            if prefix2:
+                parts.append(prefix2)
+            parts.append(template_suffix)
+            if reqset_fragment:
+                parts.append(reqset_fragment)
+            return "_".join(parts)
+
         modifier_type = self._modifier_type_combo.currentText().strip() if self._modifier_type_combo else ""
         type_fragment = self._extract_modifier_type_fragment(modifier_type)
         param_fragment = self._extract_first_param_fragment()
-        reqset_fragment = self._extract_modifier_reqset_fragment(prefix1, prefix2)
         parts = ["MODIFIER"]
         if prefix1:
             parts.append(prefix1)
@@ -5058,6 +5885,31 @@ class HomePage(BasePage):
         if reqset_fragment:
             parts.append(reqset_fragment)
         return "_".join(parts)
+
+    def _build_modifier_id_from_template(self) -> str:
+        effect_type = self._effect_type_combo.currentText().strip() if self._effect_type_combo else ""
+        if not effect_type:
+            return ""
+        template = self._comment_templates.get(effect_type)
+        if not isinstance(template, dict):
+            return ""
+        name_template = str(template.get("name_template") or "").strip()
+        if not name_template:
+            return ""
+
+        param_values: Dict[str, object] = {}
+        for row in self._collect_param_rows():
+            name = str(row.get("name") or "").strip()
+            if name:
+                param_values[name] = row.get("value")
+
+        result = name_template
+        for placeholder in re.findall(r"\{:?(\w+)\}", name_template):
+            value = param_values.get(placeholder)
+            fragment = self._param_to_fragment(placeholder, value)
+            result = result.replace(f"{{:{placeholder}}}", fragment)
+            result = result.replace(f"{{{placeholder}}}", fragment)
+        return result
 
     def _apply_modifier_id_default(self) -> None:
         if self._modifier_id_input is None:
@@ -5102,6 +5954,15 @@ class HomePage(BasePage):
                 param_values[name] = row.get("value")
 
         result = comment_raw
+        # Handle {ParamName?真文本:假文本} for boolean params
+        for m in re.finditer(r"\{(\w+)\?([^:}]+):([^}]+)\}", result):
+            pname = m.group(1)
+            true_text = m.group(2)
+            false_text = m.group(3)
+            raw = self._extract_param_value(param_values.get(pname))
+            replacement = true_text if raw else false_text
+            result = result.replace(m.group(0), replacement)
+
         for param_name, fmt in params_spec.items():
             fmt_str = str(fmt or "").strip().lower()
             value = param_values.get(param_name)
@@ -5266,10 +6127,14 @@ class HomePage(BasePage):
     def _extract_modifier_reqset_fragment(self, prefix1: str, prefix2: str) -> str:
         owner_id = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
         subject_id = self._subject_reqset_input.text().strip() if self._subject_reqset_input else ""
-        reqset_id = owner_id or subject_id
-        if not reqset_id:
-            return ""
-        return self._reqset_suffix_fragment(reqset_id, prefix1, prefix2)
+        fragments: list[str] = []
+        for reqset_id in (owner_id, subject_id):
+            if not reqset_id:
+                continue
+            frag = self._reqset_suffix_fragment(reqset_id, prefix1, prefix2)
+            if frag and frag not in fragments:
+                fragments.append(frag)
+        return "_".join(fragments)
 
     def _extract_modifier_type_fragment(self, modifier_type: str) -> str:
         if not modifier_type:
@@ -5336,7 +6201,7 @@ class HomePage(BasePage):
                 return self._last_non_numeric_segment(text_up)
             return text_up
         if isinstance(raw, bool):
-            return name_upper if raw else f"NO_{name_upper}"
+            return name_upper if raw else f"NOT_{name_upper}"
         if isinstance(raw, (int, float)):
             return self._normalize_numeric_text(f"{raw:.6f}").replace("-", "N")
         return name_upper
@@ -5512,6 +6377,16 @@ class HomePage(BasePage):
     def _build_requirement_id_auto(self) -> str:
         prefix1 = self._prefix_input.text().strip() if self._prefix_input else ""
         prefix2 = self._prefix2_input.text().strip() if self._prefix2_input else ""
+        template_suffix = self._build_requirement_id_from_template()
+        if template_suffix:
+            parts = ["REQ"]
+            if prefix1:
+                parts.append(prefix1)
+            if prefix2:
+                parts.append(prefix2)
+            parts.append(template_suffix)
+            return "_".join(parts)
+
         req_type = self._req_type_combo.currentText().strip() if self._req_type_combo else ""
         type_fragment = self._extract_requirement_type_fragment(req_type)
         param_fragment = self._extract_first_req_param_fragment()
@@ -5525,6 +6400,31 @@ class HomePage(BasePage):
         if param_fragment:
             parts.append(param_fragment)
         return "_".join(parts)
+
+    def _build_requirement_id_from_template(self) -> str:
+        req_type = self._req_type_combo.currentText().strip() if self._req_type_combo else ""
+        if not req_type:
+            return ""
+        template = self._req_comment_templates.get(req_type)
+        if not isinstance(template, dict):
+            return ""
+        name_template = str(template.get("name_template") or "").strip()
+        if not name_template:
+            return ""
+
+        param_values: Dict[str, object] = {}
+        for row in self._collect_req_param_rows():
+            name = str(row.get("name") or "").strip()
+            if name:
+                param_values[name] = row.get("value")
+
+        result = name_template
+        for placeholder in re.findall(r"\{:?(\w+)\}", name_template):
+            value = param_values.get(placeholder)
+            fragment = self._param_to_fragment(placeholder, value)
+            result = result.replace(f"{{:{placeholder}}}", fragment)
+            result = result.replace(f"{{{placeholder}}}", fragment)
+        return result
 
     def _apply_requirement_id_default(self) -> None:
         if self._req_id_input is None:
@@ -5574,6 +6474,15 @@ class HomePage(BasePage):
                 param_values[name] = row.get("value")
 
         result = comment_raw
+        # Handle {ParamName?真文本:假文本} for boolean params
+        for m in re.finditer(r"\{(\w+)\?([^:}]+):([^}]+)\}", result):
+            pname = m.group(1)
+            true_text = m.group(2)
+            false_text = m.group(3)
+            raw = self._extract_param_value(param_values.get(pname))
+            replacement = true_text if raw else false_text
+            result = result.replace(m.group(0), replacement)
+
         for param_name, fmt in params_spec.items():
             fmt_str = str(fmt or "").strip().lower()
             value = param_values.get(param_name)

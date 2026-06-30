@@ -1,96 +1,114 @@
 {
   "REQUIREMENT_ALLIANCE_AT_WAR_WITH_COMBAT_TARGET": {
     "comment": "盟友与目标交战",
-    "params": {}
+    "params": {},
+    "name_template": "ALLIANCE_AT_WAR_WITH_COMBAT_TARGET"
   },
   "REQUIREMENT_ALLIANCE_CITY_HAS_TRADE_ROUTE_WITH_ALLY": {
     "comment": "联盟城市与盟友通商",
-    "params": {}
+    "params": {},
+    "name_template": "ALLIANCE_CITY_HAS_TRADE_ROUTE_WITH_ALLY"
   },
   "REQUIREMENT_ALLY": {
     "comment": "盟友",
-    "params": {}
+    "params": {},
+    "name_template": "ALLY"
   },
   "REQUIREMENT_ALWAYS_MET": {
     "comment": "始终满足",
-    "params": {}
+    "params": {},
+    "name_template": "ALWAYS_MET"
   },
   "REQUIREMENT_ATTACKER_PLOT_IMPROVEMENT_DEFENSE_STRENGTH": {
     "comment": "攻击地块改良防御{Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "ATTACKER_PLOT_IMPROVEMENT_DEFENSE_{:Amount}"
   },
   "REQUIREMENT_ATTACKER_PLOT_IMPROVEMENT_TYPE_MATCHES": {
     "comment": "攻击地块改良{ImprovementType}",
     "params": {
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "ATTACKER_PLOT_IMPROVEMENT_{ImprovementType}"
   },
   "REQUIREMENT_CITY_CONVERTED": {
     "comment": "城市已皈依",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_CONVERTED"
   },
   "REQUIREMENT_CITY_FOLLOWS_PANTHEON": {
     "comment": "城市信奉万神殿",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_FOLLOWS_PANTHEON"
   },
   "REQUIREMENT_CITY_FOLLOWS_RELIGION": {
     "comment": "城市信奉宗教",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_FOLLOWS_RELIGION"
   },
   "REQUIREMENT_CITY_HAS_ANY_WONDER": {
     "comment": "城市有奇观",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_HAS_ANY_WONDER"
   },
   "REQUIREMENT_CITY_HAS_BUILDING": {
     "comment": "城市有{BuildingType}",
     "params": {
       "BuildingType": "text",
       "MustBeFunctioning": "bool_true"
-    }
+    },
+    "name_template": "CITY_HAS_{BuildingType}"
   },
   "REQUIREMENT_CITY_HAS_DISTRICT": {
     "comment": "城市有{DistrictType}",
     "params": {
       "DistrictType": "text",
       "MustBeFunctioning": "bool_true"
-    }
+    },
+    "name_template": "CITY_HAS_{DistrictType}"
   },
   "REQUIREMENT_CITY_HAS_FEATURE": {
     "comment": "城市有{FeatureType}",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "CITY_HAS_{FeatureType}"
   },
   "REQUIREMENT_CITY_HAS_FULL_LOYALTY": {
     "comment": "城市满忠诚度",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_HAS_FULL_LOYALTY"
   },
   "REQUIREMENT_CITY_HAS_GARRISON_UNIT": {
     "comment": "城市驻军{MilitaryFormation}",
     "params": {
       "MilitaryFormation": "text"
-    }
+    },
+    "name_template": "CITY_HAS_GARRISON_{MilitaryFormation}"
   },
   "REQUIREMENT_CITY_HAS_GOVERNMENT_BUILDING_TIER": {
     "comment": "城市政体建筑{GovernmentBuildingTier}级",
     "params": {
       "GovernmentBuildingTier": "text"
-    }
+    },
+    "name_template": "CITY_HAS_GOVERNMENT_{GovernmentBuildingTier}"
   },
   "REQUIREMENT_CITY_HAS_GOVERNOR": {
     "comment": "城市有总督",
     "params": {
       "Established": "bool_true"
-    }
+    },
+    "name_template": "CITY_HAS_GOVERNOR"
   },
   "REQUIREMENT_CITY_HAS_GOVERNOR_WITH_X_TITLES": {
     "comment": "总督有{Amount}头衔",
     "params": {
       "Amount": "signed",
       "Established": "bool_true"
-    }
+    },
+    "name_template": "CITY_HAS_GOVERNOR_{:Amount}_TITLES"
   },
   "REQUIREMENT_CITY_HAS_HIGH_ADJACENCY_DISTRICT": {
     "comment": "{DistrictType}+{Amount}相邻",
@@ -98,44 +116,51 @@
       "Amount": "signed",
       "DistrictType": "text",
       "YieldType": "text"
-    }
+    },
+    "name_template": "CITY_ADJACENCY_{DistrictType}_{:Amount}"
   },
   "REQUIREMENT_CITY_HAS_NATIONAL_PARK": {
     "comment": "城市有国家公园",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_HAS_NATIONAL_PARK"
   },
   "REQUIREMENT_CITY_HAS_RESOURCE_TYPE_IMPROVED": {
     "comment": "城市改良{ResourceType}",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "CITY_HAS_IMPROVED_{ResourceType}"
   },
   "REQUIREMENT_CITY_HAS_SPECIFIC_GOVERNOR_PROMOTION_TYPE": {
     "comment": "总督有{GovernorPromotionType}晋升",
     "params": {
       "Established": "bool_true",
       "GovernorPromotionType": "text"
-    }
+    },
+    "name_template": "CITY_HAS_GOVERNOR_{GovernorPromotionType}"
   },
   "REQUIREMENT_CITY_HAS_X_FEATURE_TYPE": {
     "comment": "有{Amount}处{FeatureType}",
     "params": {
       "Amount": "signed",
       "FeatureType": "text"
-    }
+    },
+    "name_template": "CITY_HAS_{:Amount}_{FeatureType}"
   },
   "REQUIREMENT_CITY_HAS_X_POPULATION": {
     "comment": "人口>={Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "CITY_HAS_{:Amount}_POPULATION"
   },
   "REQUIREMENT_CITY_HAS_X_SPECIALTY_DISTRICTS": {
     "comment": "{Amount}个专业化区域",
     "params": {
       "Amount": "signed",
       "MustBeFunctioning": "bool_true"
-    }
+    },
+    "name_template": "CITY_HAS_{:Amount}_SPECIALTY_DISTRICTS"
   },
   "REQUIREMENT_CITY_HAS_X_TERRAIN_TYPE": {
     "comment": "{Amount}格{TerrainType}",
@@ -143,71 +168,84 @@
       "Amount": "signed",
       "Hills": "bool_true",
       "TerrainType": "text"
-    }
+    },
+    "name_template": "CITY_HAS_{:Amount}_{TerrainType}"
   },
   "REQUIREMENT_CITY_IS_ORIGINAL_OWNER": {
     "comment": "城市为原所有者",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_IS_ORIGINAL_OWNER"
   },
   "REQUIREMENT_CITY_IS_OWNER_CAPITAL_CONTINENT": {
     "comment": "城市在首都所在大陆",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_IS_OWNER_CAPITAL_CONTINENT"
   },
   "REQUIREMENT_CITY_IS_POWERED": {
     "comment": "城市已供电",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_IS_POWERED"
   },
   "REQUIREMENT_CITY_LIBERATED": {
     "comment": "城市已解放",
     "params": {
       "OnlyOwnersCity": "bool_true"
-    }
+    },
+    "name_template": "CITY_LIBERATED"
   },
   "REQUIREMENT_CITY_OCCUPIED": {
     "comment": "城市被占领",
     "params": {
       "OnlyOwnersCity": "bool_true"
-    }
+    },
+    "name_template": "CITY_OCCUPIED"
   },
   "REQUIREMENT_CITY_OCCUPIED_FRIEND": {
     "comment": "城市被友方占领",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_OCCUPIED_FRIEND"
   },
   "REQUIREMENT_CITY_OWNER_ALLY_AT_WAR": {
     "comment": "城市所有者盟友参战",
-    "params": {}
+    "params": {},
+    "name_template": "CITY_OWNER_ALLY_AT_WAR"
   },
   "REQUIREMENT_CITY_RAZED": {
     "comment": "城市被摧毁",
     "params": {
       "OnlyOwnersCity": "bool_true"
-    }
+    },
+    "name_template": "CITY_RAZED"
   },
   "REQUIREMENT_CITY_TRANSFER_TYPE_MATCHES": {
     "comment": "城市转移类型{TransferType}",
     "params": {
       "TransferType": "text"
-    }
+    },
+    "name_template": "CITY_TRANSFER_{TransferType}"
   },
   "REQUIREMENT_CIVILIZATION_LEVEL": {
     "comment": "文明等级{OpponentCivLevel}",
     "params": {
       "OpponentCivLevel": "signed"
-    }
+    },
+    "name_template": "CIVILIZATION_LEVEL_{:OpponentCivLevel}"
   },
   "REQUIREMENT_COLLECTION_ALL_MET": {
     "comment": "{CollectionType}全部满足",
     "params": {
       "CollectionType": "text",
       "RequirementSetId": "text"
-    }
+    },
+    "name_template": "COLLECTION_ALL_{RequirementSetId}"
   },
   "REQUIREMENT_COLLECTION_ANY_MET": {
     "comment": "{CollectionType}任一满足",
     "params": {
       "CollectionType": "text",
       "RequirementSetId": "text"
-    }
+    },
+    "name_template": "COLLECTION_ANY_{RequirementSetId}"
   },
   "REQUIREMENT_COLLECTION_COUNT_ATLEAST": {
     "comment": "{CollectionType}>={Count}",
@@ -215,281 +253,339 @@
       "CollectionType": "text",
       "Count": "unsigned",
       "RequirementSetId": "text"
-    }
+    },
+    "name_template": "COLLECTION_ATLEAST_{Count}_{RequirementSetId}"
   },
   "REQUIREMENT_COLLECTION_COUNT_EQUALS": {
     "comment": "{CollectionType}={Count}",
     "params": {
       "CollectionType": "text",
       "Count": "unsigned"
-    }
+    },
+    "name_template": "COLLECTION_EQUALS_{Count}"
   },
   "REQUIREMENT_COMBAT_ATTACKER_IS_EMERGENCY_MEMBER": {
     "comment": "攻击方为危急成员",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_ATTACKER_IS_EMERGENCY_MEMBER"
   },
   "REQUIREMENT_COMBAT_ATTACKER_IS_EMERGENCY_MEMBER_WITH_SCORE": {
     "comment": "攻击方为危急成员(有积分)",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_ATTACKER_IS_EMERGENCY_MEMBER_WITH_SCORE"
   },
   "REQUIREMENT_COMBAT_ATTACKER_IS_PLAYER": {
     "comment": "攻击方为玩家",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_ATTACKER_IS_PLAYER"
   },
   "REQUIREMENT_COMBAT_DEFENDER_IS_EMERGENCY_MEMBER": {
     "comment": "防御方为危急成员",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_DEFENDER_IS_EMERGENCY_MEMBER"
   },
   "REQUIREMENT_COMBAT_DEFENDER_IS_EMERGENCY_MEMBER_WITH_SCORE": {
     "comment": "防御方为危急成员(有积分)",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_DEFENDER_IS_EMERGENCY_MEMBER_WITH_SCORE"
   },
   "REQUIREMENT_COMBAT_DEFENDER_IS_PLAYER": {
     "comment": "防御方为玩家",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_DEFENDER_IS_PLAYER"
   },
   "REQUIREMENT_COMBAT_ENEMY_NOT_ALLIANCE_RELIGION": {
     "comment": "敌方非同宗教联盟",
-    "params": {}
+    "params": {},
+    "name_template": "COMBAT_ENEMY_NOT_ALLIANCE_RELIGION"
   },
   "REQUIREMENT_COMBAT_TYPE_MATCHES": {
     "comment": "战斗类型{CombatType}",
     "params": {
       "CombatType": "text"
-    }
+    },
+    "name_template": "COMBAT_{CombatType}"
   },
   "REQUIREMENT_COMBAT_VERSUS_TYPE_MATCHES": {
     "comment": "对抗类型{CombatVersusType}",
     "params": {
       "CombatVersusType": "text"
-    }
+    },
+    "name_template": "COMBAT_VERSUS_{CombatVersusType}"
   },
   "REQUIREMENT_CULTURE_BOMBED": {
     "comment": "文化炸弹引爆",
-    "params": {}
+    "params": {},
+    "name_template": "CULTURE_BOMBED"
   },
   "REQUIREMENT_DECLARED_FRIEND": {
     "comment": "宣布友谊",
-    "params": {}
+    "params": {},
+    "name_template": "DECLARED_FRIEND"
   },
   "REQUIREMENT_DEFENSIVE_PACT": {
     "comment": "共同防御协定",
-    "params": {}
+    "params": {},
+    "name_template": "DEFENSIVE_PACT"
   },
   "REQUIREMENT_DELEGATION": {
     "comment": "派遣代表团",
-    "params": {}
+    "params": {},
+    "name_template": "DELEGATION"
   },
   "REQUIREMENT_DEMAND_RECEIVED": {
     "comment": "收到要求",
-    "params": {}
+    "params": {},
+    "name_template": "DEMAND_RECEIVED"
   },
   "REQUIREMENT_DENOUNCED": {
     "comment": "已谴责",
-    "params": {}
+    "params": {},
+    "name_template": "DENOUNCED"
   },
   "REQUIREMENT_DENOUNCED_FRIEND": {
     "comment": "谴责友方",
-    "params": {}
+    "params": {},
+    "name_template": "DENOUNCED_FRIEND"
   },
   "REQUIREMENT_DISTRICT_TYPE_MATCHES": {
     "comment": "区域类型{DistrictType}",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "DISTRICT_{DistrictType}"
   },
   "REQUIREMENT_DISTRICT_TYPE_MATCHES_CITY_CENTER": {
     "comment": "城市中心{DistrictType}",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "DISTRICT_CITY_CENTER_{DistrictType}"
   },
   "REQUIREMENT_ESPIONAGE_DETECTED": {
     "comment": "间谍活动被发现",
-    "params": {}
+    "params": {},
+    "name_template": "ESPIONAGE_DETECTED"
   },
   "REQUIREMENT_FOUNDED_NO_RELIGION": {
     "comment": "未创建宗教",
-    "params": {}
+    "params": {},
+    "name_template": "FOUNDED_NO_RELIGION"
   },
   "REQUIREMENT_GAME_ERA_ATLEAST_EXPANSION": {
     "comment": "时代>={EraType}",
     "params": {
       "EraType": "text"
-    }
+    },
+    "name_template": "GAME_ERA_ATLEAST_{EraType}"
   },
   "REQUIREMENT_GAME_ERA_ATMOST_EXPANSION": {
     "comment": "时代<={EraType}",
     "params": {
       "EraType": "text"
-    }
+    },
+    "name_template": "GAME_ERA_ATMOST_{EraType}"
   },
   "REQUIREMENT_GAME_ERA_IS": {
     "comment": "时代为{EraType}",
     "params": {
       "EraType": "text"
-    }
+    },
+    "name_template": "GAME_ERA_{EraType}"
   },
   "REQUIREMENT_GAME_HAS_CIVILIZATION_OR_LEADER_TRAIT": {
     "comment": "游戏有{TraitType}特质",
     "params": {
       "TraitType": "text"
-    }
+    },
+    "name_template": "GAME_HAS_TRAIT_{TraitType}"
   },
   "REQUIREMENT_GAME_TURN_MAX_REACHED": {
     "comment": "达到最大回合数",
-    "params": {}
+    "params": {},
+    "name_template": "GAME_TURN_MAX_REACHED"
   },
   "REQUIREMENT_GAME_VICTORY_ENABLED": {
     "comment": "胜利方式{VictoryType}启用",
     "params": {
       "VictoryType": "text"
-    }
+    },
+    "name_template": "GAME_VICTORY_{VictoryType}"
   },
   "REQUIREMENT_GREAT_PERSON_TYPE_MATCHES": {
     "comment": "伟人类型{GreatPersonClassType}",
     "params": {
       "GreatPersonClassType": "text"
-    }
+    },
+    "name_template": "GREAT_PERSON_{GreatPersonClassType}"
   },
   "REQUIREMENT_HAD_FRIENDLY_MEETING": {
     "comment": "友好会面",
-    "params": {}
+    "params": {},
+    "name_template": "HAD_FRIENDLY_MEETING"
   },
   "REQUIREMENT_MAP_HAS_FEATURE": {
     "comment": "地图有{FeatureType}",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "MAP_HAS_{FeatureType}"
   },
   "REQUIREMENT_NEAR_CULTURE_BORDER": {
     "comment": "靠近文化边界",
-    "params": {}
+    "params": {},
+    "name_template": "NEAR_CULTURE_BORDER"
   },
   "REQUIREMENT_NEAR_RELIGIOUS_CITY": {
     "comment": "靠近宗教城市",
     "params": {
       "FriendlyCity": "bool_true"
-    }
+    },
+    "name_template": "NEAR_RELIGIOUS_CITY"
   },
   "REQUIREMENT_NEVER_MET": {
     "comment": "从未相遇",
-    "params": {}
+    "params": {},
+    "name_template": "NEVER_MET"
   },
   "REQUIREMENT_OPEN_BORDERS": {
     "comment": "开放边境",
     "params": {
       "GracePeriod": "bool_true"
-    }
+    },
+    "name_template": "OPEN_BORDERS"
   },
   "REQUIREMENT_OPPONENT_ERA_AGE_MATCHES": {
     "comment": "对手时代{Type}",
     "params": {
       "Type": "text"
-    }
+    },
+    "name_template": "OPPONENT_ERA_{Type}"
   },
   "REQUIREMENT_OPPONENT_ERA_AT_LEAST": {
     "comment": "对手时代>={MinimumEraType}",
     "params": {
       "MinimumEraType": "text"
-    }
+    },
+    "name_template": "OPPONENT_ERA_ATLEAST_{MinimumEraType}"
   },
   "REQUIREMENT_OPPONENT_IS_BARBARIAN": {
     "comment": "对手为蛮族",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_BARBARIAN"
   },
   "REQUIREMENT_OPPONENT_IS_DISTRICT": {
     "comment": "对手为区域",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_DISTRICT"
   },
   "REQUIREMENT_OPPONENT_IS_FORTIFIED": {
     "comment": "对手已驻守",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_FORTIFIED"
   },
   "REQUIREMENT_OPPONENT_IS_FREE_CITY": {
     "comment": "对手为自由城市",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_FREE_CITY"
   },
   "REQUIREMENT_OPPONENT_IS_MINOR_CIV": {
     "comment": "对手为城邦",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_MINOR_CIV"
   },
   "REQUIREMENT_OPPONENT_IS_OTHER_RELIGION": {
     "comment": "对手为异教",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_OTHER_RELIGION"
   },
   "REQUIREMENT_OPPONENT_IS_STRONGER": {
     "comment": "对手更强",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_STRONGER"
   },
   "REQUIREMENT_OPPONENT_IS_WOUNDED": {
     "comment": "对手受伤",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_IS_WOUNDED"
   },
   "REQUIREMENT_OPPONENT_UNIT_DOMAIN_MATCHES": {
     "comment": "对手单位域{UnitDomain}",
     "params": {
       "UnitDomain": "text"
-    }
+    },
+    "name_template": "OPPONENT_UNIT_DOMAIN_{UnitDomain}"
   },
   "REQUIREMENT_OPPONENT_UNIT_PROMOTION_CLASS_MATCHES": {
     "comment": "对手晋升{UnitPromotionClass}",
     "params": {
       "UnitPromotionClass": "text"
-    }
+    },
+    "name_template": "OPPONENT_UNIT_PROMOTION_{UnitPromotionClass}"
   },
   "REQUIREMENT_OPPONENT_UNIT_TAG_MATCHES": {
     "comment": "对手标签{Tag}",
     "params": {
       "Tag": "text"
-    }
+    },
+    "name_template": "OPPONENT_UNIT_TAG_{Tag}"
   },
   "REQUIREMENT_OPPONENT_WAS_KILLED": {
     "comment": "对手被击杀",
-    "params": {}
+    "params": {},
+    "name_template": "OPPONENT_WAS_KILLED"
   },
   "REQUIREMENT_PLAYER_ALWAYS_ALLOWED_COMMEMORATION_QUEST": {
     "comment": "始终允许纪念任务",
-    "params": {}
+    "params": {},
+    "name_template": "ALWAYS_ALLOWED_COMMEMORATION_QUEST"
   },
   "REQUIREMENT_PLAYER_ATTACKED_CONTINENT": {
     "comment": "玩家攻击过该大陆",
-    "params": {}
+    "params": {},
+    "name_template": "ATTACKED_CONTINENT"
   },
   "REQUIREMENT_PLAYER_AT_WAR_AND_HAS_MET": {
     "comment": "交战且已相遇",
-    "params": {}
+    "params": {},
+    "name_template": "AT_WAR_AND_HAS_MET"
   },
   "REQUIREMENT_PLAYER_AT_WAR_WITH_EMERGENCY_MEMBER": {
     "comment": "与危急成员交战",
-    "params": {}
+    "params": {},
+    "name_template": "AT_WAR_WITH_EMERGENCY_MEMBER"
   },
   "REQUIREMENT_PLAYER_AT_WAR_WITH_NEIGHBOR": {
     "comment": "与邻国交战",
-    "params": {}
+    "params": {},
+    "name_template": "AT_WAR_WITH_NEIGHBOR"
   },
   "REQUIREMENT_PLAYER_AVERAGE_WALL_LEVEL_THRESHOLD": {
     "comment": "平均城墙>={AverageWallLevelThreshold}",
     "params": {
       "AboveThreshold": "bool_true",
       "AverageWallLevelThreshold": "signed"
-    }
+    },
+    "name_template": "AVERAGE_WALL_LEVEL_{:AverageWallLevelThreshold}"
   },
   "REQUIREMENT_PLAYER_BUILT_NEW_WONDER": {
     "comment": "玩家新建奇观",
-    "params": {}
+    "params": {},
+    "name_template": "BUILT_NEW_WONDER"
   },
   "REQUIREMENT_PLAYER_BUILT_WONDER": {
     "comment": "奇观比例{WonderRatio}",
     "params": {
       "WonderRatio": "signed"
-    }
+    },
+    "name_template": "BUILT_WONDER_{:WonderRatio}"
   },
   "REQUIREMENT_PLAYER_CAN_EVER_EARN_GREAT_PERSON_CLASS": {
     "comment": "可获得{GreatPersonClass}",
     "params": {
       "GreatPersonClass": "text"
-    }
+    },
+    "name_template": "CAN_EARN_GREAT_PERSON_{GreatPersonClass}"
   },
   "REQUIREMENT_PLAYER_CITY_STATE_PROTECTOR": {
     "comment": "城邦保护者",
@@ -498,7 +594,8 @@
       "NoLowerBound": "bool_true",
       "NoUpperBound": "bool_true",
       "UpperBound": "signed"
-    }
+    },
+    "name_template": "CITY_STATE_PROTECTOR"
   },
   "REQUIREMENT_PLAYER_CIVILIZED": {
     "comment": "文明化程度",
@@ -508,7 +605,8 @@
       "ClearedCampValue": "signed",
       "IgnoredCampValue": "signed",
       "TotalScoreThreshold": "signed"
-    }
+    },
+    "name_template": "CIVILIZED"
   },
   "REQUIREMENT_PLAYER_COASTAL_CITIES": {
     "comment": "沿海城市>={MinimumCities}",
@@ -516,21 +614,25 @@
       "BelowPercentage": "bool_true",
       "MinimumCities": "unsigned",
       "Percentage": "signed"
-    }
+    },
+    "name_template": "COASTAL_CITIES_{MinimumCities}"
   },
   "REQUIREMENT_PLAYER_COMPETING_MINORS": {
     "comment": "竞争城邦{PercentCompeting}%",
     "params": {
       "PercentCompeting": "signed"
-    }
+    },
+    "name_template": "COMPETING_MINORS_{:PercentCompeting}"
   },
   "REQUIREMENT_PLAYER_CONQUERING_ALLYING_MINORS": {
     "comment": "征服/同盟城邦",
-    "params": {}
+    "params": {},
+    "name_template": "CONQUERING_ALLYING_MINORS"
   },
   "REQUIREMENT_PLAYER_DEAL_ENACTED": {
     "comment": "已制定协议",
-    "params": {}
+    "params": {},
+    "name_template": "DEAL_ENACTED"
   },
   "REQUIREMENT_PLAYER_DECLARED_WAR": {
     "comment": "宣战类型{WarType}",
@@ -538,18 +640,21 @@
       "ExcludeEmergencies": "bool_true",
       "WarType": "text",
       "WhileMet": "bool_true"
-    }
+    },
+    "name_template": "DECLARED_WAR_{WarType}"
   },
   "REQUIREMENT_PLAYER_DEFAULT_DEFEAT": {
     "comment": "默认失败",
-    "params": {}
+    "params": {},
+    "name_template": "DEFAULT_DEFEAT"
   },
   "REQUIREMENT_PLAYER_DIPLO_VP_LEAD": {
     "comment": "外交胜利领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "Ratio": "signed"
-    }
+    },
+    "name_template": "DIPLO_VP_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_DISTRICT_THRESHOLD": {
     "comment": "区域比例>={DistrictPercentThreshold}%",
@@ -557,359 +662,428 @@
       "AboveThreshold": "bool_true",
       "DistrictPercentThreshold": "signed",
       "MinDistrictsNeeded": "unsigned"
-    }
+    },
+    "name_template": "DISTRICT_THRESHOLD_{:DistrictPercentThreshold}"
   },
   "REQUIREMENT_PLAYER_ERA_AT_LEAST": {
     "comment": "玩家时代>={EraType}",
     "params": {
       "EraType": "text"
-    }
+    },
+    "name_template": "ERA_ATLEAST_{EraType}"
   },
   "REQUIREMENT_PLAYER_EXPLORATION_LEAD": {
     "comment": "探索领先{MinimumDelta}",
     "params": {
       "ExplorationRatio": "signed",
       "MinimumDelta": "signed"
-    }
+    },
+    "name_template": "EXPLORATION_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_FAVOR_LEAD": {
     "comment": "外交支持领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "Ratio": "signed"
-    }
+    },
+    "name_template": "FAVOR_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_FINISHED_RESEARCH": {
     "comment": "科研差距{TechCivicDifferential}",
     "params": {
       "TechCivicDifferential": "signed"
-    }
+    },
+    "name_template": "FINISHED_RESEARCH_{:TechCivicDifferential}"
   },
   "REQUIREMENT_PLAYER_FOUNDED_NO_RELIGION": {
     "comment": "玩家未创建宗教",
-    "params": {}
+    "params": {},
+    "name_template": "FOUNDED_NO_RELIGION"
   },
   "REQUIREMENT_PLAYER_FOUNDED_OUR_RELIGION": {
     "comment": "玩家创建了我们的宗教",
-    "params": {}
+    "params": {},
+    "name_template": "FOUNDED_OUR_RELIGION"
   },
   "REQUIREMENT_PLAYER_FOUNDED_RELIGION_WITH_BELIEF": {
     "comment": "创建宗教有{BeliefType}",
     "params": {
       "BeliefType": "text"
-    }
+    },
+    "name_template": "FOUNDED_RELIGION_WITH_{BeliefType}"
   },
   "REQUIREMENT_PLAYER_GOT_FIRST_PLACE_IN_EMERGENCY": {
     "comment": "危急中获第一名",
-    "params": {}
+    "params": {},
+    "name_template": "GOT_FIRST_PLACE_IN_EMERGENCY"
   },
   "REQUIREMENT_PLAYER_GOT_GREAT_PERSON": {
     "comment": "伟人领先{MinimumDelta}",
     "params": {
       "GreatPersonRatio": "signed",
       "MinimumDelta": "signed"
-    }
+    },
+    "name_template": "GOT_GREAT_PERSON_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_GOT_HIGH_TIER_SCORE_IN_EMERGENCY": {
     "comment": "危急中获高分",
-    "params": {}
+    "params": {},
+    "name_template": "GOT_HIGH_TIER_SCORE_IN_EMERGENCY"
   },
   "REQUIREMENT_PLAYER_GOT_LOW_TIER_SCORE_IN_EMERGENCY": {
     "comment": "危急中获低分",
-    "params": {}
+    "params": {},
+    "name_template": "GOT_LOW_TIER_SCORE_IN_EMERGENCY"
   },
   "REQUIREMENT_PLAYER_HANDICAP_AT_OR_ABOVE": {
     "comment": "难度>={Handicap}",
     "params": {
       "Handicap": "text"
-    }
+    },
+    "name_template": "HANDICAP_AT_OR_ABOVE_{Handicap}"
   },
   "REQUIREMENT_PLAYER_HAPPINESS_LEAD": {
     "comment": "幸福度领先{MinimumDelta}",
     "params": {
       "HappinessRatio": "signed",
       "MinimumDelta": "signed"
-    }
+    },
+    "name_template": "HAPPINESS_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_HAS_ACTIVE_ALLIANCE_OF_AT_LEAST_LEVEL": {
     "comment": "联盟>={Level}",
     "params": {
       "Level": "unsigned"
-    }
+    },
+    "name_template": "HAS_ALLIANCE_{Level}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_DIPLO_VIS_LEVEL": {
     "comment": "外交能见度>={Level}",
     "params": {
       "Level": "unsigned"
-    }
+    },
+    "name_template": "HAS_DIPLO_VIS_{Level}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUMBER_CITIES": {
     "comment": "城市数>={Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "HAS_CITIES_{:Amount}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUM_MILITARY_UNITS": {
     "comment": "军事单位>={Amount}",
     "params": {
       "Amount": "signed"
-    }
+    },
+    "name_template": "HAS_MILITARY_UNITS_{:Amount}"
   },
   "REQUIREMENT_PLAYER_HAS_BUILDING": {
     "comment": "拥有{BuildingType}建筑",
     "params": {
       "BuildingType": "text"
-    }
+    },
+    "name_template": "HAS_{BuildingType}"
   },
   "REQUIREMENT_PLAYER_HAS_CITY_ON_EMERGENCY_PLOT_CONTINENT": {
     "comment": "危急地块大陆有城市",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_CITY_ON_EMERGENCY_PLOT_CONTINENT"
   },
   "REQUIREMENT_PLAYER_HAS_CIVIC": {
     "comment": "拥有{CivicType}市政",
     "params": {
       "CivicType": "text"
-    }
+    },
+    "name_template": "HAS_CIVIC_{CivicType}"
   },
   "REQUIREMENT_PLAYER_HAS_CIVILIZATION_OR_LEADER_TRAIT": {
     "comment": "拥有{TraitType}特质",
     "params": {
       "TraitType": "text"
-    }
+    },
+    "name_template": "HAS_TRAIT_{TraitType}"
   },
   "REQUIREMENT_PLAYER_HAS_COMPLETED_PROJECT": {
     "comment": "完成{MinimumCompletions}次{ProjectType}",
     "params": {
       "MinimumCompletions": "unsigned",
       "ProjectType": "text"
-    }
+    },
+    "name_template": "HAS_PROJECT_{MinimumCompletions}_{ProjectType}"
   },
   "REQUIREMENT_PLAYER_HAS_DARK_AGE": {
     "comment": "处于黑暗时代",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_DARK_AGE"
   },
   "REQUIREMENT_PLAYER_HAS_DESIRED_LUXURY": {
     "comment": "拥有期望奢侈品",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_DESIRED_LUXURY"
   },
   "REQUIREMENT_PLAYER_HAS_DISTRICT": {
     "comment": "拥有{DistrictType}区域",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "HAS_{DistrictType}"
   },
   "REQUIREMENT_PLAYER_HAS_ENVOY_WITH_EMERGENCY_DATA_PLAYER": {
     "comment": "与危急目标有使者",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_ENVOY_WITH_EMERGENCY_TARGET"
   },
   "REQUIREMENT_PLAYER_HAS_FEATURE": {
     "comment": "拥有{FeatureType}",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "HAS_{FeatureType}"
   },
   "REQUIREMENT_PLAYER_HAS_GIVEN_INFLUENCE_TOKENS": {
     "comment": "投入>={MinimumTokens}使者",
     "params": {
       "MinimumTokens": "unsigned"
-    }
+    },
+    "name_template": "HAS_INFLUENCE_TOKENS_{MinimumTokens}"
   },
   "REQUIREMENT_PLAYER_HAS_GOLDEN_AGE": {
     "comment": "处于黄金时代",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_GOLDEN_AGE"
   },
   "REQUIREMENT_PLAYER_HAS_GREAT_PERSON": {
     "comment": "拥有伟人{GreatPersonIndividual}",
     "params": {
       "GreatPersonIndividual": "text"
-    }
+    },
+    "name_template": "HAS_GREAT_PERSON_{GreatPersonIndividual}"
   },
   "REQUIREMENT_PLAYER_HAS_GREAT_PERSON_CLASS": {
     "comment": "拥有{GreatPersonClass}伟人",
     "params": {
       "GreatPersonClass": "text"
-    }
+    },
+    "name_template": "HAS_GREAT_PERSON_CLASS_{GreatPersonClass}"
   },
   "REQUIREMENT_PLAYER_HAS_IMPROVEMENT": {
     "comment": "拥有{ImprovementType}改良",
     "params": {
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "HAS_IMPROVEMENT_{ImprovementType}"
   },
   "REQUIREMENT_PLAYER_HAS_MANY_ALLIANCES": {
     "comment": "拥有{MinOwnerAlliances}个同盟",
     "params": {
       "ChecKForFewer": "bool_hide",
       "MinOwnerAlliances": "unsigned"
-    }
+    },
+    "name_template": "HAS_ALLIANCES_{MinOwnerAlliances}"
   },
   "REQUIREMENT_PLAYER_HAS_MET": {
     "comment": "已相遇",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_MET"
   },
   "REQUIREMENT_PLAYER_HAS_PANTHEON": {
     "comment": "拥有万神殿",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_PANTHEON"
   },
   "REQUIREMENT_PLAYER_HAS_RESOURCE_IMPROVED": {
     "comment": "{ResourceType}已改良",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "HAS_RESOURCE_IMPROVED_{ResourceType}"
   },
   "REQUIREMENT_PLAYER_HAS_RESOURCE_OWNED": {
     "comment": "拥有{ResourceType}资源",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "HAS_RESOURCE_{ResourceType}"
   },
   "REQUIREMENT_PLAYER_HAS_RESOURCE_VISIBILITY": {
     "comment": "{ResourceType}可见",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "HAS_RESOURCE_VISIBILITY_{ResourceType}"
   },
   "REQUIREMENT_PLAYER_HAS_SAME_GOVERNMENT": {
     "comment": "相同政体",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_SAME_GOVERNMENT"
   },
   "REQUIREMENT_PLAYER_HAS_SCIENCE_VICTORY_POINTS": {
     "comment": "拥有科技胜利点数",
-    "params": {}
+    "params": {},
+    "name_template": "HAS_SCIENCE_VICTORY_POINTS"
   },
   "REQUIREMENT_PLAYER_HAS_TECHNOLOGY": {
     "comment": "拥有{TechnologyType}科技",
     "params": {
       "TechnologyType": "text"
-    }
+    },
+    "name_template": "HAS_TECHNOLOGY_{TechnologyType}"
   },
   "REQUIREMENT_PLAYER_INCOME_LEAD": {
     "comment": "收入领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "YieldRatio": "signed"
-    }
+    },
+    "name_template": "INCOME_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_IN_JOINT_EMERGENCY": {
     "comment": "参与联合紧急事件",
     "params": {
       "HostileOnly": "bool_true"
-    }
+    },
+    "name_template": "IN_JOINT_EMERGENCY"
   },
   "REQUIREMENT_PLAYER_IS_ATTACKING": {
     "comment": "正在进攻",
-    "params": {}
+    "params": {},
+    "name_template": "IS_ATTACKING"
   },
   "REQUIREMENT_PLAYER_IS_AT_LEAST_ALLIANCE_LEVEL_WITH_EMERGENCY_PLAYER": {
     "comment": "同盟等级≥{Level}",
     "params": {
       "Level": "unsigned"
-    }
+    },
+    "name_template": "ALLIANCE_LEVEL_{Level}"
   },
   "REQUIREMENT_PLAYER_IS_AT_PEACE": {
     "comment": "和平状态中",
     "params": {
       "Min Turns": "unsigned"
-    }
+    },
+    "name_template": "AT_PEACE"
   },
   "REQUIREMENT_PLAYER_IS_AT_PEACE_WITH_ALL_MAJORS": {
     "comment": "与所有主要文明和平",
-    "params": {}
+    "params": {},
+    "name_template": "AT_PEACE_WITH_ALL_MAJORS"
   },
   "REQUIREMENT_PLAYER_IS_AT_WAR": {
     "comment": "处于战争中",
-    "params": {}
+    "params": {},
+    "name_template": "IS_AT_WAR"
   },
   "REQUIREMENT_PLAYER_IS_CLOSE_TO_VICTORY": {
     "comment": "接近胜利",
-    "params": {}
+    "params": {},
+    "name_template": "CLOSE_TO_VICTORY"
   },
   "REQUIREMENT_PLAYER_IS_EMERGENCY_MEMBER_WITH_SCORE": {
     "comment": "紧急事件成员有积分",
-    "params": {}
+    "params": {},
+    "name_template": "EMERGENCY_MEMBER_WITH_SCORE"
   },
   "REQUIREMENT_PLAYER_IS_EMERGENCY_TARGET": {
     "comment": "为紧急事件目标",
-    "params": {}
+    "params": {},
+    "name_template": "EMERGENCY_TARGET"
   },
   "REQUIREMENT_PLAYER_IS_HUMAN": {
     "comment": "为人类玩家",
-    "params": {}
+    "params": {},
+    "name_template": "IS_HUMAN"
   },
   "REQUIREMENT_PLAYER_IS_MINOR": {
     "comment": "为小文明",
-    "params": {}
+    "params": {},
+    "name_template": "IS_MINOR"
   },
   "REQUIREMENT_PLAYER_IS_NEIGHBOR": {
     "comment": "为邻国",
-    "params": {}
+    "params": {},
+    "name_template": "IS_NEIGHBOR"
   },
   "REQUIREMENT_PLAYER_IS_NOT_WARMONGER": {
     "comment": "非战狂",
-    "params": {}
+    "params": {},
+    "name_template": "NOT_WARMONGER"
   },
   "REQUIREMENT_PLAYER_IS_RELIGION_FOUNDER": {
     "comment": "为宗教创始者",
-    "params": {}
+    "params": {},
+    "name_template": "RELIGION_FOUNDER"
   },
   "REQUIREMENT_PLAYER_IS_SAME_RELIGION": {
     "comment": "相同宗教",
-    "params": {}
+    "params": {},
+    "name_template": "SAME_RELIGION"
   },
   "REQUIREMENT_PLAYER_IS_SAME_SEX": {
     "comment": "相同性别",
-    "params": {}
+    "params": {},
+    "name_template": "SAME_SEX"
   },
   "REQUIREMENT_PLAYER_IS_SHARING_INFO": {
     "comment": "共享信息",
     "params": {
       "SharingInfoWell": "skip"
-    }
+    },
+    "name_template": "SHARING_INFO"
   },
   "REQUIREMENT_PLAYER_IS_SUZERAIN": {
     "comment": "为宗主国",
-    "params": {}
+    "params": {},
+    "name_template": "IS_SUZERAIN"
   },
   "REQUIREMENT_PLAYER_IS_SUZERAIN_BONUS_ENABLED": {
     "comment": "宗主权加成已启用",
-    "params": {}
+    "params": {},
+    "name_template": "SUZERAIN_BONUS_ENABLED"
   },
   "REQUIREMENT_PLAYER_IS_SUZERAIN_OF_X": {
     "comment": "为{LeaderType}宗主国",
     "params": {
       "LeaderType": "text"
-    }
+    },
+    "name_template": "SUZERAIN_OF_{LeaderType}"
   },
   "REQUIREMENT_PLAYER_IS_SUZERAIN_X_TYPE": {
     "comment": "拥有{Amount}个{LeaderType}宗主城邦",
     "params": {
       "Amount": "unsigned",
       "LeaderType": "text"
-    }
+    },
+    "name_template": "SUZERAIN_{Amount}_{LeaderType}"
   },
   "REQUIREMENT_PLAYER_IS_TEAM_MEMBER": {
     "comment": "为团队成员",
-    "params": {}
+    "params": {},
+    "name_template": "TEAM_MEMBER"
   },
   "REQUIREMENT_PLAYER_IS_WINNING_ANY_VICTORY": {
     "comment": "即将赢得任意胜利",
-    "params": {}
+    "params": {},
+    "name_template": "WINNING_ANY_VICTORY"
   },
   "REQUIREMENT_PLAYER_LEADER_TYPE_MATCHES": {
     "comment": "领袖为{LeaderType}",
     "params": {
       "LeaderType": "text"
-    }
+    },
+    "name_template": "LEADER_{LeaderType}"
   },
   "REQUIREMENT_PLAYER_MAJORITY_RELIGION_IS_OWNER": {
     "comment": "主流宗教为自创",
-    "params": {}
+    "params": {},
+    "name_template": "MAJORITY_RELIGION_OWNER"
   },
   "REQUIREMENT_PLAYER_MET_X_TURNS_AGO": {
     "comment": "{TurnsAgo}回合前相遇",
     "params": {
       "TurnsAgo": "unsigned"
-    }
+    },
+    "name_template": "MET_{TurnsAgo}_TURNS_AGO"
   },
   "REQUIREMENT_PLAYER_MILITARY_STRENGTH_LEAD": {
     "comment": "军力领先{MinimumDelta}",
@@ -917,7 +1091,8 @@
       "DomainType": "skip",
       "MinimumDelta": "signed",
       "StrengthRatio": "signed"
-    }
+    },
+    "name_template": "MILITARY_STRENGTH_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_MOUNTAIN_CITIES": {
     "comment": "有{MinimumCities}座山地城市",
@@ -926,15 +1101,18 @@
       "DistanceToMountain": "unsigned",
       "MinimumCities": "unsigned",
       "Percentage": "signed"
-    }
+    },
+    "name_template": "MOUNTAIN_CITIES_{MinimumCities}"
   },
   "REQUIREMENT_PLAYER_NOT_COMPETING_MINORS": {
     "comment": "不竞争城邦",
-    "params": {}
+    "params": {},
+    "name_template": "NOT_COMPETING_MINORS"
   },
   "REQUIREMENT_PLAYER_NOT_INVOLVED_MINORS": {
     "comment": "不卷入城邦",
-    "params": {}
+    "params": {},
+    "name_template": "NOT_INVOLVED_MINORS"
   },
   "REQUIREMENT_PLAYER_NUKE_LOVER": {
     "comment": "核弹爱好者",
@@ -943,71 +1121,84 @@
       "BuiltNukeValue": "unsigned",
       "TotalScoreThreshold": "unsigned",
       "UsedNukeValue": "unsigned"
-    }
+    },
+    "name_template": "NUKE_LOVER"
   },
   "REQUIREMENT_PLAYER_ON_NON_HOME_CONTINENT": {
     "comment": "不在本土大陆",
-    "params": {}
+    "params": {},
+    "name_template": "ON_NON_HOME_CONTINENT"
   },
   "REQUIREMENT_PLAYER_OWNS_OBJECT": {
     "comment": "拥有对象",
-    "params": {}
+    "params": {},
+    "name_template": "OWNS_OBJECT"
   },
   "REQUIREMENT_PLAYER_PEACEFUL_ON_CONTINENT": {
     "comment": "大陆和平",
-    "params": {}
+    "params": {},
+    "name_template": "PEACEFUL_ON_CONTINENT"
   },
   "REQUIREMENT_PLAYER_PILLAGE_LEAD": {
     "comment": "掠夺领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "Ratio": "signed"
-    }
+    },
+    "name_template": "PILLAGE_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_POPULATION_LEAD": {
     "comment": "人口领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "PopulationRatio": "signed"
-    }
+    },
+    "name_template": "POPULATION_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_RELIGION_NOT_RECEIVED": {
     "comment": "宗教未创立",
     "params": {
       "FoundingDelay": "unsigned"
-    }
+    },
+    "name_template": "RELIGION_NOT_RECEIVED"
   },
   "REQUIREMENT_PLAYER_RELIGION_RECEIVED": {
     "comment": "已获得宗教",
-    "params": {}
+    "params": {},
+    "name_template": "RELIGION_RECEIVED"
   },
   "REQUIREMENT_PLAYER_SHARES_HOME_CONTINENT": {
     "comment": "同本土大陆",
-    "params": {}
+    "params": {},
+    "name_template": "SHARES_HOME_CONTINENT"
   },
   "REQUIREMENT_PLAYER_TOURISM_LEAD": {
     "comment": "旅游领先{MinimumDelta}",
     "params": {
       "MinimumDelta": "signed",
       "Ratio": "signed"
-    }
+    },
+    "name_template": "TOURISM_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_TURN_STARTED": {
     "comment": "回合开始时",
-    "params": {}
+    "params": {},
+    "name_template": "TURN_STARTED"
   },
   "REQUIREMENT_PLAYER_TYPE_MATCHES": {
     "comment": "{CivilizationType}{LeaderType}匹配",
     "params": {
       "CivilizationType": "text",
       "LeaderType": "text"
-    }
+    },
+    "name_template": "PLAYER_{CivilizationType}_{LeaderType}"
   },
   "REQUIREMENT_PLAYER_WITH_SHIELD_OR_ON_IT": {
     "comment": "有护盾或在其上",
     "params": {
       "AgreementValue": "signed"
-    }
+    },
+    "name_template": "WITH_SHIELD_OR_ON_IT"
   },
   "REQUIREMENT_PLAYER_YIELD_LEAD": {
     "comment": "{YieldType}产出领先{MinimumDelta}",
@@ -1015,7 +1206,8 @@
       "MinimumDelta": "signed",
       "YieldRatio": "signed",
       "YieldType": "text"
-    }
+    },
+    "name_template": "YIELD_LEAD_{YieldType}_{:MinimumDelta}"
   },
   "REQUIREMENT_PLOT_ADJACENT_BUILDING_TYPE_MATCHES": {
     "comment": "邻接{BuildingType}",
@@ -1023,7 +1215,8 @@
       "BuildingType": "text",
       "MaxRange": "unsigned",
       "MinRange": "unsigned"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_BUILDING_{BuildingType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_DISTRICT_TYPE_MATCHES": {
     "comment": "邻接{DistrictType}区域",
@@ -1032,34 +1225,39 @@
       "MaxRange": "unsigned",
       "MinRange": "unsigned",
       "MustBeFunctioning": "bool_true"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_DISTRICT_{DistrictType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES": {
     "comment": "邻接{FeatureType}地貌",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_FEATURE_{FeatureType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_TERRITORY": {
     "comment": "邻接友方领土",
     "params": {
       "MaxRange": "unsigned",
       "MinRange": "unsigned"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_FRIENDLY_TERRITORY"
   },
   "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_UNIT_TAG_MATCHES": {
     "comment": "邻接{Tag}友军",
     "params": {
       "IncludeCenter": "bool_true",
       "Tag": "text"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_FRIENDLY_TAG_{Tag}"
   },
   "REQUIREMENT_PLOT_ADJACENT_FRIENDLY_UNIT_TYPE_MATCHES": {
     "comment": "邻接{UnitType}友军",
     "params": {
       "IncludeCenter": "bool_true",
       "UnitType": "text"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_FRIENDLY_{UnitType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_IMPROVEMENT_TYPE_MATCHES": {
     "comment": "邻接{ImprovementType}改良",
@@ -1067,39 +1265,46 @@
       "ImprovementType": "text",
       "MaxRange": "unsigned",
       "MinRange": "unsigned"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_IMPROVEMENT_{ImprovementType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_RESOURCE_CLASS_TYPE_MATCHES": {
     "comment": "邻接{ResourceClassType}资源",
     "params": {
       "ResourceClassType": "text"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_RESOURCE_CLASS_{ResourceClassType}"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_COAST": {
     "comment": "邻接海岸",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_COAST"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_LAKE": {
     "comment": "邻接湖泊",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_LAKE"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_MOUNTAIN": {
     "comment": "邻接山脉",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_MOUNTAIN"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_NATURAL_WONDER": {
     "comment": "邻接自然奇观",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_NATURAL_WONDER"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_OWNER": {
     "comment": "邻接所有者{MinDistance}到{MaxDistance}环内",
     "params": {
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned"
-    }
+    },
+    "name_template": "PLOT_ADJACENT_TO_OWNER"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_OWNER_AT_WAR": {
-    "comment": "邻接交战国领土",
+    "comment": "相邻所有者{MinDistance}到{MaxDistance}环内的敌方",
     "params": {
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned"
@@ -1107,100 +1312,121 @@
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_RIVER": {
     "comment": "邻接河流",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_RIVER"
   },
   "REQUIREMENT_PLOT_ADJACENT_TO_WONDER": {
     "comment": "邻接奇观",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_ADJACENT_TO_WONDER"
   },
   "REQUIREMENT_PLOT_DISTRICT_IS_DEFENDED": {
     "comment": "区域已驻防",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_DISTRICT_DEFENDED"
   },
   "REQUIREMENT_PLOT_DISTRICT_TYPE_MATCHES": {
     "comment": "区域为{DistrictType}",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "PLOT_DISTRICT_{DistrictType}"
   },
   "REQUIREMENT_PLOT_FEATURE_TAG_MATCHES": {
     "comment": "地貌标签{Tag}匹配",
     "params": {
       "Tag": "text"
-    }
+    },
+    "name_template": "PLOT_FEATURE_TAG_{Tag}"
   },
   "REQUIREMENT_PLOT_FEATURE_TYPE_MATCHES": {
     "comment": "地貌为{FeatureType}",
     "params": {
       "FeatureType": "text"
-    }
+    },
+    "name_template": "PLOT_FEATURE_{FeatureType}"
   },
   "REQUIREMENT_PLOT_HAS_ANY_DISTRICT": {
     "comment": "地块有任意区域",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_HAS_ANY_DISTRICT"
   },
   "REQUIREMENT_PLOT_HAS_ANY_FEATURE": {
     "comment": "地块有任意地貌",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_HAS_ANY_FEATURE"
   },
   "REQUIREMENT_PLOT_HAS_ANY_IMPROVEMENT": {
     "comment": "地块有任意改良",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_HAS_ANY_IMPROVEMENT"
   },
   "REQUIREMENT_PLOT_HAS_ANY_RESOURCE": {
     "comment": "地块有任意资源",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_HAS_ANY_RESOURCE"
   },
   "REQUIREMENT_PLOT_IMPROVED_RESOURCE_CLASS_TYPE_MATCHES": {
     "comment": "改良资源为{ResourceClassType}类",
     "params": {
       "ResourceClassType": "text"
-    }
+    },
+    "name_template": "PLOT_IMPROVED_RESOURCE_CLASS_{ResourceClassType}"
   },
   "REQUIREMENT_PLOT_IMPROVEMENT_TYPE_MATCHES": {
     "comment": "改良为{ImprovementType}",
     "params": {
       "ImprovementType": "text"
-    }
+    },
+    "name_template": "PLOT_IMPROVEMENT_{ImprovementType}"
   },
   "REQUIREMENT_PLOT_IS_APPEAL_BETWEEN": {
     "comment": "魅力{MinimumAppeal}-{MaximumAppeal}",
     "params": {
       "MaximumAppeal": "signed",
       "MinimumAppeal": "signed"
-    }
+    },
+    "name_template": "PLOT_APPEAL_{:MinimumAppeal}_{:MaximumAppeal}"
   },
   "REQUIREMENT_PLOT_IS_COAST": {
     "comment": "为海岸",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_COAST"
   },
   "REQUIREMENT_PLOT_IS_COASTAL_LAND": {
     "comment": "为沿海陆地",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_COASTAL_LAND"
   },
   "REQUIREMENT_PLOT_IS_FRESH_WATER": {
     "comment": "为淡水",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_FRESH_WATER"
   },
   "REQUIREMENT_PLOT_IS_HILLS": {
     "comment": "为丘陵",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_HILLS"
   },
   "REQUIREMENT_PLOT_IS_IMPASSABLE": {
     "comment": "不可通行",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_IMPASSABLE"
   },
   "REQUIREMENT_PLOT_IS_LAKE": {
     "comment": "为湖泊",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_LAKE"
   },
   "REQUIREMENT_PLOT_IS_MOUNTAIN": {
     "comment": "为山脉",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_IS_MOUNTAIN"
   },
   "REQUIREMENT_PLOT_IS_OWNER_CAPITAL_CONTINENT": {
     "comment": "为首都所在大陆",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_OWNER_CAPITAL_CONTINENT"
   },
   "REQUIREMENT_PLOT_NEARBY_UNIT_TAG_MATCHES": {
     "comment": "附近有{Tag}单位",
@@ -1208,190 +1434,228 @@
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned",
       "Tag": "text"
-    }
+    },
+    "name_template": "PLOT_NEARBY_TAG_{Tag}"
   },
   "REQUIREMENT_PLOT_NEAR_CAPITAL": {
     "comment": "靠近首都",
     "params": {
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned"
-    }
+    },
+    "name_template": "PLOT_NEAR_CAPITAL"
   },
   "REQUIREMENT_PLOT_PROPERTY_MATCHES": {
     "comment": "属性值≥{PropertyMinimum}",
     "params": {
       "PropertyMinimum": "signed",
       "PropertyName": "skip"
-    }
+    },
+    "name_template": "PLOT_PROPERTY_{:PropertyMinimum}"
   },
   "REQUIREMENT_PLOT_RESOURCE_CLASS_TYPE_MATCHES": {
     "comment": "资源类别为{ResourceClassType}",
     "params": {
       "ResourceClassType": "text"
-    }
+    },
+    "name_template": "PLOT_RESOURCE_CLASS_{ResourceClassType}"
   },
   "REQUIREMENT_PLOT_RESOURCE_TAG_MATCHES": {
     "comment": "资源标签{Tag}匹配",
     "params": {
       "Tag": "text"
-    }
+    },
+    "name_template": "PLOT_RESOURCE_TAG_{Tag}"
   },
   "REQUIREMENT_PLOT_RESOURCE_TYPE_MATCHES": {
     "comment": "资源为{ResourceType}",
     "params": {
       "ResourceType": "text"
-    }
+    },
+    "name_template": "PLOT_RESOURCE_{ResourceType}"
   },
   "REQUIREMENT_PLOT_RESOURCE_VISIBLE": {
     "comment": "资源可见",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_RESOURCE_VISIBLE"
   },
   "REQUIREMENT_PLOT_TERRAIN_CLASS_MATCHES": {
     "comment": "地形类别为{TerrainClass}",
     "params": {
       "TerrainClass": "text"
-    }
+    },
+    "name_template": "PLOT_TERRAIN_CLASS_{TerrainClass}"
   },
   "REQUIREMENT_PLOT_TERRAIN_TYPE_MATCHES": {
     "comment": "地形为{TerrainType}",
     "params": {
       "TerrainType": "text"
-    }
+    },
+    "name_template": "PLOT_TERRAIN_{TerrainType}"
   },
   "REQUIREMENT_PLOT_UNIT_CITY_HAS_ANY_DISTRICT": {
     "comment": "单位所在城市有区域",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_UNIT_CITY_HAS_DISTRICT"
   },
   "REQUIREMENT_PLOT_UNIT_CITY_HAS_DISTRICT_SAME_OWNER": {
     "comment": "城市有{DistrictType}且同主",
     "params": {
       "DistrictType": "text"
-    }
+    },
+    "name_template": "PLOT_UNIT_CITY_{DistrictType}"
   },
   "REQUIREMENT_PLOT_UNIT_EMBARKED": {
     "comment": "单位已登船",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_UNIT_EMBARKED"
   },
   "REQUIREMENT_PLOT_UNIT_FLANKED": {
     "comment": "单位被夹击",
-    "params": {}
+    "params": {},
+    "name_template": "PLOT_UNIT_FLANKED"
   },
   "REQUIREMENT_PLOT_UNIT_TYPE_MATCHES": {
     "comment": "单位为{UnitType}",
     "params": {
       "LayerIndex": "unsigned",
       "UnitType": "text"
-    }
+    },
+    "name_template": "PLOT_UNIT_{UnitType}"
   },
   "REQUIREMENT_PLOT_WONDER_IS_ERA": {
     "comment": "奇观时代{EarliestEra}-{LatestEra}",
     "params": {
       "EarliestEra": "text",
       "LatestEra": "text"
-    }
+    },
+    "name_template": "PLOT_WONDER_ERA_{EarliestEra}_{LatestEra}"
   },
   "REQUIREMENT_REQUIREMENTSET_IS_MET": {
     "comment": "满足{RequirementSetId}条件",
     "params": {
       "OnlyOwnersCity": "bool_hide",
       "RequirementSetId": "modifier_ref"
-    }
+    },
+    "name_template": "REQUIREMENTSET_{RequirementSetId}"
   },
   "REQUIREMENT_RESIDENT_EMBASSY": {
     "comment": "派遣大使馆",
-    "params": {}
+    "params": {},
+    "name_template": "RESIDENT_EMBASSY"
   },
   "REQUIREMENT_TEAM_DIPLOMATIC_VICTORY": {
     "comment": "团队外交胜利",
-    "params": {}
+    "params": {},
+    "name_template": "TEAM_DIPLOMATIC_VICTORY"
   },
   "REQUIREMENT_TEAM_DOMINATION_VICTORY": {
     "comment": "团队统治胜利",
-    "params": {}
+    "params": {},
+    "name_template": "TEAM_DOMINATION_VICTORY"
   },
   "REQUIREMENT_TEAM_HAS_HIGHEST_SCORE": {
     "comment": "团队最高分",
-    "params": {}
+    "params": {},
+    "name_template": "TEAM_HAS_HIGHEST_SCORE"
   },
   "REQUIREMENT_TOURISTS_EXCEED_STAYCATIONERS": {
     "comment": "游客超过国内游客",
-    "params": {}
+    "params": {},
+    "name_template": "TOURISTS_EXCEED_STAYCATIONERS"
   },
   "REQUIREMENT_TRADE_ROUTE_BETWEEN_ALLIANCE_PARTNERS": {
     "comment": "商路连接同盟",
-    "params": {}
+    "params": {},
+    "name_template": "TRADE_ROUTE_ALLIANCE_PARTNERS"
   },
   "REQUIREMENT_TRADE_ROUTE_BETWEEN_EMERGENCY_MEMBERS": {
     "comment": "商路连接紧急成员",
-    "params": {}
+    "params": {},
+    "name_template": "TRADE_ROUTE_EMERGENCY_MEMBERS"
   },
   "REQUIREMENT_TRADE_ROUTE_BETWEEN_EMERGENCY_MEMBER_AND_TARGET": {
     "comment": "商路连紧急目标",
-    "params": {}
+    "params": {},
+    "name_template": "TRADE_ROUTE_EMERGENCY_TARGET"
   },
   "REQUIREMENT_TRADE_ROUTE_DESTINATION_IS_CITY_STATE": {
     "comment": "商路终点为城邦",
-    "params": {}
+    "params": {},
+    "name_template": "TRADE_ROUTE_DEST_CITY_STATE"
   },
   "REQUIREMENT_UNIT_ADJACENT_TO_OWNER_TERRITORY": {
     "comment": "单位邻接己方领土",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_ADJACENT_TO_OWNER"
   },
   "REQUIREMENT_UNIT_DAMAGE_MINIMUM": {
     "comment": "受伤≥{MinimumAmount}",
     "params": {
       "MinimumAmount": "unsigned"
-    }
+    },
+    "name_template": "UNIT_DAMAGE_{MinimumAmount}"
   },
   "REQUIREMENT_UNIT_DOMAIN_MATCHES": {
     "comment": "单位域为{UnitDomain}",
     "params": {
       "UnitDomain": "text"
-    }
+    },
+    "name_template": "UNIT_DOMAIN_{UnitDomain}"
   },
   "REQUIREMENT_UNIT_EMBARKED": {
     "comment": "单位已登船",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_EMBARKED"
   },
   "REQUIREMENT_UNIT_ERA_TYPE_MATCHES": {
     "comment": "时代为{EraType}",
     "params": {
       "EraType": "text"
-    }
+    },
+    "name_template": "UNIT_ERA_{EraType}"
   },
   "REQUIREMENT_UNIT_IN_EMERGENCY_TARGET_TERRITORY": {
     "comment": "单位在紧急目标领土",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IN_EMERGENCY_TARGET"
   },
   "REQUIREMENT_UNIT_IN_ENEMY_TERRITORY": {
     "comment": "单位在敌方领土",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IN_ENEMY_TERRITORY"
   },
   "REQUIREMENT_UNIT_IN_FORMATION": {
     "comment": "单位在编队中",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IN_FORMATION"
   },
   "REQUIREMENT_UNIT_IN_OWNER_TERRITORY": {
     "comment": "单位在己方领土",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IN_OWNER_TERRITORY"
   },
   "REQUIREMENT_UNIT_IS_BARBARIAN": {
     "comment": "单位为蛮族",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IS_BARBARIAN"
   },
   "REQUIREMENT_UNIT_IS_LEVIED": {
     "comment": "单位为征召兵",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_IS_LEVIED"
   },
   "REQUIREMENT_UNIT_ON_COAST": {
     "comment": "单位在海岸",
     "params": {
       "Water": "bool_hide"
-    }
+    },
+    "name_template": "UNIT_ON_COAST"
   },
   "REQUIREMENT_UNIT_ON_HOME_CONTINENT": {
     "comment": "单位在本土大陆",
-    "params": {}
+    "params": {},
+    "name_template": "UNIT_ON_HOME_CONTINENT"
   },
   "REQUIREMENT_UNIT_PLOT_HAS_NATIONAL_PARK": {
     "comment": "单位地块有国家公园",
@@ -1399,30 +1663,35 @@
       "MaxDistance": "unsigned",
       "MinDistance": "unsigned",
       "SameOwner": "bool_hide"
-    }
+    },
+    "name_template": "UNIT_PLOT_NATIONAL_PARK"
   },
   "REQUIREMENT_UNIT_HAS_ABILITY": {
     "comment": "拥有{UnitAbilityType}能力",
     "params": {
       "UnitAbilityType": "text"
-    }
+    },
+    "name_template": "UNIT_HAS_{UnitAbilityType}"
   },
   "REQUIREMENT_UNIT_PROMOTION_CLASS_MATCHES": {
     "comment": "晋升兵种为{UnitPromotionClass}",
     "params": {
       "UnitPromotionClass": "text"
-    }
+    },
+    "name_template": "UNIT_PROMOTION_{UnitPromotionClass}"
   },
   "REQUIREMENT_UNIT_TAG_MATCHES": {
     "comment": "单位标签{Tag}匹配",
     "params": {
       "Tag": "text"
-    }
+    },
+    "name_template": "UNIT_TAG_{Tag}"
   },
   "REQUIREMENT_UNIT_TYPE_MATCHES": {
     "comment": "单位为{UnitType}",
     "params": {
       "UnitType": "text"
-    }
+    },
+    "name_template": "UNIT_{UnitType}"
   }
 }

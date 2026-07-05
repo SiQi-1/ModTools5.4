@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 import functools
 import itertools
@@ -24,11 +25,13 @@ from PyQt6.QtWidgets import (
     QAbstractScrollArea,
     QAbstractSpinBox,
     QButtonGroup,
+    QColorDialog,
     QDialog,
     QDialogButtonBox,
     QCheckBox,
     QComboBox,
     QFormLayout,
+    QFrame,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
@@ -6121,3 +6124,248 @@ def build_template_widget(key: str) -> BaseTemplateWidget:
         if spec.key == key:
             return spec.factory()
     raise KeyError(f"Unknown template key: {key}")
+
+
+# ── Color utilities ────────────────────────────────────────────
+
+_STANDARD_COLORS_PATH = Path(__file__).resolve().parent.parent / "data" / "standard_colors.json"
+
+_COLOR_FORMAT_HEX_SHARP = re.compile(r'^#([0-9a-fA-F]{3,8})$')
+_COLOR_FORMAT_HEX_RAW = re.compile(r'^([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$')
+_COLOR_FORMAT_RGB = re.compile(r'^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d{1,3}))?\s*\)$', re.IGNORECASE)
+_COLOR_FORMAT_COMMA = re.compile(r'^\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d{1,3}))?\s*$')
+
+
+def _load_standard_colors() -> dict:
+    try:
+        return json.loads(_STANDARD_COLORS_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {"color_sets": {}, "hues": [], "levels": [], "text_colors": []}
+
+
+def parse_color_text(text: str) -> QColor | None:
+    """Parse #RRGGBB, rgb(r,g,b), R,G,B, or plain hex string into QColor."""
+    text = text.strip()
+    if not text:
+        return None
+
+    m = _COLOR_FORMAT_HEX_SHARP.match(text)
+    if m:
+        h = m.group(1)
+        if len(h) in (3, 4):
+            h = ''.join(c * 2 for c in h)
+        if len(h) == 6:
+            return QColor('#' + h)
+        if len(h) == 8:
+            r, g, b, a = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), int(h[6:8], 16)
+            return QColor(r, g, b, a)
+
+    m = _COLOR_FORMAT_RGB.match(text)
+    if m:
+        r, g, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        a = int(m.group(4)) if m.group(4) is not None else 255
+        return QColor(min(r, 255), min(g, 255), min(b, 255), min(a, 255))
+
+    m = _COLOR_FORMAT_COMMA.match(text)
+    if m:
+        r, g, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        a = int(m.group(4)) if m.group(4) is not None else 255
+        return QColor(min(r, 255), min(g, 255), min(b, 255), min(a, 255))
+
+    m = _COLOR_FORMAT_HEX_RAW.match(text)
+    if m:
+        h = m.group(1)
+        if len(h) == 6:
+            return QColor('#' + h)
+        if len(h) == 8:
+            r, g, b, a = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), int(h[6:8], 16)
+            return QColor(r, g, b, a)
+
+    return None
+
+
+def color_to_hex(c: QColor) -> str:
+    return c.name().upper()
+
+
+def hex_to_rgb01(hex_color: str) -> tuple[float, float, float]:
+    c = QColor(hex_color)
+    return (c.redF(), c.greenF(), c.blueF())
+
+
+def hex_to_rgba_ints(hex_color: str) -> tuple[int, int, int, int]:
+    c = QColor(hex_color)
+    return (c.red(), c.green(), c.blue(), c.alpha())
+
+
+def _contrast_color(hex_color: str) -> str:
+    c = QColor(hex_color)
+    luminance = 0.299 * c.redF() + 0.587 * c.greenF() + 0.114 * c.blueF()
+    return "#222222" if luminance > 0.5 else "#EEEEEE"
+
+
+def _make_swatch(hex_color: str, size: int = 28) -> QFrame:
+    swatch = QFrame()
+    swatch.setFixedSize(size, size)
+    swatch.setStyleSheet(f"background-color:{hex_color}; border:1px solid #888; border-radius:2px;")
+    return swatch
+
+
+_GRID_COLS = 7
+
+
+class ColorPickerDialog(QDialog):
+    """Color picker with standard Civ VI color grid + custom input."""
+
+    def __init__(self, initial_hex: str = "#CC0001", parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("选择颜色")
+        self._data = _load_standard_colors()
+        self._active_set = "standard"
+        self._selected_hex = initial_hex.upper()
+        self._selected_is_standard = True
+        self._result_hex = ""
+
+        self._build_ui()
+        self._select_hex(self._selected_hex)
+
+    def selected_hex(self) -> str:
+        return self._result_hex
+
+    def _build_ui(self) -> None:
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        # Color set selector
+        set_row = QHBoxLayout()
+        set_row.addWidget(QLabel("配色方案:"))
+        self._set_btns: dict[str, QRadioButton] = {}
+        first = True
+        for key, info in self._data.get("color_sets", {}).items():
+            rb = QRadioButton(info.get("name", key))
+            rb.setChecked(first)
+            rb.toggled.connect(lambda checked, k=key: self._on_set_changed(k) if checked else None)
+            set_row.addWidget(rb)
+            self._set_btns[key] = rb
+            first = False
+        set_row.addStretch(1)
+        root.addLayout(set_row)
+
+        # Standard color grid — sequential, compact
+        grid_group = QGroupBox("官方颜色")
+        self._grid_layout = QGridLayout(grid_group)
+        self._grid_layout.setSpacing(2)
+        self._grid_layout.setContentsMargins(6, 8, 6, 6)
+        root.addWidget(grid_group)
+
+        # Custom color input
+        custom_group = QGroupBox("自定义颜色")
+        custom_layout = QVBoxLayout(custom_group)
+        custom_layout.setSpacing(4)
+
+        input_row = QHBoxLayout()
+        input_row.addWidget(QLabel("输入:"))
+        self._custom_input = QLineEdit()
+        self._custom_input.setPlaceholderText("#RRGGBB  /  rgb(r,g,b)  /  R,G,B")
+        self._custom_input.textChanged.connect(self._on_custom_text_changed)
+        input_row.addWidget(self._custom_input, 1)
+
+        sys_picker_btn = QPushButton("系统取色器...")
+        sys_picker_btn.clicked.connect(self._on_system_picker)
+        input_row.addWidget(sys_picker_btn)
+        custom_layout.addLayout(input_row)
+
+        self._custom_parse_label = QLabel("")
+        self._custom_parse_label.setStyleSheet("color:#64748b; font-size:11px;")
+        custom_layout.addWidget(self._custom_parse_label)
+        root.addWidget(custom_group)
+
+        # Bottom bar
+        bottom = QHBoxLayout()
+        bottom.addWidget(QLabel("当前选中:"))
+        self._current_swatch = QFrame()
+        self._current_swatch.setFixedSize(20, 20)
+        self._current_swatch.setStyleSheet(f"background:{self._selected_hex}; border:1px solid #888; border-radius:2px;")
+        bottom.addWidget(self._current_swatch)
+        self._current_label = QLabel("")
+        bottom.addWidget(self._current_label, 1)
+
+        btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        btn_box.accepted.connect(self._on_accept)
+        btn_box.rejected.connect(self.reject)
+        bottom.addWidget(btn_box)
+        root.addLayout(bottom)
+
+        self._rebuild_grid()
+        self.setMinimumWidth(0)
+
+    def _rebuild_grid(self) -> None:
+        while self._grid_layout.count():
+            item = self._grid_layout.takeAt(0)
+            if item.widget():
+                item.widget().setParent(None)
+
+        color_set = self._data.get("color_sets", {}).get(self._active_set, {})
+        colors = color_set.get("colors", {})
+        if not colors:
+            return
+
+        sorted_colors = list(colors.items())
+        for idx, (hex_key, info) in enumerate(sorted_colors):
+            row = idx // _GRID_COLS
+            col = idx % _GRID_COLS
+            btn = QPushButton(hex_key)
+            btn.setToolTip(info.get("name", hex_key))
+            btn.setFixedHeight(24)
+            btn.setMinimumWidth(60)
+            text_c = _contrast_color(hex_key)
+            btn.setStyleSheet(
+                f"background-color:{hex_key}; color:{text_c}; border:1px solid #666; "
+                f"font-size:9px; padding:1px 4px; border-radius:2px;"
+            )
+            btn.clicked.connect(lambda checked, h=hex_key: self._select_hex(h))
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            self._grid_layout.addWidget(btn, row, col)
+
+    def _select_hex(self, hex_color: str) -> None:
+        self._selected_hex = hex_color.upper()
+        color_set = self._data.get("color_sets", {}).get(self._active_set, {})
+        colors = color_set.get("colors", {})
+        info = colors.get(self._selected_hex)
+        self._selected_is_standard = info is not None and not info.get("custom", False)
+
+        self._current_swatch.setStyleSheet(
+            f"background-color:{self._selected_hex}; border:1px solid #888; border-radius:2px;"
+        )
+        tag = "官方色" if self._selected_is_standard else "自定义色"
+        name = info.get("name", "") if info else ""
+        self._current_label.setText(f"{self._selected_hex}  {name}  ({tag})")
+        self._custom_input.setText(self._selected_hex)
+
+    def _on_set_changed(self, key: str) -> None:
+        self._active_set = key
+        self._rebuild_grid()
+
+    def _on_custom_text_changed(self, text: str) -> None:
+        c = parse_color_text(text)
+        if c is None:
+            self._custom_parse_label.setText("无法解析  |  示例: #CC0001  /  rgb(204,0,1)  /  204,0,1")
+            self._custom_parse_label.setStyleSheet("color:#dc2626; font-size:11px;")
+            return
+
+        hex_color = c.name().upper()
+        r, g, b, a = c.red(), c.green(), c.blue(), c.alpha()
+        suffix = f"  Alpha({a})" if a < 255 else ""
+        self._custom_parse_label.setText(f"HEX {hex_color}  •  RGB({r}, {g}, {b}){suffix}")
+        self._custom_parse_label.setStyleSheet("color:#16a34a; font-size:11px;")
+        self._select_hex(hex_color)
+
+    def _on_system_picker(self) -> None:
+        initial = QColor(self._selected_hex) if self._selected_hex else QColor("#CC0001")
+        c = QColorDialog.getColor(initial, self, "系统取色器", QColorDialog.ColorDialogOption.ShowAlphaChannel)
+        if c.isValid():
+            self._select_hex(c.name().upper())
+
+    def _on_accept(self) -> None:
+        self._result_hex = self._selected_hex
+        self.accept()

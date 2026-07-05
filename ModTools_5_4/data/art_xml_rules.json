@@ -1,13 +1,14 @@
 {
   "version": "beta-3",
   "art_consumers": {
-    "WorldView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Cultures.artdef", "Districts.artdef", "Improvements.artdef"],
+    "WorldView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Cultures.artdef", "Districts.artdef", "Improvements.artdef", "Civilizations.artdef"],
     "StrategicView_Translate": ["Buildings.artdef", "Landmarks.artdef", "Districts.artdef", "Improvements.artdef"],
     "Units": ["Cultures.artdef", "Units.artdef", "Landmarks.artdef"],
-    "Landmarks": ["Cultures.artdef", "Landmarks.artdef", "Improvements.artdef"],
-    "Cultures": ["Cultures.artdef"],
+    "Landmarks": ["Cultures.artdef", "Landmarks.artdef", "Improvements.artdef", "Civilizations.artdef"],
+    "Cultures": ["Cultures.artdef", "Civilizations.artdef"],
+    "Civilizations": ["Civilizations.artdef"],
     "LeaderFallback": ["FallbackLeaders.artdef"],
-    "Audio": ["Leaders.artdef", "Landmarks.artdef", "Districts.artdef", "Units.artdef", "Improvements.artdef"],
+    "Audio": ["Leaders.artdef", "Landmarks.artdef", "Districts.artdef", "Units.artdef", "Improvements.artdef", "Civilizations.artdef"],
     "LeaderLighting": ["Leaders.artdef"],
     "Leaders": ["Leaders.artdef"],
     "UILensAsset": ["Overlay.artdef"],

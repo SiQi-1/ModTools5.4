@@ -5,6 +5,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
 import html
+import json
 import logging
 import re
 import sqlite3
@@ -47,7 +48,7 @@ from .base_page import BasePage
 from .art_workspace import ArtWorkspacePanel
 from .basic_info_workspace import BasicInfoWorkspacePanel
 from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
-from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel
+from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel, _build_entity_type
 from .modifier_workspace import ModifierWorkspacePanel
 from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDialog, _ImprovementSearchDialog, _UnitSearchDialog
 from ..ui_widget_kit import set_workspace_sections_provider
@@ -683,8 +684,20 @@ class WorkspacePage(BasePage):
 
         if section == "领袖":
             data_sql, _text_sql = self._build_leader_sql_pair()
+            colors_sql = self._build_colors_sql()
+            has_colors = bool(colors_sql.strip())
             if fmt == "xml":
+                if has_colors:
+                    return {
+                        "Leaders.xml": self._sql_preview_to_xml(data_sql),
+                        "Colors.xml": self._sql_preview_to_xml(colors_sql),
+                    }
                 return self._sql_preview_to_xml(data_sql)
+            if has_colors:
+                return {
+                    "Leaders.sql": data_sql,
+                    "Colors.sql": colors_sql,
+                }
             return data_sql
 
         if section == "区域":
@@ -710,6 +723,14 @@ class WorkspacePage(BasePage):
                 "Units.sql": unit_sql,
                 "UnitAbilities.sql": ability_sql,
             }
+
+        if section == "单位晋升":
+            bundle = self._build_promotion_tree_sql_bundle()
+            if bundle is None:
+                return "-- 暂无单位晋升数据" if fmt != "xml" else "<!-- 暂无单位晋升数据 -->"
+            if fmt == "xml":
+                return {k: self._sql_preview_to_xml(v) for k, v in bundle.items()}
+            return bundle
 
         if section == "改良设施":
             data_sql, _text_sql = self._build_improvement_sql_pair()
@@ -1769,6 +1790,256 @@ class WorkspacePage(BasePage):
                 ]
             ).rstrip()
         return data_sql, text_sql
+
+    def _load_standard_colors_data(self):
+        import json as _json
+        try:
+            path = Path(__file__).resolve().parent.parent.parent / "data" / "standard_colors.json"
+            return _json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return {"color_sets": {}, "hues": [], "levels": []}
+
+    def _resolve_color_info(self, hex_color: str, leader_suffix: str, custom_counter: list[int]):
+        data = self._load_standard_colors_data()
+        upper = hex_color.upper() if hex_color else ""
+        if not upper or not upper.startswith("#"):
+            return upper, True
+
+        # Check both color sets for a match (standard first, then jan_standard)
+        for set_key in ("standard", "jan_standard"):
+            color_set = data.get("color_sets", {}).get(set_key, {})
+            colors = color_set.get("colors", {})
+            info = colors.get(upper)
+            if info is not None:
+                is_custom = bool(info.get("custom", False))
+                return info["name"], is_custom
+
+        # Not found in any standard set → generate custom name
+        n = custom_counter[0]
+        custom_counter[0] = n + 1
+        name = f"COLOR_PLAYER_{leader_suffix}_{n}" if leader_suffix else f"COLOR_PLAYER_CUSTOM_{n}"
+        return name, True
+
+    def _build_colors_sql(self) -> str:
+        entries = self._project.sections.get("领袖")
+        leader_entries = [entry for entry in entries if isinstance(entry, dict)] if isinstance(entries, list) else []
+        if not leader_entries:
+            return ""
+
+        colors_rows: list[str] = []
+        player_colors_rows: list[str] = []
+        color_name_map: dict[str, str] = {}  # hex → color_type_name
+
+        for entry in leader_entries:
+            leader_type = str(entry.get("type") or "").strip()
+            if not leader_type:
+                continue
+            suffix = leader_type[7:] if leader_type.startswith("LEADER_") else leader_type
+            colors = entry.get("colors") if isinstance(entry.get("colors"), dict) else {}
+
+            if not isinstance(colors, dict) or not colors:
+                continue
+
+            jersey_colors: list[str] = []
+            for i in range(4):
+                p_key = f"j{i+1}_primary"
+                s_key = f"j{i+1}_secondary"
+                p_hex = str(colors.get(p_key, "") or "").strip().upper()
+                s_hex = str(colors.get(s_key, "") or "").strip().upper()
+                if p_hex and not p_hex.startswith("#"):
+                    p_hex = "#" + p_hex
+                if s_hex and not s_hex.startswith("#"):
+                    s_hex = "#" + s_hex
+                jersey_colors.append(p_hex)
+                jersey_colors.append(s_hex)
+
+            counter = [1]
+            resolved: list[str] = []
+            for hex_val in jersey_colors:
+                if hex_val and hex_val not in color_name_map:
+                    name, needs_insert = self._resolve_color_info(hex_val, suffix, counter)
+                    color_name_map[hex_val] = name
+                    if needs_insert:
+                        r, g, b, a = self._hex_to_rgba_ints(hex_val)
+                        colors_rows.append(f"('{self._sql_escape(name)}', '{r}, {g}, {b}, {a}')")
+                resolved.append(color_name_map.get(hex_val, ""))
+
+            primaries = resolved[0::2]  # j1p, j2p, j3p, j4p
+            secondaries = resolved[1::2]  # j1s, j2s, j3s, j4s
+
+            # Fallback: Alt jerseys default to Jersey 1 if not configured
+            j1_p = primaries[0] or resolved[0] if len(resolved) >= 1 else ""
+            j1_s = secondaries[0] if len(secondaries) >= 1 else ""
+            j2_p = primaries[1] if len(primaries) >= 2 else j1_p
+            j2_s = secondaries[1] if len(secondaries) >= 2 else j1_s
+            j3_p = primaries[2] if len(primaries) >= 3 else j1_p
+            j3_s = secondaries[2] if len(secondaries) >= 3 else j1_s
+            j4_p = primaries[3] if len(primaries) >= 4 else j1_p
+            j4_s = secondaries[3] if len(secondaries) >= 4 else j1_s
+
+            text_color = "COLOR_PLAYER_WHITE_TEXT"
+            player_colors_rows.append(
+                "('{leader}', 'Unique', "
+                "'{p1}', '{s1}', "
+                "'{p2}', '{s2}', "
+                "'{p3}', '{s3}', "
+                "'{p4}', '{s4}', "
+                "'{text}')".format(
+                    leader=self._sql_escape(leader_type),
+                    p1=primaries[0], s1=secondaries[0],
+                    p2=j2_p, s2=j2_s,
+                    p3=j3_p, s3=j3_s,
+                    p4=j4_p, s4=j4_s,
+                    text=text_color,
+                )
+            )
+
+        if not player_colors_rows:
+            return ""
+
+        blocks: list[str] = ["-- Colors.sql", ""]
+        if colors_rows:
+            colors_rows = list(dict.fromkeys(colors_rows))  # deduplicate
+            blocks.append(
+                self._build_insert_block("Colors 表", "Colors", ["Type", "Color"], colors_rows)
+            )
+        player_colors_rows = list(dict.fromkeys(player_colors_rows))
+        blocks.append(
+            self._build_insert_block(
+                "PlayerColors 表",
+                "PlayerColors",
+                [
+                    "Type", "Usage",
+                    "PrimaryColor", "SecondaryColor",
+                    "Alt1PrimaryColor", "Alt1SecondaryColor",
+                    "Alt2PrimaryColor", "Alt2SecondaryColor",
+                    "Alt3PrimaryColor", "Alt3SecondaryColor",
+                    "TextColor",
+                ],
+                player_colors_rows,
+            )
+        )
+        return "\n".join(blocks).rstrip()
+
+    @staticmethod
+    def _hex_to_rgba_ints(hex_color: str) -> tuple[int, int, int, int]:
+        c = QColor(hex_color) if hex_color.startswith("#") else QColor("#" + hex_color)
+        return (c.red(), c.green(), c.blue(), c.alpha())
+
+    def _build_promotion_tree_sql_bundle(self) -> dict[str, str] | None:
+        entries = self._project.sections.get("单位晋升")
+        tree_entries = [e for e in entries if isinstance(e, dict)] if isinstance(entries, list) else []
+        if not tree_entries:
+            return None
+
+        types_rows: list[str] = []
+        promotion_class_rows: list[str] = []
+        promotions_rows: list[str] = []
+        prereqs_rows: list[str] = []
+        text_rows: list[str] = []
+
+        for entry in tree_entries:
+            class_type = str(entry.get("type") or "").strip()
+            if not class_type:
+                continue
+            class_name = str(entry.get("name") or "").strip()
+
+            types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
+            promotion_class_rows.append(
+                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', '', 0)"
+            )
+            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
+            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_DESC','{self._sql_escape(class_name)}')")
+
+            nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
+            for idx, node_data in enumerate(nodes):
+                if not isinstance(node_data, dict):
+                    continue
+                n = node_data
+                node_abbr = str(n.get("abbr") or "").strip()
+                if not node_abbr:
+                    continue
+                shared = self._project.sections.get("基础信息", {})
+                promo_type = _build_entity_type(shared, "PROMOTION", "P", node_abbr)
+                node_name = str(n.get("name_cn") or node_abbr).strip()
+                node_desc = str(n.get("desc_cn") or "").strip()
+                level = int(n.get("level", 1) or 1)
+                column = int(n.get("column", 1) or 1)
+                mode = str(entry.get("mode", "tree")).strip()
+
+                types_rows.append(f"('{promo_type}', 'KIND_PROMOTION')")
+                promotions_rows.append(
+                    f"('{promo_type}', '{class_type}', 'LOC_{promo_type}_NAME', "
+                    f"'LOC_{promo_type}_DESC', {level}, {column}, 0, 0)"
+                )
+                text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_NAME','{self._sql_escape(node_name)}')")
+                if node_desc:
+                    text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_DESC','{self._sql_escape(node_desc)}')")
+
+                prereq_indices = n.get("prereq_indices", [])
+                if isinstance(prereq_indices, list):
+                    for pi in prereq_indices:
+                        if isinstance(pi, int) and 0 <= pi < len(nodes):
+                            pre_data = nodes[pi]
+                            if isinstance(pre_data, dict):
+                                pre_abbr = str(pre_data.get("abbr") or "").strip()
+                                if pre_abbr:
+                                    pre_type = _build_entity_type(shared, "PROMOTION", "P", pre_abbr)
+                                    prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
+
+        types_rows = list(dict.fromkeys(types_rows))
+        promotion_class_rows = list(dict.fromkeys(promotion_class_rows))
+        promotions_rows = list(dict.fromkeys(promotions_rows))
+        prereqs_rows = list(dict.fromkeys(prereqs_rows))
+        text_rows = list(dict.fromkeys(text_rows))
+
+        classes_sql_parts: list[str] = [
+            "-- UnitPromotionClasses.sql",
+            "",
+            self._build_insert_block("Types", "Types", ["Type", "Kind"], types_rows),
+            self._build_insert_block(
+                "UnitPromotionClasses", "UnitPromotionClasses",
+                ["PromotionClassType", "Name", "Description", "DefaultUnitType", "ChoiceThreshold"],
+                promotion_class_rows,
+            ),
+        ]
+
+        promotions_sql_parts: list[str] = [
+            "-- UnitPromotions.sql",
+            "",
+            self._build_insert_block(
+                "UnitPromotions", "UnitPromotions",
+                ["UnitPromotionType", "PromotionClass", "Name", "Description", "Level", "Column", "Permanent", "IsVisibleAboveFlag"],
+                promotions_rows,
+            ),
+        ]
+
+        prereqs_sql_parts: list[str] = [
+            "-- UnitPromotionPrereqs.sql",
+            "",
+        ]
+        if prereqs_rows:
+            prereqs_sql_parts.append(
+                self._build_insert_block(
+                    "UnitPromotionPrereqs", "UnitPromotionPrereqs",
+                    ["UnitPromotion", "PrereqUnitPromotion"],
+                    prereqs_rows,
+                )
+            )
+
+        text_sql_parts: list[str] = [
+            "-- UnitPromotion_Text.sql",
+            "",
+        ]
+        if text_rows:
+            text_sql_parts.append(
+                self._build_insert_block("LocalizedText", "LocalizedText", ["Language", "Tag", "Text"], text_rows)
+            )
+
+        return {
+            "PromotionClasses.sql": "\n".join(classes_sql_parts + promotions_sql_parts + prereqs_sql_parts).rstrip(),
+            "UnitPromotions_Text.sql": "\n".join(text_sql_parts).rstrip(),
+        }
 
     def _build_district_sql_pair(self) -> tuple[str, str]:
         entries = self._project.sections.get("区域")
@@ -8704,11 +8975,6 @@ class WorkspacePage(BasePage):
 
         pix_w = max(1, pix_w)
         pix_h = max(1, pix_h)
-        min_scale = max(base_w / pix_w, base_h / pix_h)
-        if scale < min_scale:
-            scale = min_scale
-            offset_x = (base_w - pix_w * scale) / 2.0
-            offset_y = (base_h - pix_h * scale) / 2.0
 
         ratio_x = target_w / base_w
         ratio_y = target_h / base_h
@@ -9196,6 +9462,15 @@ class WorkspacePage(BasePage):
 
         _apply_single_data("文明", "Civilizations", civ_data_sql)
         _apply_single_data("领袖", "Leaders", leader_data_sql)
+
+        # Colors.sql — only if there are colors configured
+        leader_colors_sql = self._build_colors_sql()
+        if leader_colors_sql.strip() and self._should_emit_optional_section_file("领袖"):
+            fmt = self._get_group_preview_format("领袖")
+            if fmt == "xml":
+                files[f"Data/{output_base}_Colors.xml"] = self._sql_preview_to_xml(leader_colors_sql)
+            else:
+                files[f"Data/{output_base}_Colors.sql"] = leader_colors_sql
         _apply_single_data("区域", "Districts", district_data_sql)
         _apply_single_data("建筑", "Buildings", building_data_sql)
         _apply_single_data("改良设施", "Improvements", improvement_data_sql)
@@ -9204,6 +9479,17 @@ class WorkspacePage(BasePage):
         _apply_single_data("项目", "Projects", project_data_sql)
         _apply_single_data("信仰", "Beliefs", belief_data_sql)
         _apply_single_data("议程", "Agendas", agenda_data_sql)
+
+        # Unit promotion trees — multi-file bundle
+        promo_bundle = self._build_promotion_tree_sql_bundle()
+        if promo_bundle and self._should_emit_optional_section_file("单位晋升"):
+            fmt = self._get_group_preview_format("单位晋升")
+            for key, sql_content in promo_bundle.items():
+                stem = key.replace(".sql", "").replace(".xml", "")
+                if fmt == "xml":
+                    files[f"Data/{output_base}_{stem}.xml"] = self._sql_preview_to_xml(sql_content)
+                else:
+                    files[f"Data/{output_base}_{stem}.sql"] = sql_content
 
         unit_fmt = self._get_group_preview_format("单位")
         has_units = self._should_emit_optional_section_file("单位")
@@ -9447,7 +9733,7 @@ class WorkspacePage(BasePage):
         return any(isinstance(entry, dict) for entry in entries)
 
     def _should_emit_optional_section_file(self, section: str) -> bool:
-        optional_sections = {"区域", "建筑", "单位", "改良设施", "伟人", "总督", "项目", "信仰", "政策卡", "议程"}
+        optional_sections = {"区域", "建筑", "单位", "单位晋升", "改良设施", "伟人", "总督", "项目", "信仰", "政策卡", "议程"}
         if section not in optional_sections:
             return True
         return self._section_has_entries(section)

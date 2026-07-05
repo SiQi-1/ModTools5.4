@@ -6,9 +6,10 @@ import re
 import random
 import sqlite3
 from pathlib import Path
+from dataclasses import dataclass, field
 from typing import Callable, Optional
 
-from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QPoint, QPointF, QRectF, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor, QImage, QKeySequence, QPainter, QPainterPath, QPen, QPixmap
 from PyQt6.QtWidgets import (
     QApplication,
@@ -32,6 +33,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
+    QRadioButton,
     QScrollArea,
     QSpinBox,
     QStackedWidget,
@@ -46,7 +48,7 @@ from PyQt6.QtWidgets import (
 from ...app.settings_store import load_settings
 from ...db.interface import get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
-from ..ui_widget_kit import IconTokenTextEdit, NewlineTokenTextEdit, build_template_widget
+from ..ui_widget_kit import IconTokenTextEdit, NewlineTokenTextEdit, build_template_widget, ColorPickerDialog
 from .entity_table_form import AgendaCompositeEditor, BeliefCompositeEditor, BuildingCompositeEditor, DistrictCompositeEditor, ImprovementCompositeEditor, PolicyCompositeEditor, ProjectCompositeEditor, UnitCompositeEditor
 from .great_people_editor import GreatPeopleCompositeEditor
 
@@ -56,6 +58,7 @@ SECTION_FILE_BASENAME = {
     "区域": "Districts",
     "建筑": "Buildings",
     "单位": "Units",
+    "单位晋升": "UnitPromotions",
     "改良设施": "Improvements",
     "总督": "Governors",
     "伟人": "GreatPeople",
@@ -2026,7 +2029,7 @@ class _ImageAdjustCanvas(QWidget):
         fit_scale = self._minimum_scale()
         if scale is not None:
             try:
-                self._scale = max(fit_scale, float(scale))
+                self._scale = max(0.01, float(scale))
             except (TypeError, ValueError):
                 self._scale = fit_scale
         else:
@@ -2105,7 +2108,7 @@ class _ImageAdjustCanvas(QWidget):
         if self._pixmap.isNull():
             return
         old_scale = self._scale
-        min_scale = self._minimum_scale()
+        min_scale = 0.01
         max_scale = 64.0
         new_scale = max(min_scale, min(old_scale * factor, max_scale))
         if abs(new_scale - old_scale) < 1e-6:
@@ -2544,6 +2547,822 @@ class _LeaderCivilizationSelectionDialog(QDialog):
         return dict(payload) if isinstance(payload, dict) else None
 
 
+@dataclass
+class _PromotionNode:
+    abbr: str = ""
+    name_cn: str = ""
+    desc_cn: str = ""
+    level: int = 1
+    column: int = 1
+    prereq_indices: list[int] = field(default_factory=list)
+    modifier_ids: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "abbr": self.abbr, "name_cn": self.name_cn, "desc_cn": self.desc_cn,
+            "level": self.level, "column": self.column,
+            "prereq_indices": list(self.prereq_indices),
+            "modifier_ids": list(self.modifier_ids),
+        }
+
+    @classmethod
+    def from_dict(cls, d: object) -> "_PromotionNode":
+        if not isinstance(d, dict):
+            return cls()
+        return cls(
+            abbr=_safe_text(d.get("abbr", "")),
+            name_cn=_safe_text(d.get("name_cn", "")),
+            desc_cn=_safe_text(d.get("desc_cn", "")),
+            level=max(1, min(4, int(d.get("level", 1) or 1))),
+            column=max(1, min(7, int(d.get("column", 1) or 1))),
+            prereq_indices=[int(i) for i in d.get("prereq_indices", []) if isinstance(i, (int, float))],
+            modifier_ids=[str(m) for m in d.get("modifier_ids", []) if isinstance(m, str)],
+        )
+
+
+# ── Canvas dimensions ──
+_CARD_W, _CARD_H = 140, 64
+_PORT_R = 5
+_LEVEL_GAP = 32
+_COL_GAP = 20
+
+
+class _PromotionTreeCanvas(QWidget):
+    """Canvas with tree nodes and user-drawn prerequisite lines."""
+
+    nodeSelected = pyqtSignal(int)
+    nodeChanged = pyqtSignal()
+
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self._nodes: list[_PromotionNode] = []
+        self._selected_idx: int = -1
+        self._linking_from: int = -1   # bottom port clicked: source index
+        self._linking_to: int = -1     # top port clicked: target index
+        self._dragging_idx: int = -1
+        self._drag_start = QPoint()
+        self._drag_level0: int = 0
+        self._drag_col0: int = 0
+        self.setMouseTracking(True)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setMinimumSize(300, 200)
+
+    def set_nodes(self, nodes: list[_PromotionNode]) -> None:
+        self._nodes = nodes
+        self._selected_idx = -1
+        self._linking_from = -1
+        self._linking_to = -1
+        self.updateGeometry()
+        self.update()
+
+    def selected_index(self) -> int:
+        return self._selected_idx
+
+    # ── geometry ──
+
+    def _card_x(self, col: int) -> int:
+        return _COL_GAP + (col - 1) * (_CARD_W + _COL_GAP)
+
+    def _card_y(self, level: int) -> int:
+        return _LEVEL_GAP + (level - 1) * (_CARD_H + _LEVEL_GAP)
+
+    def _card_rect(self, node: _PromotionNode) -> QRectF:
+        return QRectF(self._card_x(node.column), self._card_y(node.level), _CARD_W, _CARD_H)
+
+    def _top_port_center(self, node: _PromotionNode) -> QPointF:
+        r = self._card_rect(node)
+        return QPointF(r.center().x(), r.top())
+
+    def _bot_port_center(self, node: _PromotionNode) -> QPointF:
+        r = self._card_rect(node)
+        return QPointF(r.center().x(), r.bottom())
+
+    def _max_col(self) -> int:
+        return max((n.column for n in self._nodes), default=1)
+
+    def _max_level(self) -> int:
+        return max((n.level for n in self._nodes), default=1)
+
+    def sizeHint(self) -> QSize:
+        w = self._card_x(self._max_col()) + _CARD_W + _COL_GAP
+        h = self._card_y(1) + _CARD_H + _LEVEL_GAP
+        return QSize(max(w, 300), max(h, 200))
+
+    def minimumSizeHint(self) -> QSize:
+        w = self._card_x(self._max_col()) + _CARD_W + _COL_GAP + 30
+        h = self._card_y(self._max_level()) + _CARD_H + _LEVEL_GAP + 10
+        return QSize(max(w, 300), max(h, 200))
+
+    # ── paint ──
+
+    def paintEvent(self, event) -> None:
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        p.fillRect(self.rect(), QColor("#f8fafc"))
+
+        if not self._nodes:
+            p.setPen(QColor("#94a3b8"))
+            p.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "暂无节点  |  点击 [+新增节点] 添加")
+            p.end()
+            return
+
+        # Level labels
+        p.setPen(QColor("#94a3b8"))
+        font = p.font()
+        font.setPointSize(8)
+        p.setFont(font)
+        for lv in range(1, 5):
+            y = self._card_y(lv) + _CARD_H / 2
+            p.drawText(2, int(y - 6), 20, 12, Qt.AlignmentFlag.AlignCenter, f"Lv{lv}")
+
+        # Lines
+        for idx, node in enumerate(self._nodes):
+            for pre_idx in node.prereq_indices:
+                if pre_idx < 0 or pre_idx >= len(self._nodes):
+                    continue
+                pre = self._nodes[pre_idx]
+                from_pt = self._bot_port_center(pre)
+                to_pt = self._top_port_center(node)
+                mid_y = (from_pt.y() + to_pt.y()) / 2
+                p.setPen(QPen(QColor("#64748b"), 2))
+                path = QPainterPath()
+                path.moveTo(from_pt)
+                path.lineTo(QPointF(from_pt.x(), mid_y))
+                path.lineTo(QPointF(to_pt.x(), mid_y))
+                path.lineTo(to_pt)
+                p.drawPath(path)
+
+        # Cards
+        for idx, node in enumerate(self._nodes):
+            rect = self._card_rect(node)
+            sel = idx == self._selected_idx
+            if sel:
+                p.setBrush(QColor("#eff6ff"))
+                p.setPen(QPen(QColor("#3b82f6"), 2))
+            else:
+                p.setBrush(QColor("#ffffff"))
+                p.setPen(QPen(QColor("#cbd5e1"), 1))
+            p.drawRoundedRect(rect, 6, 6)
+
+            # Type name
+            p.setPen(QColor("#1e293b"))
+            font = p.font()
+            font.setPointSize(9)
+            font.setBold(True)
+            p.setFont(font)
+            p.drawText(rect.adjusted(8, 4, -8, -28), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                       node.abbr or f"PROMOTION_{idx + 1}")
+
+            # Name / Description
+            p.setPen(QColor("#475569"))
+            font.setPointSize(8)
+            font.setBold(False)
+            p.setFont(font)
+            label = node.name_cn or node.desc_cn or "(未命名)"
+            if len(label) > 16:
+                label = label[:15] + "…"
+            p.drawText(rect.adjusted(8, 20, -8, -4), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, label)
+
+            # Ports
+            top_c = self._top_port_center(node)
+            bot_c = self._bot_port_center(node)
+            # Top port — prerequisite
+            top_hl = idx == self._linking_to
+            p.setBrush(QColor("#22c55e") if top_hl else QColor("#e2e8f0"))
+            p.setPen(QPen(QColor("#16a34a") if top_hl else QColor("#94a3b8"), 2))
+            p.drawEllipse(top_c, _PORT_R, _PORT_R)
+            p.setPen(QColor("#16a34a" if top_hl else "#64748b"))
+            font.setPointSize(7)
+            p.setFont(font)
+            p.drawText(QRectF(top_c.x() - 10, top_c.y() - 14, 20, 10), Qt.AlignmentFlag.AlignCenter, "▲")
+
+            # Bottom port — dependent
+            bot_hl = idx == self._linking_from
+            p.setBrush(QColor("#f59e0b") if bot_hl else QColor("#e2e8f0"))
+            p.setPen(QPen(QColor("#d97706") if bot_hl else QColor("#94a3b8"), 2))
+            p.drawEllipse(bot_c, _PORT_R, _PORT_R)
+            p.setPen(QColor("#d97706" if bot_hl else "#64748b"))
+            p.drawText(QRectF(bot_c.x() - 10, bot_c.y() + 4, 20, 10), Qt.AlignmentFlag.AlignCenter, "▼")
+
+        p.end()
+
+    # ── interaction ──
+
+    def _node_at(self, pos: QPointF) -> int:
+        for idx, node in enumerate(self._nodes):
+            if self._card_rect(node).contains(pos):
+                return idx
+        return -1
+
+    def _port_hit(self, pos: QPointF, node: _PromotionNode) -> int:
+        """Return 1 for top port, 2 for bottom port, 0 for no port."""
+        top = self._top_port_center(node)
+        bot = self._bot_port_center(node)
+        d_top = ((pos.x() - top.x()) ** 2 + (pos.y() - top.y()) ** 2) ** 0.5
+        d_bot = ((pos.x() - bot.x()) ** 2 + (pos.y() - bot.y()) ** 2) ** 0.5
+        if d_top <= _PORT_R + 4:
+            return 1
+        if d_bot <= _PORT_R + 4:
+            return 2
+        return 0
+
+    def mousePressEvent(self, event) -> None:
+        if event.button() != Qt.MouseButton.LeftButton:
+            return
+        pos = event.position()
+
+        # Check ports first
+        for idx, node in enumerate(self._nodes):
+            port = self._port_hit(pos, node)
+            if port == 1:  # top port (prerequisite target)
+                if self._linking_from >= 0:
+                    # Complete link: from bottom → to this top
+                    if idx != self._linking_from:
+                        if self._linking_from not in self._nodes[idx].prereq_indices:
+                            self._nodes[idx].prereq_indices.append(self._linking_from)
+                    self._linking_from = -1
+                    self._linking_to = -1
+                    self.update()
+                    self.nodeChanged.emit()
+                    return
+                self._linking_to = idx
+                self._linking_from = -1
+                self.update()
+                return
+            if port == 2:  # bottom port (prerequisite source)
+                if self._linking_to >= 0:
+                    # Complete link: from this bottom → to top
+                    if self._linking_to != idx:
+                        if idx not in self._nodes[self._linking_to].prereq_indices:
+                            self._nodes[self._linking_to].prereq_indices.append(idx)
+                    self._linking_from = -1
+                    self._linking_to = -1
+                    self.update()
+                    self.nodeChanged.emit()
+                    return
+                self._linking_from = idx
+                self._linking_to = -1
+                self.update()
+                return
+
+        target = self._node_at(pos)
+        if target >= 0:
+            self._selected_idx = target
+            self._linking_from = -1
+            self._linking_to = -1
+            self._dragging_idx = target
+            self._drag_start = event.pos()
+            n = self._nodes[target]
+            self._drag_level0 = n.level
+            self._drag_col0 = n.column
+            self.update()
+            self.nodeSelected.emit(target)
+            return
+
+        self._selected_idx = -1
+        self._linking_from = -1
+        self._linking_to = -1
+        self.update()
+        self.nodeSelected.emit(-1)
+
+    def mouseMoveEvent(self, event) -> None:
+        if self._dragging_idx >= 0:
+            delta = event.pos() - self._drag_start
+            if abs(delta.x()) > 4 or abs(delta.y()) > 4:
+                n = self._nodes[self._dragging_idx]
+                new_col = max(1, self._drag_col0 + delta.x() // (_CARD_W + _COL_GAP))
+                new_level = max(1, min(4, self._drag_level0 + delta.y() // (_CARD_H + _LEVEL_GAP)))
+                n.column = new_col
+                n.level = new_level
+                self.updateGeometry()
+                self.update()
+
+    def mouseReleaseEvent(self, event) -> None:
+        if self._dragging_idx >= 0:
+            n = self._nodes[self._dragging_idx]
+            if n.level != self._drag_level0 or n.column != self._drag_col0:
+                self.nodeChanged.emit()
+        self._dragging_idx = -1
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        pos = event.position()
+        target = self._node_at(pos)
+        if target >= 0:
+            self._selected_idx = target
+            self.update()
+            self.nodeSelected.emit(target)
+            # signal to parent to open edit dialog
+            self._edit_requested = True
+        else:
+            self._edit_requested = False
+
+    def keyPressEvent(self, event) -> None:
+        if event.key() == Qt.Key.Key_Delete and self._selected_idx >= 0:
+            # Remove all connections
+            idx = self._selected_idx
+            for n in self._nodes:
+                n.prereq_indices = [i for i in n.prereq_indices if i != idx]
+            # Fix indices
+            for n in self._nodes:
+                n.prereq_indices = [i - 1 if i > idx else i for i in n.prereq_indices if i != idx]
+            del self._nodes[idx]
+            self._selected_idx = -1
+            self._linking_from = -1
+            self._linking_to = -1
+            self.updateGeometry()
+            self.update()
+            self.nodeChanged.emit()
+            return
+        super().keyPressEvent(event)
+
+
+class _NodeEditDialog(QDialog):
+    """Edit a single promotion node (name, description, level, column)."""
+
+    def __init__(self, node: _PromotionNode, parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("编辑晋升节点")
+        self._node = node
+        self._result: _PromotionNode | None = None
+
+        layout = QFormLayout(self)
+        self._name_edit = QLineEdit(node.name_cn)
+        self._desc_edit = QLineEdit(node.desc_cn)
+        self._level_spin = QSpinBox()
+        self._level_spin.setRange(1, 4)
+        self._level_spin.setValue(node.level)
+        self._col_spin = QSpinBox()
+        self._col_spin.setRange(1, 7)
+        self._col_spin.setValue(node.column)
+
+        layout.addRow("名字（中文）", self._name_edit)
+        layout.addRow("描述（中文）", self._desc_edit)
+        layout.addRow("Level", self._level_spin)
+        layout.addRow("Column", self._col_spin)
+
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        btns.accepted.connect(self._on_ok)
+        btns.rejected.connect(self.reject)
+        layout.addRow(btns)
+
+    def _on_ok(self) -> None:
+        self._result = _PromotionNode(
+            abbr=self._node.abbr,
+            name_cn=_safe_text(self._name_edit.text()),
+            desc_cn=_safe_text(self._desc_edit.text()),
+            level=self._level_spin.value(),
+            column=self._col_spin.value(),
+            prereq_indices=list(self._node.prereq_indices),
+            modifier_ids=list(self._node.modifier_ids),
+        )
+        self.accept()
+
+    def result(self) -> _PromotionNode | None:
+        return self._result
+
+
+class PromotionTreeEditor(QWidget):
+    """Unit promotion tree editor — tree canvas + random list."""
+    dataChanged = pyqtSignal()
+
+    def __init__(self, shared_params_provider, type_builder) -> None:
+        super().__init__()
+        self.setMinimumHeight(500)
+        self._shared_params_provider = shared_params_provider
+        self._type_builder = type_builder
+        self._nodes: list[_PromotionNode] = []
+        self._mode_tree = True
+        self._loading = False
+
+        # Basic info
+        self._abbr_edit = QLineEdit()
+        self._abbr_edit.setPlaceholderText("仅英文/数字/下划线")
+        self._type_label = QLabel("PROMOTION_CLASS")
+        self._type_label.setObjectName("pageInfoLabel")
+        self._name_edit = QLineEdit()
+        self._name_edit.setPlaceholderText("晋升树名字（中文）")
+
+        # Mode
+        self._mode_tree_btn = QRadioButton("树形晋升")
+        self._mode_random_btn = QRadioButton("随机晋升")
+        self._mode_tree_btn.setChecked(True)
+        self._mode_group = QButtonGroup(self)
+        self._mode_group.addButton(self._mode_tree_btn)
+        self._mode_group.addButton(self._mode_random_btn)
+
+        # Tree
+        self._tree_canvas = _PromotionTreeCanvas()
+        self._tree_canvas.nodeSelected.connect(self._on_canvas_select)
+        self._tree_canvas.nodeChanged.connect(self._emit_changed)
+        self._tree_scroll = QScrollArea()
+        self._tree_scroll.setWidgetResizable(True)
+        self._tree_scroll.setWidget(self._tree_canvas)
+        self._tree_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self._tree_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+        # Random
+        self._random_content = QWidget()
+        self._random_layout = QVBoxLayout(self._random_content)
+        self._random_layout.setContentsMargins(0, 0, 0, 0)
+        self._random_scroll = QScrollArea()
+        self._random_scroll.setWidgetResizable(True)
+        self._random_scroll.setWidget(self._random_content)
+
+        self._mode_stack = QStackedWidget()
+        self._mode_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self._mode_stack.addWidget(self._tree_scroll)
+        self._mode_stack.addWidget(self._random_scroll)
+
+        # Node edit bar (visible when a node is selected)
+        self._node_edit_bar = QWidget()
+        bar_layout = QHBoxLayout(self._node_edit_bar)
+        bar_layout.setContentsMargins(0, 0, 0, 0)
+        self._node_sel_label = QLabel("选中: —")
+        self._node_edit_btn = QPushButton("编辑节点")
+        self._node_edit_btn.clicked.connect(self._edit_selected_node)
+        self._node_del_btn = QPushButton("删除节点")
+        self._node_del_btn.clicked.connect(self._delete_selected)
+        bar_layout.addWidget(self._node_sel_label)
+        bar_layout.addWidget(self._node_edit_btn)
+        bar_layout.addWidget(self._node_del_btn)
+        bar_layout.addStretch(1)
+        self._node_edit_bar.setVisible(False)
+
+        self._add_node_btn = QPushButton("+ 新增节点")
+        self._add_node_btn.clicked.connect(self._add_node)
+
+        self._build_ui()
+        self._bind_events()
+        self._refresh_type_display()
+
+    def _build_ui(self) -> None:
+        root = QVBoxLayout(self)
+        root.setContentsMargins(10, 10, 10, 10)
+        root.setSpacing(8)
+
+        # Basic info
+        base_group = QGroupBox("基础信息")
+        base_form = QFormLayout()
+        base_form.addRow("简称", self._abbr_edit)
+        base_form.addRow("完整Type", self._type_label)
+        base_form.addRow("名字（中文）", self._name_edit)
+        base_group.setLayout(base_form)
+        root.addWidget(base_group)
+
+        # Mode row
+        mode_row = QHBoxLayout()
+        mode_row.addWidget(QLabel("晋升模式:"))
+        mode_row.addWidget(self._mode_tree_btn)
+        mode_row.addWidget(self._mode_random_btn)
+        mode_row.addStretch(1)
+        self._tpl_2221_btn = QPushButton("2221模版")
+        self._tpl_2212_btn = QPushButton("2212模版")
+        _apply_small_button(self._tpl_2221_btn)
+        _apply_small_button(self._tpl_2212_btn)
+        self._tpl_2221_btn.clicked.connect(lambda: self._apply_template("2221"))
+        self._tpl_2212_btn.clicked.connect(lambda: self._apply_template("2212"))
+        mode_row.addWidget(self._tpl_2221_btn)
+        mode_row.addWidget(self._tpl_2212_btn)
+        mode_row.addWidget(self._add_node_btn)
+        root.addLayout(mode_row)
+
+        # Hint bar
+        hint = QLabel("树形模式: 点卡片下方 ▼ → 点另一卡片上方 ▲ 建立前置关系  |  拖拽卡片改 Level/Column  |  双击编辑  |  Delete 删除")
+        hint.setStyleSheet("color:#94a3b8; font-size:10px; padding:2px 4px;")
+        root.addWidget(hint)
+
+        root.addWidget(self._mode_stack, 1)
+        root.addWidget(self._node_edit_bar)
+
+    def _bind_events(self) -> None:
+        self._abbr_edit.textChanged.connect(self._handle_abbr_changed)
+        self._name_edit.textChanged.connect(lambda _: self._emit_changed())
+        self._mode_tree_btn.toggled.connect(self._handle_mode_changed)
+
+    def _handle_abbr_changed(self) -> None:
+        self._refresh_type_display()
+        self._emit_changed()
+
+    def _refresh_type_display(self) -> None:
+        shared = self._shared_params_provider()
+        class_type = self._type_builder(shared, "PROMOTION_CLASS", "P", self._abbr_edit.text())
+        self._type_label.setText(class_type)
+
+    def _handle_mode_changed(self) -> None:
+        self._mode_tree = self._mode_tree_btn.isChecked()
+        if self._mode_tree:
+            self._mode_stack.setCurrentIndex(0)
+        else:
+            self._mode_stack.setCurrentIndex(1)
+        self._rebuild_random_view()
+
+    def _apply_template(self, tpl: str) -> None:
+        """Replace all nodes with a standard promotion tree template."""
+        if tpl == "2221":
+            # 2 nodes L1 (C1,C3) → 2 nodes L2 (C1,C3) → 2 nodes L3 (C1,C3) → 1 node L4 (C2)
+            specs = [
+                (1, 1), (1, 3),
+                (2, 1), (2, 3),
+                (3, 1), (3, 3),
+                (4, 2),
+            ]
+            edges = [(2, 0), (3, 1), (4, 2), (5, 3), (6, 4), (6, 5)]
+        elif tpl == "2212":
+            # 2 nodes L1 (C1,C3) → 2 nodes L2 (C1,C3) → 1 node L3 (C2) → 2 nodes L4 (C1,C3)
+            specs = [
+                (1, 1), (1, 3),
+                (2, 1), (2, 3),
+                (3, 2),
+                (4, 1), (4, 3),
+            ]
+            edges = [(2, 0), (3, 1), (4, 2), (4, 3), (5, 4), (6, 4)]
+        else:
+            return
+
+        self._nodes = []
+        for level, col in specs:
+            self._nodes.append(_PromotionNode(level=level, column=col))
+        for to_idx, from_idx in edges:
+            if from_idx not in self._nodes[to_idx].prereq_indices:
+                self._nodes[to_idx].prereq_indices.append(from_idx)
+        self._refresh_views()
+        self._emit_changed()
+
+    def _add_node(self) -> None:
+        col = 1
+        for n in self._nodes:
+            if n.level == 1:
+                col = max(col, n.column + 1)
+        node = _PromotionNode(level=1, column=min(col, 7))
+        self._nodes.append(node)
+        self._refresh_views()
+        self._emit_changed()
+
+    def _on_canvas_select(self, idx: int) -> None:
+        if idx < 0:
+            self._node_edit_bar.setVisible(False)
+            return
+        node = self._nodes[idx]
+        self._node_sel_label.setText(f"选中: [{idx + 1}] {node.abbr or 'PROMOTION_' + str(idx + 1)}")
+        self._node_edit_bar.setVisible(True)
+
+    def _edit_selected_node(self) -> None:
+        idx = self._tree_canvas.selected_index()
+        if idx < 0 or idx >= len(self._nodes):
+            return
+        dlg = _NodeEditDialog(self._nodes[idx], self)
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result() is not None:
+            self._nodes[idx] = dlg.result()  # type: ignore[assignment]
+            self._refresh_views()
+            self._emit_changed()
+
+    def _delete_selected(self) -> None:
+        idx = self._tree_canvas.selected_index()
+        if idx < 0 or idx >= len(self._nodes):
+            return
+        for n in self._nodes:
+            n.prereq_indices = [i - 1 if i > idx else i for i in n.prereq_indices if i != idx]
+            n.prereq_indices = [i for i in n.prereq_indices if 0 <= i < len(self._nodes) - 1]
+        del self._nodes[idx]
+        self._tree_canvas.set_nodes(self._nodes)
+        self._node_edit_bar.setVisible(False)
+        self._emit_changed()
+
+    def _refresh_views(self) -> None:
+        self._tree_canvas.set_nodes(self._nodes)
+        self._rebuild_random_view()
+
+    def _rebuild_random_view(self) -> None:
+        while self._random_layout.count():
+            item = self._random_layout.takeAt(0)
+            if item.widget():
+                item.widget().setParent(None)
+        if self._mode_tree:
+            return
+        for level in range(1, 5):
+            level_nodes = [(i, n) for i, n in enumerate(self._nodes) if n.level == level]
+            if not level_nodes:
+                continue
+            lbl = QLabel(f"Level {level}")
+            lbl.setStyleSheet("font-weight:bold; margin-top:4px;")
+            self._random_layout.addWidget(lbl)
+            flow = QWidget()
+            fl = QHBoxLayout(flow)
+            fl.setContentsMargins(0, 0, 0, 0)
+            fl.setSpacing(4)
+            for idx, node in level_nodes:
+                card = QPushButton(f"{node.abbr or f'PROMOTION_{idx+1}'}\n{node.name_cn or ''}")
+                card.setFixedSize(130, 48)
+                card.setStyleSheet("text-align:left; font-size:9px; padding:4px;")
+                card.clicked.connect(lambda checked, i=idx: self._on_canvas_select(i))
+                fl.addWidget(card)
+            fl.addStretch(1)
+            self._random_layout.addWidget(flow)
+
+    def _emit_changed(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
+    def set_entry(self, entry: dict[str, object], fallback_name: str) -> None:
+        self._loading = True
+        self._abbr_edit.setText(_safe_text(entry.get("abbr", "")))
+        name = _safe_text(entry.get("name", entry.get("Name", fallback_name)))
+        self._name_edit.setText(name)
+        self._refresh_type_display()
+        mode = _safe_text(entry.get("mode", "tree"))
+        is_tree = mode != "random"
+        self._mode_tree_btn.setChecked(is_tree)
+        self._mode_random_btn.setChecked(not is_tree)
+        self._mode_tree = is_tree
+        nodes_data = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
+        self._nodes = [_PromotionNode.from_dict(d) for d in nodes_data if isinstance(d, dict)]
+        self._refresh_views()
+        self._node_edit_bar.setVisible(False)
+        self._handle_mode_changed()
+        self._loading = False
+
+    def export_entry(self) -> dict[str, object]:
+        return {
+            "abbr": _safe_text(self._abbr_edit.text()),
+            "type": _safe_text(self._type_label.text()),
+            "name": _safe_text(self._name_edit.text()),
+            "mode": "tree" if self._mode_tree else "random",
+            "nodes": [n.to_dict() for n in self._nodes],
+        }
+
+
+_BANNER_W = 515
+_BANNER_H = 189
+
+_DEFAULT_JERSEY_COLORS = [
+    ("#CC0001", "#F9F9F9"),
+    ("#F9F9F9", "#CC0001"),
+    ("#012A6C", "#CC0001"),
+    ("#CC0001", "#012A6C"),
+]
+
+
+def _banner_image_path(filename: str) -> Path:
+    return Path(__file__).resolve().parent.parent.parent / "resources" / "images" / filename
+
+
+class CityBannerPreview(QWidget):
+    """City banner preview rendering jersey colors with game-like layers."""
+
+    def __init__(self, display_width: int = 258, parent=None) -> None:
+        super().__init__(parent)
+        self._display_w = display_width
+        self._display_h = int(round(display_width * _BANNER_H / _BANNER_W))
+        self.setFixedSize(self._display_w, self._display_h)
+        self._primary = QColor("#CC0001")
+        self._secondary = QColor("#F9F9F9")
+        self._banner_pixmap: QPixmap | None = None
+        self._cache: dict[str, QImage] = {}
+        self._render()
+
+    def set_colors(self, primary_hex: str, secondary_hex: str) -> None:
+        p = QColor(primary_hex) if primary_hex else QColor("#CC0001")
+        s = QColor(secondary_hex) if secondary_hex else QColor("#F9F9F9")
+        if p == self._primary and s == self._secondary:
+            return
+        self._primary = p
+        self._secondary = s
+        self._render()
+        self.update()
+
+    def _load(self, filename: str) -> QImage:
+        if filename not in self._cache:
+            path = _banner_image_path(filename)
+            img = QImage(str(path))
+            if img.isNull():
+                img = QImage(_BANNER_W, _BANNER_H, QImage.Format.Format_ARGB32)
+                img.fill(Qt.GlobalColor.transparent)
+            self._cache[filename] = img
+        return self._cache[filename]
+
+    def _render(self) -> None:
+        W, H = _BANNER_W, _BANNER_H
+        canvas = QImage(W, H, QImage.Format.Format_ARGB32)
+        canvas.fill(Qt.GlobalColor.transparent)
+
+        # Layer 1: Backing — draw directly
+        backing = self._load("citybanner_backing.png")
+        p = QPainter(canvas)
+        p.drawImage(0, 0, backing)
+        p.end()
+
+        # Layer 2: Base — primary color, masked, multiplied by base texture
+        base = self._render_masked_color(self._primary, self._load("citybanner_base_mask.png"), W, H)
+        base = self._blend_multiply(base, self._load("citybanner_base.png"))
+        self._blit_onto(canvas, base)
+
+        # Layer 3: Darken — darker primary at 40%
+        dk = QColor(
+            max(0, self._primary.red() - 85),
+            max(0, self._primary.green() - 85),
+            max(0, self._primary.blue() - 85),
+        )
+        darken = self._render_masked_color(dk, self._load("citybanner_darken_mask.png"), W, H, opacity=0.4)
+        self._blit_onto(canvas, darken)
+
+        # Layer 4: Lighten — lighter primary
+        lt = QColor(
+            min(255, self._primary.red() + 90),
+            min(255, self._primary.green() + 90),
+            min(255, self._primary.blue() + 90),
+        )
+        lighten = self._render_masked_color(lt, self._load("citybanner_lighten_mask.png"), W, H)
+        self._blit_onto(canvas, lighten)
+
+        # Layer 5: Secondary — multiply with secondary texture, masked
+        sec = self._render_masked_color(self._secondary, self._load("citybanner_secondary.png"), W, H)
+        sec = self._blend_multiply(sec, self._load("citybanner_secondary.png"))
+        self._blit_onto(canvas, sec)
+
+        # Layer 6: Overlay — draw directly on top
+        overlay = self._load("citybanner_overlay.png")
+        self._blit_onto(canvas, overlay)
+
+        scaled = canvas.scaled(
+            self._display_w, self._display_h,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        self._banner_pixmap = QPixmap.fromImage(scaled)
+
+    @staticmethod
+    def _render_masked_color(color: QColor, mask: QImage, W: int, H: int, opacity: float = 1.0) -> QImage:
+        """Create an image colored by `color` where `mask` has alpha."""
+        result = QImage(W, H, QImage.Format.Format_ARGB32)
+        result.fill(Qt.GlobalColor.transparent)
+        mr, mg, mb = color.red(), color.green(), color.blue()
+        o = opacity
+        for y in range(H):
+            for x in range(W):
+                a = mask.pixelColor(x, y).alpha()
+                if a == 0:
+                    continue
+                final_a = int(a * o) if o < 1.0 else a
+                result.setPixelColor(x, y, QColor(mr, mg, mb, final_a))
+        return result
+
+    @staticmethod
+    def _blend_multiply(base: QImage, overlay: QImage) -> QImage:
+        W, H = base.width(), base.height()
+        result = QImage(W, H, QImage.Format.Format_ARGB32)
+        result.fill(Qt.GlobalColor.transparent)
+        for y in range(H):
+            for x in range(W):
+                bc = base.pixelColor(x, y)
+                oc = overlay.pixelColor(x, y)
+                ba, oa = bc.alpha(), oc.alpha()
+                if ba == 0 and oa == 0:
+                    continue
+                if ba == 0:
+                    result.setPixelColor(x, y, oc)
+                elif oa == 0:
+                    result.setPixelColor(x, y, bc)
+                else:
+                    r = (bc.red() * oc.red()) // 255
+                    g = (bc.green() * oc.green()) // 255
+                    b = (bc.blue() * oc.blue()) // 255
+                    result.setPixelColor(x, y, QColor(r, g, b, min(ba, oa)))
+        return result
+
+    @staticmethod
+    def _blit_onto(canvas: QImage, layer: QImage) -> None:
+        W, H = canvas.width(), canvas.height()
+        for y in range(H):
+            for x in range(W):
+                lc = layer.pixelColor(x, y)
+                la = lc.alpha()
+                if la == 0:
+                    continue
+                if la == 255:
+                    canvas.setPixelColor(x, y, lc)
+                else:
+                    cc = canvas.pixelColor(x, y)
+                    ca = cc.alpha()
+                    inv_la = 255 - la
+                    blend_a = la + (ca * inv_la) // 255
+                    if blend_a == 0:
+                        canvas.setPixelColor(x, y, QColor(0, 0, 0, 0))
+                    else:
+                        r = (lc.red() * la + cc.red() * ca * inv_la // 255) // blend_a
+                        g = (lc.green() * la + cc.green() * ca * inv_la // 255) // blend_a
+                        b = (lc.blue() * la + cc.blue() * ca * inv_la // 255) // blend_a
+                        canvas.setPixelColor(x, y, QColor(r, g, b, blend_a))
+
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        if self._banner_pixmap is None:
+            return
+        p = QPainter(self)
+        p.drawPixmap(0, 0, self._banner_pixmap)
+        p.end()
+
+
 class LeaderItemEditor(QWidget):
     dataChanged = pyqtSignal()
 
@@ -2600,6 +3419,14 @@ class LeaderItemEditor(QWidget):
         self._select_sort_index_spin.setRange(0, 999999999)
         self._select_sort_index_spin.setValue(0)
         self._add_diplo_background_curtain_check = QCheckBox("是否新增外交背景幕布(BARBAROSSA_4)")
+
+        # Color configuration — 4 jersey pairs with defaults
+        self._color_buttons: list[tuple[QPushButton, str]] = []
+        self._banner_previews: list[CityBannerPreview | None] = [None, None, None, None]
+        for ji in range(4):
+            p_hex, s_hex = _DEFAULT_JERSEY_COLORS[ji]
+            self._color_buttons.append((QPushButton(), p_hex))
+            self._color_buttons.append((QPushButton(), s_hex))
 
         self._foreground_name = QLineEdit()
         self._background_name = QLineEdit()
@@ -2759,6 +3586,7 @@ class LeaderItemEditor(QWidget):
         diplomacy_group.setLayout(diplomacy_layout)
 
         content_layout.addWidget(basic_group)
+        content_layout.addWidget(self._build_color_group())
         content_layout.addWidget(binding_group)
         content_layout.addWidget(diplomacy_group)
         content_layout.addStretch(1)
@@ -2785,6 +3613,92 @@ class LeaderItemEditor(QWidget):
             self._diplomacy_table.setItem(row, 2, tag_item)
         self._sync_diplomacy_table_height()
         QTimer.singleShot(0, self._sync_top_column_balance)
+
+    def _open_color_picker(self, btn_index: int) -> None:
+        current = self._color_buttons[btn_index][1]
+        if not current:
+            current = "#CC0001"
+        dlg = ColorPickerDialog(current, self)
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            hex_color = dlg.selected_hex()
+            self._color_buttons[btn_index] = (self._color_buttons[btn_index][0], hex_color)
+            self._apply_color_button_style(self._color_buttons[btn_index][0], hex_color)
+            jersey_idx = btn_index // 2
+            p_idx = jersey_idx * 2
+            s_idx = p_idx + 1
+            p_hex = self._color_buttons[p_idx][1]
+            s_hex = self._color_buttons[s_idx][1]
+            banner = self._banner_previews[jersey_idx]
+            if banner is not None and p_hex and s_hex:
+                banner.set_colors(p_hex, s_hex)
+            self._emit_data_changed()
+
+    @staticmethod
+    def _contrast_color_for_button(hex_color: str) -> str:
+        c = QColor(hex_color)
+        lum = 0.299 * c.redF() + 0.587 * c.greenF() + 0.114 * c.blueF()
+        return "#222222" if lum > 0.5 else "#EEEEEE"
+
+    def _apply_color_button_style(self, btn: QPushButton, hex_color: str) -> None:
+        if hex_color:
+            btn.setText(hex_color)
+            btn.setStyleSheet(
+                f"background-color:{hex_color}; color:{self._contrast_color_for_button(hex_color)}; "
+                f"border:1px solid #666; padding:4px 8px; border-radius:2px; font-size:11px;"
+            )
+        else:
+            btn.setText("选择颜色...")
+            btn.setStyleSheet("")
+
+    def _build_color_group(self) -> QGroupBox:
+        group = QGroupBox("领袖颜色配置")
+        grid = QGridLayout()
+        grid.setSpacing(6)
+        grid.setContentsMargins(8, 12, 8, 8)
+
+        BANNER_W = 180
+        for jersey in range(4):
+            header = QLabel(f"配色 {jersey + 1}")
+            header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            header.setStyleSheet("font-weight:bold; font-size:12px;")
+            grid.addWidget(header, 0, jersey)
+
+            p_idx = jersey * 2
+            s_idx = p_idx + 1
+
+            banner = CityBannerPreview(BANNER_W)
+            self._banner_previews[jersey] = banner
+            grid.addWidget(banner, 1, jersey, Qt.AlignmentFlag.AlignCenter)
+
+            p_hex = self._color_buttons[p_idx][1]
+            s_hex = self._color_buttons[s_idx][1]
+            if p_hex:
+                banner.set_colors(p_hex, s_hex)
+
+            row = QHBoxLayout()
+            row.setSpacing(2)
+            row.addWidget(QLabel("主"))
+            p_btn = self._color_buttons[p_idx][0]
+            p_btn.clicked.connect(lambda checked, idx=p_idx: self._open_color_picker(idx))
+            self._apply_color_button_style(p_btn, p_hex)
+            row.addWidget(p_btn, 1)
+            btn_wrap = QWidget()
+            btn_wrap.setLayout(row)
+            grid.addWidget(btn_wrap, 2, jersey)
+
+            row2 = QHBoxLayout()
+            row2.setSpacing(2)
+            row2.addWidget(QLabel("辅"))
+            s_btn = self._color_buttons[s_idx][0]
+            s_btn.clicked.connect(lambda checked, idx=s_idx: self._open_color_picker(idx))
+            self._apply_color_button_style(s_btn, s_hex)
+            row2.addWidget(s_btn, 1)
+            btn_wrap2 = QWidget()
+            btn_wrap2.setLayout(row2)
+            grid.addWidget(btn_wrap2, 3, jersey)
+
+        group.setLayout(grid)
+        return group
 
     def _bind_events(self) -> None:
         self._abbr_edit.textChanged.connect(self._handle_abbr_changed)
@@ -2981,7 +3895,39 @@ class LeaderItemEditor(QWidget):
             if text_item is not None:
                 text_item.setText(diplo_by_tag.get(tag, ""))
 
+        self._load_colors_from_entry(entry)
+
         self._internal_updating = False
+
+    def _load_colors_from_entry(self, entry: dict[str, object]) -> None:
+        colors = entry.get("colors", {}) if isinstance(entry, dict) else {}
+        if not isinstance(colors, dict):
+            colors = {}
+        color_keys = [
+            "j1_primary", "j1_secondary",
+            "j2_primary", "j2_secondary",
+            "j3_primary", "j3_secondary",
+            "j4_primary", "j4_secondary",
+        ]
+        for i, key in enumerate(color_keys):
+            hex_val = _safe_text(colors.get(key, "")) if colors else ""
+            if hex_val and not hex_val.startswith("#"):
+                hex_val = "#" + hex_val
+            # Fall back to defaults if no saved color
+            if not hex_val:
+                ji = i // 2
+                sub = i % 2
+                hex_val = _DEFAULT_JERSEY_COLORS[ji][sub]
+            self._color_buttons[i] = (self._color_buttons[i][0], hex_val)
+            self._apply_color_button_style(self._color_buttons[i][0], hex_val)
+        for i in range(4):
+            p_idx = i * 2
+            s_idx = p_idx + 1
+            p_hex = self._color_buttons[p_idx][1]
+            s_hex = self._color_buttons[s_idx][1]
+            banner = self._banner_previews[i]
+            if banner is not None:
+                banner.set_colors(p_hex, s_hex)
 
     def export_entry(self) -> dict[str, object]:
         leader_name = _safe_text(self._name_edit.text())
@@ -3036,6 +3982,16 @@ class LeaderItemEditor(QWidget):
             },
             "bindings": self._bindings.values(),
             "diplomacy": diplomacy_rows,
+            "colors": {
+                "j1_primary": self._color_buttons[0][1],
+                "j1_secondary": self._color_buttons[1][1],
+                "j2_primary": self._color_buttons[2][1],
+                "j2_secondary": self._color_buttons[3][1],
+                "j3_primary": self._color_buttons[4][1],
+                "j3_secondary": self._color_buttons[5][1],
+                "j4_primary": self._color_buttons[6][1],
+                "j4_secondary": self._color_buttons[7][1],
+            },
         }
 
     def _emit_data_changed(self) -> None:
@@ -3725,6 +4681,14 @@ class SectionItemWorkspacePanel(QWidget):
         )
         self._agenda_editor.dataChanged.connect(self._handle_agenda_changed)
 
+        self._promotion_tree_editor = PromotionTreeEditor(
+            shared_params_provider=shared_params_provider,
+            type_builder=lambda shared, head, midfix_code, short_name: _build_entity_type(
+                shared, head=head, midfix_code=midfix_code, short_name=short_name,
+            ),
+        )
+        self._promotion_tree_editor.dataChanged.connect(self._handle_promotion_tree_changed)
+
         self._placeholder_page = self._wrap_main_scroll(self._placeholder)
         self._civilization_page = self._wrap_main_scroll(self._civilization_editor)
         self._leader_page = self._wrap_main_scroll(self._leader_editor)
@@ -3738,6 +4702,7 @@ class SectionItemWorkspacePanel(QWidget):
         self._governor_page = self._wrap_main_scroll(self._governor_editor)
         self._great_people_page = self._wrap_main_scroll(self._great_people_editor)
         self._agenda_page = self._wrap_main_scroll(self._agenda_editor)
+        self._promotion_tree_page = self._wrap_main_scroll(self._promotion_tree_editor)
 
         self._stack.addWidget(self._placeholder_page)
         self._stack.addWidget(self._civilization_page)
@@ -3752,6 +4717,7 @@ class SectionItemWorkspacePanel(QWidget):
         self._stack.addWidget(self._governor_page)
         self._stack.addWidget(self._great_people_page)
         self._stack.addWidget(self._agenda_page)
+        self._stack.addWidget(self._promotion_tree_page)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -3814,6 +4780,9 @@ class SectionItemWorkspacePanel(QWidget):
         elif section == "议程":
             self._agenda_editor.set_entry(entry, fallback_name=fallback_name)
             self._stack.setCurrentWidget(self._agenda_page)
+        elif section == "单位晋升":
+            self._promotion_tree_editor.set_entry(entry, fallback_name=fallback_name)
+            self._stack.setCurrentWidget(self._promotion_tree_page)
         else:
             self._placeholder.setText(f"{section} 子条目编辑器待接入。\n已保留统一框架与预览逻辑。")
             self._stack.setCurrentWidget(self._placeholder_page)
@@ -3857,6 +4826,9 @@ class SectionItemWorkspacePanel(QWidget):
             return
         if self._section == "议程" and self._index >= 0:
             self._on_item_changed(self._section, self._index, self._agenda_editor.export_entry())
+            return
+        if self._section == "单位晋升" and self._index >= 0:
+            self._on_item_changed(self._section, self._index, self._promotion_tree_editor.export_entry())
             return
 
     def _handle_civilization_changed(self) -> None:
@@ -3971,6 +4943,14 @@ class SectionItemWorkspacePanel(QWidget):
         if self._section != "议程" or self._index < 0:
             return
         payload = self._agenda_editor.export_entry()
+        self._on_item_changed(self._section, self._index, payload)
+
+    def _handle_promotion_tree_changed(self) -> None:
+        if self._loading:
+            return
+        if self._section != "单位晋升" or self._index < 0:
+            return
+        payload = self._promotion_tree_editor.export_entry()
         self._on_item_changed(self._section, self._index, payload)
 
     def _handle_delete_current(self) -> None:

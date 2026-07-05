@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence
 
+from .group_workspace import _build_entity_type
+
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
@@ -212,6 +214,8 @@ BOOLEAN_PARAM_KEYS = {
     "Intercontinental",
     "NoDamage",
     "Prevent",
+    "IncludeCenter",
+    "CaptureOwnedTerritory",
 }
 
 INT_PARAM_KEYS = {
@@ -3748,6 +3752,7 @@ class HomePage(BasePage):
         removed = self._modifiers.pop(row)
         self._remove_modifier_row(row)
         self._remove_modifier_bindings(removed.modifier_id)
+        self._modifier_editor_index = -1
         next_row = min(row, len(self._modifiers) - 1)
         if next_row >= 0:
             self._select_modifier_row(next_row)
@@ -4021,6 +4026,7 @@ class HomePage(BasePage):
         self._requirement_sets.pop(row)
         if self._reqset_list is not None:
             self._reqset_list.removeRow(row)
+        self._current_reqset_index = -1
         next_row = min(row, len(self._requirement_sets) - 1)
         if next_row >= 0:
             self._select_reqset_row(next_row)
@@ -4066,6 +4072,7 @@ class HomePage(BasePage):
                     rid for rid in reqset.bound_requirements if rid != removed.requirement_id
                 ]
         self._refresh_reqset_bind_list()
+        self._current_req_index = -1
         next_row = min(row, len(self._requirements) - 1)
         if next_row >= 0:
             self._select_requirement_row(next_row)
@@ -6869,6 +6876,26 @@ class ModifierWorkspacePanel(HomePage):
             belief_type = str(entry.get("type") or "").strip()
             belief_name = self._resolve_entry_name(entry, index)
             add_candidate("BeliefModifiers", "BeliefType", belief_type, belief_name, source_key=f"belief:{index}")
+
+        for tree_index, entry in enumerate(iter_entries("单位晋升")):
+            tree_name = str(entry.get("name") or "").strip() or f"晋升树{tree_index + 1}"
+            shared = sections.get("基础信息", {}) if isinstance(sections, dict) else {}
+            nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
+            for node_index, node_data in enumerate(nodes):
+                if not isinstance(node_data, dict):
+                    continue
+                node_abbr = str(node_data.get("abbr") or "").strip()
+                if not node_abbr:
+                    continue
+                promo_type = _build_entity_type(shared, "PROMOTION", "P", node_abbr)
+                node_name = str(node_data.get("name_cn") or "").strip() or f"{tree_name} 节点{node_index + 1}"
+                add_candidate(
+                    "UnitPromotionModifiers",
+                    "UnitPromotionType",
+                    promo_type,
+                    node_name,
+                    source_key=f"promo_tree:{tree_index}:{node_index}",
+                )
 
         for index, entry in enumerate(iter_entries("总督")):
             governor_type = str(entry.get("GovernorType") or entry.get("type") or "").strip()

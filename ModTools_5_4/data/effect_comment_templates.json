@@ -10,13 +10,12 @@
     "name_template": "ADD_BELIEF"
   },
   "EFFECT_ADD_CULTURE_BOMB_TRIGGER": {
-    "comment": "文化炸弹：{DistrictType}",
+    "comment": "{CaptureOwnedTerritory?弱:强}文化炸弹：{DistrictType}{ImprovementType}",
     "params": {
-      "CaptureOwnedTerritory": "skip",
+      "CaptureOwnedTerritory": "bool_true",
       "DistrictType": "text",
       "ImprovementType": "text"
-    },
-    "name_template": "ADD_CULTURE_BOMB_TRIGGER_{DistrictType}"
+    }
   },
   "EFFECT_ADD_DIPLOMATIC_ACTION_OVERRIDE": {
     "comment": "外交覆盖：{CivicType}",
@@ -442,21 +441,19 @@
     "name_template": "ADJUST_ALLOWED_REGIONAL_STACKING_{YieldType}"
   },
   "EFFECT_ADJUST_CITY_ALL_MILITARY_UNITS_PRODUCTION": {
-    "comment": "军事单位生产力{+:Amount}",
+    "comment": "建造{StartEra}{EndEra}{PromotionClass}军事单位生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "EndEra": "text",
       "PromotionClass": "text",
       "StartEra": "text"
-    },
-    "name_template": "ADJUST_MILITARY_UNITS_PRODUCTION_{:Amount}"
+    }
   },
   "EFFECT_ADJUST_CITY_ALL_YIELDS_CHANGE": {
-    "comment": "全产出{+:Amount}",
+    "comment": "城市{+:Amount}全产出",
     "params": {
       "Amount": "signed"
-    },
-    "name_template": "ADJUST_ALL_YIELDS_{:Amount}"
+    }
   },
   "EFFECT_ADJUST_CITY_ALWAYS_LOYAL": {
     "comment": "永远忠诚",
@@ -1019,12 +1016,11 @@
     "name_template": "ADJUST_UNIT_MAX_LEVEL"
   },
   "EFFECT_ADJUST_CITY_YIELD_CHANGE": {
-    "comment": "城市{YieldType}{+:Amount}",
+    "comment": "城市{+:Amount}{YieldType}",
     "params": {
       "Amount": "signed",
       "YieldType": "text"
-    },
-    "name_template": "ADJUST_CITY_{YieldType}_{:Amount}"
+    }
   },
   "EFFECT_ADJUST_CITY_YIELD_FROM_FOREIGN_TRADE_ROUTES_PASSING_THROUGH": {
     "comment": "外国商路途经{YieldType}{+:Amount}",
@@ -3166,11 +3162,10 @@
     "name_template": "ADJUST_TRADE_YIELD_TO_OTHERS_{YieldType}_{:Amount}"
   },
   "EFFECT_ADJUST_TRAIT_AMENITY": {
-    "comment": "特质宜居度{+:Amount}",
+    "comment": "城市宜居度（来自特质）{+:Amount}",
     "params": {
       "Amount": "signed"
-    },
-    "name_template": "ADJUST_TRAIT_AMENITY_{:Amount}"
+    }
   },
   "EFFECT_ADJUST_UNITS_RELIGIOUS_STRENGTH_BY_RELIGION_TYPE": {
     "comment": "按宗教类型宗教战力{+:Amount}",
@@ -5168,11 +5163,10 @@
     "name_template": "GRANT_RELIGIOUS_PRESSURE_GP_{:Amount}"
   },
   "EFFECT_GRANT_PLAYER_SPECIFIC_TECHNOLOGY": {
-    "comment": "授予{TechType}科技",
+    "comment": "赠送{TechType}科技",
     "params": {
       "TechType": "text"
-    },
-    "name_template": "GRANT_TECH_{TechType}"
+    }
   },
   "EFFECT_GRANT_PLAYER_SPECIFIC_TECH_BOOST_GREAT_PERSON": {
     "comment": "伟人加速{TechType}",

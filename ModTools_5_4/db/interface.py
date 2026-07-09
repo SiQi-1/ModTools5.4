@@ -1,4 +1,12 @@
-"""Text DB query helpers for UI localization lookups."""
+"""Text DB query helpers for UI localization lookups.
+
+我们不直接使用游戏的 DebugLocalization.sqlite，原因：
+- DebugGameplay.sqlite 在每次启动游戏时由游戏重新生成，数据始终最新。
+- DebugLocalization.sqlite 不同——游戏不会主动维护它，第一次生成后就不再更新。
+  随着 DLC 安装和游戏版本更新，该文件会严重过时，缺少大量文本。
+- 因此工具维护自己的可写文本库（如 local_text_New.sqlite），从游戏 XML/SQL/DLC
+  目录重新导入文本，确保内容完整且可控。
+"""
 from __future__ import annotations
 
 from pathlib import Path

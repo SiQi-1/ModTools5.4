@@ -1414,7 +1414,7 @@ class BasicInfoWorkspacePanel(QWidget):
             {
                 "type": "UpdateColors",
                 "id": "UpdateColors",
-                "files": [f"Data/{file_token}_Colors.sql"],
+                "files": [f"Data/{file_token}_Colors.{self._group_format('领袖')}"],
                 "load_order": 0,
             },
             {
@@ -1428,16 +1428,17 @@ class BasicInfoWorkspacePanel(QWidget):
     def _quick_in_game_entries(self) -> list[dict[str, object]]:
         file_token = self._safe_file_basename(self._file_name_edit.text())
         text_files = self._quick_text_files()
+        color_ext = self._group_format("领袖")
         data_files = [
             path
             for path in self._quick_data_files()
-            if not path.endswith("_Configs.sql") and not path.endswith("_Colors.sql")
+            if not path.endswith("_Configs.sql") and not path.endswith(f"_Colors.{color_ext}")
         ]
         return [
             {
                 "type": "UpdateColors",
                 "id": "UpdateColors",
-                "files": [f"Data/{file_token}_Colors.sql"],
+                "files": [f"Data/{file_token}_Colors.{color_ext}"],
                 "load_order": 0,
             },
             {

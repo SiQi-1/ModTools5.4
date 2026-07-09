@@ -1897,28 +1897,82 @@ class WorkspacePage(BasePage):
         if not player_colors_rows:
             return ""
 
-        blocks: list[str] = ["-- Colors.sql", ""]
+        sep = "--" + "=" * 70
+        blocks: list[str] = []
+
         if colors_rows:
-            colors_rows = list(dict.fromkeys(colors_rows))  # deduplicate
-            blocks.append(
-                self._build_insert_block("Colors 表", "Colors", ["Type", "Color"], colors_rows)
-            )
+            colors_rows = list(dict.fromkeys(colors_rows))
+            blocks.append(sep)
+            blocks.append("--    COLORS")
+            blocks.append(sep)
+            blocks.append("INSERT OR REPLACE INTO Colors")
+            blocks.append("        (Type, Color)")
+            blocks.append("VALUES")
+            val_lines: list[str] = []
+            for row in colors_rows:
+                val_lines.append(f"        {row}")
+            blocks.append(",\n".join(val_lines) + ";")
+            blocks.append("")
+
+        blocks.append(sep)
+        blocks.append("--    PlayerColors")
+        blocks.append("-------------------------------------")
+        blocks.append("INSERT OR REPLACE INTO PlayerColors")
+        blocks.append("        (")
+        blocks.append("            Type,")
+        blocks.append("            Usage,")
+        blocks.append("")
+        blocks.append("            PrimaryColor,")
+        blocks.append("            SecondaryColor,")
+        blocks.append("")
+        blocks.append("            Alt1PrimaryColor,")
+        blocks.append("            Alt1SecondaryColor,")
+        blocks.append("")
+        blocks.append("            Alt2PrimaryColor,")
+        blocks.append("            Alt2SecondaryColor,")
+        blocks.append("")
+        blocks.append("            Alt3PrimaryColor,")
+        blocks.append("            Alt3SecondaryColor")
+        blocks.append("        )")
+        blocks.append("VALUES")
+
         player_colors_rows = list(dict.fromkeys(player_colors_rows))
-        blocks.append(
-            self._build_insert_block(
-                "PlayerColors 表",
-                "PlayerColors",
-                [
-                    "Type", "Usage",
-                    "PrimaryColor", "SecondaryColor",
-                    "Alt1PrimaryColor", "Alt1SecondaryColor",
-                    "Alt2PrimaryColor", "Alt2SecondaryColor",
-                    "Alt3PrimaryColor", "Alt3SecondaryColor",
-                    "TextColor",
-                ],
-                player_colors_rows,
+        val_blocks: list[str] = []
+        for row in player_colors_rows:
+            row = row.replace("'", '"')
+            # Parse: ("LEADER_X", "Unique", "P1", "S1", "P2", "S2", "P3", "S3", "P4", "S4", "TEXT")
+            inner = row.strip()[1:-1]  # remove outer parens
+            parts = [p.strip().strip('"') for p in inner.split(",")]
+            if len(parts) < 11:
+                continue
+            leader, usage = parts[0], parts[1]
+            p1, s1 = parts[2], parts[3]
+            p2, s2 = parts[4], parts[5]
+            p3, s3 = parts[6], parts[7]
+            p4, s4 = parts[8], parts[9]
+            text = parts[10]
+            val_block = (
+                "        (\n"
+                f'            "{leader}",\n'
+                f'            "{usage}",\n'
+                "\n"
+                f'            "{p1}",\n'
+                f'            "{s1}",\n'
+                "\n"
+                f'            "{p2}",\n'
+                f'            "{s2}",\n'
+                "\n"
+                f'            "{p3}",\n'
+                f'            "{s3}",\n'
+                "\n"
+                f'            "{p4}",\n'
+                f'            "{s4}"\n'
+                "        )"
             )
-        )
+            val_blocks.append(val_block)
+        blocks.append(",\n".join(val_blocks) + ";")
+        blocks.append(sep)
+        blocks.append(sep)
         return "\n".join(blocks).rstrip()
 
     @staticmethod
@@ -5531,7 +5585,7 @@ class WorkspacePage(BasePage):
         table_map: dict[str, ElementTree.Element] = {}
 
         pattern = re.compile(
-            r"INSERT\s+INTO\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)\s*VALUES\s*(.*?);",
+            r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)\s*VALUES\s*(.*?);",
             re.IGNORECASE | re.DOTALL,
         )
         for match in pattern.finditer(sql_text):
@@ -9524,7 +9578,6 @@ class WorkspacePage(BasePage):
             {
                 f"Data/{output_base}_Modifiers.sql": self.build_modifier_sql_preview(),
                 f"Data/{output_base}_Configs.sql": self._build_configs_sql_preview(),
-                f"Data/{output_base}_Colors.sql": "",
                 f"Data/{output_base}_Moments.sql": self._build_moments_sql_preview(),
             }
         )

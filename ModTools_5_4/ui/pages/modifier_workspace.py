@@ -216,6 +216,8 @@ BOOLEAN_PARAM_KEYS = {
     "Prevent",
     "IncludeCenter",
     "CaptureOwnedTerritory",
+    "NoReduction",
+    "AllowUniqueOverride",
 }
 
 INT_PARAM_KEYS = {
@@ -3801,8 +3803,8 @@ class HomePage(BasePage):
             self._set_modifier_editor_enabled(False)
             return
         record = self._modifiers[row]
-        self._load_modifier_into_editor(record)
         self._modifier_editor_index = row
+        self._load_modifier_into_editor(record)
         self._set_modifier_editor_enabled(True)
         self._update_owner_bind_buttons()
 
@@ -4270,9 +4272,10 @@ class HomePage(BasePage):
         row = self._current_req_index
         if row < 0 or row >= len(self._requirements):
             return
-        record = self._requirements[row]
-        self._req_list.item(row, 0).setText(self._requirement_display_text(record, row))
-        self._req_list.item(row, 1).setText(record.requirement_id)
+        comment = self._req_comment_input.text().strip() if self._req_comment_input else ""
+        req_id = self._req_id_input.text().strip() if self._req_id_input else ""
+        self._req_list.item(row, 0).setText(comment or f"条件{row + 1}")
+        self._req_list.item(row, 1).setText(req_id)
 
     def _refresh_reqset_bind_list(self) -> None:
         if self._reqset_bind_list is None:

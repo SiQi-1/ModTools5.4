@@ -13,11 +13,26 @@ $spec = Join-Path $root "ModTools5.4.spec"
 $entry = Join-Path $root "ModTools5.4.py"
 $db = Join-Path $root "local_text_New.sqlite"
 $settings = Join-Path $root "ModTools_5_4\data\settings.json"
+$stdColors = Join-Path $root "ModTools_5_4\data\standard_colors.json"
+$resImages = Join-Path $root "ModTools_5_4\resources\images"
 
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
 if (Test-Path $build) { Remove-Item $build -Recurse -Force }
 
-& $PythonExe -m PyInstaller --noconfirm --clean --onefile --name $AppName --add-data "$db;." --add-data "$settings;ModTools_5_4/data" $entry
+$addDataArgs = @(
+    "--add-data", "$db;.",
+    "--add-data", "$settings;ModTools_5_4/data",
+    "--add-data", "$stdColors;ModTools_5_4/data",
+    "--add-data", "$resImages\citybanner_backing.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_base.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_base_mask.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_darken_mask.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_lighten_mask.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_overlay.png;ModTools_5_4/resources/images",
+    "--add-data", "$resImages\citybanner_secondary.png;ModTools_5_4/resources/images"
+)
+
+& $PythonExe -m PyInstaller --noconfirm --clean --onefile --name $AppName @addDataArgs $entry
 
 $releaseDir = Join-Path $root "release"
 if (Test-Path $releaseDir) { Remove-Item $releaseDir -Recurse -Force }

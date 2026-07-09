@@ -347,13 +347,12 @@
     "name_template": "ADJUST_BUILDING_HOUSING_{:Amount}"
   },
   "EFFECT_ADJUST_BUILDING_PRODUCTION": {
-    "comment": "{BuildingType}生产力{+:Amount}",
+    "comment": "生产{DistrictType}的建筑{BuildingType}时生产力{+:Amount}%",
     "params": {
       "Amount": "signed",
       "BuildingType": "text",
       "DistrictType": "text"
-    },
-    "name_template": "ADJUST_{BuildingType}_PRODUCTION_{:Amount}"
+    }
   },
   "EFFECT_ADJUST_BUILDING_PURCHASE_COST": {
     "comment": "{BuildingType}购买费用{+:Amount}",
@@ -1310,13 +1309,12 @@
     "name_template": "ADJUST_DISTRICT_ESPIONAGE_DEFENSE_{:Amount}"
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS": {
-    "comment": "{DistrictType}相邻加成为{YieldTypeToGrant}",
+    "comment": "{DistrictType}获得等同于{YieldTypeToMirror}相邻加成的{YieldTypeToGrant}",
     "params": {
       "DistrictType": "text",
       "YieldTypeToGrant": "text",
       "YieldTypeToMirror": "text"
-    },
-    "name_template": "ADJUST_DISTRICT_{DistrictType}_ADJ_{YieldTypeToGrant}"
+    }
   },
   "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_APPEAL": {
     "comment": "{DistrictType}基于魅力{YieldType}",
@@ -3692,11 +3690,10 @@
     "name_template": "ADJUST_NO_FOREIGN_SPREAD"
   },
   "EFFECT_ADJUST_UNIT_NO_REDUCTION_DAMAGE": {
-    "comment": "{NoReduction?无视伤害减免:正常}",
+    "comment": "{NoReduction?受伤无战斗减益:正常}",
     "params": {
       "NoReduction": "bool_hide"
-    },
-    "name_template": "ADJUST_NO_REDUCTION_DAMAGE"
+    }
   },
   "EFFECT_ADJUST_UNIT_NUM_ATTACKS": {
     "comment": "攻击次数{+:Amount}",
@@ -5304,13 +5301,12 @@
     "name_template": "GRANT_UNIT_DOMAIN_{UnitDomain}"
   },
   "EFFECT_GRANT_UNIT_IN_CITY": {
-    "comment": "授予城市{Amount}个{UnitType}",
+    "comment": "新建城市赠送{Amount}个{UnitType}",
     "params": {
       "AllowUniqueOverride": "skip",
       "Amount": "unsigned",
       "UnitType": "text"
-    },
-    "name_template": "GRANT_UNIT_{UnitType}_{Amount}"
+    }
   },
   "EFFECT_GRANT_UNIT_IN_EACH_DISTRICT": {
     "comment": "各区域授予{UnitType}",

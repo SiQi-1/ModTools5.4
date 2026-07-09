@@ -1460,8 +1460,7 @@
       "effect_type": "EFFECT_ADJUST_GREAT_PERSON_POINTS",
       "parameter_names": [
         "Amount",
-        "GreatPersonClassType",
-        "YieldType"
+        "GreatPersonClassType"
       ]
     },
     {

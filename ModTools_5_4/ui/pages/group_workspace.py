@@ -1961,6 +1961,7 @@ class _ImageAdjustCanvas(QWidget):
         self._dragging = False
         self._drag_start = None
         self._circle_preview = False
+        self._black_border = False
 
         self.setAcceptDrops(True)
         self._apply_preview_size()
@@ -1977,6 +1978,10 @@ class _ImageAdjustCanvas(QWidget):
 
     def set_circle_preview(self, enabled: bool) -> None:
         self._circle_preview = bool(enabled)
+        self.update()
+
+    def set_black_border(self, enabled: bool) -> None:
+        self._black_border = bool(enabled)
         self.update()
 
     @staticmethod
@@ -2057,7 +2062,8 @@ class _ImageAdjustCanvas(QWidget):
             "canvas_height": int(preview_h),
         }
 
-    def render_view_image(self, *, target_size: tuple[int, int] | None = None, circle_crop: bool = False) -> QImage | None:
+    def render_view_image(self, *, target_size: tuple[int, int] | None = None, circle_crop: bool = False,
+                          add_black_border: bool = False) -> QImage | None:
         if self._pixmap.isNull():
             return None
 
@@ -2076,14 +2082,32 @@ class _ImageAdjustCanvas(QWidget):
         image.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(image)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+
+        inset = self._circle_inset_for_target(target_w=target_w, target_h=target_h)
+        target_min = float(max(1, min(target_w, target_h)))
+        border_px = max(1.0, round(target_min * 3.0 / 256.0))
+
+        if add_black_border and circle_crop:
+            outer_r = max(1.0, target_min / 2.0 - inset)
+            inner_r = max(0.0, outer_r - border_px)
+            cx = float(target_w) / 2.0
+            cy = float(target_h) / 2.0
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(Qt.GlobalColor.black)
+            painter.drawEllipse(QRectF(cx - outer_r, cy - outer_r, outer_r * 2.0, outer_r * 2.0))
+            if inner_r > 0.0:
+                painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+                painter.drawEllipse(QRectF(cx - inner_r, cy - inner_r, inner_r * 2.0, inner_r * 2.0))
+                painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+
         if circle_crop:
-            inset = self._circle_inset_for_target(target_w=target_w, target_h=target_h)
-            radius = max(1.0, min(float(target_w), float(target_h)) / 2.0 - inset)
-            center_x = float(target_w) / 2.0
-            center_y = float(target_h) / 2.0
+            radius = max(1.0, target_min / 2.0 - inset - (border_px if add_black_border else 0.0))
+            cx = float(target_w) / 2.0
+            cy = float(target_h) / 2.0
             path = QPainterPath()
-            path.addEllipse(center_x - radius, center_y - radius, radius * 2.0, radius * 2.0)
+            path.addEllipse(cx - radius, cy - radius, radius * 2.0, radius * 2.0)
             painter.setClipPath(path)
 
         draw_x = self._offset_x * scale_x
@@ -2163,7 +2187,7 @@ class _ImageAdjustCanvas(QWidget):
             draw_h = int(round(self._pixmap.height() * self._scale))
             painter.drawPixmap(int(round(self._offset_x)), int(round(self._offset_y)), draw_w, draw_h, self._pixmap)
 
-        if self._circle_preview:
+        if self._circle_preview and not self._pixmap.isNull():
             canvas_min = float(max(1, min(self.width(), self.height())))
             target_min = float(max(1, min(self._target_width, self._target_height)))
             inset_target = self._circle_inset_for_target(target_w=self._target_width, target_h=self._target_height)
@@ -2171,14 +2195,32 @@ class _ImageAdjustCanvas(QWidget):
             radius = max(1.0, canvas_min / 2.0 - inset_canvas)
             cx = float(self.width()) / 2.0
             cy = float(self.height()) / 2.0
-            outer = QPainterPath()
-            outer.addRect(0.0, 0.0, float(self.width()), float(self.height()))
-            inner = QPainterPath()
-            inner.addEllipse(cx - radius, cy - radius, radius * 2.0, radius * 2.0)
-            mask = outer.subtracted(inner)
-            painter.fillPath(mask, QColor(15, 23, 42, 140))
-            painter.setPen(QColor("#f8fafc"))
-            painter.drawEllipse(int(round(cx - radius)), int(round(cy - radius)), int(round(radius * 2.0)), int(round(radius * 2.0)))
+
+            # Black border ring (behind the image)
+            if self._black_border:
+                border_px = max(1.0, 3.0 * canvas_min / target_min)
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.setPen(QPen(Qt.GlobalColor.black, border_px, Qt.PenStyle.SolidLine, Qt.PenCapStyle.FlatCap))
+                mid_r = radius + border_px / 2.0
+                painter.drawEllipse(QRectF(cx - mid_r, cy - mid_r, mid_r * 2.0, mid_r * 2.0))
+
+            # Clip to circle — real crop
+            clip = QPainterPath()
+            clip.addEllipse(cx - radius, cy - radius, radius * 2.0, radius * 2.0)
+            painter.setClipPath(clip, Qt.ClipOperation.IntersectClip)
+
+            # Redraw pixmap inside the clip
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+            draw_w = int(round(self._pixmap.width() * self._scale))
+            draw_h = int(round(self._pixmap.height() * self._scale))
+            painter.drawPixmap(int(round(self._offset_x)), int(round(self._offset_y)), draw_w, draw_h, self._pixmap)
+
+            # Circle outline — thin black line
+            painter.setClipping(False)
+            painter.setPen(QPen(QColor("#1e293b"), 1))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawEllipse(QRectF(cx - radius, cy - radius, radius * 2.0, radius * 2.0))
 
         painter.setPen(QColor("#334155"))
         painter.drawText(
@@ -2290,6 +2332,7 @@ class _ImageSlotWidget(QWidget):
             self._circle_preview_button.setCheckable(True)
             self._circle_preview_button.toggled.connect(self._toggle_circle_preview)
         if self._black_border_check is not None:
+            self._black_border_check.toggled.connect(lambda checked: self._canvas.set_black_border(bool(checked)))
             self._black_border_check.toggled.connect(lambda _checked: self._emit_data_changed())
 
         self._top_info_label = QLabel(f"输出尺寸：{target_size[0]} x {target_size[1]}")
@@ -2386,6 +2429,7 @@ class _ImageSlotWidget(QWidget):
                 self._black_border_check.blockSignals(True)
                 self._black_border_check.setChecked(add_border)
                 self._black_border_check.blockSignals(False)
+                self._canvas.set_black_border(add_border)
             return
         if self._circle_preview_button is not None:
             self._circle_preview_button.blockSignals(True)
@@ -2396,6 +2440,7 @@ class _ImageSlotWidget(QWidget):
             self._black_border_check.blockSignals(True)
             self._black_border_check.setChecked(False)
             self._black_border_check.blockSignals(False)
+            self._canvas.set_black_border(False)
         self._canvas.set_image_path(_safe_text(payload))
 
     def export_state(self) -> dict[str, object]:

@@ -148,7 +148,7 @@
     "name_template": "CITY_HAS_{:Amount}_{FeatureType}"
   },
   "REQUIREMENT_CITY_HAS_X_POPULATION": {
-    "comment": "人口>={Amount}",
+    "comment": "人口≥{Amount}",
     "params": {
       "Amount": "signed"
     },
@@ -248,7 +248,7 @@
     "name_template": "COLLECTION_ANY_{RequirementSetId}"
   },
   "REQUIREMENT_COLLECTION_COUNT_ATLEAST": {
-    "comment": "{CollectionType}>={Count}",
+    "comment": "{CollectionType}≥{Count}",
     "params": {
       "CollectionType": "text",
       "Count": "unsigned",
@@ -350,10 +350,10 @@
   },
   "REQUIREMENT_DISTRICT_TYPE_MATCHES": {
     "comment": "区域类型{DistrictType}",
+    "name_template": "IS_DISTRICT_{DistrictType}",
     "params": {
       "DistrictType": "text"
-    },
-    "name_template": "DISTRICT_{DistrictType}"
+    }
   },
   "REQUIREMENT_DISTRICT_TYPE_MATCHES_CITY_CENTER": {
     "comment": "城市中心{DistrictType}",
@@ -373,14 +373,14 @@
     "name_template": "FOUNDED_NO_RELIGION"
   },
   "REQUIREMENT_GAME_ERA_ATLEAST_EXPANSION": {
-    "comment": "时代>={EraType}",
+    "comment": "时代≥{EraType}",
     "params": {
       "EraType": "text"
     },
     "name_template": "GAME_ERA_ATLEAST_{EraType}"
   },
   "REQUIREMENT_GAME_ERA_ATMOST_EXPANSION": {
-    "comment": "时代<={EraType}",
+    "comment": "时代≤{EraType}",
     "params": {
       "EraType": "text"
     },
@@ -463,7 +463,7 @@
     "name_template": "OPPONENT_ERA_{Type}"
   },
   "REQUIREMENT_OPPONENT_ERA_AT_LEAST": {
-    "comment": "对手时代>={MinimumEraType}",
+    "comment": "对手时代≥{MinimumEraType}",
     "params": {
       "MinimumEraType": "text"
     },
@@ -561,7 +561,7 @@
     "name_template": "AT_WAR_WITH_NEIGHBOR"
   },
   "REQUIREMENT_PLAYER_AVERAGE_WALL_LEVEL_THRESHOLD": {
-    "comment": "平均城墙>={AverageWallLevelThreshold}",
+    "comment": "平均城墙≥{AverageWallLevelThreshold}",
     "params": {
       "AboveThreshold": "bool_true",
       "AverageWallLevelThreshold": "signed"
@@ -609,7 +609,7 @@
     "name_template": "CIVILIZED"
   },
   "REQUIREMENT_PLAYER_COASTAL_CITIES": {
-    "comment": "沿海城市>={MinimumCities}",
+    "comment": "沿海城市≥{MinimumCities}",
     "params": {
       "BelowPercentage": "bool_true",
       "MinimumCities": "unsigned",
@@ -657,7 +657,7 @@
     "name_template": "DIPLO_VP_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_DISTRICT_THRESHOLD": {
-    "comment": "区域比例>={DistrictPercentThreshold}%",
+    "comment": "区域比例≥{DistrictPercentThreshold}%",
     "params": {
       "AboveThreshold": "bool_true",
       "DistrictPercentThreshold": "signed",
@@ -666,7 +666,7 @@
     "name_template": "DISTRICT_THRESHOLD_{:DistrictPercentThreshold}"
   },
   "REQUIREMENT_PLAYER_ERA_AT_LEAST": {
-    "comment": "玩家时代>={EraType}",
+    "comment": "玩家时代≥{EraType}",
     "params": {
       "EraType": "text"
     },
@@ -736,7 +736,7 @@
     "name_template": "GOT_LOW_TIER_SCORE_IN_EMERGENCY"
   },
   "REQUIREMENT_PLAYER_HANDICAP_AT_OR_ABOVE": {
-    "comment": "难度>={Handicap}",
+    "comment": "难度≥{Handicap}",
     "params": {
       "Handicap": "text"
     },
@@ -751,28 +751,28 @@
     "name_template": "HAPPINESS_LEAD_{:MinimumDelta}"
   },
   "REQUIREMENT_PLAYER_HAS_ACTIVE_ALLIANCE_OF_AT_LEAST_LEVEL": {
-    "comment": "联盟>={Level}",
+    "comment": "联盟≥{Level}",
     "params": {
       "Level": "unsigned"
     },
     "name_template": "HAS_ALLIANCE_{Level}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_DIPLO_VIS_LEVEL": {
-    "comment": "外交能见度>={Level}",
+    "comment": "外交能见度≥{Level}",
     "params": {
       "Level": "unsigned"
     },
     "name_template": "HAS_DIPLO_VIS_{Level}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUMBER_CITIES": {
-    "comment": "城市数>={Amount}",
+    "comment": "城市数≥{Amount}",
     "params": {
       "Amount": "signed"
     },
     "name_template": "HAS_CITIES_{:Amount}"
   },
   "REQUIREMENT_PLAYER_HAS_AT_LEAST_NUM_MILITARY_UNITS": {
-    "comment": "军事单位>={Amount}",
+    "comment": "军事单位≥{Amount}",
     "params": {
       "Amount": "signed"
     },
@@ -842,7 +842,7 @@
     "name_template": "HAS_{FeatureType}"
   },
   "REQUIREMENT_PLAYER_HAS_GIVEN_INFLUENCE_TOKENS": {
-    "comment": "投入>={MinimumTokens}使者",
+    "comment": "投入≥{MinimumTokens}使者",
     "params": {
       "MinimumTokens": "unsigned"
     },

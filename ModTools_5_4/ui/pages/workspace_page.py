@@ -916,7 +916,7 @@ class WorkspacePage(BasePage):
                 groups.append((display_name, [row for row, tag, _text in infos if entity_type in tag]))
             return groups
 
-        # 区域基础文本：除常规 LOC_{DistrictType}_* 外，还需要包含“自定义相邻加成”的描述文本。
+        # 区域基础文本：除常规 LOC_{DistrictType}_* 外，还需要包含"自定义相邻加成"的描述文本。
         # 这些 Tag 形如 LOC_<AdjacencyId>_DESCRIPTION，并不包含 DistrictType，因此不能只靠 entity_type in tag。
         district_entries = self._project.sections.get("区域")
         district_section_entries = [entry for entry in district_entries if isinstance(entry, dict)] if isinstance(district_entries, list) else []
@@ -953,7 +953,7 @@ class WorkspacePage(BasePage):
             district_groups.append((display_name, rows))
         building_groups = _groups_by_section("建筑", building_infos)
 
-        # 单位基础文本：不包含 UnitAbility 的 LOC_ABILITY_*，避免与后续“单位Ability文本”重复。
+        # 单位基础文本：不包含 UnitAbility 的 LOC_ABILITY_*，避免与后续"单位Ability文本"重复。
         unit_entries = self._project.sections.get("单位")
         unit_section_entries = [entry for entry in unit_entries if isinstance(entry, dict)] if isinstance(unit_entries, list) else []
         unit_groups: list[tuple[str, list[str]]] = []
@@ -999,7 +999,7 @@ class WorkspacePage(BasePage):
         project_groups = _groups_by_section("项目", project_infos)
         agenda_groups: list[tuple[str, list[str]]] = _groups_by_section("议程", agenda_infos)
 
-        # 额外文本：UnitAbility / ModifierStrings 等不一定包含“单位type”的 Tag，
+        # 额外文本：UnitAbility / ModifierStrings 等不一定包含"单位type"的 Tag，
         # 若仅按 entity_type in tag 过滤，会导致它们在 Text 预览里缺失。
         ability_text_groups: list[tuple[str, list[str]]] = []
         ability_rows_by_type: dict[str, list[str]] = {}
@@ -1189,7 +1189,7 @@ class WorkspacePage(BasePage):
         return "\n".join(lines)
 
     def _art_moments_map(self) -> dict[str, dict[str, object]]:
-        """读取“美术”工作区保存的 Moments 配置。"""
+        """读取"美术"工作区保存的 Moments 配置。"""
 
         payload = self._art_workspace.export_project_payload()
         if not isinstance(payload, dict):
@@ -3101,6 +3101,7 @@ class WorkspacePage(BasePage):
         unit_ai_info_rows: list[str] = []
         tags_rows: list[str] = []
         type_tags_rows: list[str] = []
+        type_properties_rows: list[str] = []
         ability_types_rows: list[str] = []
         ability_tags_rows: list[str] = []
         ability_type_tags_rows: list[str] = []
@@ -3376,6 +3377,23 @@ class WorkspacePage(BasePage):
                     if tag.startswith("CLASS_") and tag not in fixed_class_tags and tag not in existing_ability_class_tags:
                         tags_rows.append(f"('{self._sql_escape(tag)}', 'ABILITY_CLASS')")
 
+            type_properties = subtables.get("TypeProperties") if isinstance(subtables.get("TypeProperties"), list) else entry.get("type_properties") if isinstance(entry.get("type_properties"), list) else []
+            for row in type_properties:
+                if not isinstance(row, dict):
+                    continue
+                name = str(row.get("Name") or "").strip()
+                if not name:
+                    continue
+                value = row.get("Value")
+                # bool / int / str 分别格式化
+                if isinstance(value, bool):
+                    sql_value = "'true'" if value else "'false'"
+                elif isinstance(value, int):
+                    sql_value = str(value)
+                else:
+                    sql_value = _sql_literal(str(value) if value is not None else "")
+                type_properties_rows.append(f"('{self._sql_escape(unit_type)}', '{self._sql_escape(name)}', {sql_value})")
+
             ability_bindings = subtables.get("UnitAbilityBindings") if isinstance(subtables.get("UnitAbilityBindings"), list) else entry.get("unit_ability_bindings") if isinstance(entry.get("unit_ability_bindings"), list) else []
             for bind in ability_bindings:
                 if not isinstance(bind, dict):
@@ -3521,6 +3539,8 @@ class WorkspacePage(BasePage):
             sql_blocks.append(self._build_insert_block("Tags", "Tags", ["Tag", "Vocabulary"], tags_rows))
         if type_tags_rows:
             sql_blocks.append(self._build_insert_block("TypeTags", "TypeTags", ["Type", "Tag"], type_tags_rows))
+        if type_properties_rows:
+            sql_blocks.append(self._build_insert_block("TypeProperties", "TypeProperties", ["Type", "Name", "Value"], type_properties_rows))
         if image_comment_rows:
             sql_blocks.append("-- 单位图标（简化单位）")
             sql_blocks.append("\n".join(image_comment_rows))
@@ -3584,6 +3604,7 @@ class WorkspacePage(BasePage):
         improvement_valid_feature_groups: dict[tuple[str, ...], list[str]] = {}
         improvement_valid_resource_rows: list[str] = []
         improvement_valid_terrain_groups: dict[tuple[str, ...], list[str]] = {}
+        improvement_type_properties_rows: list[str] = []
         improvement_adjacency_rows: list[str] = []
         adjacency_custom_groups: dict[tuple[str, ...], list[str]] = {}
         text_rows: list[str] = []
@@ -3881,6 +3902,22 @@ class WorkspacePage(BasePage):
                     vals.append(prereq_civic)
                 _append_grouped_row(improvement_valid_terrain_groups, cols, vals)
 
+            type_properties = subtables.get("TypeProperties") if isinstance(subtables.get("TypeProperties"), list) else entry.get("type_properties") if isinstance(entry.get("type_properties"), list) else []
+            for row in type_properties:
+                if not isinstance(row, dict):
+                    continue
+                name = str(row.get("Name") or "").strip()
+                if not name:
+                    continue
+                value = row.get("Value")
+                if isinstance(value, bool):
+                    sql_value = "'true'" if value else "'false'"
+                elif isinstance(value, int):
+                    sql_value = str(value)
+                else:
+                    sql_value = _sql_literal(str(value) if value is not None else "")
+                improvement_type_properties_rows.append(f"('{self._sql_escape(improvement_type)}', '{self._sql_escape(name)}', {sql_value})")
+
             adjacency_payload = subtables.get("Improvement_Adjacencies") if isinstance(subtables.get("Improvement_Adjacencies"), list) else entry.get("improvement_adjacencies") if isinstance(entry.get("improvement_adjacencies"), list) else []
             for adj in adjacency_payload:
                 if not isinstance(adj, dict):
@@ -4007,6 +4044,8 @@ class WorkspacePage(BasePage):
             sql_blocks.append(self._build_insert_block("Improvement_ValidResources", "Improvement_ValidResources", ["ImprovementType", "ResourceType", "MustRemoveFeature"], improvement_valid_resource_rows))
         for columns_key, rows in improvement_valid_terrain_groups.items():
             sql_blocks.append(self._build_insert_block("Improvement_ValidTerrains", "Improvement_ValidTerrains", list(columns_key), rows))
+        if improvement_type_properties_rows:
+            sql_blocks.append(self._build_insert_block("TypeProperties", "TypeProperties", ["Type", "Name", "Value"], improvement_type_properties_rows))
         if improvement_adjacency_rows:
             sql_blocks.append(self._build_insert_block("Improvement_Adjacencies", "Improvement_Adjacencies", ["ImprovementType", "YieldChangeId"], improvement_adjacency_rows))
 
@@ -4935,7 +4974,7 @@ class WorkspacePage(BasePage):
             text_rows.append(f"('zh_Hans_CN','LOC_{governor_type}_TITLE','{self._sql_escape(title_text)}')")
             text_rows.append(f"('zh_Hans_CN','LOC_{governor_type}_SHORT_TITLE','{self._sql_escape(short_title_text)}')")
 
-            # 仅当“新TraitType”勾选时，才生成 Trait 文本键。
+            # 仅当"新TraitType"勾选时，才生成 Trait 文本键。
             # 未勾选表示复用已存在 TraitType，此处不应新增文本预览。
             if new_trait_type and trait_type:
                 text_rows.append(f"('zh_Hans_CN','LOC_{trait_type}_NAME','{{LOC_{governor_type}_NAME}}')")
@@ -5502,7 +5541,7 @@ class WorkspacePage(BasePage):
         return None
 
     def _xml_preview_boolean_columns(self, table_name: str) -> set[str]:
-        # 缓存按“当前 DB 路径 + 表名”区分，避免用户切换数据库后命中旧缓存。
+        # 缓存按"当前 DB 路径 + 表名"区分，避免用户切换数据库后命中旧缓存。
         db_path = self._resolve_preview_game_db_path()
         cache: dict[str, set[str]] = getattr(self, "_xml_preview_bool_cols_cache", {})
         last_db = getattr(self, "_xml_preview_bool_cols_db", None)
@@ -5797,6 +5836,7 @@ class WorkspacePage(BasePage):
                     "table_name": "Units",
                     "table_data": {},
                     "images": {},
+                    "type_properties": [],
                 }
             )
         elif section == "改良设施":
@@ -5806,6 +5846,7 @@ class WorkspacePage(BasePage):
                     "table_name": "Improvements",
                     "table_data": {},
                     "images": {},
+                    "type_properties": [],
                 }
             )
         elif section == "政策卡":
@@ -5934,7 +5975,10 @@ class WorkspacePage(BasePage):
         if section == "伟人":
             self._handle_import_great_people_entry()
             return
-        QMessageBox.information(self, "导入", f"{section} 当前不支持数据库导入，请使用“新增”手动创建条目。")
+        if section == "政策卡":
+            self._handle_import_policy_entry()
+            return
+        QMessageBox.information(self, "导入", f"{section} 当前不支持数据库导入，请使用新增手动创建条目。")
 
     def _handle_delete_section_item(self, section: str, index: int) -> None:
         entries = self._project.sections.get(section)
@@ -5947,7 +5991,7 @@ class WorkspacePage(BasePage):
         answer = QMessageBox.question(
             self,
             "删除对象",
-            f"确认删除“{entry_name}”吗？\n此操作不可撤销。",
+            f'确认删除"{entry_name}"吗？\n此操作不可撤销。',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -6129,6 +6173,97 @@ class WorkspacePage(BasePage):
         new_index = len(entries) - 1
         self._rebuild_tree()
         self._select_section_item("改良设施", new_index)
+
+    def _handle_import_policy_entry(self) -> None:
+        settings = load_settings()
+        db_path = Path(str(settings.game_db_path or "")).expanduser()
+        if not db_path.exists() and DEFAULT_GAME_DB.exists():
+            db_path = DEFAULT_GAME_DB
+        if not db_path.exists():
+            QMessageBox.warning(self, "导入政策卡", "未找到可用游戏数据库。")
+            return
+
+        rows: list[dict[str, object]] = []
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.execute(
+                    "SELECT PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType "
+                    "FROM Policies ORDER BY PolicyType"
+                )
+                for pt, name, desc, civic, tech, slot in cursor.fetchall():
+                    rows.append({
+                        "type": str(pt or ""),
+                        "name": self._resolve_loc_or_unknown(name),
+                        "description": self._resolve_loc_or_unknown(desc),
+                        "prereq_civic": str(civic or ""),
+                        "prereq_tech": str(tech or ""),
+                        "gov_slot": str(slot or ""),
+                    })
+        except sqlite3.Error:
+            rows = []
+
+        if not rows:
+            QMessageBox.warning(self, "导入政策卡", "未读取到政策卡数据。")
+            return
+
+        from ..ui.ui_widget_kit import SearchListDialog
+        dialog = SearchListDialog(
+            "选择要导入的政策卡",
+            [f"{r['type']}  ({r['name']})" for r in rows],
+            self,
+        )
+        if dialog.exec() != QDialog.DialogCode.Accepted or not dialog.selected():
+            return
+        selected = dialog.selected().split("  (")[0].strip()
+        payload = self._import_policy_payload_from_db(db_path, selected)
+        if payload is None:
+            QMessageBox.warning(self, "导入政策卡", f"未找到政策卡数据：{selected}")
+            return
+
+        entries = self._project.sections.setdefault("政策卡", [])
+        if not isinstance(entries, list):
+            entries = []
+            self._project.sections["政策卡"] = entries
+        entries.append(payload)
+        self._rebuild_tree()
+        self._select_section_item("政策卡", len(entries) - 1)
+
+    def _import_policy_payload_from_db(self, db_path, policy_type: str) -> dict[str, object] | None:
+        try:
+            conn = sqlite3.connect(str(db_path))
+        except sqlite3.Error:
+            return None
+
+        try:
+            rows = self._load_db_row_dicts(conn, "Policies", "PolicyType", policy_type)
+            if not rows:
+                return None
+            row = rows[0]
+
+            name_cn = self._resolve_loc_or_unknown(row.get("Name"))
+            desc_cn = self._resolve_loc_or_unknown(row.get("Description"))
+            short_type = policy_type
+            for prefix in ("POLICY_",):
+                if short_type.upper().startswith(prefix):
+                    short_type = short_type[len(prefix):]
+                    break
+
+            return {
+                "name": name_cn,
+                "abbr": short_type,
+                "type": policy_type,
+                "table_data": {
+                    "Name": name_cn,
+                    "Description": desc_cn,
+                    "PrereqCivic": str(row.get("PrereqCivic") or ""),
+                    "PrereqTech": str(row.get("PrereqTech") or ""),
+                    "GovernmentSlotType": str(row.get("GovernmentSlotType") or "SLOT_WILDCARD"),
+                    "RequiresGovernmentUnlock": int(row.get("RequiresGovernmentUnlock", 0) or 0),
+                    "ExplicitUnlock": int(row.get("ExplicitUnlock", 0) or 0),
+                },
+            }
+        finally:
+            conn.close()
 
     @staticmethod
     def _load_db_row_dicts(conn: sqlite3.Connection, table: str, key: str, value: str) -> list[dict[str, object]]:
@@ -6662,6 +6797,7 @@ class WorkspacePage(BasePage):
                 "unit_building_prereqs": unit_building_prereqs,
                 "unit_ai_infos": unit_ai_infos,
                 "type_tags": type_tags,
+                "type_properties": [],
                 "unit_ability_bindings": unit_ability_bindings,
                 "subtables": {
                     "Units_MODE": units_mode,
@@ -6674,6 +6810,7 @@ class WorkspacePage(BasePage):
                     "Unit_BuildingPrereqs": unit_building_prereqs,
                     "UnitAiInfos": unit_ai_infos,
                     "TypeTags": type_tags,
+                    "TypeProperties": [],
                     "UnitAbilityBindings": unit_ability_bindings,
                 },
             }
@@ -6903,6 +7040,7 @@ class WorkspacePage(BasePage):
                 "improvement_valid_features": improvement_valid_features,
                 "improvement_valid_resources": improvement_valid_resources,
                 "improvement_valid_terrains": improvement_valid_terrains,
+                "type_properties": [],
                 "improvement_adjacencies": improvement_adjacencies,
                 "subtables": {
                     "Improvements_MODE": improvements_mode,
@@ -6918,6 +7056,7 @@ class WorkspacePage(BasePage):
                     "Improvement_ValidFeatures": improvement_valid_features,
                     "Improvement_ValidResources": improvement_valid_resources,
                     "Improvement_ValidTerrains": improvement_valid_terrains,
+                    "TypeProperties": [],
                     "Improvement_Adjacencies": improvement_adjacencies,
                 },
             }
@@ -7231,7 +7370,7 @@ class WorkspacePage(BasePage):
         if format_name == MODIFIER_SECTION_FORMAT and isinstance(data, dict):
             return data
 
-        # 兼容旧结构：直接把修改器数据字典存放在“修改器”节点
+        # 兼容旧结构：直接把修改器数据字典存放在"修改器"节点
         return section
 
     def _modifier_custom_unit_abilities(self) -> list[dict[str, object]]:
@@ -7306,8 +7445,8 @@ class WorkspacePage(BasePage):
             self._loading_project = False
 
     def _refresh_all_workspaces_after_project_open(self) -> None:
-        # 注意：刚打开工程时不要立即把“编辑器当前状态”回写到 project。
-        # 这会在加载顺序/信号回调发生时把磁盘读取到的 direct workspace（尤其是“美术”）覆盖成空。
+        # 注意：刚打开工程时不要立即把"编辑器当前状态"回写到 project。
+        # 这会在加载顺序/信号回调发生时把磁盘读取到的 direct workspace（尤其是"美术"）覆盖成空。
         self._art_workspace.refresh_from_sections(self._project.sections)
         self._modifier_workspace.sync_owners_from_sections(self._project.sections)
         self._text_workspace.refresh_preview()
@@ -9588,7 +9727,7 @@ class WorkspacePage(BasePage):
         files[self._img_plan_relative_path()] = self._build_img_plan_table_text()
         files[self._textures_plan_relative_path()] = self._build_textures_plan_table_text()
 
-        # 工程总览下也需要美术预览文件（避免用户未进入“美术”页导致内容过旧）。
+        # 工程总览下也需要美术预览文件（避免用户未进入"美术"页导致内容过旧）。
         self._art_workspace.refresh_from_sections(self._project.sections)
         art_groups = self._art_workspace.export_preview_file_groups()
         for filename, content in art_groups.get("Icons", []):

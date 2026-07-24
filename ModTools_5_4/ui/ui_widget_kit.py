@@ -2822,6 +2822,64 @@ def _fetch_government_slot_rows() -> List[Tuple[str, str]]:
     return output
 
 
+def _fetch_great_work_slot_rows() -> List[Tuple[str, str]]:
+    if not DEFAULT_GAME_DB.exists():
+        LOGGER.warning("GreatWorkSlotTypes lookup skipped: game DB not found at %s", DEFAULT_GAME_DB)
+        return []
+    try:
+        conn = sqlite3.connect(str(DEFAULT_GAME_DB))
+    except sqlite3.Error as exc:
+        LOGGER.warning("GreatWorkSlotTypes lookup failed to open DB: %s", exc)
+        return []
+    try:
+        cursor = conn.cursor()
+        rows = cursor.execute(
+            "SELECT GreatWorkSlotType, IFNULL(Name, '') FROM GreatWorkSlotTypes ORDER BY GreatWorkSlotType"
+        ).fetchall()
+    except sqlite3.Error as exc:
+        LOGGER.warning("GreatWorkSlotTypes query failed: %s", exc)
+        rows = []
+    finally:
+        conn.close()
+
+    output: List[Tuple[str, str]] = []
+    for slot_type, name_tag in rows:
+        slot_text = str(slot_type or "").strip()
+        if not slot_text:
+            continue
+        localized = _localize_tag(str(name_tag or ""))
+        display = localized if localized and localized != "未知" else slot_text
+        output.append((slot_text, display))
+    LOGGER.info("Loaded %d GreatWorkSlotTypes options", len(output))
+    return output
+
+
+def _fetch_great_work_object_type_rows() -> List[Tuple[str, str]]:
+    if not DEFAULT_GAME_DB.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(DEFAULT_GAME_DB))
+    except sqlite3.Error:
+        return []
+    try:
+        rows = conn.execute(
+            "SELECT GreatWorkObjectType, IFNULL(Name, '') FROM GreatWorkObjectTypes ORDER BY GreatWorkObjectType"
+        ).fetchall()
+    except sqlite3.Error:
+        rows = []
+    finally:
+        conn.close()
+    output: List[Tuple[str, str]] = []
+    for obj_type, name_tag in rows:
+        text = str(obj_type or "").strip()
+        if not text:
+            continue
+        localized = _localize_tag(str(name_tag or ""))
+        display = localized if localized and localized != "未知" else text
+        output.append((text, display))
+    return output
+
+
 def _fetch_government_rows() -> List[Tuple[str, str]]:
     if not DEFAULT_GAME_DB.exists():
         LOGGER.warning("Governments lookup skipped: game DB not found at %s", DEFAULT_GAME_DB)
@@ -4315,6 +4373,26 @@ class GovernmentSlotSelectorTemplate(_DatasetComboTemplate):
             (display, slot_type)
             for slot_type, display in rows
         ]
+        self._populate_options(options)
+
+
+class GreatWorkSlotSelectorTemplate(_DatasetComboTemplate):
+    """Dropdown sourcing GreatWorkSlotTypes.GreatWorkSlotType."""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__("巨作槽位选择框", "巨作槽位", "great_work_slot_type", parent)
+        rows = _fetch_great_work_slot_rows()
+        options = [(display, slot_type) for slot_type, display in rows]
+        self._populate_options(options)
+
+
+class GreatWorkObjectTypeSelectorTemplate(_DatasetComboTemplate):
+    """Dropdown sourcing GreatWorkObjectTypes.GreatWorkObjectType."""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__("巨作类型选择框", "巨作类型", "great_work_object_type", parent)
+        rows = _fetch_great_work_object_type_rows()
+        options = [(display, obj_type) for obj_type, display in rows]
         self._populate_options(options)
 
 
@@ -6094,6 +6172,8 @@ TEMPLATE_SPECS: tuple[UITemplateSpec, ...] = (
     UITemplateSpec("unit_promotion_class", "单位晋升类型选择框", UnitPromotionClassSelectorTemplate),
     UITemplateSpec("great_person_class", "伟人类型选择框", GreatPersonClassSelectorTemplate),
     UITemplateSpec("government_slot", "政策槽位选择框", GovernmentSlotSelectorTemplate),
+    UITemplateSpec("great_work_slot", "巨作槽位选择框", GreatWorkSlotSelectorTemplate),
+    UITemplateSpec("great_work_object_type", "巨作类型选择框", GreatWorkObjectTypeSelectorTemplate),
     UITemplateSpec("government_type", "政体选择框", GovernmentSelectorTemplate),
     UITemplateSpec("belief_class", "信仰类别勾选组", BeliefClassSelectorTemplate),
     UITemplateSpec("ability_class_tag", "ABILITY_CLASS标签选择框", AbilityClassTagTemplate),

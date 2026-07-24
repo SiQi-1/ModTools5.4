@@ -4921,6 +4921,190 @@
       "parameter_names": [
         "ModifierId"
       ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_BUILDING_AMENITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_IDENTITY_PRESSURE_FROM_AGES",
+      "parameter_names": [
+        "Amount"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_CLASS_CITIES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DIPLOMATIC_SCORE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_DISTRICT_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_GAME_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IMPROVEMENT_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_ANYONE_PLUNDER_TO_FAVOR",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_HAPPINESS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_MAX_DISTRICTS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_MAX_TRADE_ROUTES",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_OTHERS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DEFENSE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_ENEMY_HEAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_FRIENDLY_HEAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_IGNORE_SHORESFORESTHILLS",
+      "parameter_names": [
+        "Ignore"
+      ]
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NEUTRAL_HEAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_NO_MOVE_TERRAIN",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ASSIGN_CITY_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ASSIGN_DISTRICT_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ASSIGN_GAME_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ASSIGN_PLAYER_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ASSIGN_UNIT_PROPERTY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_CONVERT_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_TENSION",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_DIPLOMACY_WARMONGER",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_BUILDING_IN_CAPITAL",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_POLICY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_TECHNOLOGY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_DIRECT_LOYALTY_DAMAGE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_YIELD_PER_RESOURCE_IN_CITY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_FREE_UNIT_ON_PLOT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_UNIT_COMBAT_STRENGTH_FOR_ERA",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_POPULATION_FROM_PLOT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_PLAYER_DISCOVER_HERO",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_IDENTITY_PER_TURN_FROM_NEARBY_WONDERS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_CITY_GRANT_HERO",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_PERMANENT_MODIFIER_TO_PLOT_UNITS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_STEAL_POP_ON_PLOT_TO_CREATE_UNIT",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_CITY_LEVY_UNITS_IN_TERRITORY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_GREAT_PERSON_CLASS_ON_RESOURCE",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ATTACH_PERMANENT_MODIFIER_TO_ADJACENT_PLOT_UNITS",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_ADJUST_NEUTRALIZE_INDEFINITELY",
+      "parameter_names": []
+    },
+    {
+      "effect_type": "EFFECT_GRANT_IMPROVEMENT_ADJACENT_YIELDS",
+      "parameter_names": []
     }
   ],
   "counts": {
@@ -6330,7 +6514,8 @@
         "SameOwner"
       ]
     },
-    {      "requirement_type": "REQUIREMENT_UNIT_HAS_ABILITY",
+    {
+      "requirement_type": "REQUIREMENT_UNIT_HAS_ABILITY",
       "parameter_names": [
         "UnitAbilityType"
       ]

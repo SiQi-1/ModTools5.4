@@ -5587,5 +5587,230 @@
       "ModifierId": "modifier_ref"
     },
     "name_template": "UNIT_TRANSFER_CITY_GIFT"
+  },
+  "EFFECT_ADJUST_BUILDING_AMENITY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_BUILDING_AMENITY"
+  },
+  "EFFECT_ADJUST_CITY_IDENTITY_PRESSURE_FROM_AGES": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_CITY_IDENTITY_PRESSURE_FROM_AGES"
+  },
+  "EFFECT_ADJUST_CITY_YIELD_PER_TERRAIN_CLASS_CITIES": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_CITY_YIELD_PER_TERRAIN_CLASS_CITIES"
+  },
+  "EFFECT_ADJUST_DIPLOMATIC_SCORE": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_DIPLOMATIC_SCORE"
+  },
+  "EFFECT_ADJUST_DISTRICT_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_DISTRICT_PROPERTY"
+  },
+  "EFFECT_ADJUST_GAME_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_GAME_PROPERTY"
+  },
+  "EFFECT_ADJUST_IMPROVEMENT_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_IMPROVEMENT_PROPERTY"
+  },
+  "EFFECT_ADJUST_PLAYER_ANYONE_PLUNDER_TO_FAVOR": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_PLAYER_ANYONE_PLUNDER_TO_FAVOR"
+  },
+  "EFFECT_ADJUST_PLAYER_HAPPINESS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_PLAYER_HAPPINESS"
+  },
+  "EFFECT_ADJUST_PLAYER_MAX_DISTRICTS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_PLAYER_MAX_DISTRICTS"
+  },
+  "EFFECT_ADJUST_PLAYER_MAX_TRADE_ROUTES": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_PLAYER_MAX_TRADE_ROUTES"
+  },
+  "EFFECT_ADJUST_TRADE_ROUTE_YIELD_FOR_OTHERS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_TRADE_ROUTE_YIELD_FOR_OTHERS"
+  },
+  "EFFECT_ADJUST_UNIT_DEFENSE": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_DEFENSE"
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME"
+  },
+  "EFFECT_ADJUST_UNIT_ENEMY_HEAL": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_ENEMY_HEAL"
+  },
+  "EFFECT_ADJUST_UNIT_FRIENDLY_HEAL": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_FRIENDLY_HEAL"
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_SHORESFORESTHILLS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_IGNORE_SHORESFORESTHILLS"
+  },
+  "EFFECT_ADJUST_UNIT_NEUTRAL_HEAL": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_NEUTRAL_HEAL"
+  },
+  "EFFECT_ADJUST_UNIT_NO_MOVE_TERRAIN": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_NO_MOVE_TERRAIN"
+  },
+  "EFFECT_ASSIGN_CITY_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ASSIGN_CITY_PROPERTY"
+  },
+  "EFFECT_ASSIGN_DISTRICT_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ASSIGN_DISTRICT_PROPERTY"
+  },
+  "EFFECT_ASSIGN_GAME_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ASSIGN_GAME_PROPERTY"
+  },
+  "EFFECT_ASSIGN_PLAYER_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ASSIGN_PLAYER_PROPERTY"
+  },
+  "EFFECT_ASSIGN_UNIT_PROPERTY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ASSIGN_UNIT_PROPERTY"
+  },
+  "EFFECT_DIPLOMACY_CONVERT_CITY": {
+    "comment": "",
+    "params": {},
+    "name_template": "DIPLOMACY_CONVERT_CITY"
+  },
+  "EFFECT_DIPLOMACY_TENSION": {
+    "comment": "",
+    "params": {},
+    "name_template": "DIPLOMACY_TENSION"
+  },
+  "EFFECT_DIPLOMACY_WARMONGER": {
+    "comment": "",
+    "params": {},
+    "name_template": "DIPLOMACY_WARMONGER"
+  },
+  "EFFECT_GRANT_BUILDING_IN_CAPITAL": {
+    "comment": "",
+    "params": {},
+    "name_template": "GRANT_BUILDING_IN_CAPITAL"
+  },
+  "EFFECT_GRANT_POLICY": {
+    "comment": "",
+    "params": {},
+    "name_template": "GRANT_POLICY"
+  },
+  "EFFECT_GRANT_TECHNOLOGY": {
+    "comment": "",
+    "params": {},
+    "name_template": "GRANT_TECHNOLOGY"
+  },
+  "EFFECT_ADJUST_UNIT_DIRECT_LOYALTY_DAMAGE": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_DIRECT_LOYALTY_DAMAGE"
+  },
+  "EFFECT_GRANT_YIELD_PER_RESOURCE_IN_CITY": {
+    "comment": "",
+    "params": {},
+    "name_template": "GRANT_YIELD_PER_RESOURCE_IN_CITY"
+  },
+  "EFFECT_GRANT_FREE_UNIT_ON_PLOT": {
+    "comment": "",
+    "params": {},
+    "name_template": "GRANT_FREE_UNIT_ON_PLOT"
+  },
+  "EFFECT_ADJUST_UNIT_COMBAT_STRENGTH_FOR_ERA": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_UNIT_COMBAT_STRENGTH_FOR_ERA"
+  },
+  "EFFECT_ADJUST_POPULATION_FROM_PLOT": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_POPULATION_FROM_PLOT"
+  },
+  "EFFECT_PLAYER_DISCOVER_HERO": {
+    "comment": "",
+    "params": {},
+    "name_template": "PLAYER_DISCOVER_HERO"
+  },
+  "EFFECT_ADJUST_IDENTITY_PER_TURN_FROM_NEARBY_WONDERS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_IDENTITY_PER_TURN_FROM_NEARBY_WONDERS"
+  },
+  "EFFECT_CITY_GRANT_HERO": {
+    "comment": "",
+    "params": {},
+    "name_template": "CITY_GRANT_HERO"
+  },
+  "EFFECT_ATTACH_PERMANENT_MODIFIER_TO_PLOT_UNITS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ATTACH_PERMANENT_MODIFIER_TO_PLOT_UNITS"
+  },
+  "EFFECT_STEAL_POP_ON_PLOT_TO_CREATE_UNIT": {
+    "comment": "",
+    "params": {},
+    "name_template": "STEAL_POP_ON_PLOT_TO_CREATE_UNIT"
+  },
+  "EFFECT_CITY_LEVY_UNITS_IN_TERRITORY": {
+    "comment": "",
+    "params": {},
+    "name_template": "CITY_LEVY_UNITS_IN_TERRITORY"
+  },
+  "EFFECT_ADJUST_PLAYER_YIELD_CHANGE_PER_GREAT_PERSON_CLASS_ON_RESOURCE": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_PLAYER_YIELD_CHANGE_PER_GREAT_PERSON_CLASS_ON_RESOURCE"
+  },
+  "EFFECT_ATTACH_PERMANENT_MODIFIER_TO_ADJACENT_PLOT_UNITS": {
+    "comment": "",
+    "params": {},
+    "name_template": "ATTACH_PERMANENT_MODIFIER_TO_ADJACENT_PLOT_UNITS"
+  },
+  "EFFECT_ADJUST_NEUTRALIZE_INDEFINITELY": {
+    "comment": "",
+    "params": {},
+    "name_template": "ADJUST_NEUTRALIZE_INDEFINITELY"
+  },
+  "EFFECT_GRANT_IMPROVEMENT_ADJACENT_YIELDS": {
+    "comment": "改良设施吸收相邻产出",
+    "name_template": "GRANT_IMPROVEMENT_ADJACENT_YIELDS",
+    "params": {}
   }
 }

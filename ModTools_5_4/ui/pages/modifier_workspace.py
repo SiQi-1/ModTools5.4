@@ -15,7 +15,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 from .group_workspace import _build_entity_type
 
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -195,46 +195,263 @@ TRAIT_SOURCE_PREFIX_LABELS: Dict[str, str] = {
 
 
 BOOLEAN_PARAM_KEYS = {
-    "Banned",
-    "IsWonder",
-    "CityStatesOnly",
-    "CanPurchase",
-    "HasBonus",
+    "Access",
+    "Accumulates",
+    "AddAmenity",
+    "Adopt",
+    "AffectDestination",
+    "AffectLocal",
+    "AffectOrigin",
+    "AllowUniqueOverride",
     "AlwaysLoyal",
+    "ApplyImmediately",
+    "Available",
+    "BanDistrictBuildings",
+    "Banned",
+    "BonusPerRoute",
+    "BoostsWonders",
+    "Bypass",
+    "CanAttack",
+    "CanCapture",
+    "CanDrop",
+    "CanFight",
+    "CanMove",
+    "CanPurchase",
+    "CanRaid",
+    "CanSee",
+    "CaptureOwnedTerritory",
+    "CityStatesOnly",
+    "Convert",
+    "Converts",
+    "ConvertsCity",
+    "Corps",
+    "Defense",
+    "DeltaWithOpponent",
+    "Destination",
+    "Disable",
+    "Disabled",
+    "Domestic",
+    "DomesticCities",
     "Enable",
     "Enabled",
-    "Domestic",
+    "Enemy",
+    "Enter",
+    "EntireCity",
+    "EscortMobility",
+    "Exert",
+    "Extract",
+    "Favored",
+    "ForceRetreat",
+    "Foreign",
+    "ForeignCities",
+    "Founder",
+    "HasBonus",
+    "Hidden",
+    "HiddenAgenda",
     "Ignore",
-    "NoRemove",
-    "Origin",
-    "Destination",
-    "SeeHidden",
-    "CanSee",
-    "Disable",
-    "Intercontinental",
-    "NoDamage",
-    "Prevent",
+    "ImmediateTradingPost",
     "IncludeCenter",
-    "CaptureOwnedTerritory",
+    "IncludeCivilian",
+    "IncludeWonder",
+    "Intercontinental",
+    "InternationalMajors",
+    "InternationalMinors",
+    "IsWonder",
+    "KeepOverflow",
+    "LandVictorySpread",
+    "Member",
+    "MovementOnly",
+    "Multiplicative",
+    "MustReplaceImprovement",
+    "Neutralize",
+    "NoDamage",
+    "NoFinishMoves",
+    "NoHousing",
+    "NoPenalties",
     "NoReduction",
-    "AllowUniqueOverride",
+    "NoRemove",
+    "NoSpread",
+    "NoTourism",
+    "Offense",
+    "Offensive",
+    "OnlyInboundTrade",
+    "OnlyOwnersCity",
+    "OnlyWhenDefeatedEarlierEraUnit",
+    "Origin",
+    "OtherPlayers",
+    "Overall",
+    "PaidForPeacePenalty",
+    "Prevent",
+    "Prohibited",
+    "Protected",
+    "RelicUponDeath",
+    "Religious",
+    "ReligiousCombat",
+    "ReligiousOnly",
+    "ReplacesAll",
+    "Scale",
+    "SeeHidden",
+    "ShareVis",
+    "Skip",
+    "Stack",
+    "StackWithOtherDiploYieldModifiers",
+    "TargetOnly",
+    "TechBoost",
+    "UniqueOverride",
+    "UseAdvancedCoastalRaid",
+    "UseAdvancedPillaging",
+    "Valid",
+    "VictoryResolution",
+    "YieldBasedOnAppeal",
 }
 
 INT_PARAM_KEYS = {
+    "AcceptableIslandPercentage",
+    "Amenities",
     "Amount",
-    "ScalingFactor",
-    "YieldChange",
+    "AmountPerIncident",
+    "AvoidedWarPenalty",
+    "AvoidedWarPenaltyTurnsToRampUp",
+    "BetterMilitaryBonus",
+    "BetterTerritoryBonus",
+    "Blast",
+    "Bonus",
+    "BonusIfNotOriginalOwner",
+    "BonusRate",
+    "BottomPercentage",
+    "BottomRankingDiploMod",
+    "BuildingProductionPercent",
+    "CantBuildDiploMod",
+    "CityGainLowerBound",
+    "CityGainUpperBound",
+    "DefenseValue",
     "Delta",
-    "Range",
-    "TilesRequired",
+    "DiploModForCircumnavigation",
+    "DiploModPerSpaceProject",
+    "DiploModPerSpaceport",
+    "DisappointingHolySitePercentage",
+    "DisappointingLargeCityPercentage",
+    "Discount",
+    "DistanceChange",
+    "EachSurpriseWarBonus",
+    "EachWarDeclaredBonus",
+    "Experience",
+    "Fallout",
+    "Favor",
+    "FavorAmount",
+    "Followers",
+    "ForestPlacedValue",
+    "GainTileRadius",
+    "HighPopulationThreshold",
+    "HighScoreThreshold",
+    "HighThreshold",
+    "ImprovedRouteLevel",
+    "Increment",
+    "IncrementTurns",
+    "IncrementValue",
+    "InitialValue",
+    "Interval",
+    "IntoleranceMultiplier",
+    "LowPopulationThreshold",
+    "LowScoreThreshold",
+    "LowThreshold",
+    "LowerLimit",
+    "MajorWarBonus",
+    "MaxDiploModifierMagnitude",
     "MaxDistance",
-    "MinDistance",
+    "MaxEffectMagnitude",
+    "MaxNegativeModifier",
+    "MaxPercent",
+    "MaxPositiveModifier",
+    "MaxRange",
+    "MaxTilesLargeIsland",
+    "MaxTilesMediumIsland",
+    "MaxTilesSmallIsland",
+    "MaxValue",
+    "MaxWarDeclaredBonus",
     "MaximumAppeal",
-    "MinimumAppeal",
-    "PropertyMinimum",
-    "MinimumAmount",
-    "Percent",
+    "MessageThrottle",
+    "MinDistance",
+    "MinPromotedUnits",
+    "MinRange",
     "MinScore",
+    "MinimumAmount",
+    "MinimumAppeal",
+    "MinimumCount",
+    "Modifier",
+    "ModifierPerKeptPledge",
+    "ModifierPerKeptPromise",
+    "ModifierPerTransgression",
+    "Multiplier",
+    "NationalParkConstructionValue",
+    "NeverSurpriseWarPenalty",
+    "NoTradePenalty",
+    "NotAtWarPenalty",
+    "NumSteps",
+    "PaidForPeacePenaltyTurnsToFadeOut",
+    "PenaltyPerOccupiedCity",
+    "PerXItems",
+    "Percent",
+    "PercentDefeatedStrength",
+    "PercentOfGrievances",
+    "PercentOfGrievancesDelta",
+    "PercentageActive",
+    "PercentageDifferencePerStep",
+    "PlotFeatureRemovalValue",
+    "PlotFeatureRemovedValue",
+    "PropertyMinimum",
+    "Radius",
+    "Range",
+    "RecentSurpriseWarBonus",
+    "ReductionPercent",
+    "ReductionTurns",
+    "ReductionValue",
+    "RequiredAppeal",
+    "SameEraIntoleranceFlatBonus",
+    "ScalingFactor",
+    "Score",
+    "ScoreAllowancePerEra",
+    "ScorePerCity",
+    "ScorePerStep",
+    "SinceWarPenaltyTurns",
+    "SpreadMultiplier",
+    "SurpriseWarDegradeTurns",
+    "TargetHolySitePercentage",
+    "TargetLargeCityPercentage",
+    "TechCivicsPerYield",
+    "TechEnabledSpreadMultiplier",
+    "ThresholdPercent",
+    "TileImprovementHighThreshold",
+    "TileImprovementLowThreshold",
+    "TileImprovementPreferenceValue",
+    "TilesRequired",
+    "TopMilitaryBonus",
+    "TopPercentage",
+    "TopRankingDiploMod",
+    "TopTerritoryBonus",
+    "Tourism",
+    "TradeBonus",
+    "TradeValuePerModifierPoint",
+    "Turns",
+    "TurnsActive",
+    "UnitCostPercent",
+    "UnitProductionPercent",
+    "Value",
+    "WaterDamage",
+    "WhichEffect",
+    "YieldChange",
+}
+
+FIXED_OPTION_PARAMS: Dict[str, list[str]] = {
+    "SourceType": ["SOURCE_DELEGATION", "SOURCE_TRADE_ROUTE", "SOURCE_GREAT_PERSON"],
+    "AdvisorType": ["ADVISOR_GENERIC", "ADVISOR_MILITARY", "ADVISOR_ECONOMIC", "ADVISOR_FOREIGN", "ADVISOR_SCIENCE"],
+    "DiplomaticVisibilitySource": [
+        "SOURCE_DELEGATION", "SOURCE_TRADE_ROUTE", "SOURCE_GOVERNOR",
+        "SOURCE_GREAT_PERSON", "SOURCE_ESPIONAGE", "SOURCE_ALLIANCE",
+    ],
+    "Stack": ["INITIATOR_ONLY", "TARGET_ONLY", "BOTH"],
+    "Source": ["LOCAL", "FOREIGN", "BOTH"],
+    "TargetType": ["TARGET_DISTRICT", "TARGET_IMPROVEMENT", "TARGET_UNIT"],
 }
 
 TEMPLATE_PARAM_MAPPINGS: Dict[str, str] = {
@@ -265,6 +482,9 @@ TEMPLATE_PARAM_MAPPINGS: Dict[str, str] = {
     "GreatPersonClassType": "great_person_class",
     "ResourceClassType": "resource_class",
     "AbilityType": "unit_ability_type",
+    "GovernmentSlotType": "government_slot",
+    "GreatWorkSlotType": "great_work_slot",
+    "GreatWorkObjectType": "great_work_object_type",
 }
 
 
@@ -336,6 +556,47 @@ class RequirementRecord:
     persistent: bool = False
     triggered: bool = False
     parameters: List[Dict[str, object]] = field(default_factory=list)
+
+
+class _ModifierIdSearchSelector(QWidget):
+    """LineEdit + search button for selecting a ModifierId from the current modifier list."""
+
+    def __init__(self, modifiers_provider, parent=None) -> None:
+        super().__init__(parent)
+        self._modifiers_provider = modifiers_provider
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
+        self._edit = QLineEdit()
+        self._edit.setPlaceholderText("输入 ModifierId 或点击搜索")
+        layout.addWidget(self._edit, 1)
+        btn = QToolButton()
+        btn.setText("…")
+        btn.clicked.connect(self._open_search)
+        layout.addWidget(btn)
+
+    def text(self) -> str:
+        return self._edit.text().strip()
+
+    def setText(self, text: str) -> None:
+        self._edit.setText(text)
+
+    def _open_search(self) -> None:
+        modifiers = self._modifiers_provider()
+        rows = []
+        for m in modifiers:
+            if not m.modifier_id:
+                continue
+            display = m.comment.strip() or m.modifier_id
+            rows.append(f"{m.modifier_id}  ({display})")
+        if not rows:
+            return
+        dlg = SearchListDialog("选择 ModifierId", rows, self.window())
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.selected():
+            selected = dlg.selected()
+            # Extract just the ModifierId from "MODIFIER_XXX  (comment)"
+            mod_id = selected.split("  (")[0].strip() if "  (" in selected else selected.strip()
+            self._edit.setText(mod_id)
 
 
 class SearchListDialog(QDialog):
@@ -692,7 +953,26 @@ _FORMAT_OPTIONS: List[tuple[str, str]] = [
 ]
 
 
+_ID_SYNTAX_HELP = (
+    "ID 命名模板语法：\n"
+    "  {:Param}        完整值    → BUILDING_MONUMENT\n"
+    "  {Param}         去首段    → MONUMENT\n"
+    "  {Param:last}    取末段    → MONUMENT\n"
+    "  {:Param:last}   完整取末段 → MONUMENT\n"
+    "  数字类型自动 N 替换负号  (-3 → N3)"
+)
+
+_COMMENT_SYNTAX_HELP = (
+    "注释模板语法：\n"
+    "  {Param}         纯文本值\n"
+    "  {+:Param}       带正负号 (+3 / -1)\n"
+    "  {Param?真:假}   条件文本"
+)
+
+
 class CommentTemplateEditDialog(QDialog):
+    """编辑 EffectType 的 ID 命名模板和注释模板。"""
+
     def __init__(
         self,
         effect_type: str,
@@ -701,32 +981,39 @@ class CommentTemplateEditDialog(QDialog):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
-        self.setWindowTitle("编辑注释模版")
-        self.resize(760, 520)
+        self.setWindowTitle(f"编辑模板 — {effect_type}")
+        self.resize(700, 560)
         self._effect_type = str(effect_type or "").strip()
         self._templates = templates
         self._on_save = on_save
         self._format_combos: Dict[int, QComboBox] = {}
 
         layout = QVBoxLayout(self)
+        layout.setSpacing(8)
 
-        layout.addWidget(QLabel(f"EffectType：{self._effect_type}"))
-        layout.addSpacing(8)
+        layout.addWidget(QLabel("ID 命名模板 (name_template)"))
+        id_tip = QLabel(_ID_SYNTAX_HELP)
+        id_tip.setStyleSheet("color: #475569; font-size: 10px; background: #f1f5f9; padding: 6px; border-radius: 4px;")
+        layout.addWidget(id_tip)
+        self._name_edit = QLineEdit()
+        self._name_edit.setPlaceholderText("如: ADJUST_{BuildingType}_{YieldType}")
+        layout.addWidget(self._name_edit)
 
-        layout.addWidget(QLabel("注释模版"))
-        tip = QLabel("占位符：{ParamName} 表示纯值，{+:ParamName} 表示带正负号的值")
-        tip.setStyleSheet("color: gray; font-size: 11px;")
-        layout.addWidget(tip)
+        layout.addWidget(QLabel("注释模板 (comment)"))
+        cmt_tip = QLabel(_COMMENT_SYNTAX_HELP)
+        cmt_tip.setStyleSheet("color: #475569; font-size: 10px; background: #f1f5f9; padding: 6px; border-radius: 4px;")
+        layout.addWidget(cmt_tip)
         self._comment_edit = QLineEdit()
+        self._comment_edit.setPlaceholderText("如: {BuildingType} {+:Amount}{YieldType}")
         layout.addWidget(self._comment_edit)
-        layout.addSpacing(8)
 
+        layout.addWidget(QLabel("参数格式"))
         self._param_table = QTableWidget(0, 2)
         self._param_table.setHorizontalHeaderLabels(["参数名", "格式"])
         self._param_table.horizontalHeader().setStretchLastSection(True)
         self._param_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self._param_table.verticalHeader().setVisible(False)
-        self._param_table.setMinimumHeight(240)
+        self._param_table.setMinimumHeight(160)
         layout.addWidget(self._param_table, 1)
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
@@ -740,8 +1027,10 @@ class CommentTemplateEditDialog(QDialog):
         template = self._templates.get(self._effect_type)
         if not isinstance(template, dict):
             self._comment_edit.setText("")
+            self._name_edit.setText("")
             return
         self._comment_edit.setText(str(template.get("comment") or ""))
+        self._name_edit.setText(str(template.get("name_template") or ""))
         params = template.get("params") if isinstance(template.get("params"), dict) else {}
         self._param_table.setRowCount(0)
         self._format_combos.clear()
@@ -764,6 +1053,7 @@ class CommentTemplateEditDialog(QDialog):
         if not self._effect_type:
             return
         comment = self._comment_edit.text().strip()
+        name_template = self._name_edit.text().strip()
         params: Dict[str, str] = {}
         for row in range(self._param_table.rowCount()):
             name_item = self._param_table.item(row, 0)
@@ -772,12 +1062,15 @@ class CommentTemplateEditDialog(QDialog):
             fmt = str(combo.currentData() or "").strip() if combo else ""
             if name and fmt:
                 params[name] = fmt
-        self._on_save(self._effect_type, {"comment": comment, "params": params})
+        self._on_save(self._effect_type, {"comment": comment, "name_template": name_template, "params": params})
         self.accept()
 
 
 class BatchGenerateDialog(QDialog):
-    """批量生成修改器 — 严格参照修改器编辑区 UI 样式。"""
+    """批量生成修改器 — 交叉乘 + zip配对组。参数和条件集可混选配对。"""
+
+    REQSET_KEY_OWNER = "__owner_reqset__"
+    REQSET_KEY_SUBJECT = "__subject_reqset__"
 
     def __init__(self, home: "HomePage", parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -799,11 +1092,19 @@ class BatchGenerateDialog(QDialog):
         self._owner_reqset_ids: set[str] = set()
         self._subject_reqset_ids: set[str] = set()
         self._selected_owner_keys: set[str] = set()
+        self._paired_groups: list[dict] = []
         self._preview_table: QTableWidget | None = None
         self._params_container: QWidget | None = None
+        self._params_layout: QVBoxLayout | None = None
+        self._paired_container: QWidget | None = None
+        self._paired_layout: QVBoxLayout | None = None
         self._ms_group: QWidget | None = None
         self._current_params: Dict[str, object] = {}
         self._params_spec: Dict[str, str] = {}
+        self._or_flow: FlowLayout | None = None
+        self._sr_flow: FlowLayout | None = None
+        self._or_cards: Dict[str, QWidget] = {}
+        self._sr_cards: Dict[str, QWidget] = {}
 
         self._build_ui()
         self._rebuild_params()
@@ -909,9 +1210,25 @@ class BatchGenerateDialog(QDialog):
         cl_row.addWidget(self._cl_combo, 1)
         lay.addLayout(cl_row)
 
-        # —— 参数展开 ——
-        self._params_label = QLabel("—— 参数展开 ——")
-        lay.addWidget(self._params_label)
+        # —— 配对组 ——
+        pair_header = QHBoxLayout()
+        pair_header.addWidget(QLabel("—— 配对组 ——"))
+        self._pair_btn = QPushButton("创建配对组...")
+        self._pair_btn.setFixedHeight(22)
+        self._pair_btn.setStyleSheet("font-size: 11px; padding: 0px 4px;")
+        self._pair_btn.clicked.connect(self._handle_open_pair_dialog)
+        pair_header.addStretch(1)
+        pair_header.addWidget(self._pair_btn)
+        lay.addLayout(pair_header)
+
+        self._paired_container = QWidget()
+        self._paired_layout = QVBoxLayout(self._paired_container)
+        self._paired_layout.setContentsMargins(0, 0, 0, 0)
+        self._paired_layout.setSpacing(6)
+        lay.addWidget(self._paired_container)
+
+        # —— 独立参数 ——
+        lay.addWidget(QLabel("—— 独立参数 ——"))
         self._params_container = QWidget()
         self._params_layout = QVBoxLayout(self._params_container)
         self._params_layout.setContentsMargins(0, 0, 0, 0)
@@ -1031,7 +1348,9 @@ class BatchGenerateDialog(QDialog):
             return
         self._param_value_sets.clear()
         self._param_cards.clear()
+        self._paired_groups.clear()
         self._clear_layout(self._params_layout)
+        self._rebuild_paired_section()
 
         template = self._home._comment_templates.get(self._effect_type)
         self._params_spec: Dict[str, str] = (template.get("params") if isinstance(template, dict) else None) or {}
@@ -1136,12 +1455,7 @@ class BatchGenerateDialog(QDialog):
         # text / template widget
         selector: QWidget | None = None
         if param_name == "ModifierId":
-            selector = QComboBox()
-            selector.setEditable(True)
-            selector.addItem("", "")
-            for m in self._home._modifiers:
-                if m.modifier_id:
-                    selector.addItem(m.comment.strip() or m.modifier_id, m.modifier_id)
+            selector = _ModifierIdSearchSelector(lambda: self._home._modifiers)
         elif param_name == "RequirementSetId":
             selector = QComboBox()
             selector.setEditable(True)
@@ -1149,6 +1463,10 @@ class BatchGenerateDialog(QDialog):
             for rs in self._home._requirement_sets:
                 if rs.requirement_set_id:
                     selector.addItem(f"{rs.requirement_set_id} ({rs.comment})" if rs.comment else rs.requirement_set_id, rs.requirement_set_id)
+        elif param_name in FIXED_OPTION_PARAMS:
+            selector = QComboBox()
+            selector.setEditable(True)
+            selector.addItems(FIXED_OPTION_PARAMS[param_name])
         else:
             tk = TEMPLATE_PARAM_MAPPINGS.get(param_name)
             if tk:
@@ -1174,6 +1492,9 @@ class BatchGenerateDialog(QDialog):
         self._param_value_sets[param_name] = set()
 
         def _capture():
+            if isinstance(selector, _ModifierIdSearchSelector):
+                t = selector.text()
+                return t, t
             if isinstance(selector, QComboBox):
                 return selector.currentText().strip(), selector.currentData() or selector.currentText().strip()
             if isinstance(selector, BaseTemplateWidget):
@@ -1206,10 +1527,12 @@ class BatchGenerateDialog(QDialog):
     # ---- cards -------------------------------------------------------------
 
     def _make_card(self, display, param_name, value, flow, cards, val_set):
-        short = str(display or value)
-        if len(short) > 20:
-            short = short[:18] + ".."
+        cn = self._paired_value_display(param_name, str(value))
+        short = cn if cn and cn != str(value) else str(display or value)
+        if len(short) > 30:
+            short = short[:28] + ".."
         card = QWidget()
+        card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         card.setStyleSheet("background:#475569; border:1px solid #64748b; border-radius:4px; padding:2px 6px; color:#e2e8f0;")
         cl = QHBoxLayout(card)
         cl.setContentsMargins(4, 1, 4, 1)
@@ -1237,10 +1560,14 @@ class BatchGenerateDialog(QDialog):
         rid = combo.currentData() or combo.currentText().strip()
         if not rid or rid in cards:
             return
-        short = rid
-        if len(short) > 24:
-            short = short[:22] + ".."
+        # Show Chinese name if available
+        rs = next((r for r in self._home._requirement_sets if r.requirement_set_id == rid), None)
+        cn = rs.comment.strip() if rs and rs.comment.strip() else ""
+        short = cn if cn else rid
+        if len(short) > 28:
+            short = short[:26] + ".."
         card = QWidget()
+        card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         card.setStyleSheet("background:#475569; border:1px solid #64748b; border-radius:4px; padding:2px 6px; color:#e2e8f0;")
         cl = QHBoxLayout(card)
         cl.setContentsMargins(4, 1, 4, 1)
@@ -1344,9 +1671,27 @@ class BatchGenerateDialog(QDialog):
     def _refresh_preview(self) -> None:
         if self._preview_table is None:
             return
+        self._update_pair_btn_state()
         self._preview_table.setRowCount(0)
         combos = self._compute_combinations()
-        self._preview_label.setText(f"—— 预览 —— {len(combos)} 条")
+        parts: list[str] = []
+        for pn in self._param_value_sets:
+            n = len(self._param_value_sets[pn])
+            if n > 0:
+                parts.append(f"{n}({pn})")
+        for pg in self._paired_groups:
+            n = len(pg.get("columns", []))
+            if n > 0:
+                display = "↔".join(self._paired_member_display(m) for m in pg["members"])
+                parts.append(f"{n}({display})")
+        or_n = len(self._owner_reqset_ids)
+        sr_n = len(self._subject_reqset_ids)
+        if or_n:
+            parts.append(f"{or_n}(Owner)")
+        if sr_n:
+            parts.append(f"{sr_n}(Subject)")
+        formula = " × ".join(parts) if parts else "0"
+        self._preview_label.setText(f"—— 预览 —— {len(combos)} 条  ({formula})")
         for row_idx, pv in enumerate(combos):
             self._preview_table.insertRow(row_idx)
             self._preview_table.setItem(row_idx, 0, QTableWidgetItem(self._compute_batch_id(pv)))
@@ -1355,39 +1700,84 @@ class BatchGenerateDialog(QDialog):
         self._preview_table.resizeColumnsToContents()
 
     def _compute_combinations(self) -> list[dict[str, object]]:
-        expanded: list[tuple[str, list[object]]] = []
+        paired_members: set[str] = set()
+        for pg in self._paired_groups:
+            for m in pg["members"]:
+                paired_members.add(m)
+
+        independent: list[tuple[str, list[object]]] = []
         for pn, vs in self._param_value_sets.items():
-            if not vs:
+            if pn in paired_members or not vs:
                 continue
-            vals: list[object] = []
-            for s in sorted(vs):
-                if s == "true":
-                    vals.append(True)
-                elif s == "false":
-                    vals.append(False)
-                elif pn in INT_PARAM_KEYS:
-                    try:
-                        vals.append(int(s))
-                    except ValueError:
-                        vals.append(s)
-                else:
-                    vals.append(s)
+            vals = self._sorted_values(pn, vs)
             if vals:
-                expanded.append((pn, vals))
+                independent.append((pn, vals))
 
-        if not expanded:
-            return [dict(self._current_params)] if self._current_params else [{}]
+        paired_vecs: list[list[dict[str, object]]] = []
+        for pg in self._paired_groups:
+            cols = pg.get("columns", [])
+            if not cols:
+                continue
+            group_combos: list[dict[str, object]] = []
+            for col in cols:
+                entry: dict[str, object] = {}
+                for m in pg["members"]:
+                    raw_val = col.get(m)
+                    entry[m] = self._parse_value(m, raw_val)
+                group_combos.append(entry)
+            if group_combos:
+                paired_vecs.append(group_combos)
 
-        result: list[dict[str, object]] = [dict(self._current_params)] if self._current_params else [{}]
-        for pn, vals in expanded:
+        all_vecs: list[list[dict[str, object]]] = []
+        for pn, vals in independent:
+            all_vecs.append([{pn: v} for v in vals])
+        all_vecs.extend(paired_vecs)
+
+        # Independent reqsets also cross-multiply
+        if self._owner_reqset_ids and self.REQSET_KEY_OWNER not in paired_members:
+            all_vecs.append([{self.REQSET_KEY_OWNER: rid} for rid in sorted(self._owner_reqset_ids)])
+        if self._subject_reqset_ids and self.REQSET_KEY_SUBJECT not in paired_members:
+            all_vecs.append([{self.REQSET_KEY_SUBJECT: rid} for rid in sorted(self._subject_reqset_ids)])
+
+        base = dict(self._current_params) if self._current_params else {}
+        if not all_vecs:
+            return [base] if base else [{}]
+
+        result: list[dict[str, object]] = [base]
+        for vec in all_vecs:
             nxt: list[dict[str, object]] = []
             for combo in result:
-                for v in vals:
+                for entry in vec:
                     e = dict(combo)
-                    e[pn] = v
+                    e.update(entry)
                     nxt.append(e)
             result = nxt
         return result
+
+    def _sorted_values(self, pn: str, vs: set[str]) -> list[object]:
+        vals: list[object] = []
+        for s in sorted(vs):
+            vals.append(self._parse_value(pn, s))
+        return vals
+
+    def _parse_value(self, pn: str, raw: object) -> object:
+        if pn in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT):
+            return str(raw or "").strip()
+        if isinstance(raw, bool):
+            return raw
+        if isinstance(raw, (int, float)):
+            return raw
+        s = str(raw or "").strip()
+        if s == "true":
+            return True
+        if s == "false":
+            return False
+        if pn in INT_PARAM_KEYS:
+            try:
+                return int(s)
+            except ValueError:
+                return s
+        return s
 
     # ---- name / comment ----------------------------------------------------
 
@@ -1398,10 +1788,12 @@ class BatchGenerateDialog(QDialog):
         nt = str(t.get("name_template") or "").strip() if isinstance(t, dict) else ""
         suffix = self._fill_name_template(nt, pv) if nt else self._fallback_suffix(pv)
         rfs: list[str] = []
-        for rid in sorted(set(self._owner_reqset_ids) | set(self._subject_reqset_ids)):
-            f = self._home._reqset_suffix_fragment(rid, p1, p2)
-            if f:
-                rfs.append(f)
+        for key in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT):
+            rid = str(pv.get(key, "") or "").strip()
+            if rid:
+                f = self._home._reqset_suffix_fragment(rid, p1, p2)
+                if f and f not in rfs:
+                    rfs.append(f)
         parts = ["MODIFIER"]
         if p1:
             parts.append(p1)
@@ -1413,11 +1805,7 @@ class BatchGenerateDialog(QDialog):
         return "_".join(parts)
 
     def _fill_name_template(self, nt: str, pv: dict[str, object]) -> str:
-        r = nt
-        for ph in re.findall(r"\{:?(\w+)\}", nt):
-            r = r.replace(f"{{:{ph}}}", self._home._param_to_fragment(ph, pv.get(ph)))
-            r = r.replace(f"{{{ph}}}", self._home._param_to_fragment(ph, pv.get(ph)))
-        return r
+        return self._home._fill_name_template(nt, pv)
 
     def _fallback_suffix(self, pv: dict[str, object]) -> str:
         mt = self._mt_combo.currentText().strip()
@@ -1482,6 +1870,10 @@ class BatchGenerateDialog(QDialog):
         QMessageBox.information(self, "完成", f"已生成 {len(created)} 个修改器。")
 
     def _create_record(self, mod_id: str, comment: str, pv: dict[str, object], mt: str):
+        # Extract paired reqset values
+        owner_r = pv.pop(self.REQSET_KEY_OWNER, None)
+        subject_r = pv.pop(self.REQSET_KEY_SUBJECT, None)
+
         ci = self._home._current_modifier_index
         if 0 <= ci < len(self._home._modifiers):
             src = self._home._modifiers[ci]
@@ -1491,19 +1883,19 @@ class BatchGenerateDialog(QDialog):
             return ModifierRecord(
                 modifier_id=mod_id, modifier_type=mt, comment=comment,
                 effect_type=self._effect_type,
-                parameters=[{"name": str(k), "value": v} for k, v in pv.items()],
+                owner_reqset=str(owner_r) if owner_r else None,
+                subject_reqset=str(subject_r) if subject_r else None,
+                parameters=[{"name": str(k), "value": v} for k, v in pv.items() if k not in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT)],
             )
         params = []
         for pn, v in pv.items():
-            found = any(
-                isinstance(p, dict) and p.get("name") == pn
-                for p in (getattr(src, 'parameters', []) or [])
-            )
-            params.append({"name": pn, "value": v} if not found else {"name": pn, "value": v})
+            if pn in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT):
+                continue
+            params.append({"name": pn, "value": v})
         return type(src)(
             modifier_id=mod_id, modifier_type=mt, comment=comment,
-            owner_reqset=getattr(src, 'owner_reqset', None),
-            subject_reqset=getattr(src, 'subject_reqset', None),
+            owner_reqset=str(owner_r) if owner_r else getattr(src, 'owner_reqset', None),
+            subject_reqset=str(subject_r) if subject_r else getattr(src, 'subject_reqset', None),
             run_once=self._run_once_cb.isChecked(),
             new_only=self._new_only_cb.isChecked(),
             permanent=self._permanent_cb.isChecked(),
@@ -1513,6 +1905,363 @@ class BatchGenerateDialog(QDialog):
             collection_type=self._cl_combo.currentText().strip() or getattr(src, 'collection_type', None),
             parameters=params, preview_text="",
         )
+
+
+
+    # ---- pairing ----------------------------------------------------------
+
+    def _pickable_items(self) -> dict[str, str]:
+        items: dict[str, str] = {}
+        for pn in self._param_value_sets:
+            n = len(self._param_value_sets[pn])
+            items[pn] = f"参数: {pn}" + (f" ({n}个值)" if n else " (暂无值)")
+        items[self.REQSET_KEY_OWNER] = f"条件集: OwnerReqSet" + (f" ({len(self._owner_reqset_ids)}个)" if self._owner_reqset_ids else " (暂无)")
+        items[self.REQSET_KEY_SUBJECT] = f"条件集: SubjectReqSet" + (f" ({len(self._subject_reqset_ids)}个)" if self._subject_reqset_ids else " (暂无)")
+        return items
+
+    def _handle_open_pair_dialog(self) -> None:
+        items = self._pickable_items()
+        if len(items) < 2:
+            QMessageBox.information(self, "提示", "至少需要 2 个可选项目才能创建配对组。")
+            return
+        dlg = QDialog(self)
+        dlg.setWindowTitle("选择配对成员")
+        dlg.setMinimumWidth(320)
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(QLabel("选择需要按位置配对的参数/条件集（至少选 2 个）："))
+        lst = QListWidget()
+        lst.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        for key, label in items.items():
+            lst.addItem(QListWidgetItem(label))
+            lst.item(lst.count() - 1).setData(Qt.ItemDataRole.UserRole, key)
+        layout.addWidget(lst)
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        btns.accepted.connect(dlg.accept)
+        btns.rejected.connect(dlg.reject)
+        layout.addWidget(btns)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        selected = [lst.item(i).data(Qt.ItemDataRole.UserRole) for i in range(lst.count()) if lst.item(i).isSelected()]
+        selected = [s for s in selected if isinstance(s, str)]
+        if len(selected) < 2:
+            return
+        col_count = 0
+        for m in selected:
+            col_count = max(col_count, self._member_value_count(m))
+        columns: list[dict[str, str]] = []
+        if col_count > 0:
+            for ci in range(col_count):
+                col: dict[str, str] = {}
+                for m in selected:
+                    col[m] = self._member_value_at(m, ci)
+                columns.append(col)
+        self._paired_groups.append({"members": selected, "columns": columns})
+        for m in selected:
+            if m == self.REQSET_KEY_OWNER:
+                self._owner_reqset_ids.clear()
+            elif m == self.REQSET_KEY_SUBJECT:
+                self._subject_reqset_ids.clear()
+            else:
+                self._param_value_sets.pop(m, None)
+                self._param_cards.pop(m, None)
+        self._rebuild_all_params()
+        self._rebuild_reqset_cards()
+        self._update_pair_btn_state()
+        self._refresh_preview()
+
+    def _handle_unpair(self, pg_index: int) -> None:
+        if pg_index < 0 or pg_index >= len(self._paired_groups):
+            return
+        pg = self._paired_groups.pop(pg_index)
+        for m in pg["members"]:
+            if m == self.REQSET_KEY_OWNER:
+                for col in pg.get("columns", []):
+                    v = col.get(m, "")
+                    if v:
+                        self._owner_reqset_ids.add(v)
+            elif m == self.REQSET_KEY_SUBJECT:
+                for col in pg.get("columns", []):
+                    v = col.get(m, "")
+                    if v:
+                        self._subject_reqset_ids.add(v)
+            else:
+                vs: set[str] = set()
+                for col in pg.get("columns", []):
+                    v = col.get(m, "")
+                    if v:
+                        vs.add(v)
+                self._param_value_sets[m] = vs
+                self._param_cards[m] = {}
+        self._rebuild_all_params()
+        self._rebuild_reqset_cards()
+        self._update_pair_btn_state()
+        self._refresh_preview()
+
+    def _rebuild_reqset_cards(self) -> None:
+        """Rebuild reqset card widgets from current id sets."""
+        for flow, cards, val_set in [
+            (self._or_flow, self._or_cards, self._owner_reqset_ids),
+            (self._sr_flow, self._sr_cards, self._subject_reqset_ids),
+        ]:
+            if flow is None:
+                continue
+            cards.clear()
+            while flow.count():
+                it = flow.takeAt(0)
+                if it and it.widget():
+                    it.widget().deleteLater()
+            for rid in sorted(val_set):
+                self._add_reqset_card_to_flow(rid, flow, cards, val_set)
+
+    def _add_reqset_card_to_flow(self, rid: str, flow, cards, val_set) -> None:
+        short = rid if len(rid) <= 24 else rid[:22] + ".."
+        card = QWidget()
+        card.setStyleSheet("background:#475569; border:1px solid #64748b; border-radius:4px; padding:2px 6px; color:#e2e8f0;")
+        cl = QHBoxLayout(card)
+        cl.setContentsMargins(4, 1, 4, 1)
+        cl.setSpacing(4)
+        cl.addWidget(QLabel(short))
+        btn = QPushButton("×")
+        btn.setFixedSize(20, 20)
+        btn.setStyleSheet("background:transparent; border:none; font-weight:bold;")
+        def _rm():
+            cards.pop(rid, None)
+            val_set.discard(rid)
+            flow.removeWidget(card)
+            card.hide()
+            card.deleteLater()
+            self._refresh_preview()
+        btn.clicked.connect(lambda _: _rm())
+        cl.addWidget(btn)
+        cards[rid] = card
+        flow.addWidget(card)
+        card.show()
+
+    def _member_value_count(self, member: str) -> int:
+        if member == self.REQSET_KEY_OWNER:
+            return len(self._owner_reqset_ids)
+        if member == self.REQSET_KEY_SUBJECT:
+            return len(self._subject_reqset_ids)
+        return len(self._param_value_sets.get(member, set()))
+
+    def _member_value_at(self, member: str, index: int) -> str:
+        if member == self.REQSET_KEY_OWNER:
+            items = sorted(self._owner_reqset_ids)
+            return items[index] if index < len(items) else ""
+        if member == self.REQSET_KEY_SUBJECT:
+            items = sorted(self._subject_reqset_ids)
+            return items[index] if index < len(items) else ""
+        items = sorted(self._param_value_sets.get(member, set()))
+        return items[index] if index < len(items) else ""
+
+    def _paired_member_display(self, member: str) -> str:
+        if member == self.REQSET_KEY_OWNER:
+            return "OwnerReqSet"
+        if member == self.REQSET_KEY_SUBJECT:
+            return "SubjectReqSet"
+        return member
+
+    def _build_paired_group_widget(self, pg_index: int, pg: dict) -> QWidget:
+        members = pg["members"]
+        columns = pg.get("columns", [])
+        display_names = [self._paired_member_display(m) for m in members]
+        container = QGroupBox(f"配对组 {pg_index + 1} — {', '.join(display_names)}")
+        container.setStyleSheet(
+            "QGroupBox { background:#eff6ff; border:2px solid #3b82f6; border-radius:6px; "
+            "padding:8px; margin-top:6px; font-weight:bold; }"
+        )
+        vlay = QVBoxLayout(container)
+        vlay.setSpacing(4)
+        uncouple_btn = QPushButton("取消配对")
+        uncouple_btn.setFixedHeight(20)
+        uncouple_btn.setStyleSheet("font-size: 11px; padding: 0px 4px;")
+        uncouple_btn.clicked.connect(lambda: self._handle_unpair(pg_index))
+        vlay.addWidget(uncouple_btn)
+
+        # Selector row
+        selector_row = QHBoxLayout()
+        selectors: dict[str, QWidget] = {}
+        for m in members:
+            w = self._build_paired_selector(m)
+            lbl = QLabel(self._paired_member_display(m))
+            selector_row.addWidget(lbl)
+            selector_row.addWidget(w, 1)
+            selectors[m] = w
+
+        # Card flow
+        flow = FlowLayout(spacing=4)
+        flow_widget = QWidget()
+        flow_widget.setLayout(flow)
+
+        add_btn = QPushButton("+")
+        add_btn.setFixedHeight(20)
+        add_btn.setFixedWidth(28)
+        add_btn.setStyleSheet("font-size: 11px; padding: 0px 2px;")
+        add_btn.clicked.connect(lambda pg_idx=pg_index, mems=members, sels=selectors, cols=columns, fl=flow:
+                                self._paired_add_card(pg_idx, mems, sels, cols, fl))
+        selector_row.addWidget(add_btn)
+        selector_row.addStretch(1)
+        vlay.addLayout(selector_row)
+        vlay.addWidget(flow_widget)
+
+        # Rebuild existing cards
+        for ci, col in enumerate(columns):
+            self._make_paired_card(ci, col, members, flow, columns)
+        return container
+
+    def _build_paired_selector(self, member: str) -> QWidget:
+        if member == "ModifierId":
+            return _ModifierIdSearchSelector(lambda: self._home._modifiers)
+        if member == self.REQSET_KEY_OWNER:
+            w = QComboBox()
+            w.setEditable(True)
+            w.addItem("", "")
+            for rs in self._home._requirement_sets:
+                rid = str(rs.requirement_set_id or "").strip()
+                if rid:
+                    w.addItem(f"{rid} ({rs.comment})" if rs.comment else rid, rid)
+            return w
+        if member == self.REQSET_KEY_SUBJECT:
+            w = QComboBox()
+            w.setEditable(True)
+            w.addItem("", "")
+            for rs in self._home._requirement_sets:
+                rid = str(rs.requirement_set_id or "").strip()
+                if rid:
+                    w.addItem(f"{rid} ({rs.comment})" if rs.comment else rid, rid)
+            return w
+        if member in INT_PARAM_KEYS:
+            spin = QSpinBox()
+            spin.setRange(-999, 9999)
+            return spin
+        if member in BOOLEAN_PARAM_KEYS:
+            cb = QCheckBox("True")
+            return cb
+        fixed_opts = FIXED_OPTION_PARAMS.get(member)
+        if fixed_opts:
+            combo = QComboBox()
+            combo.setEditable(True)
+            combo.addItems(fixed_opts)
+            return combo
+        tk = TEMPLATE_PARAM_MAPPINGS.get(member)
+        if tk:
+            try:
+                w2 = build_template_widget(tk)
+                if isinstance(w2, BaseTemplateWidget):
+                    w2.setMinimumHeight(28)
+                return w2
+            except Exception:
+                pass
+        w = QLineEdit()
+        w.setPlaceholderText(f"输入 {member}")
+        return w
+
+    def _capture_paired_selector(self, member: str, w: QWidget) -> str:
+        if isinstance(w, _ModifierIdSearchSelector):
+            return w.text()
+        if isinstance(w, QComboBox):
+            return str(w.currentData() or w.currentText().strip() or "")
+        if isinstance(w, QSpinBox):
+            return str(w.value())
+        if isinstance(w, QCheckBox):
+            return "true" if w.isChecked() else "false"
+        if isinstance(w, BaseTemplateWidget):
+            data = w.export_data()
+            if isinstance(data, dict):
+                for v in data.values():
+                    return str(v) if v not in (None, "") else ""
+            return str(data) if data not in (None, "") else ""
+        if isinstance(w, QLineEdit):
+            return w.text().strip()
+        return ""
+
+    def _paired_add_card(self, pg_index: int, members: list[str], selectors: dict[str, QWidget],
+                         columns: list[dict], flow: FlowLayout) -> None:
+        col: dict[str, str] = {}
+        for m in members:
+            col[m] = self._capture_paired_selector(m, selectors[m])
+        if all(not v for v in col.values()):
+            return
+        columns.append(col)
+        ci = len(columns) - 1
+        self._make_paired_card(ci, col, members, flow, columns)
+        self._refresh_preview()
+
+    def _make_paired_card(self, ci: int, col: dict[str, str], members: list[str],
+                          flow: FlowLayout, columns: list[dict]) -> None:
+        card = QWidget()
+        card.setStyleSheet(
+            "background:#2563eb; border:1px solid #1d4ed8; border-radius:4px; "
+            "padding:3px 6px; color:#eff6ff;"
+        )
+        vcl = QVBoxLayout(card)
+        vcl.setContentsMargins(4, 2, 4, 2)
+        vcl.setSpacing(1)
+
+        for m in members:
+            raw = col.get(m, "")
+            display = self._paired_value_display(m, raw)
+            lbl = QLabel(f"{self._paired_member_display(m)}: {display}")
+            lbl.setStyleSheet("color:#e2e8f0; font-size:11px;")
+            vcl.addWidget(lbl)
+
+        hrow = QHBoxLayout()
+        hrow.addStretch(1)
+        btn = QPushButton("\u00d7")
+        btn.setFixedSize(16, 16)
+        btn.setStyleSheet("background:transparent; border:none; font-weight:bold; color:#bfdbfe; font-size:10px;")
+        def _remove(col_ref=col):
+            card.hide()
+            flow.removeWidget(card)
+            card.deleteLater()
+            if col_ref in columns:
+                columns.remove(col_ref)
+            self._refresh_preview()
+        btn.clicked.connect(lambda _: _remove())
+        hrow.addWidget(btn)
+        vcl.addLayout(hrow)
+        flow.addWidget(card)
+        card.show()
+
+    def _paired_value_display(self, member: str, raw: str) -> str:
+        if not raw:
+            return "(\u7a7a)"
+        if member in INT_PARAM_KEYS or re.fullmatch(r"-?\d+", raw):
+            return raw
+        if member in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT):
+            return raw
+        cn = get_chinese_text_for_tag_or_unknown(f"LOC_{raw}_NAME")
+        if cn and cn != "\u672a\u77e5":
+            return cn
+        cn = resolve_chinese_text_or_unknown(raw)
+        return cn if cn and cn != "\u672a\u77e5" else raw
+    
+    def _update_pair_btn_state(self) -> None:
+        pass  # always enabled; _handle_open_pair_dialog validates
+
+    def _rebuild_all_params(self) -> None:
+        if self._params_layout is None:
+            return
+        self._rebuild_paired_section()
+        self._param_cards.clear()
+        self._clear_layout(self._params_layout)
+        for pn in self._current_params:
+            if pn in self._param_value_sets:
+                self._build_param_row(pn)
+        self._params_layout.addStretch(1)
+        self._update_pair_btn_state()
+        self._refresh_preview()
+
+    def _rebuild_paired_section(self) -> None:
+        if self._paired_layout is None:
+            return
+        while self._paired_layout.count():
+            it = self._paired_layout.takeAt(0)
+            if it.widget():
+                it.widget().setParent(None)
+        for pg_idx, pg in enumerate(self._paired_groups):
+            pgw = self._build_paired_group_widget(pg_idx, pg)
+            self._paired_layout.addWidget(pgw)
 
 class HomePage(BasePage):
     page_id = "home"
@@ -1664,6 +2413,59 @@ class HomePage(BasePage):
         self._load_reference_data()
         self._build_ui()
         self._ensure_default_modifier()
+        self._setup_shortcuts()
+
+    # -------------------- Shortcuts --------------------
+
+    def _setup_shortcuts(self) -> None:
+        sc = QShortcut(QKeySequence("Ctrl+B"), self)
+        sc.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        sc.activated.connect(self._handle_shortcut_bind_reqset)
+
+    def _handle_shortcut_bind_reqset(self) -> None:
+        """Ctrl+B: Create a reqset pre-bound to the selected requirement, auto-name both."""
+        if self._req_list is None:
+            return
+        row = self._get_selected_row(self._req_list)
+        if row < 0 or row >= len(self._requirements):
+            return
+        req = self._requirements[row]
+
+        # Generate reqset ID from the requirement type
+        req_type = req.requirement_type.strip()
+        prefix1 = self._prefix_input.text().strip() if self._prefix_input else ""
+        prefix2 = self._prefix2_input.text().strip() if self._prefix2_input else ""
+        type_fragment = self._extract_requirement_type_fragment(req_type)
+        parts = ["REQSET"]
+        if prefix1:
+            parts.append(prefix1)
+        if prefix2:
+            parts.append(prefix2)
+        if type_fragment:
+            parts.append(type_fragment)
+        base_id = "_".join(parts)
+        existing = {rs.requirement_set_id for rs in self._requirement_sets}
+        candidate = base_id
+        counter = 1
+        while candidate in existing:
+            counter += 1
+            candidate = f"{base_id}_{counter}"
+
+        record = RequirementSetRecord(
+            requirement_set_id=candidate,
+            comment="",
+            logic="ALL",
+            bound_requirements=[req.requirement_id],
+        )
+        self._requirement_sets.append(record)
+        self._append_reqset_row(record)
+        self._refresh_reqset_options()
+        self._select_reqset_row(len(self._requirement_sets) - 1)
+        self._update_reqset_section_state()
+
+        # Auto-name the requirement and the new reqset
+        self._persist_current_requirement()
+        self._apply_requirement_id_default()
 
     # -------------------- Data Loading --------------------
     def _load_reference_data(self) -> None:
@@ -2468,12 +3270,13 @@ class HomePage(BasePage):
     def _get_selected_row(self, table: QTableWidget | None) -> int:
         if table is None:
             return -1
+        if table.selectionModel() is not None:
+            selected = table.selectionModel().selectedRows()
+            if selected:
+                return selected[0].row()
         if table.currentRow() is not None and table.currentRow() >= 0:
             return table.currentRow()
-        if table.selectionModel() is None:
-            return -1
-        selected = table.selectionModel().selectedRows()
-        return selected[0].row() if selected else -1
+        return -1
 
     # -------------------- Modifier List Panel --------------------
     def _build_modifier_list_panel(self) -> QWidget:
@@ -3751,10 +4554,11 @@ class HomePage(BasePage):
         row = self._current_modifier_index
         if row < 0 or row >= len(self._modifiers):
             return
+        self._modifier_editor_index = -1
+        self._current_modifier_index = -1
         removed = self._modifiers.pop(row)
         self._remove_modifier_row(row)
         self._remove_modifier_bindings(removed.modifier_id)
-        self._modifier_editor_index = -1
         next_row = min(row, len(self._modifiers) - 1)
         if next_row >= 0:
             self._select_modifier_row(next_row)
@@ -4025,10 +4829,10 @@ class HomePage(BasePage):
         row = self._current_reqset_index
         if row < 0 or row >= len(self._requirement_sets):
             return
+        self._current_reqset_index = -1
         self._requirement_sets.pop(row)
         if self._reqset_list is not None:
             self._reqset_list.removeRow(row)
-        self._current_reqset_index = -1
         next_row = min(row, len(self._requirement_sets) - 1)
         if next_row >= 0:
             self._select_reqset_row(next_row)
@@ -4065,6 +4869,7 @@ class HomePage(BasePage):
         row = self._current_req_index
         if row < 0 or row >= len(self._requirements):
             return
+        self._current_req_index = -1
         removed = self._requirements.pop(row)
         if self._req_list is not None:
             self._req_list.removeRow(row)
@@ -4910,12 +5715,22 @@ class HomePage(BasePage):
             sections.append("\n".join(lines))
 
         # Custom ModifierType definitions (Types / DynamicModifiers)
+        prefix1 = self._prefix_input.text().strip().upper() if self._prefix_input else ""
+        prefix2 = self._prefix2_input.text().strip().upper() if self._prefix2_input else ""
+
+        def _is_project_custom(modifier_type: str) -> bool:
+            """Any ModifierType matching the project prefix is always treated as custom."""
+            for p in (prefix1, prefix2):
+                if p and modifier_type.upper().startswith(p) or f"_{p}_" in modifier_type.upper():
+                    return True
+            return False
+
         custom_modifier_types: Dict[str, Dict[str, str | None]] = {}
         for record in self._modifiers:
             modifier_type = record.modifier_type.strip()
             if not modifier_type:
                 continue
-            if modifier_type in self._modifier_meta_index:
+            if modifier_type in self._modifier_meta_index and not _is_project_custom(modifier_type):
                 continue
             current = custom_modifier_types.get(modifier_type)
             if current is None:
@@ -5613,6 +6428,12 @@ class HomePage(BasePage):
             spin = IntParamSpinBox()
             spin.setRange(-999999, 999999)
             return spin
+        fixed_opts = FIXED_OPTION_PARAMS.get(key)
+        if fixed_opts:
+            combo = QComboBox()
+            combo.setEditable(True)
+            combo.addItems(fixed_opts)
+            return combo
         template_key = TEMPLATE_PARAM_MAPPINGS.get(key)
         if template_key:
             try:
@@ -5913,12 +6734,26 @@ class HomePage(BasePage):
             if name:
                 param_values[name] = row.get("value")
 
+        return self._fill_name_template(name_template, param_values)
+
+    def _fill_name_template(self, name_template: str, param_values: Dict[str, object]) -> str:
         result = name_template
-        for placeholder in re.findall(r"\{:?(\w+)\}", name_template):
-            value = param_values.get(placeholder)
-            fragment = self._param_to_fragment(placeholder, value)
-            result = result.replace(f"{{:{placeholder}}}", fragment)
-            result = result.replace(f"{{{placeholder}}}", fragment)
+        for m in re.finditer(r"\{:(\w+):last\}", result):
+            pname = m.group(1)
+            fragment = self._param_to_fragment(pname, param_values.get(pname), mode="last")
+            result = result.replace(m.group(0), fragment)
+        for m in re.finditer(r"\{:(\w+)\}", result):
+            pname = m.group(1)
+            fragment = self._param_to_fragment(pname, param_values.get(pname), mode="full")
+            result = result.replace(m.group(0), fragment)
+        for m in re.finditer(r"\{(\w+):last\}", result):
+            pname = m.group(1)
+            fragment = self._param_to_fragment(pname, param_values.get(pname), mode="strip_last")
+            result = result.replace(m.group(0), fragment)
+        for m in re.finditer(r"\{(\w+)\}", result):
+            pname = m.group(1)
+            fragment = self._param_to_fragment(pname, param_values.get(pname), mode="strip")
+            result = result.replace(m.group(0), fragment)
         return result
 
     def _apply_modifier_id_default(self) -> None:
@@ -6186,35 +7021,55 @@ class HomePage(BasePage):
             return re.fullmatch(r"-?\d+(\.\d+)?", text) is None
         return False
 
-    def _param_to_fragment(self, name: str, value: object | None) -> str:
+    def _param_to_fragment(self, name: str, value: object | None, mode: str = "strip") -> str:
         name_upper = name.strip().upper()
         raw = self._extract_param_value(value)
+
+        if isinstance(raw, (int, float)) and not isinstance(raw, bool):
+            text = f"{raw:.6f}"
+            normalized = self._normalize_numeric_text(text)
+            return normalized.replace("-", "N")
+
+        if isinstance(raw, bool):
+            return name_upper if raw else f"NOT_{name_upper}"
+
         if isinstance(raw, str):
             text = raw.strip()
             text_up = text.upper()
             lowered = text.lower()
+
             if lowered in {"true", "false"}:
                 return name_upper if lowered == "true" else f"NO_{name_upper}"
+
             if re.fullmatch(r"-?\d+(\.\d+)?", text):
                 return self._normalize_numeric_text(text).replace("-", "N")
-            if "_" in text_up:
-                # whitelist prefixes that should keep everything after the first token
-                whitelist = ("TERRAIN", "FEATURE", "TECHNOLOGY", "CIVIC", "RESOURCE")
-                for p in whitelist:
-                    if text_up.startswith(p + "_"):
-                        return text_up.split("_", 1)[1]
-                # special case for UNIT_*..._1 -> keep last two segments (e.g., XXX_1)
-                if text_up.startswith("UNIT_"):
-                    parts = [p for p in text_up.split("_") if p != ""]
-                    if parts and parts[-1].isdigit() and len(parts) >= 2:
-                        return f"{parts[-2]}_{parts[-1]}"
-                return self._last_non_numeric_segment(text_up)
-            return text_up
-        if isinstance(raw, bool):
-            return name_upper if raw else f"NOT_{name_upper}"
-        if isinstance(raw, (int, float)):
-            return self._normalize_numeric_text(f"{raw:.6f}").replace("-", "N")
-        return name_upper
+
+            if "_" not in text_up:
+                return text_up
+
+            if mode == "full":
+                return text_up
+            if mode == "last":
+                parts = [p for p in text_up.split("_") if p != ""]
+                return parts[-1] if parts else text_up
+            if mode == "strip_last":
+                first = text_up.split("_", 1)
+                remainder = first[1] if len(first) > 1 else text_up
+                parts = [p for p in remainder.split("_") if p != ""]
+                return parts[-1] if parts else remainder
+
+            # mode == "strip" — keep existing complex logic
+            whitelist = ("TERRAIN", "FEATURE", "TECHNOLOGY", "CIVIC", "RESOURCE")
+            for p in whitelist:
+                if text_up.startswith(p + "_"):
+                    return text_up.split("_", 1)[1]
+            if text_up.startswith("UNIT_"):
+                parts = [p for p in text_up.split("_") if p != ""]
+                if parts and parts[-1].isdigit() and len(parts) >= 2:
+                    return f"{parts[-2]}_{parts[-1]}"
+            return self._last_non_numeric_segment(text_up)
+
+        return ""
 
     @staticmethod
     def _normalize_numeric_text(text: str) -> str:
@@ -6387,6 +7242,7 @@ class HomePage(BasePage):
     def _build_requirement_id_auto(self) -> str:
         prefix1 = self._prefix_input.text().strip() if self._prefix_input else ""
         prefix2 = self._prefix2_input.text().strip() if self._prefix2_input else ""
+        inverse = self._req_inverse_cb.isChecked() if self._req_inverse_cb else False
         template_suffix = self._build_requirement_id_from_template()
         if template_suffix:
             parts = ["REQ"]
@@ -6394,6 +7250,8 @@ class HomePage(BasePage):
                 parts.append(prefix1)
             if prefix2:
                 parts.append(prefix2)
+            if inverse:
+                parts.append("NOT")
             parts.append(template_suffix)
             return "_".join(parts)
 
@@ -6405,6 +7263,8 @@ class HomePage(BasePage):
             parts.append(prefix1)
         if prefix2:
             parts.append(prefix2)
+        if inverse:
+            parts.append("NOT")
         if type_fragment:
             parts.append(type_fragment)
         if param_fragment:
@@ -6482,6 +7342,9 @@ class HomePage(BasePage):
             name = str(row.get("name") or "").strip()
             if name:
                 param_values[name] = row.get("value")
+        # Inject Inverse as a pseudo-param so templates can use {Inverse?反义:本义}
+        if self._req_inverse_cb is not None:
+            param_values["Inverse"] = self._req_inverse_cb.isChecked()
 
         result = comment_raw
         # Handle {ParamName?真文本:假文本} for boolean params

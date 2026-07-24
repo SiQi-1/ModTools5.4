@@ -4174,6 +4174,232 @@ class UnitTypeTagsEditor(QWidget):
         return output
 
 
+# ── TypeProperties Name → Value 类型映射 ──────────────────────────
+# "bool" → 复选框  |  "int" → 整数框  |  "str" → 自由文本
+
+# Name → (ValueType, 中文标签)
+_UNIT_TYPE_PROPERTIES_VALUE_MAP: dict[str, tuple[str, str]] = {
+    "LIFESPAN":                        ("int",  "寿命（存活回合数）"),
+    "CAN_EVER_TRAIN_BARBARIAN":        ("bool", "可训练蛮族单位"),
+    "CAN_EVER_TRAIN_CITY_STATE":       ("bool", "可训练城邦单位"),
+    "CAN_EVER_TRAIN_FREE_CITY":        ("bool", "可训练自由城市单位"),
+    "IGNORE_PLAYER_STAT_MAX_STRENGTH": ("bool", "自身不计入玩家最大军力统计"),
+    "CAN_MOVE_AFTER_PURCHASE":         ("bool", "购买后可移动"),
+    "CAN_TELEPORT_TO_CITY":            ("bool", "可传送至城市"),
+    "CLAN_EXCLUDE_UNIT_TYPE":          ("bool", "氏族模式排除此单位类型"),
+}
+
+_IMPROVEMENT_TYPE_PROPERTIES_VALUE_MAP: dict[str, tuple[str, str]] = {
+    "PLOT_DAMAGE_TO_WALKING_INTO":     ("int", "走入地块伤害"),
+    "PLOT_DAMAGE_TO_WALKING_ADJACENT": ("int", "走入相邻地块伤害"),
+    "IMPROVEMENT_VIS_CONTROL":         ("int", "改良设施视野控制"),
+}
+
+
+class UnitTypePropertiesEditor(QWidget):
+    """TypeProperties 多行编辑器（Type / Name / Value 三列表格）。"""
+
+    dataChanged = pyqtSignal()
+
+    def __init__(self, value_map: dict[str, tuple[str, str]] | None = None) -> None:
+        super().__init__()
+        self._value_map = value_map or {}
+        self._unit_type = ""
+
+        group = QGroupBox("TypeProperties")
+        group_layout = QVBoxLayout(group)
+        group_layout.setContentsMargins(8, 6, 8, 6)
+        group_layout.setSpacing(8)
+        tip = QLabel("单位 TypeProperties 独立属性（Name 可自选或手输，Value 控件随 Name 变化）。")
+        tip.setWordWrap(True)
+        group_layout.addWidget(tip)
+
+        top = QHBoxLayout()
+        top.addWidget(QLabel("Type"))
+        self._unit_display = QLineEdit()
+        self._unit_display.setReadOnly(True)
+        top.addWidget(self._unit_display, 1)
+        self._add_btn = QPushButton("＋ 添加行")
+        self._add_btn.clicked.connect(self._add_row)
+        top.addWidget(self._add_btn)
+        group_layout.addLayout(top)
+
+        self._table = QTableWidget(0, 4)
+        self._table.setHorizontalHeaderLabels(["Type", "Name", "Value", "Action"])
+        header = self._table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
+        self._table.setColumnWidth(3, 56)
+        header.setMinimumSectionSize(72)
+        self._table.verticalHeader().setVisible(False)
+        self._table.verticalHeader().setDefaultSectionSize(36)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        group_layout.addWidget(self._table)
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.addWidget(group)
+
+    def set_unit_type(self, unit_type: str) -> None:
+        self._unit_type = _safe_text(unit_type)
+        self._unit_display.setText(self._unit_type)
+
+    # ── 行操作 ──────────────────────────────────────────────
+
+    def _build_name_combo(self) -> QComboBox:
+        """构建 Name 列下拉框：显示「英文名（中文标签）」并允许自由输入。"""
+        combo = QComboBox()
+        combo.setEditable(True)
+        combo.addItem("")  # 空白默认
+        for name, (_, zh_label) in self._value_map.items():
+            combo.addItem(f"{name}（{zh_label}）", name)
+        return combo
+
+    def _build_value_widget(self, name: str, current_value: object = None) -> QWidget:
+        """根据 Name 映射类型构建对应的 Value 控件。"""
+        entry = self._value_map.get(name)
+        value_type = entry[0] if entry else "str"
+        if value_type == "bool":
+            widget = QCheckBox()
+            checked = False
+            if isinstance(current_value, str) and current_value.lower() in ("true", "1"):
+                checked = True
+            elif isinstance(current_value, (int, float)) and current_value:
+                checked = True
+            elif isinstance(current_value, bool) and current_value:
+                checked = True
+            widget.setChecked(checked)
+            return widget
+        elif value_type == "int":
+            spin = QSpinBox()
+            spin.setRange(-999999, 999999)
+            try:
+                spin.setValue(int(current_value or 0))
+            except (ValueError, TypeError):
+                spin.setValue(0)
+            return spin
+        else:
+            edit = QLineEdit()
+            edit.setText(_safe_text(current_value))
+            edit.setPlaceholderText("输入 Value...")
+            return edit
+
+    @staticmethod
+    def _read_value_widget(widget: QWidget) -> object:
+        """从 Value 控件读取当前值。"""
+        if isinstance(widget, QCheckBox):
+            return widget.isChecked()
+        elif isinstance(widget, QSpinBox):
+            return widget.value()
+        elif isinstance(widget, QLineEdit):
+            return _safe_text(widget.text())
+        return ""
+
+    def _on_name_changed(self, row: int, _display_text: str) -> None:
+        """Name 变化时，替换同行 Value 控件以匹配类型。"""
+        combo = self._table.cellWidget(row, 1)
+        raw_name = combo.currentData() or _safe_text(combo.currentText())
+        old_value = None
+        old_widget = self._table.cellWidget(row, 2)
+        if old_widget is not None:
+            old_value = self._read_value_widget(old_widget)
+        new_widget = self._build_value_widget(raw_name, old_value)
+        self._table.setCellWidget(row, 2, new_widget)
+        self._connect_value_signal(new_widget)
+        self.dataChanged.emit()
+
+    def _connect_value_signal(self, widget: QWidget) -> None:
+        if isinstance(widget, QCheckBox):
+            widget.stateChanged.connect(lambda _v: self.dataChanged.emit())
+        elif isinstance(widget, QSpinBox):
+            widget.valueChanged.connect(lambda _v: self.dataChanged.emit())
+        elif isinstance(widget, QLineEdit):
+            widget.textChanged.connect(lambda _t: self.dataChanged.emit())
+
+    def _add_row(self, seed: dict[str, object] | None = None) -> None:
+        row = self._table.rowCount()
+        self._table.insertRow(row)
+
+        # Type 列（只读）
+        type_display = QLineEdit()
+        type_display.setReadOnly(True)
+        type_display.setText(self._unit_type)
+        self._table.setCellWidget(row, 0, type_display)
+
+        # Name 列（可编辑下拉框）
+        name_combo = self._build_name_combo()
+        seed_name = _safe_text((seed or {}).get("Name"))
+        if seed_name:
+            idx = name_combo.findData(seed_name)
+            if idx >= 0:
+                name_combo.setCurrentIndex(idx)
+            else:
+                name_combo.setCurrentText(seed_name)
+        name_combo.editTextChanged.connect(lambda text, r=row: self._on_name_changed(r, text))
+        self._table.setCellWidget(row, 1, name_combo)
+
+        # Value 列（动态控件）
+        value_widget = self._build_value_widget(seed_name, (seed or {}).get("Value"))
+        self._table.setCellWidget(row, 2, value_widget)
+        self._connect_value_signal(value_widget)
+
+        # Action 列（删除按钮）
+        btn = QPushButton("删")
+        btn.clicked.connect(lambda: self._remove_row(btn))
+        self._table.setCellWidget(row, 3, btn)
+
+        self._refresh_table_height()
+        self.dataChanged.emit()
+
+    def _remove_row(self, button: QPushButton) -> None:
+        for row in range(self._table.rowCount()):
+            if self._table.cellWidget(row, 3) is button:
+                self._table.removeRow(row)
+                self._refresh_table_height()
+                self.dataChanged.emit()
+                return
+
+    # ── 数据出入口 ───────────────────────────────────────────
+
+    def set_payload(self, payload: list[dict[str, object]]) -> None:
+        self._table.setRowCount(0)
+        for row_data in payload:
+            if isinstance(row_data, dict):
+                self._add_row(row_data)
+        self._refresh_table_height()
+
+    def export_payload(self) -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for row in range(self._table.rowCount()):
+            name_widget = self._table.cellWidget(row, 1)
+            value_widget = self._table.cellWidget(row, 2)
+            raw = name_widget.currentData() if isinstance(name_widget, QComboBox) else None
+            name = _safe_text(raw if raw else name_widget.currentText())
+            if not name:
+                continue
+            value = self._read_value_widget(value_widget) if value_widget is not None else ""
+            rows.append({"Type": self._unit_type, "Name": name, "Value": value})
+        return rows
+
+    # ── 表格高度自适应 ──────────────────────────────────────
+
+    def _refresh_table_height(self) -> None:
+        self._table.resizeRowsToContents()
+        header_h = self._table.horizontalHeader().height()
+        frame_h = self._table.frameWidth() * 2
+        rows_h = sum(self._table.rowHeight(r) for r in range(self._table.rowCount()))
+        if self._table.rowCount() == 0:
+            rows_h += self._table.verticalHeader().defaultSectionSize()
+        self._table.setFixedHeight(header_h + rows_h + frame_h + 2)
+
+
 class UnitAbilityBindingsEditor(QWidget):
     dataChanged = pyqtSignal()
 
@@ -4357,6 +4583,7 @@ class UnitCompositeEditor(QWidget):
             columns=[_UnitColumnSpec("AiType", "AiType", "template", "unit_ai_type")],
         )
         self._type_tags_editor = UnitTypeTagsEditor()
+        self._type_properties_editor = UnitTypePropertiesEditor(_UNIT_TYPE_PROPERTIES_VALUE_MAP)
         self._ability_bindings_editor = UnitAbilityBindingsEditor()
 
         self._main_editor.dataChanged.connect(self._handle_main_changed)
@@ -4371,6 +4598,7 @@ class UnitCompositeEditor(QWidget):
             self._building_prereqs_editor,
             self._ai_infos_editor,
             self._type_tags_editor,
+            self._type_properties_editor,
             self._ability_bindings_editor,
         ):
             editor.dataChanged.connect(self._emit_data_changed)
@@ -4406,6 +4634,7 @@ class UnitCompositeEditor(QWidget):
         layout.addWidget(_pair_row(self._retreats_editor, self._building_prereqs_editor))
         layout.addWidget(self._type_tags_editor)
         layout.addWidget(self._ai_infos_editor)
+        layout.addWidget(self._type_properties_editor)
         layout.addWidget(self._ability_bindings_editor)
 
     def _sync_unit_type(self) -> None:
@@ -4420,6 +4649,7 @@ class UnitCompositeEditor(QWidget):
         self._building_prereqs_editor.set_unit_type(unit_type)
         self._ai_infos_editor.set_unit_type(unit_type)
         self._type_tags_editor.set_unit_type(unit_type)
+        self._type_properties_editor.set_unit_type(unit_type)
         self._ability_bindings_editor.set_unit_type(unit_type)
 
     def _handle_main_changed(self) -> None:
@@ -4442,6 +4672,7 @@ class UnitCompositeEditor(QWidget):
         self._building_prereqs_editor.set_payload(subtables.get("Unit_BuildingPrereqs") if isinstance(subtables.get("Unit_BuildingPrereqs"), list) else entry.get("unit_building_prereqs") if isinstance(entry.get("unit_building_prereqs"), list) else [])
         self._ai_infos_editor.set_payload(subtables.get("UnitAiInfos") if isinstance(subtables.get("UnitAiInfos"), list) else entry.get("unit_ai_infos") if isinstance(entry.get("unit_ai_infos"), list) else [])
         self._type_tags_editor.set_payload(subtables.get("TypeTags") if isinstance(subtables.get("TypeTags"), list) else entry.get("type_tags") if isinstance(entry.get("type_tags"), list) else [])
+        self._type_properties_editor.set_payload(subtables.get("TypeProperties") if isinstance(subtables.get("TypeProperties"), list) else entry.get("type_properties") if isinstance(entry.get("type_properties"), list) else [])
         self._ability_bindings_editor.set_payload(subtables.get("UnitAbilityBindings") if isinstance(subtables.get("UnitAbilityBindings"), list) else entry.get("unit_ability_bindings") if isinstance(entry.get("unit_ability_bindings"), list) else [])
 
         self._loading = False
@@ -4458,6 +4689,7 @@ class UnitCompositeEditor(QWidget):
         unit_building_prereqs = self._building_prereqs_editor.export_payload()
         unit_ai_infos = self._ai_infos_editor.export_payload()
         type_tags = self._type_tags_editor.export_payload()
+        type_properties = self._type_properties_editor.export_payload()
         unit_ability_bindings = self._ability_bindings_editor.export_payload()
 
         payload.update(
@@ -4472,6 +4704,7 @@ class UnitCompositeEditor(QWidget):
                 "unit_building_prereqs": unit_building_prereqs,
                 "unit_ai_infos": unit_ai_infos,
                 "type_tags": type_tags,
+                "type_properties": type_properties,
                 "unit_ability_bindings": unit_ability_bindings,
                 "subtables": {
                     "Units_MODE": units_mode,
@@ -4484,6 +4717,7 @@ class UnitCompositeEditor(QWidget):
                     "Unit_BuildingPrereqs": unit_building_prereqs,
                     "UnitAiInfos": unit_ai_infos,
                     "TypeTags": type_tags,
+                    "TypeProperties": type_properties,
                     "UnitAbilityBindings": unit_ability_bindings,
                 },
             }
@@ -4835,6 +5069,7 @@ class ImprovementCompositeEditor(QWidget):
             ],
         )
         self._valid_terrains_editor = ImprovementValidTerrainsEditor()
+        self._type_properties_editor = UnitTypePropertiesEditor(_IMPROVEMENT_TYPE_PROPERTIES_VALUE_MAP)
 
         self._adjacency_editor = AdjacencyEditorWidget(
             auto_context=AdjacencyAutoContext(),
@@ -4858,6 +5093,7 @@ class ImprovementCompositeEditor(QWidget):
             self._valid_features_editor,
             self._valid_resources_editor,
             self._valid_terrains_editor,
+            self._type_properties_editor,
             self._adjacency_editor,
         ):
             editor.dataChanged.connect(self._emit_data_changed)
@@ -4891,6 +5127,7 @@ class ImprovementCompositeEditor(QWidget):
         layout.addWidget(_pair_row(self._valid_adj_terrain_editor, self._valid_build_units_editor))
         layout.addWidget(_pair_row(self._valid_features_editor, self._valid_resources_editor))
         layout.addWidget(self._valid_terrains_editor)
+        layout.addWidget(self._type_properties_editor)
         layout.addWidget(self._adjacency_editor)
 
     def _build_adjacency_context(self) -> AdjacencyAutoContext:
@@ -4925,6 +5162,7 @@ class ImprovementCompositeEditor(QWidget):
         self._valid_features_editor.set_unit_type(improvement_type)
         self._valid_resources_editor.set_unit_type(improvement_type)
         self._valid_terrains_editor.set_unit_type(improvement_type)
+        self._type_properties_editor.set_unit_type(improvement_type)
         self._adjacency_editor.set_auto_context(self._build_adjacency_context())
 
     def _handle_main_changed(self) -> None:
@@ -4950,6 +5188,7 @@ class ImprovementCompositeEditor(QWidget):
         self._valid_features_editor.set_payload(subtables.get("Improvement_ValidFeatures") if isinstance(subtables.get("Improvement_ValidFeatures"), list) else entry.get("improvement_valid_features") if isinstance(entry.get("improvement_valid_features"), list) else [])
         self._valid_resources_editor.set_payload(subtables.get("Improvement_ValidResources") if isinstance(subtables.get("Improvement_ValidResources"), list) else entry.get("improvement_valid_resources") if isinstance(entry.get("improvement_valid_resources"), list) else [])
         self._valid_terrains_editor.set_payload(subtables.get("Improvement_ValidTerrains") if isinstance(subtables.get("Improvement_ValidTerrains"), list) else entry.get("improvement_valid_terrains") if isinstance(entry.get("improvement_valid_terrains"), list) else [])
+        self._type_properties_editor.set_payload(subtables.get("TypeProperties") if isinstance(subtables.get("TypeProperties"), list) else entry.get("type_properties") if isinstance(entry.get("type_properties"), list) else [])
 
         adjacency_payload = subtables.get("Improvement_Adjacencies") if isinstance(subtables.get("Improvement_Adjacencies"), list) else None
         if adjacency_payload is None:
@@ -4973,6 +5212,7 @@ class ImprovementCompositeEditor(QWidget):
         improvement_valid_features = self._valid_features_editor.export_payload()
         improvement_valid_resources = self._valid_resources_editor.export_payload()
         improvement_valid_terrains = self._valid_terrains_editor.export_payload()
+        type_properties = self._type_properties_editor.export_payload()
         improvement_adjacencies = self._adjacency_editor.export_payload()
 
         payload.update(
@@ -4990,6 +5230,7 @@ class ImprovementCompositeEditor(QWidget):
                 "improvement_valid_features": improvement_valid_features,
                 "improvement_valid_resources": improvement_valid_resources,
                 "improvement_valid_terrains": improvement_valid_terrains,
+                "type_properties": type_properties,
                 "improvement_adjacencies": improvement_adjacencies,
                 "subtables": {
                     "Improvements_MODE": improvements_mode,
@@ -5005,6 +5246,7 @@ class ImprovementCompositeEditor(QWidget):
                     "Improvement_ValidFeatures": improvement_valid_features,
                     "Improvement_ValidResources": improvement_valid_resources,
                     "Improvement_ValidTerrains": improvement_valid_terrains,
+                    "TypeProperties": type_properties,
                     "Improvement_Adjacencies": improvement_adjacencies,
                 },
             }

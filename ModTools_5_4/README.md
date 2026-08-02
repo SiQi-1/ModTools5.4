@@ -3,6 +3,20 @@
 
 基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。
 
+> **下载发布版**：GitHub Releases 页面提供打包好的 `ModTools5.4.exe`（无需安装 Python，双击即用）。发布版由 GitHub Actions 自动构建，保证与源码一致。
+
+---
+
+## 界面预览
+
+| | |
+|---|---|
+| ![主页](docs/screenshots/01_home.png) | ![工程总览](docs/screenshots/02_workspace_overview.png) |
+| ![文明编辑器](docs/screenshots/03_civilization_editor.png) | ![领袖编辑器](docs/screenshots/04_leader_editor.png) |
+| ![搜索页](docs/screenshots/05_search.png) | ![设置页](docs/screenshots/06_settings.png) |
+
+> 截图由 `tools/make_screenshots.py` 自动生成（加载内置示例工程后逐页渲染）。
+
 ---
 
 ## 快速上手（5 步）
@@ -151,3 +165,16 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 - 文明6（需要至少运行过一次，以生成 Cache 中的游戏数据库）
 - 不需要 Python 环境（打包版自带）
 - 不需要 ModBuddy（但最后一步 Build 和部署到游戏需要）
+
+---
+
+## 素材来源与版权说明
+
+本工具为文明6 Mod 制作提供参考数据与素材，其中部分文件来自游戏本体或 ModBuddy：
+
+- `ModTools_5_4/From/{Base,DLC}/`：官方 ModBuddy 附带的 artdef 参考文件（仅用于解析艺术层条目名称与结构）。
+- `ModTools_5_4/data/FontIcons.dds` / `FontIconsXP1.dds`：游戏界面图标图集（用于编辑器内图标插入与预览）。
+- `local_text_New.sqlite`：由游戏文本（XML/SQL/DLC）导入生成的本地化文本数据库，仅作中文文本解析与预览用途。
+- 应用图标与部分图片为基于游戏素材的二次创作。
+
+以上素材仅服务于"为文明6制作 Mod"这一用途，版权归 Firaxis Games / 2K 及其相关方所有。若涉及侵权，请联系移除。本工具自身代码采用 MIT 许可证（见根目录 `LICENSE`）。

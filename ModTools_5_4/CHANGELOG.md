@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-02 - 开源准备：LICENSE / CI / 测试 / Release 自动构建 / 截图
+
+### 工程规范化
+- 新增 `LICENSE`（MIT）。
+- 新增 `requirements.txt`（PyQt6）。
+- 新增 `.gitattributes`（文本换行统一 LF、二进制文件声明）。
+- 移除版本库中追踪的 `__pycache__/*.pyc` 与发布产物（zip/exe/sqlite/日志），并重写 `.gitignore`。
+- `ModTools5.4.py` 中 `__version__` 修正为 `5.4.0-beta.5`。
+
+### CI 与发布
+- 新增 `.github/workflows/ci.yml`：push/PR 时编译检查 + 单元测试（Windows runner）。
+- 新增 `.github/workflows/release.yml`：推送 `v*` tag 时自动用 PyInstaller 构建 exe 并发布到 GitHub Releases。
+- `build_release.ps1` 增加 `--noconsole`：打包 exe 不再弹出控制台黑框。
+
+### 测试（首版，19 个用例）
+- `tests/test_civ_project.py`：.CIV 模型创建/归一化/往返读写/非法文件校验。
+- `tests/test_artdef_parser.py`：From/ 目录 artdef 名称列表与条目抽取。
+- `tests/test_text_database.py`：内置文本库 LOC 查询与嵌套引用解析。
+- `tests/test_workspace_smoke.py`：无头（offscreen）启动真实窗口 + 工程全流程 + 核心 SQL 预览构建不崩溃。
+- 运行方式：`python -m unittest discover -s tests -v`（无需游戏环境）。
+
+### 文档与截图
+- 新增 `tools/make_screenshots.py`：自动渲染各页面并生成 README 截图（无需手工截图）。
+- README 新增界面预览、素材来源与版权说明；CHANGELOG 补记 2026-06-30 ~ 2026-07-24 缺失条目；CLAUDE.md 与 ROADMAP 同步现状。
+
 ## 2026-07-24 - 修改器配对参数与搜索 + 政策卡导入 + 图片圆形/黑边渲染
 
 ### 修改器工作区

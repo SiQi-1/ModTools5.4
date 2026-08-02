@@ -31,8 +31,11 @@
 ### 6) 数据库导入能力（游戏库）
 - 区域、建筑、单位、单位晋升、改良设施、伟人、政策卡（逻辑已实现）。
 
-### 7) 发布
-- `build_release.ps1`：PyInstaller onefile → release/ + ModTools5.4.zip（含文本库与素材）。
+### 7) 发布与工程规范化（2026-08）
+- `build_release.ps1`：PyInstaller onefile（`--noconsole`）→ release/ + ModTools5.4.zip。
+- GitHub Actions：`ci.yml`（push/PR 编译检查 + 单元测试）、`release.yml`（`v*` tag 自动构建并发布 GitHub Release）。
+- 首版测试 19 个用例（工程模型 / artdef 解析 / 文本库 / 无头 GUI 冒烟），`python -m unittest discover -s tests -v`。
+- MIT LICENSE、requirements.txt、.gitattributes、README 截图自动生成脚本（tools/make_screenshots.py）。
 
 ## 二、当前缺口（TODO）
 
@@ -44,9 +47,9 @@
 - 现状：分组面板"导入"按钮仅对 区域/建筑/单位/单位晋升/改良设施/伟人 显示；政策卡导入逻辑已实现但按钮未开放（`group_workspace.py` 显隐名单需加入政策卡）。
 - 未实现导入：文明、领袖、总督、项目、信仰、议程。
 
-### P2：测试与回归
-- 现状：自动化测试覆盖为零。
-- 目标：新增最小冒烟测试（启动、工程读写、关键预览生成），优先覆盖纯函数式的 SQL 预览构建方法。
+### P2：测试与回归扩展
+- 现状：已有 19 个冒烟/逻辑用例，但 SQL 预览方法尚未按分类逐一覆盖（当前仅验证空工程不崩溃）。
+- 目标：补充带示例数据的分类预览断言；必要时引入 GUI 交互测试（QTest）。
 
 ### P2：打包配置收敛
 - 现状：`build_release.ps1` 与本地 `ModTools5.4.spec` 各维护一份数据清单，易漂移。

@@ -1,0 +1,25 @@
+# Normalize line endings; text files use LF, keep binary as-is
+* text=auto
+
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.qss text eol=lf
+*.sql text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.txt text eol=lf
+*.ps1 text eol=crlf
+
+# Binary (never touch)
+*.artdef binary
+*.dds binary
+*.sqlite binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.exe binary
+*.zip binary
+*.pyc binary

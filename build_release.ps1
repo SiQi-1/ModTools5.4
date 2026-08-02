@@ -32,7 +32,7 @@ $addDataArgs = @(
     "--add-data", "$resImages\citybanner_secondary.png;ModTools_5_4/resources/images"
 )
 
-& $PythonExe -m PyInstaller --noconfirm --clean --onefile --name $AppName @addDataArgs $entry
+& $PythonExe -m PyInstaller --noconfirm --clean --onefile --noconsole --name $AppName @addDataArgs $entry
 
 $releaseDir = Join-Path $root "release"
 if (Test-Path $releaseDir) { Remove-Item $releaseDir -Recurse -Force }

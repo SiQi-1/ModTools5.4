@@ -16,6 +16,12 @@ ModTools 5.4 is a PyQt6-based visual editor for creating Civilization VI mods (C
 # Run from source
 python ModTools5.4.py
 
+# Run unit tests (no game needed; GUI tests run headless via offscreen)
+python -m unittest discover -s tests -v
+
+# Regenerate README screenshots (renders the real UI briefly)
+python tools/make_screenshots.py
+
 # Build release exe (PowerShell, generates dist/ + release/ + ModTools5.4.zip)
 powershell -File build_release.ps1
 
@@ -23,9 +29,10 @@ powershell -File build_release.ps1
 powershell -File build_release.ps1 -PythonExe python
 ```
 
-- Build uses PyInstaller with `--onefile` via `build_release.ps1` (CLI args, no spec file needed; a local `ModTools5.4.spec` exists but is gitignored and secondary).
-- Only dependency: PyQt6 (see `requirements.txt`). No test suite, no CI.
-- Note: git tracks `dist/ModTools5.4.exe`, `release/*`, `ModTools5.4.zip`, `local_text_New.sqlite` (runtime data) and history commits include `__pycache__/*.pyc`; prefer not adding new binaries/pyc to the repo.
+- Build uses PyInstaller with `--onefile --noconsole` via `build_release.ps1` (CLI args, no spec file needed; a local `ModTools5.4.spec` exists but is gitignored and secondary).
+- Only dependency: PyQt6 (see `requirements.txt`). Tests use stdlib `unittest`, no extra deps.
+- CI (`.github/workflows/ci.yml`) runs compileall + tests on every push; `release.yml` builds exe and publishes a GitHub Release when pushing a `v*` tag. Tests run in the same repo checkout (game DB not required — tests avoid game-dependent code paths).
+- Note: git tracks `local_text_New.sqlite` (runtime data); large artifacts (zip/exe/pyc/logs) are gitignored.
 
 ## Architecture (verified against source)
 
@@ -84,9 +91,16 @@ ModTools_5_4/
 ├── docs/
 │   ├── ROADMAP.md              # Current Done/TODO status (keep in sync)
 │   ├── TUTORIAL.md             # Full user tutorial (765 lines, from-zero mod making)
-│   └── TEX_FORMAT.md           # Texture file format reference
+│   ├── TEX_FORMAT.md           # Texture file format reference
+│   └── screenshots/            # Auto-generated README screenshots (tools/make_screenshots.py)
 └── logs/                       # modtools_5_4.log (git-tracked history; prefer not adding more)
 ```
+
+## Tests
+
+- `tests/` uses stdlib `unittest` (no pytest). Run: `python -m unittest discover -s tests -v`.
+- GUI smoke test (`test_workspace_smoke.py`) sets `QT_QPA_PLATFORM=offscreen` itself — no display needed.
+- Tests must not require the game database; keep them usable in CI.
 
 ## Key Design Decisions
 

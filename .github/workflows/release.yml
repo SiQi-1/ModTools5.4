@@ -1,0 +1,35 @@
+name: Build Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install PyQt6 PyInstaller
+
+      - name: Build exe and zip
+        run: powershell -ExecutionPolicy Bypass -File build_release.ps1
+
+      - name: Run unit tests against source
+        run: python -m unittest discover -s tests -v
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ModTools5.4.zip
+            release/ModTools5.4.exe
+            release/local_text_New.sqlite
+            release/settings.json
+          fail_on_unmatched_files: false

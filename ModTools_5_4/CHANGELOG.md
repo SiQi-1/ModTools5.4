@@ -1,6 +1,73 @@
 # Changelog
 
-## 2026-06-26 - 5.4.0-beta.5（AI Agent 对话系统）
+## 2026-07-24 - 修改器配对参数与搜索 + 政策卡导入 + 图片圆形/黑边渲染
+
+### 修改器工作区
+- 新增 `_ModifierIdSearchSelector`：ModifierId 可搜索选择控件（弹窗按 ModifierType 检索并回填）。
+- RequirementSet 参数编辑支持"配对参数"：对 `{X}A / {X}B` 类成员成对编辑（选择器 + 卡片列表），支持取消配对与动态增删。
+- 新增键盘快捷键（`_setup_shortcuts`）：快速绑定 RequirementSet 等常用操作。
+- Effect 名称模板填充规则完善（`_fill_name_template` / `_param_to_fragment`），参数渲染支持 `{:+:name}` 等占位符形式。
+- `effect_comment_templates.json` 继续扩充（+225 条）。
+
+### 政策卡：数据库导入
+- 新增 `_handle_import_policy_entry` / `_import_policy_payload_from_db`：从游戏库按 PolicyType 导入政策卡数据，已接入统一导入分发（`_handle_import_group_entry`）。
+- 注意：分组面板"导入"按钮的显隐规则暂未包含政策卡，按钮暂不可见（逻辑已就绪）。
+
+### 图片渲染
+- 图片渲染统一接口 `render_view_image` 支持 `circle_crop`（圆形裁切）与黑边参数；`set_black_border` 控制黑边（3px 默认，按尺寸等比缩放）。
+
+### 巨作下拉模板
+- 新增 `GreatWorkSlotSelectorTemplate` / `GreatWorkObjectTypeSelectorTemplate`：巨作槽位与巨作类型的数据集下拉模板。
+
+### 文档
+- 新增 `docs/TUTORIAL.md`（765 行）：从零制作完整文明6 Mod 的图文教程（覆盖全部 14 个分类、修改器、美术、部署）。
+
+## 2026-07-10 - 打包清单扩展 + Colors 输出重构 + 文本库设计说明
+
+### 打包（build_release.ps1）
+- 数据清单改为数组集中维护；新增打包 `standard_colors.json` 与 7 张 citybanner 素材（城邦旗帜预览资源随包分发）。
+
+### 领袖颜色输出
+- 领袖 `Data/{前缀}_Colors` 文件改为跟随分组输出格式（SQL/XML 单选）。
+- `Colors` / `PlayerColors` SQL 块重构：行去重、独立 COLORS 段输出，预览与输出结构统一。
+
+### 文本库设计说明
+- `db/interface.py` 补充模块说明：解释为何不使用游戏自维护的 `DebugLocalization.sqlite`（游戏不更新该文件，会随 DLC/版本严重过时），而由工具自建可写文本库（如 `local_text_New.sqlite`）从游戏 XML/SQL/DLC 目录重新导入。
+
+### 文档
+- `README.md` 重写：新增功能覆盖表、工作区说明、常见问题与系统要求。
+
+## 2026-07-05 - 单位晋升树编辑器 + 城邦旗帜预览
+
+### 单位晋升（全新画布编辑器）
+- 新增 `PromotionTreeEditor`（group_workspace）：画布式晋升树编辑。
+  - 树形模式：卡片拖拽定位（Level 1→4），上下端口连线建立前置关系；支持 2221 / 2212 一键模板；双击编辑节点、键盘操作。
+  - 随机模式：按 Level 分组列表排列。
+  - 节点数据结构 `_PromotionNode` 序列化兼容 `.CIV`。
+
+### 领袖颜色：城邦旗帜实时预览
+- 新增 `CityBannerPreview` 控件：按主色/辅色实时渲染城邦旗帜（7 张 citybanner 素材分层合成），随领袖颜色配置联动。
+- `standard_colors.json` 扩充官方标准色（+91 行）。
+- `art_xml_rules.json` 微调（Art.xml 映射规则）。
+
+## 2026-06-30 - 移除 AI Agent 功能（切换到 no-agent 分支）
+
+- 删除 `ModTools_5_4/agent/` 全部源码与知识库。
+- 删除 `ui/pages/agent_chat_panel.py`（聊天面板），清理 workspace_page / main_window / group_workspace / settings_store 中的 Agent 集成。
+- 如需恢复该功能：`git checkout agent-dev`（分支内保留完整实现）。
+- 同提交保留的非 Agent 改动：`ui_widget_kit` 修复、`art_xml_rules`、basic_info / modifier 改进。
+
+### 保留：修改器批量生成对话框（2026-06-30 同日）
+- 修改器工作区新增 `BatchGenerateDialog` 批量生成窗口：
+  - ModifierType / EffectType 可搜索选择（含英文关键词打分排序）。
+  - owner / subject RequirementSet 搜索选择。
+  - 多值参数以卡片流式布局（`FlowLayout`）编辑，支持多选值集合。
+  - 所有者勾选树 + 实时 SQL 预览。
+- Effect / Requirement 注释模板大幅扩充：`effect_comment_templates.json`（+2353）、`requirement_comment_templates.json`（+809）。
+
+## 2026-06-26 - 5.4.0-beta.5（AI Agent 对话系统）【功能已移除，见 2026-06-30 条目】
+
+> 注意：以下 Agent 功能已于 2026-06-30 移除并切换 no-agent 分支。保留本条记录仅供历史追溯。
 
 ### 新增：AI Agent 聊天面板
 - 新增 `agent/` 包：完整 AI Agent 框架，支持自然语言驱动的 Mod 数据编辑

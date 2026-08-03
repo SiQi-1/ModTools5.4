@@ -1,10 +1,10 @@
 # Changelog
 
-## 2026-08-02 - 文案优化：单位 AiType 等字段中文说明
+## 2026-08-02 - 文案优化：单位 AiType 字段中文说明
 
 - 单位子表 UnitAiInfos：列标签 `AiType` → **AI职能类型**，提示语补充说明（定义 AI 将该单位用于何种用途，如 UNITAI_SCOUT=侦察、UNITAI_COMBAT=进攻）。
 - AI 职能类型搜索弹窗：表头与搜索占位文案同步中文化。
-- 单位主表：`IgnoreMoves` → **无视移动消耗**、`TrackReligion` → **携带并传播宗教**（原为未翻译的英文标签）。
+- 说明：`IgnoreMoves` / `TrackReligion` 等语义未明确的字段保持英文标签，不猜测翻译（曾尝试翻译后已撤销）。
 
 ## 2026-08-02 - 修复：NOT NULL 字段被"默认值省略"导致数据库约束失败
 

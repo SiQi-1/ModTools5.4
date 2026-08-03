@@ -137,6 +137,46 @@ class SqlPreviewsTestCase(unittest.TestCase):
         sql = self.page._build_moments_sql_preview()
         self.assertIsInstance(sql, str)
 
+    # ---- NOT NULL 无 SQL 默认值字段必须始终输出（防止数据库 NOT NULL 约束失败） ----
+
+    def test_district_not_null_no_default_fields_always_emitted(self) -> None:
+        sql = self._preview("区域", "sql")
+        for column in ("RequiresPlacement", "NoAdjacentCity", "Aqueduct", "InternalOnly",
+                       "CaptureRemovesBuildings", "CaptureRemovesCityDefenses",
+                       "PlunderType", "MilitaryDomain"):
+            with self.subTest(column=column):
+                self.assertIn(column, sql)
+
+    def test_improvement_not_null_no_default_fields_always_emitted(self) -> None:
+        sql = self._preview("改良设施", "sql")
+        for column in ("PlunderType", "Icon"):
+            with self.subTest(column=column):
+                self.assertIn(column, sql)
+
+    def test_unit_not_null_no_default_fields_always_emitted(self) -> None:
+        result = self._preview("单位", "sql")
+        unit_sql = result["Units.sql"] if isinstance(result, dict) else str(result)
+        for column in ("BaseMoves", "BaseSightRange", "Domain", "FormationClass", "Cost"):
+            with self.subTest(column=column):
+                self.assertIn(column, unit_sql)
+
+    def test_building_cost_always_emitted(self) -> None:
+        self.assertIn("Cost", self._preview("建筑", "sql"))
+
+    def test_fields_with_sql_default_are_omitted(self) -> None:
+        district_sql = self._preview("区域", "sql")
+        self.assertNotIn("RequiresPopulation", district_sql)  # DEFAULT 1，等于默认值省略
+        self.assertNotIn("OnePerCity", district_sql)  # DEFAULT 1
+        improvement_sql = self._preview("改良设施", "sql")
+        self.assertNotIn("Workable", improvement_sql)  # DEFAULT 1
+
+    def test_district_requires_placement_unchecked_still_emitted(self) -> None:
+        project = build_sample_project()
+        project.sections["区域"][0]["table_data"]["RequiresPlacement"] = 0
+        self.page._project = project
+        sql = self._preview("区域", "sql")
+        self.assertIn("RequiresPlacement", sql)
+
 
 if __name__ == "__main__":
     unittest.main()

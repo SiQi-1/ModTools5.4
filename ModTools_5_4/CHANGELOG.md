@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-02 - 修复：NOT NULL 字段被"默认值省略"导致数据库约束失败
+
+### 问题
+- SQL 输出存在"与默认值相同则省略该列"的优化，但省略依据（`TableFieldSpec.default`）同时兼任"UI 常用值"与"SQL 默认值"两个概念，被混用。
+- 游戏数据库中 **NOT NULL 且无 SQL DEFAULT** 的字段一旦被省略，INSERT 即报 `NOT NULL constraint failed`，例如：
+  - `Districts.RequiresPlacement`（实测 61/63 区域为 1，UI 默认却是 0，且省略名单漏掉）
+  - `Improvements.PlunderType`（选默认 NO_PLUNDER 即被省略）
+  - 单位 `BaseMoves/BaseSightRange/Domain/FormationClass/Cost` 等此前靠构建器硬编码名单保护，防得住但属"运气"
+
+### 修复
+- `TableFieldSpec` 新增独立维度 `sql_default`（哨兵 `_NO_SQL_DEFAULT` = 数据库无默认值 → 生成时**必须显式输出**）；`default` 只保留 UI 常用值职责。
+- 新增 `SQL_FIELD_DEFAULTS` 中央数据表：按游戏库 `DebugGameplay.sqlite` 真实表结构为 区域/建筑/单位/改良设施 四张主表约 110 个字段填充 SQL 默认值（2026-08 实测）。
+- 四个主表 SQL 构建器省略规则改为：**仅当 `sql_default` 存在且当前值等于它时才省略**；删除硬编码的 `always_emit_fields` / `required_main_fields` 名单。
+- UI 常用值修正：区域 `RequiresPlacement` 默认 0 → 1（与库中绝大多数区域一致）。
+- 附带行为变化：无 SQL 默认的可空列（如 `PrereqTech`、`Buildings.Coast`）从"省略为 NULL"变为"显式输出 ''/0"，语义更明确。
+
+### 测试
+- 新增 6 个回归用例（51 总）：区域/改良/单位/建筑的 NOT NULL 无默认字段必出断言、有 SQL 默认字段照旧省略断言、`RequiresPlacement=0` 时仍输出的反例断言。
+
 ## 2026-08-02 - 修复：美术工作区"已丢失对象"残留行
 
 ### 问题

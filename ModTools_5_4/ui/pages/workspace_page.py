@@ -47,7 +47,7 @@ from PyQt6.QtWidgets import (
 from .base_page import BasePage
 from .art_workspace import ArtWorkspacePanel
 from .basic_info_workspace import BasicInfoWorkspacePanel
-from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
+from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, _NO_SQL_DEFAULT, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
 from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel, _build_entity_type
 from .modifier_workspace import ModifierWorkspacePanel
 from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDialog, _ImprovementSearchDialog, _UnitSearchDialog
@@ -2164,17 +2164,8 @@ class WorkspacePage(BasePage):
             row = "(" + ", ".join(_sql_literal(v) for v in values) + ")"
             groups.setdefault(key, []).append(row)
 
-        # 这些字段即便等于默认值也必须输出（主表必填/需要显式覆盖默认）。
-        always_emit_fields = {
-            "NoAdjacentCity",
-            "Aqueduct",
-            "InternalOnly",
-            "CaptureRemovesBuildings",
-            "CaptureRemovesCityDefenses",
-            "PlunderType",
-            "MilitaryDomain",
-        }
-
+        # 省略规则：仅当字段存在数据库 SQL 默认值且当前值等于它时才省略；
+        # 无 SQL 默认值的字段（NOT NULL 无默认）必须始终输出，否则数据库 NOT NULL 约束失败。
         for index, entry in enumerate(district_entries, start=1):
             district_type = str(entry.get("type") or "").strip()
             if not district_type:
@@ -2225,8 +2216,8 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType", "Cost"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
-                default = _normalized(key, field_defaults.get(key))
-                if current == default and key not in always_emit_fields:
+                sql_default = field.sql_default
+                if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
                 district_columns.append(key)
                 district_values.append(current)
@@ -2651,12 +2642,12 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType", "Cost", "Quote"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
-                default = _normalized(key, field_defaults.get(key))
                 if key == "ObsoleteEra":
                     current_text = str(current or "").strip().upper()
                     if current_text in {"", "NO_ERA"}:
                         continue
-                if current == default:
+                sql_default = field.sql_default
+                if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
                 columns.append(key)
                 values.append(current)
@@ -3221,9 +3212,6 @@ class WorkspacePage(BasePage):
             columns = ["UnitType", "Name"]
             values: list[object] = [unit_type, f"LOC_{unit_type}_NAME"]
 
-            # Domain 在游戏表结构中没有可依赖的默认值，因此即便等于 UI 默认值也必须输出。
-            # 其它字段仍按当前预览规则：与字段默认值一致时可省略（required_main_fields 除外）。
-            required_main_fields = {"Description", "BaseSightRange", "BaseMoves", "Domain", "FormationClass"}
             for field in schema.fields:
                 key = field.key
                 if key in {"Name", "TraitType"}:
@@ -3233,12 +3221,8 @@ class WorkspacePage(BasePage):
                     values.append(f"LOC_{unit_type}_DESCRIPTION")
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
-                default = _normalized(key, field_defaults.get(key))
-                if key in required_main_fields:
-                    columns.append(key)
-                    values.append(current)
-                    continue
-                if current == default:
+                sql_default = field.sql_default
+                if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
                 columns.append(key)
                 values.append(current)
@@ -3682,8 +3666,8 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
-                default = _normalized(key, field_defaults.get(key))
-                if current == default:
+                sql_default = field.sql_default
+                if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
                 columns.append(key)
                 values.append(current)

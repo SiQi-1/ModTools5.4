@@ -81,6 +81,74 @@ REQUIRED_MAIN_TABLE_FIELD_RULES: dict[str, dict[str, dict[str, object]]] = {
 REQUIRED_MAIN_TABLE_FIELD_RULES.setdefault("Improvements", {})
 REQUIRED_MAIN_TABLE_FIELD_RULES["Improvements"]["PlunderType"] = {"required": True, "default": "NO_PLUNDER"}
 
+# 哨兵：该字段在游戏数据库表结构中没有 SQL DEFAULT。
+# 生成 SQL 时“相等即省略”的优化只对存在 SQL DEFAULT 的字段生效；
+# 无 SQL DEFAULT 的字段（尤其 NOT NULL 无默认）必须始终显式输出，
+# 否则省略后数据库会因 NOT NULL 约束失败（如 Districts.RequiresPlacement）。
+_NO_SQL_DEFAULT = object()
+
+
+# 各主表字段在游戏数据库（DebugGameplay.sqlite）中的 SQL 默认值。
+# 以游戏表结构为准（2026-08 实测），未列出的字段一律视为无 SQL 默认值 → 生成时始终输出。
+SQL_FIELD_DEFAULTS: dict[str, dict[str, object]] = {
+    "Districts": {
+        "PlunderAmount": 0,
+        "CostProgressionModel": "NO_COST_PROGRESSION",
+        "CostProgressionParam1": 0,
+        "HitPoints": 0,
+        "Appeal": 0, "Housing": 0, "Entertainment": 0, "Maintenance": 0, "AirSlots": 0,
+        "TravelTime": -1, "CityStrengthModifier": 0, "MaxPerPlayer": -1,
+        "Coast": 0, "RequiresPopulation": 1, "CityCenter": 0, "ZOC": 0,
+        "FreeEmbark": 0, "TradeEmbark": 0, "OnePerCity": 1, "AllowsHolyCity": 0,
+        "AdjacentToLand": 0, "CanAttack": 0, "CaptureRemovesDistrict": 0,
+    },
+    "Buildings": {
+        "MaxPlayerInstances": -1, "MaxWorldInstances": -1,
+        "Housing": 0, "Entertainment": 0, "Maintenance": 0,
+        "OuterDefenseStrength": 0, "RegionalRange": 0, "GrantFortification": 0, "DefenseModifier": 0,
+        "Capital": 0, "RequiresPlacement": 0, "RequiresRiver": 0, "EnabledByReligion": 0,
+        "AllowsHolyCity": 0, "MustPurchase": 0, "IsWonder": 0, "MustBeLake": 0,
+        "MustNotBeLake": 0, "AdjacentToMountain": 0, "ObsoleteEra": "NO_ERA",
+        "RequiresReligion": 0, "InternalOnly": 0, "RequiresAdjacentRiver": 0,
+        "MustBeAdjacentLand": 0, "AdjacentCapital": 0, "UnlocksGovernmentPolicy": 0,
+    },
+    "Units": {
+        "CostProgressionModel": "NO_COST_PROGRESSION", "CostProgressionParam1": 0,
+        "Combat": 0, "RangedCombat": 0, "Range": 0, "Bombard": 0,
+        "BuildCharges": 0, "ReligiousStrength": 0, "ReligionEvictPercent": 0,
+        "SpreadCharges": 0, "ReligiousHealCharges": 0, "InitialLevel": 1,
+        "NumRandomChoices": 0, "Maintenance": 0, "AirSlots": 0, "AntiAirCombat": 0,
+        "ParkCharges": 0, "DisasterCharges": 0,
+        "FoundCity": 0, "FoundReligion": 0, "MakeTradeRoute": 0, "EvangelizeBelief": 0,
+        "LaunchInquisition": 0, "RequiresInquisition": 0, "ExtractsArtifacts": 0,
+        "CanCapture": 1, "CanRetreatWhenCaptured": 0, "AllowBarbarians": 0,
+        "CanTrain": 1, "MustPurchase": 0, "Stackable": 0, "CanTargetAir": 0,
+        "ZoneOfControl": 0, "Spy": 0, "WMDCapable": 0, "IgnoreMoves": 0,
+        "TeamVisibility": 0, "EnabledByReligion": 0, "TrackReligion": 0,
+        "UseMaxMeleeTrainedStrength": 0, "ImmediatelyName": 0, "CanEarnExperience": 1,
+    },
+    "Improvements": {
+        "DispersalGold": 0, "Housing": 0, "TilesRequired": 1, "AirSlots": 0,
+        "DefenseModifier": 0, "GrantFortification": 0, "WeaponSlots": 0,
+        "ReligiousUnitHealRate": 0, "Appeal": 0, "YieldFromAppealPercent": 100,
+        "ValidAdjacentTerrainAmount": 0, "MovementChange": 0, "Domain": "DOMAIN_LAND",
+        "BarbarianCamp": 0, "Buildable": 0, "RemoveOnEntry": 0, "Goody": 0,
+        "SameAdjacentValid": 1, "RequiresRiver": 0, "EnforceTerrain": 0,
+        "BuildInLine": 0, "CanBuildOutsideTerritory": 0, "BuildOnFrontier": 0,
+        "Coast": 0, "OnePerCity": 0, "AdjacentSeaResource": 0,
+        "RequiresAdjacentBonusOrLuxury": 0, "Workable": 1, "GoodyNotify": 1,
+        "NoAdjacentSpecialtyDistrict": 0, "RequiresAdjacentLuxury": 0,
+        "AdjacentToLand": 0, "Removable": 1, "OnlyOpenBorders": 0, "Capturable": 1,
+    },
+}
+
+
+def _apply_sql_defaults(table_name: str, fields: list["TableFieldSpec"]) -> None:
+    """为字段设置数据库 SQL 默认值（无默认的字段保持哨兵 → 生成时始终输出）。"""
+    defaults = SQL_FIELD_DEFAULTS.get(str(table_name or ""), {})
+    for field in fields:
+        field.sql_default = defaults.get(field.key, _NO_SQL_DEFAULT)
+
 
 def _apply_required_rules(table_name: str, fields: list[TableFieldSpec]) -> None:
     rules = REQUIRED_MAIN_TABLE_FIELD_RULES.get(str(table_name or ""), {})
@@ -733,6 +801,7 @@ class TableFieldSpec:
     field_type: str  # text/int/real/bool/template
     section: str  # basic/number/bool
     default: object = ""
+    sql_default: object = _NO_SQL_DEFAULT  # 数据库 SQL 默认值；哨兵 = 无默认 → SQL 始终输出
     template_key: str | None = None
     chinese_input: bool = False
     english_only: bool = False
@@ -918,7 +987,7 @@ def build_districts_main_schema() -> MainTableSchema:
         TableFieldSpec("MaxPerPlayer", "每玩家上限", "real", "number", -1.0),
 
         TableFieldSpec("Coast", "允许沿海", "bool", "bool", 0),
-        TableFieldSpec("RequiresPlacement", "需要地块放置", "bool", "bool", 0),
+        TableFieldSpec("RequiresPlacement", "需要地块放置", "bool", "bool", 1),
         TableFieldSpec("RequiresPopulation", "需要人口", "bool", "bool", 1),
         TableFieldSpec("NoAdjacentCity", "不可邻接城市中心", "bool", "bool", 0),
         TableFieldSpec("CityCenter", "作为城市中心", "bool", "bool", 0),
@@ -937,6 +1006,7 @@ def build_districts_main_schema() -> MainTableSchema:
     ]
 
     _apply_required_rules("Districts", fields)
+    _apply_sql_defaults("Districts", fields)
 
     linked_groups = [
         LinkedGroupSpec("plunder", "掠夺联动参数", "PlunderType", "PlunderAmount"),
@@ -1007,6 +1077,8 @@ def build_buildings_main_schema() -> MainTableSchema:
         TableFieldSpec("AdjacentCapital", "必须邻接首都", "bool", "bool", 0),
         TableFieldSpec("UnlocksGovernmentPolicy", "解锁政体政策", "bool", "bool", 0),
     ]
+
+    _apply_sql_defaults("Buildings", fields)
 
     return MainTableSchema(
         table_name="Buildings",
@@ -1095,6 +1167,7 @@ def build_units_main_schema() -> MainTableSchema:
     ]
 
     _apply_required_rules("Units", fields)
+    _apply_sql_defaults("Units", fields)
 
     return MainTableSchema(
         table_name="Units",
@@ -1171,6 +1244,7 @@ def build_improvements_main_schema() -> MainTableSchema:
 
     # 应用全局必填规则（如 Improvements.PlunderType -> required, default）
     _apply_required_rules("Improvements", fields)
+    _apply_sql_defaults("Improvements", fields)
 
     return MainTableSchema(
         table_name="Improvements",

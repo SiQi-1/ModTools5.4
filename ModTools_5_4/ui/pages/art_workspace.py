@@ -891,6 +891,7 @@ class ArtWorkspacePanel(QWidget):
 
     def refresh_from_sections(self, sections: dict[str, object]) -> None:
         self._sections = sections if isinstance(sections, dict) else {}
+        self._prune_orphan_state()
         self._replacement_maps = self._load_replacement_maps()
         self._civ_source_options = self._load_civ_source_options()
         self._alias_options = self._load_alias_options()
@@ -933,6 +934,54 @@ class ArtWorkspacePanel(QWidget):
             len(self._source_rows),
             str(need_hits),
         )
+
+    def _prune_orphan_state(self) -> None:
+        """清理美术状态中已无对应分区条目的“空配置”残留。
+
+        与历史时刻孤儿行修复同一原则：状态里存在、但分区条目已删除/改名的 key，
+        不再在表格中显示（不再出现“（已丢失对象）”行）；
+        仅当残留没有任何实际配置时才从状态中删除（避免无意义堆积）；
+        仍带配置（need / 音乐 / 文化组 / 源引用）的残留保留在状态中，对象恢复后配置可回填。
+        """
+        section_types = {type_name for type_name, _cn, _entry in self._collect_new_items("文明") if _safe_text(type_name)}
+
+        raw_civs = self._state.get("civs")
+        if isinstance(raw_civs, dict):
+            for civ_type in [key for key in raw_civs]:
+                if civ_type in section_types:
+                    continue
+                meta = raw_civs[civ_type]
+                if not isinstance(meta, dict):
+                    continue
+                cultures = meta.get("cultures")
+                has_cultures = isinstance(cultures, dict) and any(
+                    value for value in cultures.values()
+                    if isinstance(value, (list, tuple, set)) and _safe_text(value)
+                )
+                meaningful = bool(meta.get("need")) or bool(meta.get("music_source")) or has_cultures
+                if not meaningful:
+                    del raw_civs[civ_type]
+
+        source_sections = (
+            ("district", "区域"), ("building", "建筑"),
+            ("improvement", "改良设施"), ("unit", "单位"),
+        )
+        existing_source_keys = {
+            f"{entity}:{type_name}"
+            for entity, section in source_sections
+            for type_name, _cn, _entry in self._collect_new_items(section, name_key="Name")
+            if _safe_text(type_name)
+        }
+        raw_need = self._state.get("need_map")
+        raw_source = self._state.get("source_map")
+        if isinstance(raw_need, dict) and isinstance(raw_source, dict):
+            orphan_keys = (set(raw_need) | set(raw_source)) - existing_source_keys
+            for state_key in orphan_keys:
+                has_need = bool(raw_need.get(state_key))
+                has_source = bool(_safe_text(raw_source.get(state_key)))
+                if not has_need and not has_source:
+                    raw_need.pop(state_key, None)
+                    raw_source.pop(state_key, None)
 
     def _state_moments_map(self) -> dict[str, dict[str, object]]:
         raw = self._state.get("moments_map")
@@ -1399,9 +1448,7 @@ class ArtWorkspacePanel(QWidget):
     def _build_civ_rows(self) -> list[_CivArtRow]:
         section_items = self._collect_new_items("文明")
         section_types = [type_name for type_name, _cn, _entry in section_items if _safe_text(type_name)]
-        state_types = list(self._state_civ_art_map().keys())
-        civ_types = sorted({*section_types, *state_types})
-        labels = self._load_civilization_display_labels(civ_types)
+        labels = self._load_civilization_display_labels(section_types)
         rows: list[_CivArtRow] = []
         for civ_type, cn, _entry in section_items:
             display_cn = cn
@@ -1409,13 +1456,6 @@ class ArtWorkspacePanel(QWidget):
                 label = labels.get(civ_type, "")
                 display_cn = label.split("|", 1)[1].strip() if "|" in label else ""
             rows.append(_CivArtRow(civ_type=civ_type, chinese_name=display_cn))
-
-        # 兼容：旧工程 state 中有 civs，但“文明”分区条目丢失/结构变更导致无法枚举时，仍显示出来。
-        missing = [c for c in state_types if c not in set(section_types)]
-        for civ_type in sorted(missing):
-            label = labels.get(civ_type, "")
-            display_cn = label.split("|", 1)[1].strip() if "|" in label else ""
-            rows.append(_CivArtRow(civ_type=civ_type, chinese_name=display_cn or "（已丢失对象）"))
 
         rows.sort(key=lambda r: r.civ_type)
         return rows
@@ -1778,37 +1818,6 @@ class ArtWorkspacePanel(QWidget):
                         replacement_type=_safe_text(replace_map.get(type_name)),
                     )
                 )
-
-        # 兼容：旧工程 state 中有 need/source，但对应分区条目缺失时，补“孤儿行”避免看起来像没导入。
-        seen = {r.state_key for r in rows}
-        state_keys: set[str] = set()
-        try:
-            state_keys |= set(self._state_need_map().keys())
-        except Exception:
-            pass
-        try:
-            state_keys |= set(self._state_source_map().keys())
-        except Exception:
-            pass
-        allowed_entities = {e for e, _s in mappings}
-        for key in sorted(state_keys):
-            if key in seen:
-                continue
-            if ":" not in key:
-                continue
-            entity, type_name = key.split(":", 1)
-            if entity not in allowed_entities:
-                continue
-            if not _safe_text(type_name):
-                continue
-            rows.append(
-                _ArtdefSourceRow(
-                    entity=entity,
-                    type_name=type_name,
-                    chinese_name="（已丢失对象）",
-                    replacement_type="",
-                )
-            )
 
         rows.sort(key=lambda r: (r.entity, r.type_name))
         return rows

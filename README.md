@@ -1,4 +1,3 @@
-
 # ModTools 5.4 使用教程
 
 基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。
@@ -11,13 +10,13 @@
 
 | | |
 |---|---|
-| ![主页](docs/screenshots/01_home.png) | ![工程总览](docs/screenshots/02_workspace_overview.png) |
-| ![文明编辑器](docs/screenshots/03_civilization_editor.png) | ![领袖编辑器](docs/screenshots/04_leader_editor.png) |
-| ![单位晋升树](docs/screenshots/05_promotion_tree_editor.png) | ![议程编辑器](docs/screenshots/06_agenda_editor.png) |
-| ![伟人编辑器](docs/screenshots/07_great_people_editor.png) | ![基础信息](docs/screenshots/08_basic_info.png) |
-| ![美术工作区](docs/screenshots/09_art_workspace.png) | ![修改器工作区](docs/screenshots/10_modifier_workspace.png) |
-| ![文本工作区](docs/screenshots/11_text_workspace.png) | ![搜索页](docs/screenshots/12_search.png) |
-| ![设置页](docs/screenshots/13_settings.png) | |
+| ![主页](ModTools_5_4/docs/screenshots/01_home.png) | ![工程总览](ModTools_5_4/docs/screenshots/02_workspace_overview.png) |
+| ![文明编辑器](ModTools_5_4/docs/screenshots/03_civilization_editor.png) | ![领袖编辑器](ModTools_5_4/docs/screenshots/04_leader_editor.png) |
+| ![单位晋升树](ModTools_5_4/docs/screenshots/05_promotion_tree_editor.png) | ![议程编辑器](ModTools_5_4/docs/screenshots/06_agenda_editor.png) |
+| ![伟人编辑器](ModTools_5_4/docs/screenshots/07_great_people_editor.png) | ![基础信息](ModTools_5_4/docs/screenshots/08_basic_info.png) |
+| ![美术工作区](ModTools_5_4/docs/screenshots/09_art_workspace.png) | ![修改器工作区](ModTools_5_4/docs/screenshots/10_modifier_workspace.png) |
+| ![文本工作区](ModTools_5_4/docs/screenshots/11_text_workspace.png) | ![搜索页](ModTools_5_4/docs/screenshots/12_search.png) |
+| ![设置页](ModTools_5_4/docs/screenshots/13_settings.png) | |
 
 > 截图由 `tools/make_screenshots.py` 自动生成（加载内置示例工程后逐页渲染，示例数据与测试共用 `tests/sample_project.py`）。
 

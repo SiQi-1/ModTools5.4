@@ -30,8 +30,8 @@ powershell -File build_release.ps1 -PythonExe python
 ```
 
 - Build uses PyInstaller with `--onefile --noconsole` via `build_release.ps1` (CLI args, no spec file needed; a local `ModTools5.4.spec` exists but is gitignored and secondary).
-- Only dependency: PyQt6 (see `requirements.txt`). Tests use stdlib `unittest`, no extra deps.
-- CI (`.github/workflows/ci.yml`) runs compileall + tests on every push; `release.yml` builds exe and publishes a GitHub Release when pushing a `v*` tag. Tests run in the same repo checkout (game DB not required — tests avoid game-dependent code paths).
+- Only dependencies: PyQt6 + Pillow (see `requirements.txt`). Tests use stdlib `unittest`, no extra deps.
+- Tests are run locally only (no CI). `release.yml` builds the exe on GitHub Actions when pushing a `v*` tag.
 - Note: git tracks `local_text_New.sqlite` (runtime data); large artifacts (zip/exe/pyc/logs) are gitignored.
 
 ## Architecture (verified against source)
@@ -98,9 +98,10 @@ ModTools_5_4/
 
 ## Tests
 
-- `tests/` uses stdlib `unittest` (no pytest). Run: `python -m unittest discover -s tests -v`.
-- GUI smoke test (`test_workspace_smoke.py`) sets `QT_QPA_PLATFORM=offscreen` itself — no display needed.
-- Tests must not require the game database; keep them usable in CI.
+- `tests/` uses stdlib `unittest` (no pytest). Run locally: `python -m unittest discover -s tests -v`.
+- Tests run without the game database or a display (`test_workspace_smoke.py` / `test_sql_previews.py` set `QT_QPA_PLATFORM=offscreen` themselves).
+- `tests/sample_project.py` is the shared demo project fixture: one minimal entry per content section, also used by `tools/make_screenshots.py` (single source of truth).
+- When adding/renaming fields in preview builders, update the fixture if the affected section's sample entry is minimal.
 
 ## Key Design Decisions
 

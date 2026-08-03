@@ -2014,7 +2014,7 @@ class WorkspacePage(BasePage):
                 if not node_abbr:
                     continue
                 shared = self._project.sections.get("基础信息", {})
-                promo_type = _build_entity_type(shared, "PROMOTION", "P", node_abbr)
+                promo_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=node_abbr)
                 node_name = str(n.get("name_cn") or node_abbr).strip()
                 node_desc = str(n.get("desc_cn") or "").strip()
                 level = int(n.get("level", 1) or 1)
@@ -2038,7 +2038,7 @@ class WorkspacePage(BasePage):
                             if isinstance(pre_data, dict):
                                 pre_abbr = str(pre_data.get("abbr") or "").strip()
                                 if pre_abbr:
-                                    pre_type = _build_entity_type(shared, "PROMOTION", "P", pre_abbr)
+                                    pre_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=pre_abbr)
                                     prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
 
         types_rows = list(dict.fromkeys(types_rows))

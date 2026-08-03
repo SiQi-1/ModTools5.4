@@ -7753,7 +7753,7 @@ class ModifierWorkspacePanel(HomePage):
                 node_abbr = str(node_data.get("abbr") or "").strip()
                 if not node_abbr:
                     continue
-                promo_type = _build_entity_type(shared, "PROMOTION", "P", node_abbr)
+                promo_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=node_abbr)
                 node_name = str(node_data.get("name_cn") or "").strip() or f"{tree_name} 节点{node_index + 1}"
                 add_candidate(
                     "UnitPromotionModifiers",

@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-02 - 测试扩充（39 用例）+ 晋升预览崩溃修复 + 截图扩充
+
+### 测试扩充（39 个用例，本地运行）
+- 新增 `tests/sample_project.py`：共享示例工程 fixture（13 个内容分类各一条有效条目），测试与截图脚本共用同一数据源。
+- 新增 `tests/test_sql_previews.py`：逐一验证每个分类的 SQL/XML 预览（表名、示例 Type、领袖 Colors 对、单位/伟人 Bundle 键、晋升树前置关系、议程副表、文本工作区）。
+- 新增 `tests/test_text_import.py`：XML/SQL 文本导入 → sqlite 查询往返、重复导入更新、LOC_ 过滤。
+- 新增 `tests/test_settings_store.py`：设置读写往返（隔离临时文件，不触碰真实配置）。
+- 测试仅本地运行（不再配置 CI 测试流水线），`python -m unittest discover -s tests -v`。
+
+### 修复：单位晋升 SQL 预览崩溃
+- `_build_entity_type` 为 keyword-only 参数签名，但 workspace_page / modifier_workspace 中有 3 处按位置参数调用，导致"单位晋升存在节点时 SQL 预览直接抛 TypeError"。
+- 已改为关键字传参（由 test_sql_previews 发现）。
+
+### 截图自动化扩充（6 → 13 张）
+- 新增：单位晋升树、议程、伟人、基础信息、美术、修改器、文本工作区截图。
+- `tools/make_screenshots.py` 改为复用 `tests/sample_project.py` 的示例工程，保证截图与测试数据一致。
+
+### 其他
+- `requirements.txt` 补充 `Pillow`（workspace_page 模块级依赖）。
+- 移除 `.github/workflows/ci.yml`（测试本地化）；`release.yml` 去掉测试步骤并补充 Pillow 依赖。
+
 ## 2026-08-02 - 开源准备：LICENSE / CI / 测试 / Release 自动构建 / 截图
 
 ### 工程规范化

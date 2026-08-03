@@ -16,13 +16,10 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install PyQt6 PyInstaller
+        run: pip install PyQt6 Pillow PyInstaller
 
       - name: Build exe and zip
         run: powershell -ExecutionPolicy Bypass -File build_release.ps1
-
-      - name: Run unit tests against source
-        run: python -m unittest discover -s tests -v
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

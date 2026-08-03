@@ -33,9 +33,10 @@
 
 ### 7) 发布与工程规范化（2026-08）
 - `build_release.ps1`：PyInstaller onefile（`--noconsole`）→ release/ + ModTools5.4.zip。
-- GitHub Actions：`ci.yml`（push/PR 编译检查 + 单元测试）、`release.yml`（`v*` tag 自动构建并发布 GitHub Release）。
-- 首版测试 19 个用例（工程模型 / artdef 解析 / 文本库 / 无头 GUI 冒烟），`python -m unittest discover -s tests -v`。
-- MIT LICENSE、requirements.txt、.gitattributes、README 截图自动生成脚本（tools/make_screenshots.py）。
+- GitHub Actions `release.yml`：`v*` tag 自动构建并发布 GitHub Release（测试仅本地运行，无 CI 测试流水线）。
+- 测试 39 个用例（工程模型 / artdef 解析 / 文本库导入查询 / 设置读写 / 各分类 SQL 预览 / 无头 GUI 冒烟），`python -m unittest discover -s tests -v`。
+- `tests/sample_project.py` 共享示例工程（测试与截图脚本共用）。
+- MIT LICENSE、requirements.txt（PyQt6 + Pillow）、.gitattributes、README 截图自动生成脚本（tools/make_screenshots.py，13 张）。
 
 ## 二、当前缺口（TODO）
 
@@ -48,8 +49,8 @@
 - 未实现导入：文明、领袖、总督、项目、信仰、议程。
 
 ### P2：测试与回归扩展
-- 现状：已有 19 个冒烟/逻辑用例，但 SQL 预览方法尚未按分类逐一覆盖（当前仅验证空工程不崩溃）。
-- 目标：补充带示例数据的分类预览断言；必要时引入 GUI 交互测试（QTest）。
+- 现状：已有 39 个用例，覆盖工程模型、artdef、文本导入、设置、全部 13 分类 SQL/XML 预览与无头 GUI 冒烟。
+- 目标：生成链路测试（`_generate_all_output_files` 写出文件树）、图片导出（PNG/DDS/TEX）、GUI 交互测试（QTest）可按需补充。
 
 ### P2：打包配置收敛
 - 现状：`build_release.ps1` 与本地 `ModTools5.4.spec` 各维护一份数据清单，易漂移。

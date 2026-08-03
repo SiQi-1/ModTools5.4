@@ -1157,10 +1157,10 @@ def build_units_main_schema() -> MainTableSchema:
         TableFieldSpec("ZoneOfControl", "控制区", "bool", "bool", 0),
         TableFieldSpec("Spy", "间谍单位", "bool", "bool", 0),
         TableFieldSpec("WMDCapable", "可携带核武", "bool", "bool", 0),
-        TableFieldSpec("IgnoreMoves", "IgnoreMoves", "bool", "bool", 0),
+        TableFieldSpec("IgnoreMoves", "无视移动消耗", "bool", "bool", 0),
         TableFieldSpec("TeamVisibility", "团队共享视野", "bool", "bool", 0),
         TableFieldSpec("EnabledByReligion", "宗教启用", "bool", "bool", 0),
-        TableFieldSpec("TrackReligion", "TrackReligion", "bool", "bool", 0),
+        TableFieldSpec("TrackReligion", "携带并传播宗教", "bool", "bool", 0),
         TableFieldSpec("UseMaxMeleeTrainedStrength", "使用最高近战训练力", "bool", "bool", 0),
         TableFieldSpec("ImmediatelyName", "立即命名", "bool", "bool", 0),
         TableFieldSpec("CanEarnExperience", "可获得经验", "bool", "bool", 1),
@@ -4652,9 +4652,9 @@ class UnitCompositeEditor(QWidget):
         )
         self._ai_infos_editor = _UnitRowsTableEditor(
             table_name="UnitAiInfos",
-            hint_text="单位AI类型。",
+            hint_text="AI 职能类型：定义 AI 将该单位用于何种用途（如 UNITAI_SCOUT=侦察、UNITAI_COMBAT=进攻、UNITAI_BUILDER=建造）。可点击搜索选择，也可直接输入。",
             owner_key="UnitType",
-            columns=[_UnitColumnSpec("AiType", "AiType", "template", "unit_ai_type")],
+            columns=[_UnitColumnSpec("AiType", "AI职能类型", "template", "unit_ai_type")],
         )
         self._type_tags_editor = UnitTypeTagsEditor()
         self._type_properties_editor = UnitTypePropertiesEditor(_UNIT_TYPE_PROPERTIES_VALUE_MAP)

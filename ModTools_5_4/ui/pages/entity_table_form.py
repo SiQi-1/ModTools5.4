@@ -1206,13 +1206,13 @@ def build_improvements_main_schema() -> MainTableSchema:
         TableFieldSpec("GrantFortification", "驻防加成", "int", "number", 0),
         TableFieldSpec("MinimumAppeal", "最低魅力需求", "int", "number", 0),
         TableFieldSpec("WeaponSlots", "核武器发射槽位", "int", "number", 0),
-        TableFieldSpec("ReligiousUnitHealRate", "ReligiousUnitHealRate", "int", "number", 0),
+        TableFieldSpec("ReligiousUnitHealRate", "宗教单位治疗量", "int", "number", 0),
         TableFieldSpec("Appeal", "相邻地块魅力加成", "int", "number", 0),
         TableFieldSpec("YieldFromAppealPercent", "魅力产出百分比", "int", "number", 100),
         TableFieldSpec("ValidAdjacentTerrainAmount", "需要相邻指定地形数量", "int", "number", 0),
         TableFieldSpec("MovementChange", "移动力变化", "int", "number", 0),
-        TableFieldSpec("TilesPerGoody", "TilesPerGoody", "int", "number", 0),
-        TableFieldSpec("GoodyRange", "GoodyRange", "int", "number", 0),
+        TableFieldSpec("TilesPerGoody", "部落村庄间隔地块数", "int", "number", 0),
+        TableFieldSpec("GoodyRange", "部落村庄生成范围", "int", "number", 0),
 
         TableFieldSpec("BarbarianCamp", "蛮族营地", "bool", "bool", 0),
         TableFieldSpec("Buildable", "可建造", "bool", "bool", 0),
@@ -1220,7 +1220,7 @@ def build_improvements_main_schema() -> MainTableSchema:
         TableFieldSpec("Goody", "部落村庄", "bool", "bool", 0),
         TableFieldSpec("SameAdjacentValid", "允许相邻", "bool", "bool", 1),
         TableFieldSpec("RequiresRiver", "需求河流", "bool", "bool", 0),
-        TableFieldSpec("EnforceTerrain", "EnforceTerrain", "bool", "bool", 0),
+        TableFieldSpec("EnforceTerrain", "强制地形限制", "bool", "bool", 0),
         TableFieldSpec("BuildInLine", "线性建造", "bool", "bool", 0),
         TableFieldSpec("CanBuildOutsideTerritory", "可在境外建造", "bool", "bool", 0),
         TableFieldSpec("BuildOnFrontier", "边境建造", "bool", "bool", 0),
@@ -1229,7 +1229,7 @@ def build_improvements_main_schema() -> MainTableSchema:
         TableFieldSpec("AdjacentSeaResource", "邻接海洋资源", "bool", "bool", 0),
         TableFieldSpec("RequiresAdjacentBonusOrLuxury", "需求邻接加成或奢侈", "bool", "bool", 0),
         TableFieldSpec("Workable", "可工作", "bool", "bool", 1),
-        TableFieldSpec("GoodyNotify", "GoodyNotify", "bool", "bool", 1),
+        TableFieldSpec("GoodyNotify", "发现时通知玩家", "bool", "bool", 1),
         TableFieldSpec("NoAdjacentSpecialtyDistrict", "不可邻接专业区域", "bool", "bool", 0),
         TableFieldSpec("RequiresAdjacentLuxury", "需求邻接奢侈", "bool", "bool", 0),
         TableFieldSpec("AdjacentToLand", "邻接陆地", "bool", "bool", 0),
@@ -1927,363 +1927,26 @@ class MainTableEditor(QWidget):
         self.dataChanged.emit()
 
 
-class DistrictXP2SubTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._district_type = ""
-        self._district_type_display = QLineEdit()
-        self._district_type_display.setReadOnly(True)
-
-        self._one_per_river = QCheckBox("OnePerRiver")
-        self._prevents_floods = QCheckBox("PreventsFloods")
-        self._prevents_drought = QCheckBox("PreventsDrought")
-        self._canal = QCheckBox("Canal")
-        self._attack_range = QSpinBox()
-        self._attack_range.setRange(-999999, 999999)
-        self._attack_range.setValue(0)
-        _attach_hover_param_tooltip(self._attack_range, "AttackRange")
-        for checkbox, param in (
-            (self._one_per_river, "OnePerRiver"),
-            (self._prevents_floods, "PreventsFloods"),
-            (self._prevents_drought, "PreventsDrought"),
-            (self._canal, "Canal"),
-        ):
-            _normalize_checkbox_caption(checkbox)
-            _attach_hover_param_tooltip(checkbox, param)
-
-        group = QGroupBox("Districts_XP2")
-        group_layout = QVBoxLayout()
-        tip = QLabel("XP2的参数")
-        tip.setWordWrap(True)
-        group_layout.addWidget(tip)
-
-        grid = QGridLayout()
-        grid.setContentsMargins(8, 6, 8, 6)
-        grid.setHorizontalSpacing(12)
-        grid.setVerticalSpacing(8)
-
-        def _field_cell(label: str, widget: QWidget) -> QWidget:
-            container = QWidget()
-            row = QHBoxLayout(container)
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            title = QLabel(label)
-            title.setMinimumWidth(110)
-            row.addWidget(title)
-            row.addWidget(widget, 1)
-            return container
-
-        grid.addWidget(_field_cell("DistrictType", self._district_type_display), 0, 0)
-        grid.addWidget(_field_cell("AttackRange", self._attack_range), 0, 1)
-        grid.addWidget(_field_cell("OnePerRiver", self._one_per_river), 1, 0)
-        grid.addWidget(_field_cell("PreventsFloods", self._prevents_floods), 1, 1)
-        grid.addWidget(_field_cell("PreventsDrought", self._prevents_drought), 2, 0)
-        grid.addWidget(_field_cell("Canal", self._canal), 2, 1)
-        group_layout.addLayout(grid)
-        group.setLayout(group_layout)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(group)
-        self.setLayout(layout)
-
-        for cb in (self._one_per_river, self._prevents_floods, self._prevents_drought, self._canal):
-            cb.stateChanged.connect(lambda _v: self.dataChanged.emit())
-        self._attack_range.valueChanged.connect(lambda _v: self.dataChanged.emit())
-
-    def set_district_type(self, district_type: str) -> None:
-        self._district_type = _safe_text(district_type)
-        self._district_type_display.setText(self._district_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        self._one_per_river.setChecked(bool(int(payload.get("OnePerRiver", 0) or 0)))
-        self._prevents_floods.setChecked(bool(int(payload.get("PreventsFloods", 0) or 0)))
-        self._prevents_drought.setChecked(bool(int(payload.get("PreventsDrought", 0) or 0)))
-        self._canal.setChecked(bool(int(payload.get("Canal", 0) or 0)))
-        try:
-            self._attack_range.setValue(int(payload.get("AttackRange", 0) or 0))
-        except (TypeError, ValueError):
-            self._attack_range.setValue(0)
-
-    def export_payload(self) -> dict[str, object]:
-        return {
-            "DistrictType": self._district_type,
-            "OnePerRiver": 1 if self._one_per_river.isChecked() else 0,
-            "PreventsFloods": 1 if self._prevents_floods.isChecked() else 0,
-            "PreventsDrought": 1 if self._prevents_drought.isChecked() else 0,
-            "Canal": 1 if self._canal.isChecked() else 0,
-            "AttackRange": int(self._attack_range.value()),
-        }
 
 
-@dataclass(slots=True)
-class _DistrictRowColumnSpec:
-    key: str
-    label: str
-    kind: str  # template/int/real
-    template_key: str | None = None
+def _top_cell(widget: QWidget) -> QWidget:
+    holder = QWidget()
+    holder_layout = QVBoxLayout(holder)
+    holder_layout.setContentsMargins(0, 0, 0, 0)
+    holder_layout.setSpacing(0)
+    holder_layout.addWidget(widget, 0, Qt.AlignmentFlag.AlignTop)
+    holder_layout.addStretch(1)
+    return holder
 
 
-class _DistrictRowsTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self, *, table_name: str, hint_text: str, columns: list[_DistrictRowColumnSpec]) -> None:
-        super().__init__()
-        self._district_type = ""
-        self._columns = columns
-        self._base_column_widths: list[int] = []
-
-        group = QGroupBox(table_name)
-        group_layout = QVBoxLayout()
-        group_layout.setContentsMargins(8, 6, 8, 6)
-        group_layout.setSpacing(8)
-
-        tip = QLabel(hint_text)
-        tip.setWordWrap(True)
-        group_layout.addWidget(tip)
-
-        top_row = QHBoxLayout()
-        top_row.addWidget(QLabel("DistrictType"))
-        self._district_type_display = QLineEdit()
-        self._district_type_display.setReadOnly(True)
-        top_row.addWidget(self._district_type_display, 1)
-        self._add_button = QPushButton("＋ 添加行")
-        self._add_button.clicked.connect(self._add_row)
-        top_row.addWidget(self._add_button)
-        group_layout.addLayout(top_row)
-
-        self._table = QTableWidget(0, len(self._columns) + 1)
-        headers = [item.label for item in self._columns] + ["操作"]
-        self._table.setHorizontalHeaderLabels(headers)
-        header = self._table.horizontalHeader()
-        for col in range(len(self._columns)):
-            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(len(self._columns), QHeaderView.ResizeMode.Fixed)
-        header.setMinimumSectionSize(72)
-        self._table.setColumnWidth(len(self._columns), 56)
-        self._init_header_width_policy(headers)
-        self._table.verticalHeader().setVisible(False)
-        self._table.verticalHeader().setDefaultSectionSize(36)
-        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-        self._table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self._table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self._table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        group_layout.addWidget(self._table, 1)
-        group.setLayout(group_layout)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(group)
-        self.setLayout(layout)
-        QTimer.singleShot(0, self._apply_proportional_column_widths)
-
-    def _init_header_width_policy(self, headers: list[str]) -> None:
-        metrics = QFontMetrics(self._table.horizontalHeader().font())
-        self._base_column_widths = []
-        for col, text in enumerate(headers[:-1]):
-            header_width = metrics.horizontalAdvance(text) + 34
-            base_width = 220 if col == 0 else 150
-            width = max(base_width, header_width)
-            self._base_column_widths.append(width)
-        self._table.setMinimumWidth(0)
-        self._apply_proportional_column_widths()
-
-    def _apply_proportional_column_widths(self) -> None:
-        if not self._base_column_widths:
-            return
-        op_col = len(self._columns)
-        op_width = 56
-        self._table.setColumnWidth(op_col, op_width)
-
-        available = max(0, self._table.viewport().width() - op_width - 2)
-        if available <= 0:
-            return
-        scaled = _fit_column_widths(self._base_column_widths, available, preferred_min=60)
-
-        for col, width in enumerate(scaled):
-            self._table.setColumnWidth(col, width)
-
-    def resizeEvent(self, event) -> None:  # type: ignore[override]
-        super().resizeEvent(event)
-        self._apply_proportional_column_widths()
-
-    def set_district_type(self, district_type: str) -> None:
-        self._district_type = _safe_text(district_type)
-        self._district_type_display.setText(self._district_type)
-
-    def _create_cell_widget(self, spec: _DistrictRowColumnSpec, seed: dict[str, object] | None) -> QWidget:
-        if spec.kind == "template" and spec.template_key:
-            widget = build_template_widget(spec.template_key)
-            if hasattr(widget, "set_label_text"):
-                widget.set_label_text("")
-            if seed and hasattr(widget, "set_current_value"):
-                widget.set_current_value(_safe_text(seed.get(spec.key)) or None)
-            widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            widget.setMinimumWidth(220)
-            return widget
-
-        if spec.kind == "real":
-            spin = _CompactDoubleSpinBox()
-            spin.setRange(-999999.0, 999999.0)
-            try:
-                spin.setValue(float((seed or {}).get(spec.key, 0.0) or 0.0))
-            except (TypeError, ValueError):
-                spin.setValue(0.0)
-            _attach_hover_param_tooltip(spin, spec.key)
-            return spin
-
-        spin = QSpinBox()
-        spin.setRange(-999999, 999999)
-        try:
-            spin.setValue(int((seed or {}).get(spec.key, 0) or 0))
-        except (TypeError, ValueError):
-            spin.setValue(0)
-        _attach_hover_param_tooltip(spin, spec.key)
-        return spin
-
-    def _add_row(self, seed: dict[str, object] | None = None) -> None:
-        row = self._table.rowCount()
-        self._table.insertRow(row)
-        for col, spec in enumerate(self._columns):
-            cell_widget = self._create_cell_widget(spec, seed)
-            self._table.setCellWidget(row, col, cell_widget)
-            if isinstance(cell_widget, BaseTemplateWidget):
-                cell_widget.dataChanged.connect(self.dataChanged.emit)
-            elif isinstance(cell_widget, QSpinBox):
-                cell_widget.valueChanged.connect(lambda _v: self.dataChanged.emit())
-            elif isinstance(cell_widget, QDoubleSpinBox):
-                cell_widget.valueChanged.connect(lambda _v: self.dataChanged.emit())
-
-        del_btn = QPushButton("删")
-        small_font = QFont(del_btn.font())
-        small_font.setPointSize(max(8, small_font.pointSize() - 1))
-        del_btn.setFont(small_font)
-        del_btn.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        del_btn.clicked.connect(lambda: self._remove_row_by_button(del_btn))
-
-        self._table.setCellWidget(row, len(self._columns), del_btn)
-        self._refresh_table_height()
-        self.dataChanged.emit()
-
-    def _remove_row_by_button(self, button: QPushButton) -> None:
-        op_col = len(self._columns)
-        for row in range(self._table.rowCount()):
-            if self._table.cellWidget(row, op_col) is button:
-                self._table.removeRow(row)
-                self._refresh_table_height()
-                self.dataChanged.emit()
-                return
-
-    def set_payload(self, payload: list[dict[str, object]]) -> None:
-        self._table.setRowCount(0)
-        for row in payload:
-            if isinstance(row, dict):
-                self._add_row(row)
-        self._refresh_table_height()
-
-    def _refresh_table_height(self) -> None:
-        self._table.resizeRowsToContents()
-        header_h = self._table.horizontalHeader().height()
-        frame_h = self._table.frameWidth() * 2
-        rows_h = 0
-        for row in range(self._table.rowCount()):
-            rows_h += self._table.rowHeight(row)
-        min_rows = 1
-        if self._table.rowCount() < min_rows:
-            rows_h += self._table.verticalHeader().defaultSectionSize() * (min_rows - self._table.rowCount())
-        self._table.setFixedHeight(header_h + rows_h + frame_h + 2)
-
-    def export_payload(self) -> list[dict[str, object]]:
-        output: list[dict[str, object]] = []
-        for row in range(self._table.rowCount()):
-            row_payload: dict[str, object] = {"DistrictType": self._district_type}
-            skip_row = False
-            for col, spec in enumerate(self._columns):
-                widget = self._table.cellWidget(row, col)
-                if isinstance(widget, BaseTemplateWidget):
-                    value = _safe_text(_first_non_empty(widget.export_data()))
-                elif isinstance(widget, QDoubleSpinBox):
-                    value = float(widget.value())
-                elif isinstance(widget, QSpinBox):
-                    value = int(widget.value())
-                else:
-                    value = ""
-                if col == 0 and _safe_text(value) == "":
-                    skip_row = True
-                row_payload[spec.key] = value
-            if not skip_row:
-                output.append(row_payload)
-        return output
-
-
-class DistrictReplacesSubTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._district_type = ""
-        self._district_type_display = QLineEdit()
-        self._district_type_display.setReadOnly(True)
-        self._replaces_widget = build_template_widget("district_search_no_trait")
-        if hasattr(self._replaces_widget, "set_label_text"):
-            self._replaces_widget.set_label_text("")
-
-        group = QGroupBox("DistrictReplaces")
-        group_layout = QVBoxLayout()
-        tip = QLabel("取代区域：设置该文明专属区域替代的区域")
-        tip.setWordWrap(True)
-        group_layout.addWidget(tip)
-
-        grid = QGridLayout()
-        grid.setContentsMargins(8, 6, 8, 6)
-        grid.setHorizontalSpacing(12)
-        grid.setVerticalSpacing(8)
-
-        def _field_cell(label: str, widget: QWidget) -> QWidget:
-            container = QWidget()
-            row = QHBoxLayout(container)
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            title = QLabel(label)
-            title.setMinimumWidth(140)
-            row.addWidget(title)
-            row.addWidget(widget, 1)
-            return container
-
-        grid.addWidget(_field_cell("CivUniqueDistrictType", self._district_type_display), 0, 0)
-        grid.addWidget(_field_cell("ReplacesDistrictType", self._replaces_widget), 0, 1)
-        group_layout.addLayout(grid)
-        group.setLayout(group_layout)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(group)
-        self.setLayout(layout)
-
-        if hasattr(self._replaces_widget, "dataChanged"):
-            self._replaces_widget.dataChanged.connect(self.dataChanged.emit)
-
-    def set_district_type(self, district_type: str) -> None:
-        self._district_type = _safe_text(district_type)
-        self._district_type_display.setText(self._district_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        if hasattr(self._replaces_widget, "set_current_value"):
-            self._replaces_widget.set_current_value(_safe_text(payload.get("ReplacesDistrictType")) or None)
-
-    def export_payload(self) -> dict[str, object]:
-        replaces_type = ""
-        if isinstance(self._replaces_widget, BaseTemplateWidget):
-            replaces_type = _safe_text(_first_non_empty(self._replaces_widget.export_data()))
-        return {
-            "CivUniqueDistrictType": self._district_type,
-            "ReplacesDistrictType": replaces_type,
-        }
+def _pair_row(left: QWidget, right: QWidget) -> QWidget:
+    row_holder = QWidget()
+    row_layout = QHBoxLayout(row_holder)
+    row_layout.setContentsMargins(0, 0, 0, 0)
+    row_layout.setSpacing(10)
+    row_layout.addWidget(_top_cell(left), 1)
+    row_layout.addWidget(_top_cell(right), 1)
+    return row_holder
 
 
 class DistrictCompositeEditor(QWidget):
@@ -2306,48 +1969,71 @@ class DistrictCompositeEditor(QWidget):
             type_builder=type_builder,
             image_widget_factory=image_widget_factory,
         )
-        self._xp2_editor = DistrictXP2SubTableEditor()
-        self._gp_editor = _DistrictRowsTableEditor(
+        self._xp2_editor = _SingleRowTableEditor(
+            table_name="Districts_XP2",
+            hint_text="资料片XP2扩展参数。",
+            owner_key="DistrictType",
+            columns=[
+                _ColumnSpec("OnePerRiver", "每河限一", "bool"),
+                _ColumnSpec("PreventsFloods", "防洪", "bool"),
+                _ColumnSpec("PreventsDrought", "防旱", "bool"),
+                _ColumnSpec("Canal", "运河", "bool"),
+                _ColumnSpec("AttackRange", "攻击范围", "int"),
+            ],
+        )
+        self._gp_editor = _RowsTableEditor(
             table_name="District_GreatPersonPoints",
             hint_text="伟人点：为该区域配置每回合提供的伟人类型与点数。",
+            owner_key="DistrictType",
             columns=[
-                _DistrictRowColumnSpec("GreatPersonClassType", "GreatPersonClassType", "template", "great_person_class"),
-                _DistrictRowColumnSpec("PointsPerTurn", "PointsPerTurn", "int"),
+                _ColumnSpec("GreatPersonClassType", "GreatPersonClassType", "template", "great_person_class"),
+                _ColumnSpec("PointsPerTurn", "每回合点数", "int"),
             ],
         )
-        self._citizen_yield_editor = _DistrictRowsTableEditor(
+        self._citizen_yield_editor = _RowsTableEditor(
             table_name="District_CitizenYieldChanges",
             hint_text="公民产出：配置公民在该区域工作时的额外产出类型与数值。",
+            owner_key="DistrictType",
             columns=[
-                _DistrictRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _DistrictRowColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "产出变化", "int"),
             ],
         )
-        self._required_features_editor = _DistrictRowsTableEditor(
+        self._required_features_editor = _RowsTableEditor(
             table_name="District_RequiredFeatures",
             hint_text="地貌限制：仅允许在指定地貌上建造该区域。",
+            owner_key="DistrictType",
             columns=[
-                _DistrictRowColumnSpec("FeatureType", "FeatureType", "template", "feature_all"),
+                _ColumnSpec("FeatureType", "FeatureType", "template", "feature_all"),
             ],
         )
-        self._trade_route_yields_editor = _DistrictRowsTableEditor(
+        self._trade_route_yields_editor = _RowsTableEditor(
             table_name="District_TradeRouteYields",
             hint_text="贸易路线产出：配置该区域作为起点/国内终点/国际终点时提供的额外产出。",
+            owner_key="DistrictType",
             columns=[
-                _DistrictRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _DistrictRowColumnSpec("YieldChangeAsOrigin", "YieldChangeAsOrigin", "real"),
-                _DistrictRowColumnSpec("YieldChangeAsDomesticDestination", "YieldChangeAsDomesticDestination", "real"),
-                _DistrictRowColumnSpec("YieldChangeAsInternationalDestination", "YieldChangeAsInternationalDestination", "real"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChangeAsOrigin", "作为起点产出", "real"),
+                _ColumnSpec("YieldChangeAsDomesticDestination", "国内终点产出", "real"),
+                _ColumnSpec("YieldChangeAsInternationalDestination", "国际终点产出", "real"),
             ],
         )
-        self._valid_terrains_editor = _DistrictRowsTableEditor(
+        self._valid_terrains_editor = _RowsTableEditor(
             table_name="District_ValidTerrains",
             hint_text="地形限制：仅允许在指定地形上建造该区域。",
+            owner_key="DistrictType",
             columns=[
-                _DistrictRowColumnSpec("TerrainType", "TerrainType", "template", "terrain"),
+                _ColumnSpec("TerrainType", "TerrainType", "template", "terrain"),
             ],
         )
-        self._replaces_editor = DistrictReplacesSubTableEditor()
+        self._replaces_editor = _SingleRowTableEditor(
+            table_name="DistrictReplaces",
+            hint_text="取代区域：设置该文明专属区域替代的区域。",
+            owner_key="CivUniqueDistrictType",
+            columns=[
+                _ColumnSpec("ReplacesDistrictType", "ReplacesDistrictType", "template", "district_search_no_trait"),
+            ],
+        )
         self._adjacency_editor = AdjacencyEditorWidget(
             auto_context=AdjacencyAutoContext(),
             include_placeholder=False,
@@ -2362,24 +2048,6 @@ class DistrictCompositeEditor(QWidget):
         self._valid_terrains_editor.dataChanged.connect(self._emit_data_changed)
         self._replaces_editor.dataChanged.connect(self._emit_data_changed)
         self._adjacency_editor.dataChanged.connect(self._emit_data_changed)
-
-        def _top_cell(widget: QWidget) -> QWidget:
-            holder = QWidget()
-            holder_layout = QVBoxLayout(holder)
-            holder_layout.setContentsMargins(0, 0, 0, 0)
-            holder_layout.setSpacing(0)
-            holder_layout.addWidget(widget, 0, Qt.AlignmentFlag.AlignTop)
-            holder_layout.addStretch(1)
-            return holder
-
-        def _pair_row(left: QWidget, right: QWidget) -> QWidget:
-            row_holder = QWidget()
-            row_layout = QHBoxLayout(row_holder)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            row_layout.setSpacing(10)
-            row_layout.addWidget(_top_cell(left), 1)
-            row_layout.addWidget(_top_cell(right), 1)
-            return row_holder
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -2407,13 +2075,13 @@ class DistrictCompositeEditor(QWidget):
 
     def _sync_district_type(self) -> None:
         district_type = self._main_editor.current_type()
-        self._xp2_editor.set_district_type(district_type)
-        self._gp_editor.set_district_type(district_type)
-        self._citizen_yield_editor.set_district_type(district_type)
-        self._required_features_editor.set_district_type(district_type)
-        self._trade_route_yields_editor.set_district_type(district_type)
-        self._valid_terrains_editor.set_district_type(district_type)
-        self._replaces_editor.set_district_type(district_type)
+        self._xp2_editor.set_owner_type(district_type)
+        self._gp_editor.set_owner_type(district_type)
+        self._citizen_yield_editor.set_owner_type(district_type)
+        self._required_features_editor.set_owner_type(district_type)
+        self._trade_route_yields_editor.set_owner_type(district_type)
+        self._valid_terrains_editor.set_owner_type(district_type)
+        self._replaces_editor.set_owner_type(district_type)
         self._adjacency_editor.set_auto_context(self._build_adjacency_context())
 
     def _handle_main_changed(self) -> None:
@@ -2504,460 +2172,8 @@ class DistrictCompositeEditor(QWidget):
         self.dataChanged.emit()
 
 
-class BuildingsXP2SubTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._building_type = ""
-        self._building_type_display = QLineEdit()
-        self._building_type_display.setReadOnly(True)
-
-        self._required_power = QSpinBox()
-        self._required_power.setRange(0, 999999)
-        self._resource_type_to_power = build_template_widget("resource_strategic")
-        if hasattr(self._resource_type_to_power, "set_label_text"):
-            self._resource_type_to_power.set_label_text("")
-
-        self._prevents_floods = QCheckBox("PreventsFloods")
-        self._prevents_drought = QCheckBox("PreventsDrought")
-        self._blocks_coastal_flooding = QCheckBox("BlocksCoastalFlooding")
-        self._bridge = QCheckBox("Bridge")
-        self._canal_wonder = QCheckBox("CanalWonder")
-        self._nuclear_reactor = QCheckBox("NuclearReactor")
-        self._pillage = QCheckBox("Pillage")
-        self._pillage.setChecked(True)
-
-        self._cost_mul_tile = QSpinBox()
-        self._cost_mul_tile.setRange(0, 999999)
-        self._cost_mul_sea = QSpinBox()
-        self._cost_mul_sea.setRange(0, 999999)
-        self._ent_bonus_with_power = QSpinBox()
-        self._ent_bonus_with_power.setRange(0, 999999)
-        _attach_hover_param_tooltip(self._required_power, "RequiredPower")
-        _attach_hover_param_tooltip(self._cost_mul_tile, "CostMultiplierPerTile")
-        _attach_hover_param_tooltip(self._cost_mul_sea, "CostMultiplierPerSeaLevel")
-        _attach_hover_param_tooltip(self._ent_bonus_with_power, "EntertainmentBonusWithPower")
-        for checkbox, param in (
-            (self._prevents_floods, "PreventsFloods"),
-            (self._prevents_drought, "PreventsDrought"),
-            (self._blocks_coastal_flooding, "BlocksCoastalFlooding"),
-            (self._bridge, "Bridge"),
-            (self._canal_wonder, "CanalWonder"),
-            (self._nuclear_reactor, "NuclearReactor"),
-            (self._pillage, "Pillage"),
-        ):
-            _normalize_checkbox_caption(checkbox)
-            _attach_hover_param_tooltip(checkbox, param)
-
-        group = QGroupBox("Buildings_XP2")
-        layout = QVBoxLayout(group)
-        tip = QLabel(_building_table_hint("Buildings_XP2"))
-        tip.setWordWrap(True)
-        layout.addWidget(tip)
-
-        grid = QGridLayout()
-        grid.setContentsMargins(8, 6, 8, 6)
-        grid.setHorizontalSpacing(12)
-        grid.setVerticalSpacing(8)
-
-        def _cell(label: str, widget: QWidget) -> QWidget:
-            holder = QWidget()
-            row = QHBoxLayout(holder)
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            title = QLabel(label)
-            title.setMinimumWidth(120)
-            row.addWidget(title)
-            row.addWidget(widget, 1)
-            return holder
-
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "BuildingType"), fallback_key="BuildingType"), self._building_type_display), 0, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "RequiredPower"), fallback_key="RequiredPower"), self._required_power), 0, 1)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "ResourceTypeConvertedToPower"), fallback_key="ResourceTypeConvertedToPower"), self._resource_type_to_power), 1, 0, 1, 2)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "CostMultiplierPerTile"), fallback_key="CostMultiplierPerTile"), self._cost_mul_tile), 2, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "CostMultiplierPerSeaLevel"), fallback_key="CostMultiplierPerSeaLevel"), self._cost_mul_sea), 2, 1)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "EntertainmentBonusWithPower"), fallback_key="EntertainmentBonusWithPower"), self._ent_bonus_with_power), 3, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "PreventsFloods"), fallback_key="PreventsFloods"), self._prevents_floods), 4, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "PreventsDrought"), fallback_key="PreventsDrought"), self._prevents_drought), 4, 1)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "BlocksCoastalFlooding"), fallback_key="BlocksCoastalFlooding"), self._blocks_coastal_flooding), 5, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "Bridge"), fallback_key="Bridge"), self._bridge), 5, 1)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "CanalWonder"), fallback_key="CanalWonder"), self._canal_wonder), 6, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "NuclearReactor"), fallback_key="NuclearReactor"), self._nuclear_reactor), 6, 1)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("Buildings_XP2", "Pillage"), fallback_key="Pillage"), self._pillage), 7, 0)
-
-        layout.addLayout(grid)
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.addWidget(group)
-
-        for cb in (
-            self._prevents_floods,
-            self._prevents_drought,
-            self._blocks_coastal_flooding,
-            self._bridge,
-            self._canal_wonder,
-            self._nuclear_reactor,
-            self._pillage,
-        ):
-            cb.stateChanged.connect(lambda _v: self.dataChanged.emit())
-        self._required_power.valueChanged.connect(lambda _v: self.dataChanged.emit())
-        self._cost_mul_tile.valueChanged.connect(lambda _v: self.dataChanged.emit())
-        self._cost_mul_sea.valueChanged.connect(lambda _v: self.dataChanged.emit())
-        self._ent_bonus_with_power.valueChanged.connect(lambda _v: self.dataChanged.emit())
-        if hasattr(self._resource_type_to_power, "dataChanged"):
-            self._resource_type_to_power.dataChanged.connect(self.dataChanged.emit)
-
-    def set_building_type(self, building_type: str) -> None:
-        self._building_type = _safe_text(building_type)
-        self._building_type_display.setText(self._building_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        self._required_power.setValue(int(payload.get("RequiredPower", 0) or 0))
-        if hasattr(self._resource_type_to_power, "set_current_value"):
-            self._resource_type_to_power.set_current_value(_safe_text(payload.get("ResourceTypeConvertedToPower")) or None)
-        self._prevents_floods.setChecked(bool(int(payload.get("PreventsFloods", 0) or 0)))
-        self._prevents_drought.setChecked(bool(int(payload.get("PreventsDrought", 0) or 0)))
-        self._blocks_coastal_flooding.setChecked(bool(int(payload.get("BlocksCoastalFlooding", 0) or 0)))
-        self._cost_mul_tile.setValue(int(payload.get("CostMultiplierPerTile", 0) or 0))
-        self._cost_mul_sea.setValue(int(payload.get("CostMultiplierPerSeaLevel", 0) or 0))
-        self._bridge.setChecked(bool(int(payload.get("Bridge", 0) or 0)))
-        self._canal_wonder.setChecked(bool(int(payload.get("CanalWonder", 0) or 0)))
-        self._ent_bonus_with_power.setValue(int(payload.get("EntertainmentBonusWithPower", 0) or 0))
-        self._nuclear_reactor.setChecked(bool(int(payload.get("NuclearReactor", 0) or 0)))
-        self._pillage.setChecked(bool(int(payload.get("Pillage", 1) or 1)))
-
-    def export_payload(self) -> dict[str, object]:
-        resource_type = ""
-        if isinstance(self._resource_type_to_power, BaseTemplateWidget):
-            resource_type = _safe_text(_first_non_empty(self._resource_type_to_power.export_data()))
-        return {
-            "BuildingType": self._building_type,
-            "RequiredPower": int(self._required_power.value()),
-            "ResourceTypeConvertedToPower": resource_type,
-            "PreventsFloods": 1 if self._prevents_floods.isChecked() else 0,
-            "PreventsDrought": 1 if self._prevents_drought.isChecked() else 0,
-            "BlocksCoastalFlooding": 1 if self._blocks_coastal_flooding.isChecked() else 0,
-            "CostMultiplierPerTile": int(self._cost_mul_tile.value()),
-            "CostMultiplierPerSeaLevel": int(self._cost_mul_sea.value()),
-            "Bridge": 1 if self._bridge.isChecked() else 0,
-            "CanalWonder": 1 if self._canal_wonder.isChecked() else 0,
-            "EntertainmentBonusWithPower": int(self._ent_bonus_with_power.value()),
-            "NuclearReactor": 1 if self._nuclear_reactor.isChecked() else 0,
-            "Pillage": 1 if self._pillage.isChecked() else 0,
-        }
 
 
-@dataclass(slots=True)
-class _BuildingRowColumnSpec:
-    key: str
-    label: str
-    kind: str  # template/int/real/bool/text
-    template_key: str | None = None
-
-
-class _BuildingRowsTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self, *, table_name: str, hint_text: str, columns: list[_BuildingRowColumnSpec]) -> None:
-        super().__init__()
-        self._building_type = ""
-        self._columns = columns
-        self._base_column_widths: list[int] = []
-
-        group = QGroupBox(table_name)
-        group_layout = QVBoxLayout(group)
-        group_layout.setContentsMargins(8, 6, 8, 6)
-        group_layout.setSpacing(8)
-        tip = QLabel(hint_text)
-        tip.setWordWrap(True)
-        group_layout.addWidget(tip)
-
-        top = QHBoxLayout()
-        top.addWidget(QLabel("BuildingType"))
-        self._building_type_display = QLineEdit()
-        self._building_type_display.setReadOnly(True)
-        top.addWidget(self._building_type_display, 1)
-        self._add_btn = QPushButton("＋ 添加行")
-        self._add_btn.clicked.connect(self._add_row)
-        top.addWidget(self._add_btn)
-        group_layout.addLayout(top)
-
-        self._table = QTableWidget(0, len(self._columns) + 1)
-        self._table.setHorizontalHeaderLabels([item.label for item in self._columns] + ["Action"])
-        header = self._table.horizontalHeader()
-        for col in range(len(self._columns)):
-            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(len(self._columns), QHeaderView.ResizeMode.Fixed)
-        self._table.setColumnWidth(len(self._columns), 56)
-        header.setMinimumSectionSize(72)
-        self._init_header_width_policy([item.label for item in self._columns])
-        self._table.verticalHeader().setVisible(False)
-        self._table.verticalHeader().setDefaultSectionSize(36)
-        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self._table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self._table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        group_layout.addWidget(self._table)
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.addWidget(group)
-        QTimer.singleShot(0, self._apply_proportional_column_widths)
-
-    def _init_header_width_policy(self, headers: list[str]) -> None:
-        metrics = QFontMetrics(self._table.horizontalHeader().font())
-        self._base_column_widths = []
-        for col, text in enumerate(headers):
-            header_width = metrics.horizontalAdvance(text) + 34
-            base_width = 200 if col == 0 else 150
-            self._base_column_widths.append(max(base_width, header_width))
-        self._apply_proportional_column_widths()
-
-    def _apply_proportional_column_widths(self) -> None:
-        if not self._base_column_widths:
-            return
-        op_col = len(self._columns)
-        op_width = 56
-        self._table.setColumnWidth(op_col, op_width)
-
-        available = max(0, self._table.viewport().width() - op_width - 2)
-        if available <= 0:
-            return
-        scaled = _fit_column_widths(self._base_column_widths, available, preferred_min=60)
-
-        for col, width in enumerate(scaled):
-            self._table.setColumnWidth(col, width)
-
-    def resizeEvent(self, event) -> None:  # type: ignore[override]
-        super().resizeEvent(event)
-        self._apply_proportional_column_widths()
-
-    def set_building_type(self, building_type: str) -> None:
-        self._building_type = _safe_text(building_type)
-        self._building_type_display.setText(self._building_type)
-
-    def _create_cell_widget(self, spec: _BuildingRowColumnSpec, seed: dict[str, object] | None) -> QWidget:
-        if spec.kind == "template" and spec.template_key:
-            widget = build_template_widget(spec.template_key)
-            if hasattr(widget, "set_label_text"):
-                widget.set_label_text("")
-            if seed and hasattr(widget, "set_current_value"):
-                widget.set_current_value(_safe_text(seed.get(spec.key)) or None)
-            return widget
-        if spec.kind == "real":
-            spin = _CompactDoubleSpinBox()
-            spin.setRange(-999999.0, 999999.0)
-            spin.setValue(float((seed or {}).get(spec.key, 0.0) or 0.0))
-            _attach_hover_param_tooltip(spin, spec.key)
-            return spin
-        if spec.kind == "bool":
-            cb = QCheckBox()
-            cb.setChecked(bool(int((seed or {}).get(spec.key, 0) or 0)))
-            _normalize_checkbox_caption(cb)
-            _attach_hover_param_tooltip(cb, spec.key)
-            return cb
-        if spec.kind == "text":
-            edit = QLineEdit()
-            edit.setText(_safe_text((seed or {}).get(spec.key)))
-            return edit
-        spin = QSpinBox()
-        spin.setRange(-999999, 999999)
-        spin.setValue(int((seed or {}).get(spec.key, 0) or 0))
-        _attach_hover_param_tooltip(spin, spec.key)
-        return spin
-
-    def _add_row(self, seed: dict[str, object] | None = None) -> None:
-        row = self._table.rowCount()
-        self._table.insertRow(row)
-        for col, spec in enumerate(self._columns):
-            widget = self._create_cell_widget(spec, seed)
-            self._table.setCellWidget(row, col, widget)
-            if isinstance(widget, BaseTemplateWidget):
-                widget.dataChanged.connect(self.dataChanged.emit)
-            elif isinstance(widget, (QSpinBox, QDoubleSpinBox)):
-                widget.valueChanged.connect(lambda _v: self.dataChanged.emit())
-            elif isinstance(widget, QCheckBox):
-                widget.stateChanged.connect(lambda _v: self.dataChanged.emit())
-            elif isinstance(widget, QLineEdit):
-                widget.textChanged.connect(lambda _t: self.dataChanged.emit())
-
-        btn = QPushButton("删")
-        btn.clicked.connect(lambda: self._remove_row(btn))
-        self._table.setCellWidget(row, len(self._columns), btn)
-        self._refresh_table_height()
-        self.dataChanged.emit()
-
-    def _remove_row(self, button: QPushButton) -> None:
-        op_col = len(self._columns)
-        for row in range(self._table.rowCount()):
-            if self._table.cellWidget(row, op_col) is button:
-                self._table.removeRow(row)
-                self._refresh_table_height()
-                self.dataChanged.emit()
-                return
-
-    def set_payload(self, payload: list[dict[str, object]]) -> None:
-        self._table.setRowCount(0)
-        for row in payload:
-            if isinstance(row, dict):
-                self._add_row(row)
-        self._refresh_table_height()
-
-    def _refresh_table_height(self) -> None:
-        self._table.resizeRowsToContents()
-        header_h = self._table.horizontalHeader().height()
-        frame_h = self._table.frameWidth() * 2
-        rows_h = sum(self._table.rowHeight(r) for r in range(self._table.rowCount()))
-        min_rows = 1
-        if self._table.rowCount() < min_rows:
-            rows_h += self._table.verticalHeader().defaultSectionSize() * (min_rows - self._table.rowCount())
-        self._table.setFixedHeight(header_h + rows_h + frame_h + 2)
-
-    def export_payload(self) -> list[dict[str, object]]:
-        rows: list[dict[str, object]] = []
-        for row in range(self._table.rowCount()):
-            payload: dict[str, object] = {"BuildingType": self._building_type}
-            empty_first = False
-            for col, spec in enumerate(self._columns):
-                widget = self._table.cellWidget(row, col)
-                value: object = ""
-                if isinstance(widget, BaseTemplateWidget):
-                    value = _safe_text(_first_non_empty(widget.export_data()))
-                elif isinstance(widget, QSpinBox):
-                    value = int(widget.value())
-                elif isinstance(widget, QDoubleSpinBox):
-                    value = float(widget.value())
-                elif isinstance(widget, QCheckBox):
-                    value = 1 if widget.isChecked() else 0
-                elif isinstance(widget, QLineEdit):
-                    value = _safe_text(widget.text())
-                if col == 0 and _safe_text(value) == "":
-                    empty_first = True
-                payload[spec.key] = value
-            if not empty_first:
-                rows.append(payload)
-        return rows
-
-
-class BuildingReplacesSubTableEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._building_type = ""
-        self._building_type_display = QLineEdit()
-        self._building_type_display.setReadOnly(True)
-        self._replaces_widget = build_template_widget("building_search_no_trait")
-        if hasattr(self._replaces_widget, "set_label_text"):
-            self._replaces_widget.set_label_text("")
-
-        group = QGroupBox("BuildingReplaces")
-        layout = QVBoxLayout(group)
-        tip = QLabel(_building_table_hint("BuildingReplaces"))
-        tip.setWordWrap(True)
-        layout.addWidget(tip)
-
-        grid = QGridLayout()
-        def _cell(label: str, widget: QWidget) -> QWidget:
-            holder = QWidget()
-            row = QHBoxLayout(holder)
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            title = QLabel(label)
-            title.setMinimumWidth(120)
-            row.addWidget(title)
-            row.addWidget(widget, 1)
-            return holder
-
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("BuildingReplaces", "CivUniqueBuildingType"), fallback_key="CivUniqueBuildingType"), self._building_type_display), 0, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("BuildingReplaces", "ReplacesBuildingType"), fallback_key="ReplacesBuildingType"), self._replaces_widget), 0, 1)
-        layout.addLayout(grid)
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.addWidget(group)
-
-        if hasattr(self._replaces_widget, "dataChanged"):
-            self._replaces_widget.dataChanged.connect(self.dataChanged.emit)
-
-    def set_building_type(self, building_type: str) -> None:
-        self._building_type = _safe_text(building_type)
-        self._building_type_display.setText(self._building_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        if hasattr(self._replaces_widget, "set_current_value"):
-            self._replaces_widget.set_current_value(_safe_text(payload.get("ReplacesBuildingType")) or None)
-
-    def export_payload(self) -> dict[str, object]:
-        replaces_type = ""
-        if isinstance(self._replaces_widget, BaseTemplateWidget):
-            replaces_type = _safe_text(_first_non_empty(self._replaces_widget.export_data()))
-        return {
-            "CivUniqueBuildingType": self._building_type,
-            "ReplacesBuildingType": replaces_type,
-        }
-
-
-class BuildingConditionsSingleEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._building_type = ""
-        self._building_type_display = QLineEdit()
-        self._building_type_display.setReadOnly(True)
-        self._unlocks_from_effect = QCheckBox("UnlocksFromEffect")
-        _normalize_checkbox_caption(self._unlocks_from_effect)
-        _attach_hover_param_tooltip(self._unlocks_from_effect, "UnlocksFromEffect")
-
-        group = QGroupBox("BuildingConditions")
-        layout = QVBoxLayout(group)
-        tip = QLabel(_building_table_hint("BuildingConditions"))
-        tip.setWordWrap(True)
-        layout.addWidget(tip)
-
-        grid = QGridLayout()
-        grid.setContentsMargins(8, 6, 8, 6)
-        grid.setHorizontalSpacing(12)
-        grid.setVerticalSpacing(8)
-
-        def _cell(label: str, widget: QWidget) -> QWidget:
-            holder = QWidget()
-            row = QHBoxLayout(holder)
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
-            title = QLabel(label)
-            title.setMinimumWidth(180)
-            row.addWidget(title)
-            row.addWidget(widget, 1)
-            return holder
-
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("BuildingConditions", "BuildingType"), fallback_key="BuildingType"), self._building_type_display), 0, 0)
-        grid.addWidget(_cell(_param_display_text(zh_text=_building_param_zh("BuildingConditions", "UnlocksFromEffect"), fallback_key="UnlocksFromEffect"), self._unlocks_from_effect), 0, 1)
-        layout.addLayout(grid)
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.addWidget(group)
-
-        self._unlocks_from_effect.stateChanged.connect(lambda _v: self.dataChanged.emit())
-
-    def set_building_type(self, building_type: str) -> None:
-        self._building_type = _safe_text(building_type)
-        self._building_type_display.setText(self._building_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        self._unlocks_from_effect.setChecked(bool(int(payload.get("UnlocksFromEffect", 0) or 0)))
-
-    def export_payload(self) -> dict[str, object]:
-        return {
-            "BuildingType": self._building_type,
-            "UnlocksFromEffect": 1 if self._unlocks_from_effect.isChecked() else 0,
-        }
 
 
 class BuildingGreatWorksEditor(QWidget):
@@ -3258,97 +2474,143 @@ class BuildingCompositeEditor(QWidget):
             image_widget_factory=image_widget_factory,
         )
 
-        self._xp2_editor = BuildingsXP2SubTableEditor()
-        self._replaces_editor = BuildingReplacesSubTableEditor()
-        self._prereqs_editor = _BuildingRowsTableEditor(
+        self._xp2_editor = _SingleRowTableEditor(
+            table_name="Buildings_XP2",
+            hint_text=_building_table_hint("Buildings_XP2"),
+            owner_key="BuildingType",
+            columns=[
+                _ColumnSpec("RequiredPower", "运行所需电力", "int"),
+                _ColumnSpec("ResourceTypeConvertedToPower", "ResourceTypeConvertedToPower", "template", "resource_strategic"),
+                _ColumnSpec("CostMultiplierPerTile", "每地块成本倍率", "int"),
+                _ColumnSpec("CostMultiplierPerSeaLevel", "每级海平面成本倍率", "int"),
+                _ColumnSpec("EntertainmentBonusWithPower", "通电后额外宜居度", "int"),
+                _ColumnSpec("PreventsFloods", "防洪", "bool"),
+                _ColumnSpec("PreventsDrought", "防旱", "bool"),
+                _ColumnSpec("BlocksCoastalFlooding", "阻挡沿海洪水", "bool"),
+                _ColumnSpec("Bridge", "桥梁", "bool"),
+                _ColumnSpec("CanalWonder", "运河奇观", "bool"),
+                _ColumnSpec("NuclearReactor", "核反应堆", "bool"),
+                _ColumnSpec("Pillage", "可被劫掠", "bool"),
+            ],
+            defaults={"Pillage": 1},
+        )
+        self._replaces_editor = _SingleRowTableEditor(
+            table_name="BuildingReplaces",
+            hint_text=_building_table_hint("BuildingReplaces"),
+            owner_key="CivUniqueBuildingType",
+            columns=[
+                _ColumnSpec("ReplacesBuildingType", "ReplacesBuildingType", "template", "building_search_no_trait"),
+            ],
+        )
+        self._conditions_editor = _SingleRowTableEditor(
+            table_name="BuildingConditions",
+            hint_text=_building_table_hint("BuildingConditions"),
+            owner_key="BuildingType",
+            columns=[
+                _ColumnSpec("UnlocksFromEffect", "效果解锁", "bool"),
+            ],
+        )
+        self._prereqs_editor = _RowsTableEditor(
             table_name="BuildingPrereqs",
             hint_text=_building_table_hint("BuildingPrereqs"),
-            columns=[_BuildingRowColumnSpec("PrereqBuilding", "PrereqBuilding", "template", "building_search_all")],
+            owner_key="BuildingType",
+            columns=[_ColumnSpec("PrereqBuilding", "PrereqBuilding", "template", "building_search_all")],
         )
-        self._citizen_yield_editor = _BuildingRowsTableEditor(
+        self._citizen_yield_editor = _RowsTableEditor(
             table_name="Building_CitizenYieldChanges",
             hint_text=_building_table_hint("Building_CitizenYieldChanges"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _BuildingRowColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "产出变化", "int"),
             ],
         )
-        self._gp_editor = _BuildingRowsTableEditor(
+        self._gp_editor = _RowsTableEditor(
             table_name="Building_GreatPersonPoints",
             hint_text=_building_table_hint("Building_GreatPersonPoints"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("GreatPersonClassType", "GreatPersonClassType", "template", "great_person_class"),
-                _BuildingRowColumnSpec("PointsPerTurn", "PointsPerTurn", "int"),
+                _ColumnSpec("GreatPersonClassType", "GreatPersonClassType", "template", "great_person_class"),
+                _ColumnSpec("PointsPerTurn", "每回合点数", "int"),
             ],
         )
-        self._required_features_editor = _BuildingRowsTableEditor(
+        self._required_features_editor = _RowsTableEditor(
             table_name="Building_RequiredFeatures",
             hint_text=_building_table_hint("Building_RequiredFeatures"),
-            columns=[_BuildingRowColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
+            owner_key="BuildingType",
+            columns=[_ColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
         )
-        self._tourism_bombs_editor = _BuildingRowsTableEditor(
+        self._tourism_bombs_editor = _RowsTableEditor(
             table_name="Building_TourismBombs_XP2",
             hint_text=_building_table_hint("Building_TourismBombs_XP2"),
-            columns=[_BuildingRowColumnSpec("TourismBombValue", "TourismBombValue", "int")],
+            owner_key="BuildingType",
+            columns=[_ColumnSpec("TourismBombValue", "旅游业绩炸弹数值", "int")],
         )
-        self._resource_costs_editor = _BuildingRowsTableEditor(
+        self._resource_costs_editor = _RowsTableEditor(
             table_name="Building_ResourceCosts",
             hint_text=_building_table_hint("Building_ResourceCosts"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("ResourceType", "ResourceType", "template", "resource_strategic"),
-                _BuildingRowColumnSpec("StartProductionCost", "StartProductionCost", "int"),
-                _BuildingRowColumnSpec("PerTurnMaintenanceCost", "PerTurnMaintenanceCost", "int"),
+                _ColumnSpec("ResourceType", "ResourceType", "template", "resource_strategic"),
+                _ColumnSpec("StartProductionCost", "初始生产成本", "int"),
+                _ColumnSpec("PerTurnMaintenanceCost", "每回合维护成本", "int"),
             ],
         )
-        self._valid_features_editor = _BuildingRowsTableEditor(
+        self._valid_features_editor = _RowsTableEditor(
             table_name="Building_ValidFeatures",
             hint_text=_building_table_hint("Building_ValidFeatures"),
-            columns=[_BuildingRowColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
+            owner_key="BuildingType",
+            columns=[_ColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
         )
-        self._valid_terrains_editor = _BuildingRowsTableEditor(
+        self._valid_terrains_editor = _RowsTableEditor(
             table_name="Building_ValidTerrains",
             hint_text=_building_table_hint("Building_ValidTerrains"),
-            columns=[_BuildingRowColumnSpec("TerrainType", "TerrainType", "template", "terrain")],
+            owner_key="BuildingType",
+            columns=[_ColumnSpec("TerrainType", "TerrainType", "template", "terrain")],
         )
-        self._yield_changes_editor = _BuildingRowsTableEditor(
+        self._yield_changes_editor = _RowsTableEditor(
             table_name="Building_YieldChanges",
             hint_text=_building_table_hint("Building_YieldChanges"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _BuildingRowColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "产出变化", "int"),
             ],
         )
-        self._yield_power_editor = _BuildingRowsTableEditor(
+        self._yield_power_editor = _RowsTableEditor(
             table_name="Building_YieldChangesBonusWithPower",
             hint_text=_building_table_hint("Building_YieldChangesBonusWithPower"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _BuildingRowColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "产出变化", "int"),
             ],
         )
-        self._yield_district_copies_editor = _BuildingRowsTableEditor(
+        self._yield_district_copies_editor = _RowsTableEditor(
             table_name="Building_YieldDistrictCopies",
             hint_text=_building_table_hint("Building_YieldDistrictCopies"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("OldYieldType", "OldYieldType", "template", "yield"),
-                _BuildingRowColumnSpec("NewYieldType", "NewYieldType", "template", "yield"),
+                _ColumnSpec("OldYieldType", "OldYieldType", "template", "yield"),
+                _ColumnSpec("NewYieldType", "NewYieldType", "template", "yield"),
             ],
         )
-        self._yields_per_era_editor = _BuildingRowsTableEditor(
+        self._yields_per_era_editor = _RowsTableEditor(
             table_name="Building_YieldsPerEra",
             hint_text=_building_table_hint("Building_YieldsPerEra"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _BuildingRowColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "产出变化", "int"),
             ],
         )
-        self._conditions_editor = BuildingConditionsSingleEditor()
-        self._build_charge_prod_editor = _BuildingRowsTableEditor(
+        self._build_charge_prod_editor = _RowsTableEditor(
             table_name="Building_BuildChargeProductions",
             hint_text=_building_table_hint("Building_BuildChargeProductions"),
+            owner_key="BuildingType",
             columns=[
-                _BuildingRowColumnSpec("UnitType", "UnitType", "template", "unit_search"),
-                _BuildingRowColumnSpec("PercentProductionPerCharge", "PercentProductionPerCharge", "int"),
+                _ColumnSpec("UnitType", "UnitType", "template", "unit_search"),
+                _ColumnSpec("PercentProductionPerCharge", "每次建造次数生产百分比", "int"),
             ],
         )
         self._greatworks_editor = BuildingGreatWorksEditor()
@@ -3375,57 +2637,38 @@ class BuildingCompositeEditor(QWidget):
         ):
             editor.dataChanged.connect(self._emit_data_changed)
 
-        def _top_cell(widget: QWidget) -> QWidget:
-            holder = QWidget()
-            holder_layout = QVBoxLayout(holder)
-            holder_layout.setContentsMargins(0, 0, 0, 0)
-            holder_layout.setSpacing(0)
-            holder_layout.addWidget(widget, 0, Qt.AlignmentFlag.AlignTop)
-            holder_layout.addStretch(1)
-            return holder
-
-        def _pair_row(left: QWidget, right: QWidget) -> QWidget:
-            row_holder = QWidget()
-            row_layout = QHBoxLayout(row_holder)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            row_layout.setSpacing(10)
-            row_layout.addWidget(_top_cell(left), 1)
-            row_layout.addWidget(_top_cell(right), 1)
-            return row_holder
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(10)
         layout.addWidget(self._main_editor)
-        layout.addWidget(self._xp2_editor)
-        layout.addWidget(_pair_row(self._replaces_editor, self._prereqs_editor))
-        layout.addWidget(_pair_row(self._resource_costs_editor, self._yield_changes_editor))
-        layout.addWidget(_pair_row(self._yield_power_editor, self._citizen_yield_editor))
-        layout.addWidget(_pair_row(self._yields_per_era_editor, self._gp_editor))
-        layout.addWidget(_pair_row(self._tourism_bombs_editor, self._required_features_editor))
+        layout.addWidget(_pair_row(self._xp2_editor, self._replaces_editor))
+        layout.addWidget(_pair_row(self._prereqs_editor, self._citizen_yield_editor))
+        layout.addWidget(_pair_row(self._gp_editor, self._required_features_editor))
+        layout.addWidget(_pair_row(self._tourism_bombs_editor, self._resource_costs_editor))
         layout.addWidget(_pair_row(self._valid_features_editor, self._valid_terrains_editor))
-        layout.addWidget(_pair_row(self._conditions_editor, self._yield_district_copies_editor))
-        layout.addWidget(self._build_charge_prod_editor)
+        layout.addWidget(_pair_row(self._yield_changes_editor, self._yield_power_editor))
+        layout.addWidget(_pair_row(self._yield_district_copies_editor, self._yields_per_era_editor))
+        layout.addWidget(_pair_row(self._build_charge_prod_editor, self._conditions_editor))
         layout.addWidget(self._greatworks_editor)
 
     def _sync_building_type(self) -> None:
         building_type = self._main_editor.current_type()
-        self._xp2_editor.set_building_type(building_type)
-        self._replaces_editor.set_building_type(building_type)
-        self._prereqs_editor.set_building_type(building_type)
-        self._citizen_yield_editor.set_building_type(building_type)
-        self._gp_editor.set_building_type(building_type)
-        self._required_features_editor.set_building_type(building_type)
-        self._tourism_bombs_editor.set_building_type(building_type)
-        self._resource_costs_editor.set_building_type(building_type)
-        self._valid_features_editor.set_building_type(building_type)
-        self._valid_terrains_editor.set_building_type(building_type)
-        self._yield_changes_editor.set_building_type(building_type)
-        self._yield_power_editor.set_building_type(building_type)
-        self._yield_district_copies_editor.set_building_type(building_type)
-        self._yields_per_era_editor.set_building_type(building_type)
-        self._conditions_editor.set_building_type(building_type)
-        self._build_charge_prod_editor.set_building_type(building_type)
+        self._xp2_editor.set_owner_type(building_type)
+        self._replaces_editor.set_owner_type(building_type)
+        self._conditions_editor.set_owner_type(building_type)
+        self._prereqs_editor.set_owner_type(building_type)
+        self._citizen_yield_editor.set_owner_type(building_type)
+        self._gp_editor.set_owner_type(building_type)
+        self._required_features_editor.set_owner_type(building_type)
+        self._tourism_bombs_editor.set_owner_type(building_type)
+        self._resource_costs_editor.set_owner_type(building_type)
+        self._valid_features_editor.set_owner_type(building_type)
+        self._valid_terrains_editor.set_owner_type(building_type)
+        self._yield_changes_editor.set_owner_type(building_type)
+        self._yield_power_editor.set_owner_type(building_type)
+        self._yield_district_copies_editor.set_owner_type(building_type)
+        self._yields_per_era_editor.set_owner_type(building_type)
+        self._build_charge_prod_editor.set_owner_type(building_type)
         self._greatworks_editor.set_building_type(building_type)
 
     def _handle_main_changed(self) -> None:
@@ -3533,19 +2776,19 @@ class BuildingCompositeEditor(QWidget):
 
 
 @dataclass(slots=True)
-class _UnitColumnSpec:
+class _ColumnSpec:
     key: str
     label: str
     kind: str  # template/int/real/bool/text
     template_key: str | None = None
 
 
-class _UnitRowsTableEditor(QWidget):
+class _RowsTableEditor(QWidget):
     dataChanged = pyqtSignal()
 
-    def __init__(self, *, table_name: str, hint_text: str, owner_key: str, columns: list[_UnitColumnSpec]) -> None:
+    def __init__(self, *, table_name: str, hint_text: str, owner_key: str, columns: list[_ColumnSpec]) -> None:
         super().__init__()
-        self._unit_type = ""
+        self._owner_value = ""
         self._owner_key = owner_key
         self._columns = columns
         self._base_column_widths: list[int] = []
@@ -3561,9 +2804,9 @@ class _UnitRowsTableEditor(QWidget):
         top = QHBoxLayout()
         self._top_layout = top
         top.addWidget(QLabel(owner_key))
-        self._unit_type_display = QLineEdit()
-        self._unit_type_display.setReadOnly(True)
-        top.addWidget(self._unit_type_display, 1)
+        self._owner_value_display = QLineEdit()
+        self._owner_value_display.setReadOnly(True)
+        top.addWidget(self._owner_value_display, 1)
         self._add_btn = QPushButton("＋ 添加行")
         self._add_btn.clicked.connect(self._add_row)
         top.addWidget(self._add_btn)
@@ -3623,11 +2866,11 @@ class _UnitRowsTableEditor(QWidget):
         super().resizeEvent(event)
         self._apply_proportional_column_widths()
 
-    def set_unit_type(self, unit_type: str) -> None:
-        self._unit_type = _safe_text(unit_type)
-        self._unit_type_display.setText(self._unit_type)
+    def set_owner_type(self, owner_value: str) -> None:
+        self._owner_value = _safe_text(owner_value)
+        self._owner_value_display.setText(self._owner_value)
 
-    def _create_cell_widget(self, spec: _UnitColumnSpec, seed: dict[str, object] | None) -> QWidget:
+    def _create_cell_widget(self, spec: _ColumnSpec, seed: dict[str, object] | None) -> QWidget:
         if spec.kind == "template" and spec.template_key:
             widget = build_template_widget(spec.template_key)
             if hasattr(widget, "set_label_text"):
@@ -3705,7 +2948,7 @@ class _UnitRowsTableEditor(QWidget):
     def export_payload(self) -> list[dict[str, object]]:
         rows: list[dict[str, object]] = []
         for row in range(self._table.rowCount()):
-            payload: dict[str, object] = {self._owner_key: self._unit_type}
+            payload: dict[str, object] = {self._owner_key: self._owner_value}
             empty_first = False
             for col, spec in enumerate(self._columns):
                 widget = self._table.cellWidget(row, col)
@@ -3728,13 +2971,15 @@ class _UnitRowsTableEditor(QWidget):
         return rows
 
 
-class _UnitSingleRowEditor(QWidget):
+class _SingleRowTableEditor(QWidget):
     dataChanged = pyqtSignal()
 
-    def __init__(self, *, table_name: str, hint_text: str, owner_key: str, columns: list[_UnitColumnSpec]) -> None:
+    def __init__(self, *, table_name: str, hint_text: str, owner_key: str, columns: list[_ColumnSpec],
+                 defaults: dict[str, object] | None = None) -> None:
         super().__init__()
         self._owner_key = owner_key
-        self._unit_type = ""
+        self._owner_value = ""
+        self._defaults = dict(defaults or {})
         self._widgets: dict[str, QWidget] = {}
 
         group = QGroupBox(table_name)
@@ -3824,13 +3069,15 @@ class _UnitSingleRowEditor(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.addWidget(group)
 
-    def set_unit_type(self, unit_type: str) -> None:
-        self._unit_type = _safe_text(unit_type)
-        self._owner_display.setText(self._unit_type)
+    def set_owner_type(self, owner_value: str) -> None:
+        self._owner_value = _safe_text(owner_value)
+        self._owner_display.setText(self._owner_value)
 
     def set_payload(self, payload: dict[str, object]) -> None:
         for key, widget in self._widgets.items():
             value = payload.get(key)
+            if value is None:
+                value = self._defaults.get(key, 0)
             if isinstance(widget, BaseTemplateWidget) and hasattr(widget, "set_current_value"):
                 widget.set_current_value(_safe_text(value) or None)
             elif isinstance(widget, QSpinBox):
@@ -3843,7 +3090,7 @@ class _UnitSingleRowEditor(QWidget):
                 widget.setText(_safe_text(value))
 
     def export_payload(self) -> dict[str, object]:
-        payload: dict[str, object] = {self._owner_key: self._unit_type}
+        payload: dict[str, object] = {self._owner_key: self._owner_value}
         for key, widget in self._widgets.items():
             if isinstance(widget, BaseTemplateWidget):
                 payload[key] = _safe_text(_first_non_empty(widget.export_data()))
@@ -3858,7 +3105,7 @@ class _UnitSingleRowEditor(QWidget):
         return payload
 
 
-class UnitReplacesSingleEditor(_UnitSingleRowEditor):
+class UnitReplacesSingleEditor(_SingleRowTableEditor):
     replacesChanged = pyqtSignal(str)
 
     def __init__(self) -> None:
@@ -3866,7 +3113,7 @@ class UnitReplacesSingleEditor(_UnitSingleRowEditor):
             table_name="UnitReplaces",
             hint_text="特色单位替代关系。",
             owner_key="CivUniqueUnitType",
-            columns=[_UnitColumnSpec("ReplacesUnitType", "ReplacesUnitType", "template", "unit_search_no_trait")],
+            columns=[_ColumnSpec("ReplacesUnitType", "ReplacesUnitType", "template", "unit_search_no_trait")],
         )
         widget = self._widgets.get("ReplacesUnitType")
         if isinstance(widget, BaseTemplateWidget):
@@ -3961,120 +3208,6 @@ class UnitUpgradesSingleEditor(QWidget):
         return {"Unit": self._unit_type, "UpgradeUnit": value}
 
 
-class UnitsXP2SingleEditor(QWidget):
-    dataChanged = pyqtSignal()
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._unit_type = ""
-        self._unit_display = QLineEdit()
-        self._unit_display.setReadOnly(True)
-
-        self._resource_maintenance_amount = QSpinBox(); self._resource_maintenance_amount.setRange(0, 999999)
-        self._resource_cost = QSpinBox(); self._resource_cost.setRange(0, 999999)
-        self._resource_maintenance_type = build_template_widget("resource_strategic")
-        if hasattr(self._resource_maintenance_type, "set_label_text"):
-            self._resource_maintenance_type.set_label_text("")
-        self._tourism_bomb = QSpinBox(); self._tourism_bomb.setRange(0, 999999)
-
-        self._can_earn_experience = QCheckBox(); _normalize_checkbox_caption(self._can_earn_experience)
-        self._tourism_bomb_possible = QCheckBox(); _normalize_checkbox_caption(self._tourism_bomb_possible)
-        self._can_form_military = QCheckBox(); _normalize_checkbox_caption(self._can_form_military)
-        self._major_civ_only = QCheckBox(); _normalize_checkbox_caption(self._major_civ_only)
-        self._can_cause_disasters = QCheckBox(); _normalize_checkbox_caption(self._can_cause_disasters)
-        self._can_sacrifice_units = QCheckBox(); _normalize_checkbox_caption(self._can_sacrifice_units)
-
-        for widget, key in (
-            (self._resource_maintenance_amount, "ResourceMaintenanceAmount"),
-            (self._resource_cost, "ResourceCost"),
-            (self._tourism_bomb, "TourismBomb"),
-            (self._can_earn_experience, "CanEarnExperience"),
-            (self._tourism_bomb_possible, "TourismBombPossible"),
-            (self._can_form_military, "CanFormMilitaryFormation"),
-            (self._major_civ_only, "MajorCivOnly"),
-            (self._can_cause_disasters, "CanCauseDisasters"),
-            (self._can_sacrifice_units, "CanSacrificeUnits"),
-        ):
-            _attach_hover_param_tooltip(widget, key)
-
-        group = QGroupBox("Units_XP2")
-        layout = QVBoxLayout(group)
-        tip = QLabel("单位 XP2 扩展参数。")
-        tip.setWordWrap(True)
-        layout.addWidget(tip)
-        grid = QGridLayout()
-
-        def _cell(label: str, widget: QWidget) -> QWidget:
-            holder = QWidget(); row = QHBoxLayout(holder)
-            row.setContentsMargins(0, 0, 0, 0); row.setSpacing(6)
-            title = QLabel(label); title.setMinimumWidth(190)
-            row.addWidget(title); row.addWidget(widget, 1)
-            return holder
-
-        grid.addWidget(_cell("UnitType", self._unit_display), 0, 0)
-        grid.addWidget(_cell("ResourceMaintenanceAmount", self._resource_maintenance_amount), 0, 1)
-        grid.addWidget(_cell("ResourceCost", self._resource_cost), 1, 0)
-        grid.addWidget(_cell("ResourceMaintenanceType", self._resource_maintenance_type), 1, 1)
-        grid.addWidget(_cell("TourismBomb", self._tourism_bomb), 2, 0)
-        grid.addWidget(_cell("CanEarnExperience", self._can_earn_experience), 2, 1)
-        grid.addWidget(_cell("TourismBombPossible", self._tourism_bomb_possible), 3, 0)
-        grid.addWidget(_cell("CanFormMilitaryFormation", self._can_form_military), 3, 1)
-        grid.addWidget(_cell("MajorCivOnly", self._major_civ_only), 4, 0)
-        grid.addWidget(_cell("CanCauseDisasters", self._can_cause_disasters), 4, 1)
-        grid.addWidget(_cell("CanSacrificeUnits", self._can_sacrifice_units), 5, 0)
-        layout.addLayout(grid)
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.addWidget(group)
-
-        for widget in (self._resource_maintenance_amount, self._resource_cost, self._tourism_bomb):
-            widget.valueChanged.connect(lambda _v: self.dataChanged.emit())
-        for widget in (
-            self._can_earn_experience,
-            self._tourism_bomb_possible,
-            self._can_form_military,
-            self._major_civ_only,
-            self._can_cause_disasters,
-            self._can_sacrifice_units,
-        ):
-            widget.stateChanged.connect(lambda _v: self.dataChanged.emit())
-        if hasattr(self._resource_maintenance_type, "dataChanged"):
-            self._resource_maintenance_type.dataChanged.connect(self.dataChanged.emit)
-
-    def set_unit_type(self, unit_type: str) -> None:
-        self._unit_type = _safe_text(unit_type)
-        self._unit_display.setText(self._unit_type)
-
-    def set_payload(self, payload: dict[str, object]) -> None:
-        self._resource_maintenance_amount.setValue(int(payload.get("ResourceMaintenanceAmount", 0) or 0))
-        self._resource_cost.setValue(int(payload.get("ResourceCost", 0) or 0))
-        if hasattr(self._resource_maintenance_type, "set_current_value"):
-            self._resource_maintenance_type.set_current_value(_safe_text(payload.get("ResourceMaintenanceType")) or None)
-        self._tourism_bomb.setValue(int(payload.get("TourismBomb", 0) or 0))
-        self._can_earn_experience.setChecked(bool(int(payload.get("CanEarnExperience", 1) or 1)))
-        self._tourism_bomb_possible.setChecked(bool(int(payload.get("TourismBombPossible", 0) or 0)))
-        self._can_form_military.setChecked(bool(int(payload.get("CanFormMilitaryFormation", 1) or 1)))
-        self._major_civ_only.setChecked(bool(int(payload.get("MajorCivOnly", 0) or 0)))
-        self._can_cause_disasters.setChecked(bool(int(payload.get("CanCauseDisasters", 0) or 0)))
-        self._can_sacrifice_units.setChecked(bool(int(payload.get("CanSacrificeUnits", 0) or 0)))
-
-    def export_payload(self) -> dict[str, object]:
-        resource_type = ""
-        if isinstance(self._resource_maintenance_type, BaseTemplateWidget):
-            resource_type = _safe_text(_first_non_empty(self._resource_maintenance_type.export_data()))
-        return {
-            "UnitType": self._unit_type,
-            "ResourceMaintenanceAmount": int(self._resource_maintenance_amount.value()),
-            "ResourceCost": int(self._resource_cost.value()),
-            "ResourceMaintenanceType": resource_type,
-            "TourismBomb": int(self._tourism_bomb.value()),
-            "CanEarnExperience": 1 if self._can_earn_experience.isChecked() else 0,
-            "TourismBombPossible": 1 if self._tourism_bomb_possible.isChecked() else 0,
-            "CanFormMilitaryFormation": 1 if self._can_form_military.isChecked() else 0,
-            "MajorCivOnly": 1 if self._major_civ_only.isChecked() else 0,
-            "CanCauseDisasters": 1 if self._can_cause_disasters.isChecked() else 0,
-            "CanSacrificeUnits": 1 if self._can_sacrifice_units.isChecked() else 0,
-        }
 
 
 class _UnitTagPickerDialog(QDialog):
@@ -4610,51 +3743,68 @@ class UnitCompositeEditor(QWidget):
             image_widget_factory=image_widget_factory,
         )
 
-        self._mode_editor = _UnitSingleRowEditor(
+        self._mode_editor = _SingleRowTableEditor(
             table_name="Units_MODE",
             hint_text="单位模式参数。",
             owner_key="UnitType",
-            columns=[_UnitColumnSpec("ActionCharges", "ActionCharges", "int")],
+            columns=[_ColumnSpec("ActionCharges", "行动次数", "int")],
         )
-        self._presentation_editor = _UnitSingleRowEditor(
+        self._presentation_editor = _SingleRowTableEditor(
             table_name="Units_Presentation",
             hint_text="单位显示参数。",
             owner_key="UnitType",
-            columns=[_UnitColumnSpec("UIFlagOffset", "UIFlagOffset", "int")],
+            columns=[_ColumnSpec("UIFlagOffset", "UI旗帜偏移", "int")],
         )
-        self._xp2_editor = UnitsXP2SingleEditor()
+        self._xp2_editor = _SingleRowTableEditor(
+            table_name="Units_XP2",
+            hint_text="单位 XP2 扩展参数。",
+            owner_key="UnitType",
+            columns=[
+                _ColumnSpec("ResourceMaintenanceAmount", "战略资源维护量", "int"),
+                _ColumnSpec("ResourceCost", "战略资源成本", "int"),
+                _ColumnSpec("ResourceMaintenanceType", "ResourceMaintenanceType", "template", "resource_strategic"),
+                _ColumnSpec("TourismBomb", "旅游业绩炸弹", "int"),
+                _ColumnSpec("CanEarnExperience", "可获得经验", "bool"),
+                _ColumnSpec("TourismBombPossible", "可触发旅游炸弹", "bool"),
+                _ColumnSpec("CanFormMilitaryFormation", "可组成军事编队", "bool"),
+                _ColumnSpec("MajorCivOnly", "仅主要文明", "bool"),
+                _ColumnSpec("CanCauseDisasters", "可引发灾害", "bool"),
+                _ColumnSpec("CanSacrificeUnits", "可牺牲单位", "bool"),
+            ],
+            defaults={"CanEarnExperience": 1, "CanFormMilitaryFormation": 1},
+        )
         self._replaces_editor = UnitReplacesSingleEditor()
         self._upgrades_editor = UnitUpgradesSingleEditor()
-        self._captures_editor = _UnitSingleRowEditor(
+        self._captures_editor = _SingleRowTableEditor(
             table_name="UnitCaptures",
             hint_text="捕获后转换单位。",
             owner_key="CapturedUnitType",
-            columns=[_UnitColumnSpec("BecomesUnitType", "BecomesUnitType", "template", "unit_search")],
+            columns=[_ColumnSpec("BecomesUnitType", "BecomesUnitType", "template", "unit_search")],
         )
-        self._retreats_editor = _UnitRowsTableEditor(
+        self._retreats_editor = _RowsTableEditor(
             table_name="UnitRetreats_XP1",
             hint_text="撤退规则。",
             owner_key="UnitType",
             columns=[
-                _UnitColumnSpec("UnitRetreatType", "UnitRetreatType", "text"),
-                _UnitColumnSpec("BuildingType", "BuildingType", "template", "building_search_all"),
-                _UnitColumnSpec("ImprovementType", "ImprovementType", "template", "improvement_search"),
+                _ColumnSpec("UnitRetreatType", "UnitRetreatType", "text"),
+                _ColumnSpec("BuildingType", "BuildingType", "template", "building_search_all"),
+                _ColumnSpec("ImprovementType", "ImprovementType", "template", "improvement_search"),
             ],
         )
-        self._building_prereqs_editor = _UnitRowsTableEditor(
+        self._building_prereqs_editor = _RowsTableEditor(
             table_name="Unit_BuildingPrereqs",
             hint_text="单位建筑前置。",
             owner_key="Unit",
             columns=[
-                _UnitColumnSpec("PrereqBuilding", "PrereqBuilding", "template", "building_search_all"),
-                _UnitColumnSpec("NumSupported", "NumSupported", "int"),
+                _ColumnSpec("PrereqBuilding", "PrereqBuilding", "template", "building_search_all"),
+                _ColumnSpec("NumSupported", "可支持单位数", "int"),
             ],
         )
-        self._ai_infos_editor = _UnitRowsTableEditor(
+        self._ai_infos_editor = _RowsTableEditor(
             table_name="UnitAiInfos",
             hint_text="AI 职能类型：定义 AI 将该单位用于何种用途（如 UNITAI_SCOUT=侦察、UNITAI_COMBAT=进攻、UNITAI_BUILDER=建造）。可点击搜索选择，也可直接输入。",
             owner_key="UnitType",
-            columns=[_UnitColumnSpec("AiType", "AI职能类型", "template", "unit_ai_type")],
+            columns=[_ColumnSpec("AiType", "AI职能类型", "template", "unit_ai_type")],
         )
         self._type_tags_editor = UnitTypeTagsEditor()
         self._type_properties_editor = UnitTypePropertiesEditor(_UNIT_TYPE_PROPERTIES_VALUE_MAP)
@@ -4679,24 +3829,6 @@ class UnitCompositeEditor(QWidget):
 
         self._replaces_editor.replacesChanged.connect(self._upgrades_editor.set_replaces_type)
 
-        def _top_cell(widget: QWidget) -> QWidget:
-            holder = QWidget()
-            holder_layout = QVBoxLayout(holder)
-            holder_layout.setContentsMargins(0, 0, 0, 0)
-            holder_layout.setSpacing(0)
-            holder_layout.addWidget(widget, 0, Qt.AlignmentFlag.AlignTop)
-            holder_layout.addStretch(1)
-            return holder
-
-        def _pair_row(left: QWidget, right: QWidget) -> QWidget:
-            row_holder = QWidget()
-            row_layout = QHBoxLayout(row_holder)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            row_layout.setSpacing(10)
-            row_layout.addWidget(_top_cell(left), 1)
-            row_layout.addWidget(_top_cell(right), 1)
-            return row_holder
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(10)
@@ -4704,24 +3836,23 @@ class UnitCompositeEditor(QWidget):
         layout.addWidget(self._xp2_editor)
         layout.addWidget(_pair_row(self._mode_editor, self._presentation_editor))
         layout.addWidget(_pair_row(self._replaces_editor, self._upgrades_editor))
-        layout.addWidget(self._captures_editor)
+        layout.addWidget(_pair_row(self._captures_editor, self._ai_infos_editor))
         layout.addWidget(_pair_row(self._retreats_editor, self._building_prereqs_editor))
         layout.addWidget(self._type_tags_editor)
-        layout.addWidget(self._ai_infos_editor)
         layout.addWidget(self._type_properties_editor)
         layout.addWidget(self._ability_bindings_editor)
 
     def _sync_unit_type(self) -> None:
         unit_type = self._main_editor.current_type()
-        self._mode_editor.set_unit_type(unit_type)
-        self._presentation_editor.set_unit_type(unit_type)
-        self._xp2_editor.set_unit_type(unit_type)
-        self._replaces_editor.set_unit_type(unit_type)
+        self._mode_editor.set_owner_type(unit_type)
+        self._presentation_editor.set_owner_type(unit_type)
+        self._xp2_editor.set_owner_type(unit_type)
+        self._replaces_editor.set_owner_type(unit_type)
         self._upgrades_editor.set_unit_type(unit_type)
-        self._captures_editor.set_unit_type(unit_type)
-        self._retreats_editor.set_unit_type(unit_type)
-        self._building_prereqs_editor.set_unit_type(unit_type)
-        self._ai_infos_editor.set_unit_type(unit_type)
+        self._captures_editor.set_owner_type(unit_type)
+        self._retreats_editor.set_owner_type(unit_type)
+        self._building_prereqs_editor.set_owner_type(unit_type)
+        self._ai_infos_editor.set_owner_type(unit_type)
         self._type_tags_editor.set_unit_type(unit_type)
         self._type_properties_editor.set_unit_type(unit_type)
         self._ability_bindings_editor.set_unit_type(unit_type)
@@ -4857,22 +3988,22 @@ class ImprovementYieldsOutsideTerritoriesEditor(QWidget):
         return [{"ImprovementType": self._improvement_type}]
 
 
-class ImprovementBonusYieldChangesEditor(_UnitRowsTableEditor):
+class ImprovementBonusYieldChangesEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Improvement_BonusYieldChanges",
             hint_text="加成产出变化。ID 固定为 {完整Type}_{序数}。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _UnitColumnSpec("BonusYieldChange", "BonusYieldChange", "int"),
-                _UnitColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
-                _UnitColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("BonusYieldChange", "额外产出加成", "int"),
+                _ColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
+                _ColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
             ],
         )
 
     def set_improvement_type(self, improvement_type: str) -> None:
-        self.set_unit_type(improvement_type)
+        self.set_owner_type(improvement_type)
 
     def export_payload(self) -> list[dict[str, object]]:
         rows = super().export_payload()
@@ -4886,7 +4017,7 @@ class ImprovementBonusYieldChangesEditor(_UnitRowsTableEditor):
         return output
 
 
-class ImprovementYieldChangesFixedEditor(_UnitRowsTableEditor):
+class ImprovementYieldChangesFixedEditor(_RowsTableEditor):
     _DEFAULT_YIELDS = [
         "YIELD_GOLD",
         "YIELD_PRODUCTION",
@@ -4902,13 +4033,13 @@ class ImprovementYieldChangesFixedEditor(_UnitRowsTableEditor):
             hint_text="默认包含 6 种产出，初始值为 0。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("YieldType", "YieldType", "template", "yield"),
-                _UnitColumnSpec("YieldChange", "YieldChange", "int"),
+                _ColumnSpec("YieldType", "YieldType", "template", "yield"),
+                _ColumnSpec("YieldChange", "YieldChange", "int"),
             ],
         )
 
     def set_improvement_type(self, improvement_type: str) -> None:
-        self.set_unit_type(improvement_type)
+        self.set_owner_type(improvement_type)
 
     def set_payload(self, payload: list[dict[str, object]]) -> None:
         if payload:
@@ -4916,7 +4047,7 @@ class ImprovementYieldChangesFixedEditor(_UnitRowsTableEditor):
             return
         defaults = [
             {
-                "ImprovementType": self._unit_type,
+                "ImprovementType": self._owner_value,
                 "YieldType": yield_type,
                 "YieldChange": 0,
             }
@@ -4925,34 +4056,34 @@ class ImprovementYieldChangesFixedEditor(_UnitRowsTableEditor):
         super().set_payload(defaults)
 
 
-class ImprovementValidBuildUnitsEditor(_UnitRowsTableEditor):
+class ImprovementValidBuildUnitsEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Improvement_ValidBuildUnits",
             hint_text="可建造单位。默认自带一行 UNIT_BUILDER。",
             owner_key="ImprovementType",
-            columns=[_UnitColumnSpec("UnitType", "UnitType", "template", "unit_search")],
+            columns=[_ColumnSpec("UnitType", "UnitType", "template", "unit_search")],
         )
 
     def set_improvement_type(self, improvement_type: str) -> None:
-        self.set_unit_type(improvement_type)
+        self.set_owner_type(improvement_type)
 
     def set_payload(self, payload: list[dict[str, object]]) -> None:
         if payload:
             super().set_payload(payload)
             return
-        super().set_payload([{"ImprovementType": self._unit_type, "UnitType": "UNIT_BUILDER"}])
+        super().set_payload([{"ImprovementType": self._owner_value, "UnitType": "UNIT_BUILDER"}])
 
     def export_payload(self) -> list[dict[str, object]]:
         rows = super().export_payload()
         if rows:
             return rows
-        if self._unit_type:
-            return [{"ImprovementType": self._unit_type, "UnitType": "UNIT_BUILDER"}]
+        if self._owner_value:
+            return [{"ImprovementType": self._owner_value, "UnitType": "UNIT_BUILDER"}]
         return []
 
 
-class ImprovementValidTerrainsEditor(_UnitRowsTableEditor):
+class ImprovementValidTerrainsEditor(_RowsTableEditor):
     _FALLBACK_LAND_TERRAINS = [
         "TERRAIN_GRASS",
         "TERRAIN_PLAINS",
@@ -4967,9 +4098,9 @@ class ImprovementValidTerrainsEditor(_UnitRowsTableEditor):
             hint_text="需要地形。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("TerrainType", "TerrainType", "template", "terrain"),
-                _UnitColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
-                _UnitColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
+                _ColumnSpec("TerrainType", "TerrainType", "template", "terrain"),
+                _ColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
+                _ColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
             ],
         )
         self._add_land_btn = QPushButton("一键添加所有陆地")
@@ -5025,7 +4156,7 @@ class ImprovementValidTerrainsEditor(_UnitRowsTableEditor):
         return values
 
     def _add_all_land_terrains(self) -> None:
-        if not self._unit_type:
+        if not self._owner_value:
             QMessageBox.information(self, "提示", "请先填写改良设施 Type，再添加地形。")
             return
 
@@ -5036,7 +4167,7 @@ class ImprovementValidTerrainsEditor(_UnitRowsTableEditor):
                 continue
             self._add_row(
                 {
-                    self._owner_key: self._unit_type,
+                    self._owner_key: self._owner_value,
                     "TerrainType": terrain_type,
                     "PrereqTech": "",
                     "PrereqCivic": "",
@@ -5069,77 +4200,77 @@ class ImprovementCompositeEditor(QWidget):
             image_widget_factory=image_widget_factory,
         )
 
-        self._mode_editor = _UnitSingleRowEditor(
+        self._mode_editor = _SingleRowTableEditor(
             table_name="Improvements_MODE",
             hint_text="垄断公司模式参数。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("Industry", "Industry", "bool"),
-                _UnitColumnSpec("Corporation", "Corporation", "bool"),
+                _ColumnSpec("Industry", "产业", "bool"),
+                _ColumnSpec("Corporation", "公司", "bool"),
             ],
         )
-        self._xp2_editor = _UnitSingleRowEditor(
+        self._xp2_editor = _SingleRowTableEditor(
             table_name="Improvements_XP2",
             hint_text="资料片XP2参数。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("AllowImpassableMovement", "AllowImpassableMovement", "bool"),
-                _UnitColumnSpec("BuildOnAdjacentPlot", "BuildOnAdjacentPlot", "bool"),
-                _UnitColumnSpec("PreventsDrought", "PreventsDrought", "bool"),
-                _UnitColumnSpec("DisasterResistant", "DisasterResistant", "bool"),
+                _ColumnSpec("AllowImpassableMovement", "允许穿越不可通行地形", "bool"),
+                _ColumnSpec("BuildOnAdjacentPlot", "可在相邻地块建造", "bool"),
+                _ColumnSpec("PreventsDrought", "防旱", "bool"),
+                _ColumnSpec("DisasterResistant", "防灾", "bool"),
             ],
         )
-        self._tourism_editor = _UnitSingleRowEditor(
+        self._tourism_editor = _SingleRowTableEditor(
             table_name="Improvement_Tourism",
             hint_text="旅游业绩参数。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("TourismSource", "TourismSource", "template", "tourism_source"),
-                _UnitColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
-                _UnitColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
-                _UnitColumnSpec("ScalingFactor", "ScalingFactor", "int"),
+                _ColumnSpec("TourismSource", "旅游业绩来源", "template", "tourism_source"),
+                _ColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
+                _ColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
+                _ColumnSpec("ScalingFactor", "缩放系数", "int"),
             ],
         )
         self._outside_territories_editor = ImprovementYieldsOutsideTerritoriesEditor()
 
         self._bonus_yield_editor = ImprovementBonusYieldChangesEditor()
         self._yield_changes_editor = ImprovementYieldChangesFixedEditor()
-        self._invalid_adj_feature_editor = _UnitRowsTableEditor(
+        self._invalid_adj_feature_editor = _RowsTableEditor(
             table_name="Improvement_InvalidAdjacentFeatures",
             hint_text="排除相邻地貌。",
             owner_key="ImprovementType",
-            columns=[_UnitColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
+            columns=[_ColumnSpec("FeatureType", "FeatureType", "template", "feature_all")],
         )
-        self._valid_adj_resource_editor = _UnitRowsTableEditor(
+        self._valid_adj_resource_editor = _RowsTableEditor(
             table_name="Improvement_ValidAdjacentResources",
             hint_text="需要相邻资源。",
             owner_key="ImprovementType",
-            columns=[_UnitColumnSpec("ResourceType", "ResourceType", "template", "resource_search")],
+            columns=[_ColumnSpec("ResourceType", "ResourceType", "template", "resource_search")],
         )
-        self._valid_adj_terrain_editor = _UnitRowsTableEditor(
+        self._valid_adj_terrain_editor = _RowsTableEditor(
             table_name="Improvement_ValidAdjacentTerrains",
             hint_text="需要相邻地形。",
             owner_key="ImprovementType",
-            columns=[_UnitColumnSpec("TerrainType", "TerrainType", "template", "terrain")],
+            columns=[_ColumnSpec("TerrainType", "TerrainType", "template", "terrain")],
         )
         self._valid_build_units_editor = ImprovementValidBuildUnitsEditor()
-        self._valid_features_editor = _UnitRowsTableEditor(
+        self._valid_features_editor = _RowsTableEditor(
             table_name="Improvement_ValidFeatures",
             hint_text="需要地貌。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("FeatureType", "FeatureType", "template", "feature_all"),
-                _UnitColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
-                _UnitColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
+                _ColumnSpec("FeatureType", "FeatureType", "template", "feature_all"),
+                _ColumnSpec("PrereqTech", "PrereqTech", "template", "technology_search"),
+                _ColumnSpec("PrereqCivic", "PrereqCivic", "template", "civic_search"),
             ],
         )
-        self._valid_resources_editor = _UnitRowsTableEditor(
+        self._valid_resources_editor = _RowsTableEditor(
             table_name="Improvement_ValidResources",
             hint_text="需要资源。",
             owner_key="ImprovementType",
             columns=[
-                _UnitColumnSpec("ResourceType", "ResourceType", "template", "resource_search"),
-                _UnitColumnSpec("MustRemoveFeature", "MustRemoveFeature", "bool"),
+                _ColumnSpec("ResourceType", "ResourceType", "template", "resource_search"),
+                _ColumnSpec("MustRemoveFeature", "必须移除地貌", "bool"),
             ],
         )
         self._valid_terrains_editor = ImprovementValidTerrainsEditor()
@@ -5171,24 +4302,6 @@ class ImprovementCompositeEditor(QWidget):
             self._adjacency_editor,
         ):
             editor.dataChanged.connect(self._emit_data_changed)
-
-        def _top_cell(widget: QWidget) -> QWidget:
-            holder = QWidget()
-            holder_layout = QVBoxLayout(holder)
-            holder_layout.setContentsMargins(0, 0, 0, 0)
-            holder_layout.setSpacing(0)
-            holder_layout.addWidget(widget, 0, Qt.AlignmentFlag.AlignTop)
-            holder_layout.addStretch(1)
-            return holder
-
-        def _pair_row(left: QWidget, right: QWidget) -> QWidget:
-            row_holder = QWidget()
-            row_layout = QHBoxLayout(row_holder)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-            row_layout.setSpacing(10)
-            row_layout.addWidget(_top_cell(left), 1)
-            row_layout.addWidget(_top_cell(right), 1)
-            return row_holder
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -5223,19 +4336,19 @@ class ImprovementCompositeEditor(QWidget):
 
     def _sync_improvement_type(self) -> None:
         improvement_type = self._main_editor.current_type()
-        self._mode_editor.set_unit_type(improvement_type)
-        self._xp2_editor.set_unit_type(improvement_type)
-        self._tourism_editor.set_unit_type(improvement_type)
+        self._mode_editor.set_owner_type(improvement_type)
+        self._xp2_editor.set_owner_type(improvement_type)
+        self._tourism_editor.set_owner_type(improvement_type)
         self._outside_territories_editor.set_improvement_type(improvement_type)
         self._bonus_yield_editor.set_improvement_type(improvement_type)
         self._yield_changes_editor.set_improvement_type(improvement_type)
-        self._invalid_adj_feature_editor.set_unit_type(improvement_type)
-        self._valid_adj_resource_editor.set_unit_type(improvement_type)
-        self._valid_adj_terrain_editor.set_unit_type(improvement_type)
+        self._invalid_adj_feature_editor.set_owner_type(improvement_type)
+        self._valid_adj_resource_editor.set_owner_type(improvement_type)
+        self._valid_adj_terrain_editor.set_owner_type(improvement_type)
         self._valid_build_units_editor.set_improvement_type(improvement_type)
-        self._valid_features_editor.set_unit_type(improvement_type)
-        self._valid_resources_editor.set_unit_type(improvement_type)
-        self._valid_terrains_editor.set_unit_type(improvement_type)
+        self._valid_features_editor.set_owner_type(improvement_type)
+        self._valid_resources_editor.set_owner_type(improvement_type)
+        self._valid_terrains_editor.set_owner_type(improvement_type)
         self._type_properties_editor.set_unit_type(improvement_type)
         self._adjacency_editor.set_auto_context(self._build_adjacency_context())
 
@@ -5413,125 +4526,125 @@ class ProjectPrereqSelectorTemplate(BaseTemplateWidget):
         self.refresh_options(value)
 
 
-class ProjectsModeSingleEditor(_UnitSingleRowEditor):
+class ProjectsModeSingleEditor(_SingleRowTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Projects_MODE",
             hint_text=_project_table_hint("Projects_MODE"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("PrereqImprovement", _param_display_text(zh_text=_project_param_zh("Projects_MODE", "PrereqImprovement"), fallback_key="PrereqImprovement"), "template", "improvement_search"),
-                _UnitColumnSpec("ResourceType", _param_display_text(zh_text=_project_param_zh("Projects_MODE", "ResourceType"), fallback_key="ResourceType"), "template", "resource_search"),
+                _ColumnSpec("PrereqImprovement", _param_display_text(zh_text=_project_param_zh("Projects_MODE", "PrereqImprovement"), fallback_key="PrereqImprovement"), "template", "improvement_search"),
+                _ColumnSpec("ResourceType", _param_display_text(zh_text=_project_param_zh("Projects_MODE", "ResourceType"), fallback_key="ResourceType"), "template", "resource_search"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectsXP1SingleEditor(_UnitSingleRowEditor):
+class ProjectsXP1SingleEditor(_SingleRowTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Projects_XP1",
             hint_text=_project_table_hint("Projects_XP1"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("IdentityPerCitizenChange", _param_display_text(zh_text=_project_param_zh("Projects_XP1", "IdentityPerCitizenChange"), fallback_key="IdentityPerCitizenChange"), "real"),
-                _UnitColumnSpec("UnlocksFromEffect", _param_display_text(zh_text=_project_param_zh("Projects_XP1", "UnlocksFromEffect"), fallback_key="UnlocksFromEffect"), "bool"),
+                _ColumnSpec("IdentityPerCitizenChange", _param_display_text(zh_text=_project_param_zh("Projects_XP1", "IdentityPerCitizenChange"), fallback_key="IdentityPerCitizenChange"), "real"),
+                _ColumnSpec("UnlocksFromEffect", _param_display_text(zh_text=_project_param_zh("Projects_XP1", "UnlocksFromEffect"), fallback_key="UnlocksFromEffect"), "bool"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectsXP2SingleEditor(_UnitSingleRowEditor):
+class ProjectsXP2SingleEditor(_SingleRowTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Projects_XP2",
             hint_text=_project_table_hint("Projects_XP2"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("RequiredPowerWhileActive", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "RequiredPowerWhileActive"), fallback_key="RequiredPowerWhileActive"), "int"),
-                _UnitColumnSpec("ReligiousPressureModifier", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "ReligiousPressureModifier"), fallback_key="ReligiousPressureModifier"), "int"),
-                _UnitColumnSpec("UnlocksFromEffect", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "UnlocksFromEffect"), fallback_key="UnlocksFromEffect"), "bool"),
-                _UnitColumnSpec("RequiredBuilding", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "RequiredBuilding"), fallback_key="RequiredBuilding"), "template", "building_search_no_trait"),
-                _UnitColumnSpec("CreateBuilding", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "CreateBuilding"), fallback_key="CreateBuilding"), "template", "building_search_no_trait"),
-                _UnitColumnSpec("FullyPoweredWhileActive", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "FullyPoweredWhileActive"), fallback_key="FullyPoweredWhileActive"), "bool"),
-                _UnitColumnSpec("MaxSimultaneousInstances", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "MaxSimultaneousInstances"), fallback_key="MaxSimultaneousInstances"), "int"),
+                _ColumnSpec("RequiredPowerWhileActive", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "RequiredPowerWhileActive"), fallback_key="RequiredPowerWhileActive"), "int"),
+                _ColumnSpec("ReligiousPressureModifier", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "ReligiousPressureModifier"), fallback_key="ReligiousPressureModifier"), "int"),
+                _ColumnSpec("UnlocksFromEffect", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "UnlocksFromEffect"), fallback_key="UnlocksFromEffect"), "bool"),
+                _ColumnSpec("RequiredBuilding", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "RequiredBuilding"), fallback_key="RequiredBuilding"), "template", "building_search_no_trait"),
+                _ColumnSpec("CreateBuilding", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "CreateBuilding"), fallback_key="CreateBuilding"), "template", "building_search_no_trait"),
+                _ColumnSpec("FullyPoweredWhileActive", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "FullyPoweredWhileActive"), fallback_key="FullyPoweredWhileActive"), "bool"),
+                _ColumnSpec("MaxSimultaneousInstances", _param_display_text(zh_text=_project_param_zh("Projects_XP2", "MaxSimultaneousInstances"), fallback_key="MaxSimultaneousInstances"), "int"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectBuildingCostsEditor(_UnitRowsTableEditor):
+class ProjectBuildingCostsEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Project_BuildingCosts",
             hint_text=_project_table_hint("Project_BuildingCosts"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("ConsumedBuildingType", _param_display_text(zh_text=_project_param_zh("Project_BuildingCosts", "ConsumedBuildingType"), fallback_key="ConsumedBuildingType"), "template", "building_search_no_trait"),
+                _ColumnSpec("ConsumedBuildingType", _param_display_text(zh_text=_project_param_zh("Project_BuildingCosts", "ConsumedBuildingType"), fallback_key="ConsumedBuildingType"), "template", "building_search_no_trait"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectGreatPersonPointsEditor(_UnitRowsTableEditor):
+class ProjectGreatPersonPointsEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Project_GreatPersonPoints",
             hint_text=_project_table_hint("Project_GreatPersonPoints"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("GreatPersonClassType", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "GreatPersonClassType"), fallback_key="GreatPersonClassType"), "template", "great_person_class"),
-                _UnitColumnSpec("Points", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "Points"), fallback_key="Points"), "int"),
-                _UnitColumnSpec("PointProgressionModel", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "PointProgressionModel"), fallback_key="PointProgressionModel"), "template", "cost_progression"),
-                _UnitColumnSpec("PointProgressionParam1", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "PointProgressionParam1"), fallback_key="PointProgressionParam1"), "int"),
+                _ColumnSpec("GreatPersonClassType", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "GreatPersonClassType"), fallback_key="GreatPersonClassType"), "template", "great_person_class"),
+                _ColumnSpec("Points", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "Points"), fallback_key="Points"), "int"),
+                _ColumnSpec("PointProgressionModel", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "PointProgressionModel"), fallback_key="PointProgressionModel"), "template", "cost_progression"),
+                _ColumnSpec("PointProgressionParam1", _param_display_text(zh_text=_project_param_zh("Project_GreatPersonPoints", "PointProgressionParam1"), fallback_key="PointProgressionParam1"), "int"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectResourceCostsEditor(_UnitRowsTableEditor):
+class ProjectResourceCostsEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Project_ResourceCosts",
             hint_text=_project_table_hint("Project_ResourceCosts"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("ResourceType", _param_display_text(zh_text=_project_param_zh("Project_ResourceCosts", "ResourceType"), fallback_key="ResourceType"), "template", "resource_search"),
-                _UnitColumnSpec("StartProductionCost", _param_display_text(zh_text=_project_param_zh("Project_ResourceCosts", "StartProductionCost"), fallback_key="StartProductionCost"), "int"),
+                _ColumnSpec("ResourceType", _param_display_text(zh_text=_project_param_zh("Project_ResourceCosts", "ResourceType"), fallback_key="ResourceType"), "template", "resource_search"),
+                _ColumnSpec("StartProductionCost", _param_display_text(zh_text=_project_param_zh("Project_ResourceCosts", "StartProductionCost"), fallback_key="StartProductionCost"), "int"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectYieldConversionsEditor(_UnitRowsTableEditor):
+class ProjectYieldConversionsEditor(_RowsTableEditor):
     def __init__(self) -> None:
         super().__init__(
             table_name="Project_YieldConversions",
             hint_text=_project_table_hint("Project_YieldConversions"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("YieldType", _param_display_text(zh_text=_project_param_zh("Project_YieldConversions", "YieldType"), fallback_key="YieldType"), "template", "yield"),
-                _UnitColumnSpec("PercentOfProductionRate", _param_display_text(zh_text=_project_param_zh("Project_YieldConversions", "PercentOfProductionRate"), fallback_key="PercentOfProductionRate"), "int"),
+                _ColumnSpec("YieldType", _param_display_text(zh_text=_project_param_zh("Project_YieldConversions", "YieldType"), fallback_key="YieldType"), "template", "yield"),
+                _ColumnSpec("PercentOfProductionRate", _param_display_text(zh_text=_project_param_zh("Project_YieldConversions", "PercentOfProductionRate"), fallback_key="PercentOfProductionRate"), "int"),
             ],
         )
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
 
 
-class ProjectPrereqsEditor(_UnitRowsTableEditor):
+class ProjectPrereqsEditor(_RowsTableEditor):
     def __init__(self, *, workspace_projects_provider: Callable[[str], list[tuple[str, str]]]) -> None:
         self._workspace_projects_provider = workspace_projects_provider
         super().__init__(
@@ -5539,15 +4652,15 @@ class ProjectPrereqsEditor(_UnitRowsTableEditor):
             hint_text=_project_table_hint("ProjectPrereqs"),
             owner_key="ProjectType",
             columns=[
-                _UnitColumnSpec("PrereqProjectType", _param_display_text(zh_text=_project_param_zh("ProjectPrereqs", "PrereqProjectType"), fallback_key="PrereqProjectType"), "template", "project_prereq_selector"),
-                _UnitColumnSpec("MinimumPlayerInstances", _param_display_text(zh_text=_project_param_zh("ProjectPrereqs", "MinimumPlayerInstances"), fallback_key="MinimumPlayerInstances"), "int"),
+                _ColumnSpec("PrereqProjectType", _param_display_text(zh_text=_project_param_zh("ProjectPrereqs", "PrereqProjectType"), fallback_key="PrereqProjectType"), "template", "project_prereq_selector"),
+                _ColumnSpec("MinimumPlayerInstances", _param_display_text(zh_text=_project_param_zh("ProjectPrereqs", "MinimumPlayerInstances"), fallback_key="MinimumPlayerInstances"), "int"),
             ],
         )
 
-    def _create_cell_widget(self, spec: _UnitColumnSpec, seed: dict[str, object] | None) -> QWidget:
+    def _create_cell_widget(self, spec: _ColumnSpec, seed: dict[str, object] | None) -> QWidget:
         if spec.key == "PrereqProjectType":
             widget = ProjectPrereqSelectorTemplate(
-                workspace_projects_provider=lambda: self._workspace_projects_provider(self._unit_type)
+                workspace_projects_provider=lambda: self._workspace_projects_provider(self._owner_value)
             )
             if seed:
                 widget.set_current_value(_safe_text(seed.get(spec.key)) or None)
@@ -5555,7 +4668,7 @@ class ProjectPrereqsEditor(_UnitRowsTableEditor):
         return super()._create_cell_widget(spec, seed)
 
     def set_project_type(self, project_type: str) -> None:
-        self.set_unit_type(project_type)
+        self.set_owner_type(project_type)
         for row in range(self._table.rowCount()):
             widget = self._table.cellWidget(row, 0)
             if isinstance(widget, ProjectPrereqSelectorTemplate):

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-02 - 统一 区域/建筑/单位/改良设施 复合编辑器架构（-887 行）
+
+### 通用编辑器合并
+- 三个近似的"行编辑器"（`_DistrictRowsTableEditor` / `_BuildingRowsTableEditor` / `_UnitRowsTableEditor`，各 ~190 行复制粘贴）合并为统一的 `_RowsTableEditor`（owner 参数化，`set_owner_type`），区域/建筑换用，改良/项目子类迁移；三个 ColumnSpec 合并为 `_ColumnSpec`。
+- 单行子表统一为 `_SingleRowTableEditor`（支持 template/int/real/bool/text 列 + 新增 `defaults` 缺省值参数）。
+- 删除 6 个手写重复类（528 行）：`DistrictXP2SubTableEditor`、`DistrictReplacesSubTableEditor`、`BuildingsXP2SubTableEditor`、`BuildingReplacesSubTableEditor`、`BuildingConditionsSingleEditor`、`UnitsXP2SingleEditor`，全部改为通用件声明式配置。
+- 保留真正特殊的编辑器：巨作槽位（GreatWorks）、单位升级建议（Upgrades）、TypeTags/TypeProperties/AbilityBindings、改良境外产出开关等。
+
+### 布局统一
+- `_top_cell` / `_pair_row` 双列排布助手提取为模块级，删除 4 个复合编辑器内的重复副本；建筑/单位编辑器改为与区域/改良一致的双列紧凑排布。
+
+### 中文标签补齐（除 Type 字段外）
+- 改良设施主表：`EnforceTerrain`→强制地形限制、`GoodyNotify`→发现时通知玩家、`GoodyRange`→部落村庄生成范围、`TilesPerGoody`→部落村庄间隔地块数、`ReligiousUnitHealRate`→宗教单位治疗量（依据游戏库实际用途核实）。
+- 子表列：PointsPerTurn→每回合点数、YieldChange→产出变化、YieldChangeAsOrigin→作为起点产出、YieldChangeAsDomesticDestination→国内终点产出、YieldChangeAsInternationalDestination→国际终点产出、TourismBombValue→旅游业绩炸弹数值、StartProductionCost→初始生产成本、PerTurnMaintenanceCost→每回合维护成本、PercentProductionPerCharge→每次建造次数生产百分比、NumSupported→可支持单位数、ActionCharges→行动次数、UIFlagOffset→UI旗帜偏移、Industry→产业、Corporation→公司、AllowImpassableMovement→允许穿越不可通行地形、BuildOnAdjacentPlot→可在相邻地块建造、PreventsDrought→防旱、DisasterResistant→防灾、TourismSource→旅游业绩来源、ScalingFactor→缩放系数、MustRemoveFeature→必须移除地貌、BonusYieldChange→额外产出加成，以及 Districts_XP2/Buildings_XP2/Units_XP2 全部参数。
+
+### 行为保持
+- XP2 默认值保持：建筑 `Pillage=1`、单位 `CanEarnExperience=1` / `CanFormMilitaryFormation=1`（通过 `defaults` 参数）。
+
 ## 2026-08-02 - 文案优化：单位 AiType 字段中文说明
 
 - 单位子表 UnitAiInfos：列标签 `AiType` → **AI职能类型**，提示语补充说明（定义 AI 将该单位用于何种用途，如 UNITAI_SCOUT=侦察、UNITAI_COMBAT=进攻）。

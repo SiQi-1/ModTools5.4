@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-02 - 修复：启动崩溃兜底自身的两处缺陷
+
+### 问题
+- 上一版为 application.py 增加崩溃兜底时，重写文件**丢失了 `ModToolsApplication` 类定义**，导致 `build_application()` 直接 `NameError: name 'ModToolsApplication' is not defined`（此前测试未覆盖该函数、exe 冒烟检查的 10 秒窗口内尚未启动完成，均未暴露）。
+- 崩溃处理函数 `_handle` 内对 `_CRASH_BOX_SHOWN` 赋值但 `global` 声明写在外层函数，触发 `UnboundLocalError`，导致真正的异常信息被二次异常掩盖。
+
+### 修复
+- 恢复 `ModToolsApplication(QApplication)` 类定义；`_handle` 内补 `global _CRASH_BOX_SHOWN`。
+
+### 测试
+- 新增 `tests/test_application.py`（3 用例，共 54）：ModToolsApplication 类存在、`build_application()` 返回实例、崩溃处理写入 crash.log 且自身不抛异常、防重复处理。
+- 重新构建 exe 验证：无头启动 25 秒无退出、无新 crash.log 产生。
+
 ## 2026-08-02 - 修复：打包 exe 缺失运行时资源 + 崩溃静默无提示
 
 ### 问题

@@ -18,6 +18,14 @@ from ..ui.main_window import MainWindow
 _CRASH_BOX_SHOWN = False
 
 
+class ModToolsApplication(QApplication):
+    """Thin wrapper over QApplication for future service wiring."""
+
+    def __init__(self, config: AppConfig) -> None:
+        self.config = config
+        super().__init__(sys.argv)
+
+
 def _crash_log_path() -> Path:
     log_dir = log_dir_path()
     try:
@@ -46,6 +54,7 @@ def _install_crash_handler() -> None:
     global _CRASH_BOX_SHOWN
 
     def _handle(exc_type, exc_value, exc_tb) -> None:
+        global _CRASH_BOX_SHOWN
         lines = _write_crash_log(exc_type, exc_value, exc_tb)
         if _CRASH_BOX_SHOWN:
             return

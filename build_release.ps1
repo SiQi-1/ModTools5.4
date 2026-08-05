@@ -33,7 +33,7 @@ New-Item -ItemType Directory -Path $releaseDir | Out-Null
 
 $exePath = Join-Path $dist "$AppName.exe"
 if (-not (Test-Path $exePath)) {
-    throw "未找到生成的 exe: $exePath"
+    throw "Exe not found: $exePath"
 }
 
 Copy-Item $exePath (Join-Path $releaseDir "$AppName.exe") -Force

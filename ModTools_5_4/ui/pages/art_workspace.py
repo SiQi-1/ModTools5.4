@@ -43,7 +43,7 @@ from PyQt6.QtWidgets import (
 
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
-from ...db.paths import DEFAULT_GAME_DB
+from ...db.paths import DEFAULT_GAME_DB, _resolve_data_path
 from ..ui_widget_kit import MomentTextureSearchTemplate
 
 try:
@@ -73,8 +73,8 @@ except Exception:
 
 LOGGER = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-ART_XML_RULES_FILE = DATA_DIR / "art_xml_rules.json"
-DEFAULT_BLANK_ART_XML_FILE = DATA_DIR / "default_blank_art.xml"
+ART_XML_RULES_FILE = _resolve_data_path("art_xml_rules.json")
+DEFAULT_BLANK_ART_XML_FILE = _resolve_data_path("default_blank_art.xml")
 
 ART_SECTION_FORMAT = "MODTOOLS54_ART_WORKSPACE"
 ART_SECTION_SCHEMA = "1.0.0"

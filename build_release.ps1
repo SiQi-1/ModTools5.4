@@ -39,6 +39,8 @@ if (-not (Test-Path $exePath)) {
 Copy-Item $exePath (Join-Path $releaseDir "$AppName.exe") -Force
 Copy-Item $db (Join-Path $releaseDir "local_text_New.sqlite") -Force
 Copy-Item (Join-Path $pkg "data\settings.json") (Join-Path $releaseDir "settings.json") -Force
+Copy-Item (Join-Path $pkg "data") (Join-Path $releaseDir "data") -Recurse -Force
+Remove-Item (Join-Path $releaseDir "data\settings.json") -ErrorAction SilentlyContinue
 
 $zipPath = Join-Path $root "$AppName.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }

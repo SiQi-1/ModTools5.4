@@ -54,7 +54,7 @@ from PyQt6.QtWidgets import (
 
 from ..ui_widget_kit import BaseTemplateWidget, build_template_widget
 from ...db.interface import get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
-from ...db.paths import DATA_DIR, DEFAULT_GAME_DB
+from ...db.paths import DATA_DIR, DEFAULT_GAME_DB, _resolve_data_path
 from .base_page import BasePage
 
 
@@ -2288,9 +2288,9 @@ class HomePage(BasePage):
         self._requirement_param_map: Dict[str, List[str]] = {}
         self._attachment_target_types: List[str] = []
         self._comment_templates: Dict[str, dict] = {}
-        self._comment_template_path: Path = DATA_DIR / "effect_comment_templates.json"
+        self._comment_template_path: Path = _resolve_data_path("effect_comment_templates.json")
         self._req_comment_templates: Dict[str, dict] = {}
-        self._req_comment_template_path: Path = DATA_DIR / "requirement_comment_templates.json"
+        self._req_comment_template_path: Path = _resolve_data_path("requirement_comment_templates.json")
 
         self._loading_modifier_editor = False
         self._loading_reqset_editor = False
@@ -2561,7 +2561,7 @@ class HomePage(BasePage):
     def _load_effect_type_parameters(
         self,
     ) -> tuple[List[str], List[str], Dict[str, List[str]], List[str], Dict[str, List[str]]]:
-        json_path = DATA_DIR / "effect_type_parameters.json"
+        json_path = _resolve_data_path("effect_type_parameters.json")
         if not json_path.exists():
             return [], [], {}, [], {}
         try:

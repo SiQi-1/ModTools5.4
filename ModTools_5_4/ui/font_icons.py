@@ -19,13 +19,13 @@ from pathlib import Path
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QImage, QPixmap
 
-from ..db.paths import DATA_DIR
+from ..db.paths import DATA_DIR, _resolve_data_path
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-_REGISTRY_FILE = DATA_DIR / "font_icons_registry.json"
+_REGISTRY_FILE = _resolve_data_path("font_icons_registry.json")
 
 
 @dataclass(frozen=True)

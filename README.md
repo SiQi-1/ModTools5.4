@@ -154,7 +154,8 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 **Q: 颜色配置里颜色全被当成自定义重新定义了**
 → 标准色匹配依赖 `standard_colors.json`，确保文件未被删除。
 
-**Q: 图片缩到比画布小，导出还是撑满的**
+**Q: 双击 exe 毫无反应/没有界面**
+→ 打包版无控制台，启动期异常会被静默吞掉。请检查 exe 所在目录（或 `%LOCALAPPDATA%\ModTools5.4\logs`）下的 `crash.log`，按其中报错排查；另外请确认系统为 Windows 10 或更高版本（Qt6 不支持 Win7/8）。
 → 重新打开图片选择一次即可（已修复导出端强制缩放问题，旧状态需刷新）。
 
 **Q: 我的文明6装D盘，影响使用吗**

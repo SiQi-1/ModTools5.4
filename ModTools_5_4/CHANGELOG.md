@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-02 - 修复：打包 exe 缺失运行时资源 + 崩溃静默无提示
+
+### 问题
+- PyInstaller 会随 exe 打包 PyQt6 本身，但 `build_release.ps1` 的 `--add-data` 清单只包含 settings/standard_colors/citybanner，导致打包版缺失大量运行时文件：`resources/styles/base.qss`（界面样式）、FontIcons.dds/XP1.dds（图标图集）、`data/` 全部 JSON 模板、`From/` artdef 参考文件等——换设备后界面无样式/功能缺失。
+- 打包版为 `--noconsole`，启动期任何异常都表现为"双击后毫无反应"，无任何线索。
+
+### 修复
+- `build_release.ps1` 打包清单改为整目录递归：`data/`、`resources/`、`From/` 全量进包（替换原先零散文件列表），并同步本地 `ModTools5.4.spec`。
+- `application.py` 新增崩溃兜底：未处理异常写入 `crash.log`（exe 旁/用户数据目录），并尽可能弹窗提示异常内容。
+- README 常见问题新增"双击 exe 毫无反应"排查指引（查 crash.log；Qt6 需 Windows 10+）。
+- 验证：重新构建 exe 并用 PyInstaller archive_viewer 确认 data/resources/From 全部进包；exe 无头启动 10 秒无异常退出。
+
 ## 2026-08-02 - 统一 区域/建筑/单位/改良设施 复合编辑器架构（-887 行）
 
 ### 通用编辑器合并

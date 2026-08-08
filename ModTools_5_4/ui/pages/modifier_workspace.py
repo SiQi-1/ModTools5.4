@@ -602,13 +602,6 @@ ADJACENCY_DESCRIPTION_EFFECTS = {
     "EFFECT_TERRAIN_ADJACENCY",
 }
 
-_ADJACENCY_SOURCE_LABELS = {
-    "DistrictType": "与{value}相邻",
-    "FeatureType": "与{value}相邻",
-    "ImprovementType": "与{value}相邻",
-    "TerrainType": "与{value}相邻",
-}
-
 
 def _adjacency_source_label(param_key: str, value: str) -> str:
     """相邻加成来源 Type 的显示名（与相邻加成编辑器同款映射）。"""
@@ -634,11 +627,28 @@ def _extract_param_scalar(value: object) -> object:
     return None
 
 
+# 产出类型 → 游戏图标标记（[ICON_XXX] 格式）
+_YIELD_ICON_MAP = {
+    "YIELD_GOLD": "[ICON_Gold]",
+    "YIELD_PRODUCTION": "[ICON_Production]",
+    "YIELD_SCIENCE": "[ICON_Science]",
+    "YIELD_CULTURE": "[ICON_Culture]",
+    "YIELD_FAITH": "[ICON_Faith]",
+    "YIELD_FOOD": "[ICON_Food]",
+}
+
+
 class _AdjacencyDescriptionEdit(QWidget):
     """相邻加成 Description 参数控件：输入框 + 自动生成按钮。
 
     - 自动生成时标记 _auto_managed=True，手动编辑后置 False；
     - 自动生成按钮仅覆盖"空 或 自动生成"的值，不覆盖手动填写。
+
+    生成格式（游戏描述惯例）：
+    - EFFECT_DISTRICT_ADJACENCY：+1[ICON_Production]产出 来自每个相邻的其他区域
+    - EFFECT_FEATURE/IMPROVEMENT/TERRAIN_ADJACENCY：…来自每个相邻的{来源}
+    - EFFECT_RIVER_ADJACENCY：+1[ICON_Production]产出 位于河流（无数量概念）
+    - TilesRequired > 1 时"每个"改为"每{N}个"；DistrictType 为归属方，不参与描述。
     """
 
     dataChanged = pyqtSignal()
@@ -646,11 +656,13 @@ class _AdjacencyDescriptionEdit(QWidget):
     def __init__(
         self,
         sibling_values_provider,
+        effect_type: str = "",
         param_name: str = "Description",
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self._sibling_values_provider = sibling_values_provider
+        self._effect_type = str(effect_type or "").strip()
         self._param_name = param_name
         self._auto_managed = False
 
@@ -659,7 +671,7 @@ class _AdjacencyDescriptionEdit(QWidget):
         layout.setSpacing(6)
         self._edit = QLineEdit()
         self._edit.setPlaceholderText("中文描述（自动注册LOC）或 LOC_ 标签")
-        self._edit.setMinimumWidth(220)
+        self._edit.setMinimumWidth(280)
         self._edit.textChanged.connect(self._on_text_edited)
         layout.addWidget(self._edit, 1)
         self._gen_btn = QPushButton("自动生成")
@@ -693,25 +705,39 @@ class _AdjacencyDescriptionEdit(QWidget):
             amount_int = 0
         change_prefix = "+" if amount_int > 0 else "-" if amount_int < 0 else ""
         abs_amount = abs(amount_int)
-        yield_label = YIELD_VALUE_TO_NAME.get(yield_type, yield_type) if yield_type else "产出"
-        base = f"{change_prefix}{abs_amount}{yield_label}" if yield_type else f"{change_prefix}{abs_amount}"
-        source_parts: list[str] = []
-        for key, template in _ADJACENCY_SOURCE_LABELS.items():
+        yield_icon = _YIELD_ICON_MAP.get(yield_type, "")
+        base = f"{change_prefix}{abs_amount}{yield_icon}产出"
+
+        source_text = self._source_description(values)
+        if not source_text:
+            return base
+        return f"{base} {source_text}"
+
+    def _source_description(self, values: dict[str, object]) -> str:
+        """来源描述；DistrictType 为归属方不参与。"""
+        tiles_required = _extract_param_scalar(values.get("TilesRequired"))
+        try:
+            tiles_int = max(1, int(tiles_required))
+        except (TypeError, ValueError):
+            tiles_int = 1
+        quantifier = "每个" if tiles_int <= 1 else f"每{tiles_int}个"
+
+        effect = self._effect_type
+        if effect == "EFFECT_RIVER_ADJACENCY":
+            return "位于河流"
+        if effect == "EFFECT_DISTRICT_ADJACENCY":
+            return f"来自{quantifier}相邻的其他区域"
+        for key, label_key in (
+            ("FeatureType", "FeatureType"),
+            ("ImprovementType", "ImprovementType"),
+            ("TerrainType", "TerrainType"),
+        ):
             value = str(_extract_param_scalar(values.get(key)) or "").strip()
             if not value:
                 continue
-            label = _adjacency_source_label(key, value)
-            source_parts.append(template.format(value=label))
-        tiles_required = _extract_param_scalar(values.get("TilesRequired"))
-        try:
-            tiles_int = int(tiles_required)
-        except (TypeError, ValueError):
-            tiles_int = 0
-        if tiles_int > 1:
-            source_parts.append(f"需{tiles_int}地块")
-        if not source_parts:
-            return base
-        return f"{base}（{'；'.join(source_parts)}）"
+            label = _adjacency_source_label(label_key, value)
+            return f"来自{quantifier}相邻的{label}"
+        return ""
 
     def set_value(self, value: object, *, auto: bool = False) -> None:
         text = str(value or "").strip()
@@ -6743,7 +6769,10 @@ class HomePage(BasePage):
             combo.addItems(fixed_opts)
             return combo
         if key == "Description" and self._current_effect_type() in ADJACENCY_DESCRIPTION_EFFECTS:
-            return _AdjacencyDescriptionEdit(sibling_values_provider=self._collect_param_values_dict)
+            return _AdjacencyDescriptionEdit(
+                sibling_values_provider=self._collect_param_values_dict,
+                effect_type=self._current_effect_type(),
+            )
         template_key = TEMPLATE_PARAM_MAPPINGS.get(key)
         if template_key:
             try:

@@ -28,43 +28,88 @@ class AdjacencyDescriptionTestCase(unittest.TestCase):
 
     # ---- 自动生成文本格式 ----
 
-    def test_auto_build_text_format(self) -> None:
-        widget = _AdjacencyDescriptionEdit(sibling_values_provider=lambda: {
-            "Amount": 2,
-            "YieldType": "YIELD_PRODUCTION",
-            "DistrictType": "DISTRICT_CITY_CENTER",
-        })
+    def test_auto_build_text_feature_format(self) -> None:
+        widget = _AdjacencyDescriptionEdit(
+            sibling_values_provider=lambda: {
+                "Amount": 1,
+                "YieldType": "YIELD_PRODUCTION",
+                "FeatureType": "FEATURE_FLOODPLAINS_GRASS",
+                "DistrictType": "DISTRICT_THEATER",
+            },
+            effect_type="EFFECT_FEATURE_ADJACENCY",
+        )
         text = widget._auto_build_text()
-        self.assertIn("+2", text)
-        self.assertIn("生产力", text)
-        self.assertNotIn("DISTRICT_CITY_CENTER", text, "来源 Type 应本地化为中文")
+        self.assertIn("+1", text)
+        self.assertIn("[ICON_Production]", text)
+        self.assertIn("来自每个相邻的", text)
+        self.assertNotIn("DISTRICT_THEATER", text, "DistrictType 是归属方，不参与描述")
 
     def test_auto_build_text_accepts_template_dict_values(self) -> None:
         """模板控件 export 的 dict（如 yield/district 搜索）应归一化为标量。"""
-        widget = _AdjacencyDescriptionEdit(sibling_values_provider=lambda: {
-            "Amount": 1,
-            "YieldType": {"yield_type": "YIELD_PRODUCTION", "display": "生产力", "name": "生产力", "value": "YIELD_PRODUCTION"},
-            "DistrictType": {"district_type": "DISTRICT_THEATER", "display": "DISTRICT_THEATER", "value": "DISTRICT_THEATER"},
-        })
+        widget = _AdjacencyDescriptionEdit(
+            sibling_values_provider=lambda: {
+                "Amount": 1,
+                "YieldType": {"yield_type": "YIELD_PRODUCTION", "display": "生产力", "name": "生产力", "value": "YIELD_PRODUCTION"},
+                "FeatureType": {"feature_type": "FEATURE_FLOODPLAINS_GRASS", "display": "FEATURE_FLOODPLAINS_GRASS", "value": "FEATURE_FLOODPLAINS_GRASS"},
+                "DistrictType": {"district_type": "DISTRICT_THEATER", "display": "DISTRICT_THEATER", "value": "DISTRICT_THEATER"},
+            },
+            effect_type="EFFECT_FEATURE_ADJACENCY",
+        )
         text = widget._auto_build_text()
         self.assertNotIn("{", text, "dict repr 不应出现在描述中")
         self.assertIn("+1", text)
-        self.assertIn("生产力", text)
+        self.assertIn("[ICON_Production]", text)
+        self.assertNotIn("DISTRICT_THEATER", text)
 
     def test_auto_build_text_negative_and_tiles(self) -> None:
-        widget = _AdjacencyDescriptionEdit(sibling_values_provider=lambda: {
-            "Amount": -1,
-            "YieldType": "YIELD_FOOD",
-            "TerrainType": "TERRAIN_MOUNTAIN",
-            "TilesRequired": 2,
-        })
+        widget = _AdjacencyDescriptionEdit(
+            sibling_values_provider=lambda: {
+                "Amount": -1,
+                "YieldType": "YIELD_FOOD",
+                "TerrainType": "TERRAIN_MOUNTAIN",
+                "TilesRequired": 2,
+            },
+            effect_type="EFFECT_TERRAIN_ADJACENCY",
+        )
         text = widget._auto_build_text()
         self.assertIn("-1", text)
-        self.assertIn("食物", text)
+        self.assertIn("[ICON_Food]", text)
+        self.assertIn("每2个", text)
+        self.assertIn("相邻的", text)
         # 地形名依赖文本库词条；有词条则显示中文，缺词条时回退原 Type
         if "TERRAIN_MOUNTAIN" in text:
             self.assertIn("TERRAIN_MOUNTAIN", text)
-        self.assertIn("需2地块", text)
+
+    def test_auto_build_text_district_adjacency(self) -> None:
+        """DISTRICT_ADJ：来源为相邻的其他区域，非指定区域。"""
+        widget = _AdjacencyDescriptionEdit(
+            sibling_values_provider=lambda: {
+                "Amount": 1,
+                "YieldType": "YIELD_GOLD",
+                "DistrictType": "DISTRICT_THEATER",
+            },
+            effect_type="EFFECT_DISTRICT_ADJACENCY",
+        )
+        text = widget._auto_build_text()
+        self.assertIn("[ICON_Gold]", text)
+        self.assertIn("来自每个相邻的其他区域", text)
+        self.assertNotIn("DISTRICT_THEATER", text)
+
+    def test_auto_build_text_river_adjacency(self) -> None:
+        """河流相邻：无数量概念，位于河流即有。"""
+        widget = _AdjacencyDescriptionEdit(
+            sibling_values_provider=lambda: {
+                "Amount": 2,
+                "YieldType": "YIELD_FOOD",
+                "DistrictType": "DISTRICT_THEATER",
+            },
+            effect_type="EFFECT_RIVER_ADJACENCY",
+        )
+        text = widget._auto_build_text()
+        self.assertIn("+2", text)
+        self.assertIn("[ICON_Food]", text)
+        self.assertIn("位于河流", text)
+        self.assertNotIn("DISTRICT_THEATER", text)
 
     # ---- 覆盖规则 ----
 

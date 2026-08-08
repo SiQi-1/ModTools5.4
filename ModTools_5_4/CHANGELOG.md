@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-02 - 修正：相邻加成描述语义（DistrictType 不参与、产出带图标、按效果器区分来源）
+
+### 问题
+- 原自动生成把 DistrictType 当作来源参与描述（如"与剧院广场相邻"），语义错误：DistrictType 是**归属方**（这是谁的相邻加成），不参与来源描述。
+- 产出未带 `[ICON_XXX]` 图标；"每个/每X个"数量措辞未按 TilesRequired 区分；DISTRICT_ADJACENCY 与 RIVER_ADJACENCY 无专属来源描述。
+
+### 修正后格式
+- `EFFECT_FEATURE / IMPROVEMENT / TERRAIN_ADJACENCY`：`+1[ICON_Production]产出 来自每个相邻的草原泛滥平原`（TilesRequired>1 → `来自每X个相邻的…`）
+- `EFFECT_DISTRICT_ADJACENCY`：`+1[ICON_XXX]产出 来自每个相邻的其他区域`（非指定区域）
+- `EFFECT_RIVER_ADJACENCY`：`+1[ICON_XXX]产出 位于河流`（无数量概念）
+- 产出图标映射 `_YIELD_ICON_MAP`（[ICON_Gold]/[ICON_Production]…），DistrictType 从描述中移除。
+- `_AdjacencyDescriptionEdit` 构造时传入 effect_type 以区分来源措辞。
+
+### 测试
+- 更新/新增 3 个用例（共 70）：Feature 格式（DistrictType 不参与）、District 相邻"其他区域"、河流"位于河流"、数量措辞"每X个"、dict 值归一化。
+
 ## 2026-08-02 - 修复：相邻加成描述自动生成取值与按钮样式
 
 ### 问题

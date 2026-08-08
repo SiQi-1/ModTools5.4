@@ -77,11 +77,20 @@ def _install_crash_handler() -> None:
 
 
 def build_application(config: AppConfig | None = None) -> ModToolsApplication:
-    """Create application with logging/config prepared."""
+    """Create application with logging/config prepared.
+
+    若当前进程已存在 QApplication 实例（如测试环境或多次调用），复用之，
+    避免重复构造 QApplication 触发 Qt 硬崩溃。
+    """
     _install_crash_handler()
     active_config = config or load_config()
     configure_logging(active_config.log_dir, active_config.debug)
-    app = ModToolsApplication(active_config)
+    existing = QApplication.instance()
+    if existing is not None:
+        app = existing
+        app.config = active_config  # type: ignore[attr-defined]
+    else:
+        app = ModToolsApplication(active_config)
     app.setApplicationName(active_config.app_title)
     icon_path = app_icon_path()
     if icon_path.exists():

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-02 - 新增：相邻加成效果器 Description 自动命名（UI→SQL→Text.sql 全链路）
+
+### 功能
+- 5 个相邻加成效果器（EFFECT_DISTRICT_ADJACENCY / FEATURE / IMPROVEMENT / RIVER / TERRAIN_ADJACENCY）的 `Description` 参数升级为专用控件：输入框 + "自动生成"按钮。
+- 自动生成文本格式与相邻加成编辑器一致：`+2生产力（与市中心相邻；需2地块）`（产出/来源 Type 中文名来自游戏库映射，缺词条回退原 Type）。
+- 覆盖规则：自动生成的值带 `_auto_managed` 标记，可被再次自动覆盖；手动填写的不覆盖。
+
+### 语义（按用户要求）
+- Description 填中文（自动或手动）→ SQL 输出 `LOC_{modifier_id}_DESCRIPTION` tag，并在 LocalizedText 注册中文行（Text.sql 可见）。
+- Description 填 `LOC_...` → SQL 原样输出，不重复注册。
+- 仅相邻加成效果器特判；其他效果器的 Description 保持文本框不受影响（按效果类型判断，非参数名）。
+
+### 涉及改动
+- `modifier_workspace.py`：`_AdjacencyDescriptionEdit` 控件 + `ADJACENCY_DESCRIPTION_EFFECTS` 常量 + `_build_param_value_widget` 特判 + 参数表取值/回填支持；SQL/XML 生成：Description 转 LOC tag + 新增 LocalizedText 输出段；新增只读方法 `adjacency_description_text_entries()`。
+- `workspace_page.py`：`_build_text_workspace_preview` 新增"修改器描述文本"分组（预览与 Text.sql 落盘共用）。
+- `app/application.py`：修复 `build_application` 在 QApplication 已存在时重复构造导致 Qt 硬崩溃（复用之）。
+
+### 测试
+- 新增 `tests/test_adjacency_description.py`（8 用例，共 67）：自动生成格式、覆盖规则、中文→tag+Text.sql、LOC 直出不注册、非相邻效果不受影响。
+
 ## 2026-08-02 - 修复：启动崩溃兜底自身的两处缺陷
 
 ### 问题

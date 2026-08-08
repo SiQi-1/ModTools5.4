@@ -1025,6 +1025,15 @@ class WorkspacePage(BasePage):
         for modifier_id in sorted(modifier_rows_by_id.keys()):
             modifier_preview_groups.append((modifier_id, modifier_rows_by_id[modifier_id]))
 
+        modifier_desc_groups: list[tuple[str, list[str]]] = []
+        try:
+            desc_entries = self._modifier_workspace.adjacency_description_text_entries()
+        except Exception:
+            desc_entries = []
+        for desc_tag, desc_text in desc_entries:
+            desc_row = f"('zh_Hans_CN','{self._sql_escape(desc_tag)}','{self._sql_escape(desc_text)}')"
+            modifier_desc_groups.append((desc_tag, [desc_row]))
+
         sections: list[tuple[str, list[tuple[str, list[str]]]]] = [
             ("文明基础文本", civ_base_groups),
             ("领袖基础文本", leader_base_groups),
@@ -1033,6 +1042,7 @@ class WorkspacePage(BasePage):
             ("单位基础文本", unit_groups),
             ("单位Ability文本", ability_text_groups),
             ("修改器预览文本", modifier_preview_groups),
+            ("修改器描述文本", modifier_desc_groups),
             ("改良基础文本", improvement_groups),
             ("总督基础文本", governor_groups),
             ("伟人基础文本", great_people_groups),

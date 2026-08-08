@@ -22,8 +22,11 @@ class ApplicationBootstrapTestCase(unittest.TestCase):
 
     def test_build_application_returns_app(self) -> None:
         app = application.build_application()
-        self.assertIsInstance(app, application.ModToolsApplication)
+        self.assertIsInstance(app, QApplication)
         self.assertEqual(app.applicationName(), "ModTools 5.4")
+        # 幂等：再次调用不崩溃（复用已有实例）
+        again = application.build_application()
+        self.assertIs(again, app)
 
     def test_crash_handler_writes_log_and_does_not_crash(self) -> None:
         """崩溃兜底本身不能抛异常（曾因闭包内 global 缺失触发 UnboundLocalError）。"""
@@ -36,6 +39,13 @@ class ApplicationBootstrapTestCase(unittest.TestCase):
             application._crash_log_path = lambda: log_path
             application.sys.exit = lambda code: None  # 测试中不真正退出
             application._CRASH_BOX_SHOWN = False
+
+            # 避免模态弹窗阻塞测试进程：记录调用但不显示
+            from PyQt6.QtWidgets import QMessageBox
+
+            original_critical = QMessageBox.critical
+            critical_calls = []
+            QMessageBox.critical = staticmethod(lambda *args, **kwargs: critical_calls.append(args))
             try:
                 application._install_crash_handler()
                 handler = application.sys.excepthook
@@ -58,6 +68,7 @@ class ApplicationBootstrapTestCase(unittest.TestCase):
                 application._crash_log_path = original_log_path
                 application.sys.exit = original_exit
                 application._CRASH_BOX_SHOWN = original_flag
+                QMessageBox.critical = original_critical
 
 
 if __name__ == "__main__":

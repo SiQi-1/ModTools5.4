@@ -14,7 +14,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 
 from .group_workspace import _build_entity_type
 
-from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel
+from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -52,8 +52,16 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ..ui_widget_kit import BaseTemplateWidget, build_template_widget
-from ...db.interface import get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
+from ..ui_widget_kit import (
+    BaseTemplateWidget,
+    YIELD_VALUE_TO_NAME,
+    build_template_widget,
+    _district_name_map,
+    _feature_name_map,
+    _improvement_name_map,
+    _terrain_name_map,
+)
+from ...db.interface import get_chinese_text_for_tag, get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
 from ...db.paths import DATA_DIR, DEFAULT_GAME_DB, _resolve_data_path
 from .base_page import BasePage
 
@@ -584,6 +592,123 @@ TEMPLATE_PARAM_MAPPINGS: Dict[str, str] = {
     "RelicSource": "relic_source_search",
     "EffectType": "effect_type_search",
 }
+
+# 相邻加成类效果器：Description 参数为相邻加成描述，支持自动命名并输出 Text.sql。
+ADJACENCY_DESCRIPTION_EFFECTS = {
+    "EFFECT_DISTRICT_ADJACENCY",
+    "EFFECT_FEATURE_ADJACENCY",
+    "EFFECT_IMPROVEMENT_ADJACENCY",
+    "EFFECT_RIVER_ADJACENCY",
+    "EFFECT_TERRAIN_ADJACENCY",
+}
+
+_ADJACENCY_SOURCE_LABELS = {
+    "DistrictType": "与{value}相邻",
+    "FeatureType": "与{value}相邻",
+    "ImprovementType": "与{value}相邻",
+    "TerrainType": "与{value}相邻",
+}
+
+
+def _adjacency_source_label(param_key: str, value: str) -> str:
+    """相邻加成来源 Type 的显示名（与相邻加成编辑器同款映射）。"""
+    if param_key == "DistrictType":
+        return _district_name_map().get(value, value)
+    if param_key == "FeatureType":
+        return _feature_name_map().get(value, value)
+    if param_key == "ImprovementType":
+        return _improvement_name_map().get(value, value)
+    if param_key == "TerrainType":
+        return _terrain_name_map().get(value, value)
+    return YIELD_VALUE_TO_NAME.get(value, value)
+
+
+class _AdjacencyDescriptionEdit(QWidget):
+    """相邻加成 Description 参数控件：输入框 + 自动生成按钮。
+
+    - 自动生成时标记 _auto_managed=True，手动编辑后置 False；
+    - 自动生成按钮仅覆盖"空 或 自动生成"的值，不覆盖手动填写。
+    """
+
+    dataChanged = pyqtSignal()
+
+    def __init__(
+        self,
+        sibling_values_provider,
+        param_name: str = "Description",
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._sibling_values_provider = sibling_values_provider
+        self._param_name = param_name
+        self._auto_managed = False
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        self._edit = QLineEdit()
+        self._edit.setPlaceholderText("中文描述（自动注册LOC）或 LOC_ 标签")
+        self._edit.textChanged.connect(self._on_text_edited)
+        layout.addWidget(self._edit, 1)
+        self._gen_btn = QPushButton("自动生成")
+        self._gen_btn.setToolTip("按相邻加成参数生成描述；不覆盖手动填写的内容")
+        self._gen_btn.clicked.connect(self._auto_generate)
+        layout.addWidget(self._gen_btn)
+
+    def _on_text_edited(self, _text: str) -> None:
+        self._auto_managed = False
+        self.dataChanged.emit()
+
+    def _auto_generate(self) -> None:
+        text = self._auto_build_text()
+        if not text:
+            return
+        if self._auto_managed or not self._edit.text().strip():
+            self._edit.setText(text)
+            self._auto_managed = True
+            self.dataChanged.emit()
+
+    def _auto_build_text(self) -> str:
+        values = self._sibling_values_provider() if callable(self._sibling_values_provider) else {}
+        values = values if isinstance(values, dict) else {}
+        amount = values.get("Amount")
+        yield_type = str(values.get("YieldType") or "").strip()
+        try:
+            amount_int = int(amount)
+        except (TypeError, ValueError):
+            amount_int = 0
+        change_prefix = "+" if amount_int > 0 else "-" if amount_int < 0 else ""
+        abs_amount = abs(amount_int)
+        yield_label = YIELD_VALUE_TO_NAME.get(yield_type, yield_type) if yield_type else "产出"
+        base = f"{change_prefix}{abs_amount}{yield_label}" if yield_type else f"{change_prefix}{abs_amount}"
+        source_parts: list[str] = []
+        for key, template in _ADJACENCY_SOURCE_LABELS.items():
+            value = str(values.get(key) or "").strip()
+            if not value:
+                continue
+            label = _adjacency_source_label(key, value)
+            source_parts.append(template.format(value=label))
+        tiles_required = values.get("TilesRequired")
+        try:
+            tiles_int = int(tiles_required)
+        except (TypeError, ValueError):
+            tiles_int = 0
+        if tiles_int > 1:
+            source_parts.append(f"需{tiles_int}地块")
+        if not source_parts:
+            return base
+        return f"{base}（{'；'.join(source_parts)}）"
+
+    def set_value(self, value: object, *, auto: bool = False) -> None:
+        text = str(value or "").strip()
+        self._edit.setText(text)
+        self._auto_managed = auto
+
+    def current_value(self) -> str:
+        return self._edit.text().strip()
+
+    def is_auto_managed(self) -> bool:
+        return self._auto_managed
 
 
 @dataclass
@@ -5717,6 +5842,20 @@ class HomePage(BasePage):
     def _sql_escape(self, text: str) -> str:
         return text.replace("'", "''")
 
+    @staticmethod
+    def _build_localized_text_block(rows: List[str]) -> str:
+        """LocalizedText INSERT 块（与工程其余 Text.sql 输出格式一致）。"""
+        if not rows:
+            return ""
+        return "\n".join(
+            [
+                "-- LocalizedText",
+                "INSERT INTO LocalizedText (Language, Tag, Text) VALUES",
+                ",\n".join(rows) + ";",
+                "",
+            ]
+        )
+
     def _sql_text_or_null(self, value: str | None) -> str:
         if value is None:
             return "NULL"
@@ -5916,14 +6055,35 @@ class HomePage(BasePage):
 
         # ModifierArguments
         arg_lines: List[str] = []
+        adjacency_text_rows: List[str] = []
         for record in self._modifiers:
+            is_adjacency_effect = (record.effect_type or "").strip() in ADJACENCY_DESCRIPTION_EFFECTS
+            modifier_id = str(record.modifier_id or "").strip()
             for param in record.parameters:
                 name = str(param.get("name", "")).strip()
                 if not name:
                     continue
-                value = self._param_to_sql(param.get("value"))
+                raw_value = param.get("value")
+                if name == "Description" and is_adjacency_effect:
+                    if isinstance(raw_value, dict):
+                        desc_value = raw_value.get("value")
+                    else:
+                        desc_value = raw_value
+                    desc_text = str(desc_value or "").strip()
+                    if not desc_text:
+                        continue
+                    if desc_text.startswith("LOC_"):
+                        value = self._param_to_sql(desc_text)
+                    else:
+                        desc_tag = f"LOC_{modifier_id}_DESCRIPTION"
+                        value = f"'{self._sql_escape(desc_tag)}'"
+                        adjacency_text_rows.append(
+                            f"('zh_Hans_CN','{self._sql_escape(desc_tag)}','{self._sql_escape(desc_text)}')"
+                        )
+                else:
+                    value = self._param_to_sql(raw_value)
                 arg_lines.append(
-                    f"('{self._sql_escape(record.modifier_id)}', '{self._sql_escape(name)}', {value})"
+                    f"('{self._sql_escape(modifier_id)}', '{self._sql_escape(name)}', {value})"
                 )
         if arg_lines:
             lines = ["INSERT INTO ModifierArguments (ModifierId, Name, Value) VALUES"]
@@ -5933,6 +6093,12 @@ class HomePage(BasePage):
             sections.append("\n".join(lines))
         else:
             sections.append("-- ModifierArguments 为空")
+
+        # 相邻加成描述文本（LocalizedText）
+        if adjacency_text_rows:
+            sections.append(
+                self._build_localized_text_block(adjacency_text_rows)
+            )
 
         modifier_strings_rows: List[str] = []
         for record in self._modifiers:
@@ -6215,15 +6381,40 @@ class HomePage(BasePage):
 
         # ModifierArguments
         args_el = ElementTree.SubElement(root, "ModifierArguments")
+        adjacency_text_el = ElementTree.SubElement(root, "LocalizedText")
+        adjacency_text_emitted = False
         for record in self._modifiers:
+            is_adjacency_effect = (record.effect_type or "").strip() in ADJACENCY_DESCRIPTION_EFFECTS
+            modifier_id = str(record.modifier_id or "").strip()
             for param in record.parameters:
                 name = str(param.get("name", "")).strip()
                 if not name:
                     continue
+                raw_value = param.get("value")
+                value_text = ""
+                if name == "Description" and is_adjacency_effect:
+                    desc_value = raw_value.get("value") if isinstance(raw_value, dict) else raw_value
+                    desc_text = str(desc_value or "").strip()
+                    if not desc_text:
+                        continue
+                    if desc_text.startswith("LOC_"):
+                        value_text = desc_text
+                    else:
+                        desc_tag = f"LOC_{modifier_id}_DESCRIPTION"
+                        value_text = desc_tag
+                        text_row = ElementTree.SubElement(adjacency_text_el, "Row")
+                        ElementTree.SubElement(text_row, "Language").text = "zh_Hans_CN"
+                        ElementTree.SubElement(text_row, "Tag").text = desc_tag
+                        ElementTree.SubElement(text_row, "Text").text = desc_text
+                        adjacency_text_emitted = True
+                else:
+                    value_text = _param_value_to_xml_with_name(raw_value, name)
                 row_el = ElementTree.SubElement(args_el, "Row")
-                ElementTree.SubElement(row_el, "ModifierId").text = _text(record.modifier_id)
+                ElementTree.SubElement(row_el, "ModifierId").text = modifier_id
                 ElementTree.SubElement(row_el, "Name").text = name
-                ElementTree.SubElement(row_el, "Value").text = _param_value_to_xml_with_name(param.get("value"), name)
+                ElementTree.SubElement(row_el, "Value").text = value_text
+        if not adjacency_text_emitted:
+            root.remove(adjacency_text_el)
 
         modifier_strings_el = ElementTree.SubElement(root, "ModifierStrings")
         for record in self._modifiers:
@@ -6513,6 +6704,11 @@ class HomePage(BasePage):
                     value_widget.setValue(0)
             elif isinstance(value_widget, QLineEdit):
                 value_widget.setText(str(old_value))
+            elif isinstance(value_widget, _AdjacencyDescriptionEdit):
+                if isinstance(old_value, dict):
+                    value_widget.set_value(old_value.get("value"), auto=bool(old_value.get("auto", False)))
+                else:
+                    value_widget.set_value(old_value)
             elif isinstance(value_widget, BaseTemplateWidget):
                 self._apply_template_value(value_widget, old_value)
 
@@ -6532,6 +6728,8 @@ class HomePage(BasePage):
             combo.setEditable(True)
             combo.addItems(fixed_opts)
             return combo
+        if key == "Description" and self._current_effect_type() in ADJACENCY_DESCRIPTION_EFFECTS:
+            return _AdjacencyDescriptionEdit(sibling_values_provider=self._collect_param_values_dict)
         template_key = TEMPLATE_PARAM_MAPPINGS.get(key)
         if template_key:
             try:
@@ -6548,6 +6746,39 @@ class HomePage(BasePage):
             except KeyError:
                 pass
         return QLineEdit()
+
+    def _current_effect_type(self) -> str:
+        if self._effect_type_combo is not None:
+            return str(self._effect_type_combo.currentText() or "").strip()
+        return ""
+
+    def _collect_param_values_dict(self) -> Dict[str, object]:
+        """参数表当前各行的值字典（供相邻加成描述自动生成使用）。"""
+        values: Dict[str, object] = {}
+        if self._param_table is None:
+            return values
+        for row in range(self._param_table.rowCount()):
+            name_widget = self._param_table.cellWidget(row, 0)
+            if not isinstance(name_widget, QLineEdit):
+                continue
+            name = name_widget.text().strip()
+            if not name:
+                continue
+            value_widget = self._param_table.cellWidget(row, 1)
+            if isinstance(value_widget, QCheckBox):
+                value: object = value_widget.isChecked()
+            elif isinstance(value_widget, (QSpinBox, QDoubleSpinBox)):
+                value = value_widget.value()
+            elif isinstance(value_widget, QLineEdit):
+                value = value_widget.text()
+            elif isinstance(value_widget, _AdjacencyDescriptionEdit):
+                value = value_widget.current_value()
+            elif isinstance(value_widget, BaseTemplateWidget):
+                value = value_widget.export_data()
+            else:
+                value = None
+            values[name] = value
+        return values
 
     def _remove_selected_param_rows(self) -> None:
         if self._param_table is None:
@@ -6575,6 +6806,11 @@ class HomePage(BasePage):
                 value = value_widget.value()
             elif isinstance(value_widget, QLineEdit):
                 value = value_widget.text()
+            elif isinstance(value_widget, _AdjacencyDescriptionEdit):
+                value = {
+                    "value": value_widget.current_value(),
+                    "auto": value_widget.is_auto_managed(),
+                }
             elif isinstance(value_widget, BaseTemplateWidget):
                 value = value_widget.export_data()
             else:
@@ -6629,6 +6865,11 @@ class HomePage(BasePage):
                 widget.setValue(0)
         elif isinstance(widget, QLineEdit):
             widget.setText(str(value or ""))
+        elif isinstance(widget, _AdjacencyDescriptionEdit):
+            if isinstance(value, dict):
+                widget.set_value(value.get("value"), auto=bool(value.get("auto", False)))
+            else:
+                widget.set_value(value)
         elif isinstance(widget, BaseTemplateWidget):
             self._apply_template_value(widget, value)
 
@@ -8026,6 +8267,30 @@ class ModifierWorkspacePanel(HomePage):
         self._persist_current_reqset(refresh_list=False)
         self._persist_current_requirement()
         return self._build_xml_preview_text()
+
+    def adjacency_description_text_entries(self) -> List[tuple[str, str]]:
+        """只读：相邻加成效果器的 Description 中文文本条目 [(tag, text)]。
+
+        供 Text 工作区聚合展示；与 SQL 生成共用同一套 tag 命名规则，
+        中文描述注册为 LOC_{modifier_id}_DESCRIPTION。
+        """
+        entries: List[tuple[str, str]] = []
+        for record in self._modifiers:
+            if (record.effect_type or "").strip() not in ADJACENCY_DESCRIPTION_EFFECTS:
+                continue
+            modifier_id = str(record.modifier_id or "").strip()
+            if not modifier_id:
+                continue
+            for param in record.parameters:
+                if str(param.get("name", "")).strip() != "Description":
+                    continue
+                raw_value = param.get("value")
+                desc_value = raw_value.get("value") if isinstance(raw_value, dict) else raw_value
+                desc_text = str(desc_value or "").strip()
+                if not desc_text or desc_text.startswith("LOC_"):
+                    continue
+                entries.append((f"LOC_{modifier_id}_DESCRIPTION", desc_text))
+        return entries
 
     def _build_home_footer(self) -> QWidget:
         footer = QWidget()

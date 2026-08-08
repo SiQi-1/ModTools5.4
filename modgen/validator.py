@@ -69,7 +69,7 @@ def check_entry(section: str, entry: dict[str, Any], *, prefix: str = "", infix:
             errors.append(f"type 必须以 {head}_ 开头（实际 {entry_type}）")
         if re.search(r"[^A-Za-z0-9_]", entry_type):
             errors.append(f"type 含非法字符：{entry_type}")
-        abbr = str(entry.get("abbr") or "").strip()
+        abbr = str(entry.get("abbr") or entry.get("code") or "").strip()
         expected = rules.build_entity_type(
             prefix, infix,
             head=head,
@@ -142,17 +142,31 @@ def check_entry(section: str, entry: dict[str, Any], *, prefix: str = "", infix:
     return errors, warnings
 
 
-def validate_project(project: dict[str, Any], *, prefix: str = "", infix: int = 0) -> list[str]:
-    """校验整个工程（workspace 结构），返回错误清单。"""
+def validate_project(
+    project: dict[str, Any],
+    *,
+    prefix: str | None = None,
+    infix: int | None = None,
+) -> list[str]:
+    """校验整个工程（workspace 结构），返回错误清单。
+
+    prefix/infix 未显式指定时，自动从工程基础信息读取。
+    """
     errors: list[str] = []
     workspace = project.get("workspace")
     if not isinstance(workspace, dict):
         return ["工程缺少 workspace 节点"]
+    if prefix is None or infix is None:
+        auto_prefix, auto_infix = rules.project_workspace_params(workspace)
+        if prefix is None:
+            prefix = auto_prefix
+        if infix is None:
+            infix = auto_infix
     for section in rules.CONTENT_SECTIONS:
         entries = workspace.get(section)
         if not isinstance(entries, list):
             continue
         for index, entry in enumerate(entries):
-            for error in validate_entry(section, entry, prefix=prefix, infix=infix):
+            for error in validate_entry(section, entry, prefix=prefix or "", infix=infix or 0):
                 errors.append(f"{section}[{index}]: {error}")
     return errors

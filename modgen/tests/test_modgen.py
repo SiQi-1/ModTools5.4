@@ -164,6 +164,15 @@ class ValidatorTestCase(unittest.TestCase):
         errors = validate_project(bad, prefix="SIQI", infix=1)
         self.assertTrue(errors)
 
+    def test_project_workspace_params_autodetect(self) -> None:
+        project = {"workspace": {
+            "基础信息": {"data": {"shared_workspace_params": {"prefix": "SIQI", "infix": 32}}},
+            "区域": [{"type": "DISTRICT_SIQI_D0032_1", "abbr": "1", "name": "测试",
+                      "table_data": {"Name": "测试", "MilitaryDomain": "NO_DOMAIN"}}],
+        }}
+        errors = validate_project(project)  # 不传 prefix/infix，自动读取
+        self.assertEqual(errors, [], f"{errors}")
+
 
 class MergerTestCase(unittest.TestCase):
     def test_merge_adds_and_dedupes(self) -> None:

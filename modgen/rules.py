@@ -182,6 +182,39 @@ def entry_type(entry: dict[str, Any]) -> str:
     return str(entry.get("type") or "").strip()
 
 
+def project_workspace_params(workspace: dict[str, Any]) -> tuple[str, int]:
+    """从工程 workspace 读取共享参数（prefix/infix）。
+
+    兼容两种结构：
+    - 基础信息.data.shared_workspace_params.{prefix,infix}
+    - 基础信息.{prefix,infix}（旧/简版）
+    读不到返回 ("", 0)。
+    """
+    basic = workspace.get("基础信息")
+    basic = basic if isinstance(basic, dict) else {}
+    candidates = []
+    data = basic.get("data")
+    if isinstance(data, dict):
+        swp = data.get("shared_workspace_params")
+        if isinstance(swp, dict):
+            candidates.append(swp)
+        candidates.append(data)
+    candidates.append(basic)
+    prefix = ""
+    infix = 0
+    for source in candidates:
+        if not isinstance(source, dict):
+            continue
+        if not prefix:
+            prefix = str(source.get("prefix") or "").strip()
+        if infix == 0 and source.get("infix") not in (None, ""):
+            try:
+                infix = max(0, int(source.get("infix")))
+            except (TypeError, ValueError):
+                infix = 0
+    return prefix, infix
+
+
 def requires_type_key(section: str) -> bool:
     """该分类的条目是否必须携带主表类型键。"""
     return section not in {"单位晋升"}

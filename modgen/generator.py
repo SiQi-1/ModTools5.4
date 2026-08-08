@@ -174,3 +174,183 @@ def required_fields_to_fill(section: str) -> list[str]:
             if key:
                 fields.append(key)
     return fields
+
+
+def generate_great_person(
+    *,
+    prefix: str,
+    infix: int,
+    name: str,
+    class_abbr: str,
+    unit_abbr: str = "",
+    individuals: list[dict[str, Any]] | None = None,
+    **extra: Any,
+) -> dict[str, Any]:
+    """生成伟人类型条目（含伟人个体骨架）。
+
+    Args:
+        prefix/infix: 工程前缀/中缀
+        name: 伟人类型中文名
+        class_abbr: 伟人类型简称（生成 GreatPersonClassType）
+        unit_abbr: 对应单位简称（生成 UnitType，如 SCIENTIST）
+        individuals: 个体列表，每项含 mode(activation/greatwork)/abbr/name_cn，
+            可选 desc_cn/era/charges 等；仅传 abbr+name 即可，其余自动生成默认
+        extra: 覆盖 class_data 的其他字段（IconString/ActionIcon 等）
+    """
+    class_type = rules.build_entity_type(
+        prefix, infix, head="GREAT_PERSON_CLASS", midfix_code="G", short_name=class_abbr
+    )
+    unit_type = rules.build_entity_type(prefix, infix, head="UNIT", midfix_code="U", short_name=unit_abbr) if unit_abbr else ""
+
+    entry: dict[str, Any] = {
+        "type": class_type,
+        "name": name,
+        "class_data": {
+            "GreatPersonClassType": class_type,
+            "UnitType": unit_type,
+            "Name": name,
+            "DistrictType": "",
+            "IconString": "ICON_UNIT_GREAT_GENERAL",
+            "ActionIcon": "ICON_UNITACTION_RETIRE",
+            "AvailableInTimeline": True,
+            "GenerateDuplicateIndividuals": False,
+        },
+        "unit_data": {},
+        "import_locked": False,
+        "individuals": [],
+    }
+
+    for index, spec in enumerate(individuals or [], start=1):
+        mode = str(spec.get("mode") or "activation").strip().lower()
+        individual_abbr = str(spec.get("abbr") or "").strip() or f"{class_abbr}_I{index}"
+        name_cn = str(spec.get("name_cn") or "").strip() or f"{name}个体{index}"
+        individual_type = rules.build_individual_type(prefix, infix, individual_abbr)
+
+        individual: dict[str, Any] = {
+            "mode": mode,
+            "abbr": individual_abbr,
+            "GreatPersonIndividualType": individual_type,
+            "Name": name_cn,
+            "EraType": str(spec.get("era") or "ERA_ANCIENT").strip(),
+        }
+        if mode == "activation":
+            individual["ActionCharges"] = 1
+            individual["Gender"] = "M"
+            individual["ActionNameTextOverride"] = "LOC_GREATPERSON_ACTION_NAME_RETIRE"
+            desc = str(spec.get("desc_cn") or "").strip()
+            if desc:
+                individual["ActionEffectTextOverride"] = desc
+        elif mode == "greatwork":
+            individual["ActionCharges"] = 0
+            works = spec.get("great_works")
+            if isinstance(works, list) and works:
+                individual["great_works"] = []
+                for work_spec in works:
+                    work_abbr = str(work_spec.get("abbr") or "").strip() or f"{individual_abbr}_W"
+                    individual["great_works"].append({
+                        "GreatWorkType": rules.build_great_work_type(prefix, infix, work_abbr),
+                        "GreatWorkObjectType": str(work_spec.get("object_type") or "GREATWORKOBJECT_LITERATURE"),
+                        "Name": str(work_spec.get("name_cn") or "").strip() or f"巨作{index}",
+                        "Quote": str(work_spec.get("quote_cn") or "").strip(),
+                        "Tourism": int(work_spec.get("tourism") or 1),
+                        "EraType": str(work_spec.get("era") or "").strip(),
+                        "Audio": "",
+                        "Image": "",
+                        "yield_changes": [],
+                    })
+            else:
+                individual["great_works"] = []
+        entry["individuals"].append(individual)
+
+    for key, value in extra.items():
+        entry["class_data"][key] = value
+    return entry
+
+
+def generate_promotion_tree(
+    *,
+    prefix: str,
+    infix: int,
+    name: str,
+    tree_abbr: str,
+    nodes: list[dict[str, Any]] | None = None,
+    **extra: Any,
+) -> dict[str, Any]:
+    """生成单位晋升树条目。
+
+    Args:
+        name: 晋升树中文名
+        tree_abbr: 晋升树简称（生成 PromotionClassType）
+        nodes: 节点列表，每项含 abbr/name_cn，可选 desc_cn/level/column/prereq_indices；
+            缺省 level=1/column=1/prereq 空
+    """
+    tree_type = rules.build_entity_type(
+        prefix, infix, head="PROMOTION_CLASS", midfix_code="P", short_name=tree_abbr
+    )
+    entry: dict[str, Any] = {
+        "name": name,
+        "type": tree_type,
+        "mode": "tree",
+        "nodes": [],
+    }
+    for index, spec in enumerate(nodes or [], start=1):
+        node_abbr = str(spec.get("abbr") or "").strip() or f"N{index}"
+        node: dict[str, Any] = {
+            "abbr": node_abbr,
+            "name_cn": str(spec.get("name_cn") or "").strip() or f"{name}晋升{index}",
+            "desc_cn": str(spec.get("desc_cn") or "").strip(),
+            "level": int(spec.get("level") or 1),
+            "column": int(spec.get("column") or 1),
+            "prereq_indices": list(spec.get("prereq_indices") or []),
+        }
+        entry["nodes"].append(node)
+    entry.update(extra)
+    return entry
+
+
+def generate_agenda(
+    *,
+    prefix: str,
+    infix: int,
+    name: str,
+    agenda_abbr: str,
+    description: str = "",
+    leader_abbr: str = "",
+    **extra: Any,
+) -> dict[str, Any]:
+    """生成议程条目。
+
+    Args:
+        name: 议程中文名
+        agenda_abbr: 议程简称（生成 AgendaType）
+        description: 议程中文描述
+        leader_abbr: 绑定领袖简称（生成 HistoricalAgendas.LeaderType）
+    """
+    agenda_type = rules.build_entity_type(
+        prefix, infix, head="AGENDA", midfix_code="A", short_name=agenda_abbr
+    )
+    leader_type = rules.build_entity_type(prefix, infix, head="LEADER", midfix_code="L", short_name=leader_abbr) if leader_abbr else ""
+    entry: dict[str, Any] = {
+        "name": name,
+        "type": agenda_type,
+        "table_data": {
+            "Name": name,
+            "Description": description,
+        },
+        "historical_agendas": {},
+        "subtables": {
+            "ExclusiveAgendas": [],
+            "AiLists": [],
+            "AgendaModifiers": [],
+        },
+    }
+    if leader_type:
+        entry["historical_agendas"] = {
+            "LeaderType": leader_type,
+            "ExitKudoStatementKey": "",
+            "ExitKudoText": "",
+            "ExitWarningStatementKey": "",
+            "ExitWarnText": "",
+        }
+    entry.update(extra)
+    return entry

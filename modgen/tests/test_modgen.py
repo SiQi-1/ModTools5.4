@@ -12,7 +12,14 @@ repo_root = str(Path(__file__).resolve().parents[2])
 if repo_root not in os.sys.path:
     os.sys.path.insert(0, repo_root)
 
-from modgen.generator import GenerateError, generate_entry, required_fields_to_fill  # noqa: E402
+from modgen.generator import (  # noqa: E402
+    GenerateError,
+    generate_agenda,
+    generate_entry,
+    generate_great_person,
+    generate_promotion_tree,
+    required_fields_to_fill,
+)
 from modgen.merger import load_civ, merge_entry, save_civ  # noqa: E402
 from modgen.rules import build_entity_type  # noqa: E402
 from modgen.validator import validate_entry, validate_project  # noqa: E402
@@ -69,6 +76,50 @@ class GenerateTestCase(unittest.TestCase):
     def test_generate_unknown_section_raises(self) -> None:
         with self.assertRaises(GenerateError):
             generate_entry("不存在", prefix="X", infix=0, name="x", abbr="x")
+
+    def test_generate_great_person(self) -> None:
+        entry = generate_great_person(
+            prefix="SIQI", infix=35, name="示例伟人", class_abbr="SCIENTIST", unit_abbr="SCIENTIST",
+            individuals=[
+                {"mode": "activation", "abbr": "NEWTON", "name_cn": "牛顿"},
+                {"mode": "greatwork", "abbr": "WRITER", "name_cn": "作家",
+                 "great_works": [{"abbr": "BOOK", "name_cn": "巨作"}]},
+            ],
+        )
+        self.assertEqual(entry["type"], "GREAT_PERSON_CLASS_SIQI_G0035_SCIENTIST")
+        self.assertEqual(entry["class_data"]["UnitType"], "UNIT_SIQI_U0035_SCIENTIST")
+        self.assertEqual(len(entry["individuals"]), 2)
+        ind = entry["individuals"][0]
+        self.assertEqual(ind["mode"], "activation")
+        self.assertEqual(ind["GreatPersonIndividualType"], "GREAT_PERSON_INDIVIDUAL_SIQI_G0035_NEWTON")
+        self.assertEqual(ind["ActionCharges"], 1)
+        greatwork = entry["individuals"][1]
+        self.assertEqual(greatwork["mode"], "greatwork")
+        self.assertEqual(greatwork["ActionCharges"], 0)
+        self.assertEqual(greatwork["great_works"][0]["GreatWorkType"], "GREATWORK_SIQI_G0035_BOOK")
+
+    def test_generate_promotion_tree(self) -> None:
+        entry = generate_promotion_tree(
+            prefix="SIQI", infix=35, name="示例晋升树", tree_abbr="MILITARY",
+            nodes=[
+                {"abbr": "A", "name_cn": "晋升一"},
+                {"abbr": "B", "name_cn": "晋升二", "level": 2, "prereq_indices": [0]},
+            ],
+        )
+        self.assertEqual(entry["type"], "PROMOTION_CLASS_SIQI_P0035_MILITARY")
+        self.assertEqual(len(entry["nodes"]), 2)
+        self.assertEqual(entry["nodes"][0]["level"], 1)
+        self.assertEqual(entry["nodes"][1]["prereq_indices"], [0])
+
+    def test_generate_agenda(self) -> None:
+        entry = generate_agenda(
+            prefix="SIQI", infix=35, name="示例议程", agenda_abbr="WAR",
+            description="描述", leader_abbr="DEMO",
+        )
+        self.assertEqual(entry["type"], "AGENDA_SIQI_A0035_WAR")
+        self.assertEqual(entry["historical_agendas"]["LeaderType"], "LEADER_SIQI_L0035_DEMO")
+        self.assertIn("ExclusiveAgendas", entry["subtables"])
+        self.assertIn("AgendaModifiers", entry["subtables"])
 
 
 class ValidatorTestCase(unittest.TestCase):

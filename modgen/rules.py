@@ -151,6 +151,23 @@ def loc_tag_for(entity_type: str, suffix: str) -> str:
     return f"LOC_{entity_type}_{suffix}"
 
 
+def build_individual_type(prefix: str, infix: int, abbr: str) -> str:
+    """伟人个体 Type：GREAT_PERSON_INDIVIDUAL_{前缀}_{中缀}_{简称}。"""
+    return build_entity_type(
+        prefix, infix, head="GREAT_PERSON_INDIVIDUAL", midfix_code="G", short_name=abbr
+    )
+
+
+def build_great_work_type(prefix: str, infix: int, abbr: str) -> str:
+    """巨作 Type：GREATWORK_{前缀}_{中缀}_{简称}。"""
+    return build_entity_type(prefix, infix, head="GREATWORK", midfix_code="G", short_name=abbr)
+
+
+def build_promotion_type(prefix: str, infix: int, abbr: str) -> str:
+    """晋升节点 Type：PROMOTION_{前缀}_{中缀}_{简称}。"""
+    return build_entity_type(prefix, infix, head="PROMOTION", midfix_code="P", short_name=abbr)
+
+
 def entry_display_name(entry: dict[str, Any]) -> str:
     """条目的显示名（name 优先，回退 Name/type）。"""
     for key in ("name", "Name"):

@@ -22,6 +22,12 @@ from .generator import (
     required_fields_to_fill,
 )
 from .merger import load_civ, merge_entry, save_civ
+from .modifier_generator import (
+    generate_ability,
+    generate_modifier,
+    generate_requirement,
+    generate_requirement_set,
+)
 from .validator import check_entry, validate_project
 
 
@@ -111,6 +117,78 @@ def _cmd_merge(args: argparse.Namespace) -> int:
     return 0
 
 
+def _parse_params(raw: str | None) -> list[dict[str, Any]]:
+    """--params JSON 对象 → [{"name","value"}] 列表。"""
+    if not raw:
+        return []
+    data = json.loads(raw)
+    if not isinstance(data, dict):
+        raise ValueError("--params 需要 JSON 对象")
+    return [{"name": name, "value": value} for name, value in data.items()]
+
+
+def _cmd_generate_modifier(args: argparse.Namespace) -> int:
+    entry = generate_modifier(
+        prefix=args.prefix,
+        infix=args.infix,
+        effect_type=args.effect,
+        collection_type=args.collection,
+        desc=args.desc,
+        modifier_id=args.id,
+        parameters=_parse_params(args.params) or None,
+        comment=args.comment,
+        owner_reqset=args.owner_reqset,
+        subject_reqset=args.subject_reqset,
+        run_once=args.run_once,
+        new_only=args.new_only,
+        permanent=args.permanent,
+    )
+    print(json.dumps(entry, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_generate_requirement(args: argparse.Namespace) -> int:
+    entry = generate_requirement(
+        prefix=args.prefix,
+        infix=args.infix,
+        requirement_type=args.req_type,
+        desc=args.desc,
+        requirement_id=args.id,
+        parameters=_parse_params(args.params) or None,
+        comment=args.comment,
+    )
+    print(json.dumps(entry, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_generate_reqset(args: argparse.Namespace) -> int:
+    requirements = json.loads(args.requirements) if args.requirements else []
+    entry = generate_requirement_set(
+        prefix=args.prefix,
+        infix=args.infix,
+        desc=args.desc,
+        requirement_set_id=args.id,
+        logic=args.logic,
+        requirements=requirements,
+        comment=args.comment,
+    )
+    print(json.dumps(entry, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_generate_ability(args: argparse.Namespace) -> int:
+    entry = generate_ability(
+        prefix=args.prefix,
+        infix=args.infix,
+        abbr=args.abbr,
+        name_zh=args.name,
+        description_zh=args.desc,
+        unit_ability_type=args.id,
+    )
+    print(json.dumps(entry, ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="modgen", description="文明6 Mod 工程(.CIV)生成与校验工具")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -144,6 +222,52 @@ def build_parser() -> argparse.ArgumentParser:
     merge.add_argument("--infix", type=int, default=0, help="工程中缀编号")
     merge.add_argument("--no-validate", action="store_true", help="跳过校验")
     merge.set_defaults(func=_cmd_merge)
+
+    # 修改器四类（共享 prefix/infix）
+    def _add_shared(parser_: argparse.ArgumentParser) -> None:
+        parser_.add_argument("--prefix", default="", help="工程前缀（如 SIQI）")
+        parser_.add_argument("--infix", type=int, default=0, help="工程中缀编号（如 35）")
+
+    mod = sub.add_parser("generate-modifier", help="生成 Modifier（参数骨架自动按 EffectType 生成）")
+    _add_shared(mod)
+    mod.add_argument("--effect", required=True, help="EffectType（必填）")
+    mod.add_argument("--collection", default="", help="CollectionType（如 COLLECTION_OWNER）")
+    mod.add_argument("--desc", default="", help="效果描述（自动生成 ModifierId）")
+    mod.add_argument("--id", default="", help="完整 ModifierId（不传则按 desc 生成）")
+    mod.add_argument("--params", default="", help="参数 JSON 对象，如 {\"Amount\":2,\"YieldType\":\"YIELD_PRODUCTION\"}")
+    mod.add_argument("--comment", default="", help="中文注释")
+    mod.add_argument("--owner-reqset", default="", help="OwnerRequirementSetId")
+    mod.add_argument("--subject-reqset", default="", help="SubjectRequirementSetId")
+    mod.add_argument("--run-once", action="store_true")
+    mod.add_argument("--new-only", action="store_true")
+    mod.add_argument("--permanent", action="store_true")
+    mod.set_defaults(func=_cmd_generate_modifier)
+
+    req = sub.add_parser("generate-requirement", help="生成 Requirement")
+    _add_shared(req)
+    req.add_argument("--type", dest="req_type", required=True, help="RequirementType（必填）")
+    req.add_argument("--desc", default="", help="条件描述（自动生成 RequirementId）")
+    req.add_argument("--id", default="", help="完整 RequirementId")
+    req.add_argument("--params", default="", help="参数 JSON 对象")
+    req.add_argument("--comment", default="", help="中文注释")
+    req.set_defaults(func=_cmd_generate_requirement)
+
+    rs = sub.add_parser("generate-reqset", help="生成 RequirementSet")
+    _add_shared(rs)
+    rs.add_argument("--desc", required=True, help="集合描述（生成 RequirementSetId）")
+    rs.add_argument("--id", default="", help="完整 RequirementSetId")
+    rs.add_argument("--logic", default="ALL", choices=["ALL", "ANY"])
+    rs.add_argument("--requirements", default="", help="RequirementId 列表 JSON，如 [\"REQUIREMENT_A\",\"REQUIREMENT_B\"]")
+    rs.add_argument("--comment", default="", help="中文注释")
+    rs.set_defaults(func=_cmd_generate_reqset)
+
+    ab = sub.add_parser("generate-ability", help="生成 UnitAbility")
+    _add_shared(ab)
+    ab.add_argument("--abbr", required=True, help="能力简称（生成 ABILITY_ Type）")
+    ab.add_argument("--name", required=True, help="中文名")
+    ab.add_argument("--desc", default="", help="中文描述")
+    ab.add_argument("--id", default="", help="完整 UnitAbilityType（不传则按 abbr 生成）")
+    ab.set_defaults(func=_cmd_generate_ability)
 
     return parser
 

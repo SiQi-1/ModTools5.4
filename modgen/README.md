@@ -16,6 +16,10 @@
 ```bash
 # 无需安装，仓库根目录下直接运行
 python -m modgen.cli generate 区域 --name "测试区域" --abbr TEST --prefix SIQI --infix 35
+python -m modgen.cli generate-modifier --effect EFFECT_DISTRICT_ADJACENCY --collection COLLECTION_OWNER --desc ADJ_STRENGTH
+python -m modgen.cli generate-requirement --type REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES --desc ADJ_FOREST
+python -m modgen.cli generate-reqset --desc MILITARY --logic ALL
+python -m modgen.cli generate-ability --abbr DEMO_ABILITY --name "测试能力"
 python -m modgen.cli validate 工程.CIV
 python -m modgen.cli merge 工程.CIV 区域 --entry entry.json
 ```
@@ -28,10 +32,13 @@ modgen/
 ├── cli.py                    # generate / validate / merge 命令
 ├── rules.py                  # 命名/结构规则（与 GUI 一致）
 ├── generator.py              # generate 核心
+├── modifier_generator.py     # 修改器四类生成（Modifier/Requirement/ReqSet/Ability）
 ├── validator.py              # 校验（errors + warnings）
+├── modifier_validator.py     # 修改器校验（类型/参数名/引用）
 ├── merger.py                 # 合并进 .CIV（自动备份）
-├── schema_store.py           # 加载 entry_schemas.json
+├── schema_store.py           # 加载 entry_schemas.json / modifier_schemas.json
 ├── schemas/entry_schemas.json# 条目结构 schema（提取产物，提交 git）
+├── schemas/modifier_schemas.json # EffectType/RequirementType 参数集（源自游戏库）
 ├── tools/extract_schemas.py  # 从 ModTools 源码+fixture 重新提取 schema
 └── tests/test_modgen.py      # 回归测试（fixture 全过 + 真实错误抓取）
 ```

@@ -16,6 +16,7 @@ import re
 from typing import Any
 
 from . import rules
+from .modifier_validator import check_modifier_data
 from .schema_store import load_schemas
 
 
@@ -169,4 +170,12 @@ def validate_project(
         for index, entry in enumerate(entries):
             for error in validate_entry(section, entry, prefix=prefix or "", infix=infix or 0):
                 errors.append(f"{section}[{index}]: {error}")
+    # 修改器直接工作区
+    modifier_payload = workspace.get("修改器")
+    if isinstance(modifier_payload, dict):
+        modifier_data = modifier_payload.get("data")
+        if isinstance(modifier_data, dict):
+            sub_errors, _sub_warnings = check_modifier_data(modifier_data)
+            for error in sub_errors:
+                errors.append(f"修改器: {error}")
     return errors

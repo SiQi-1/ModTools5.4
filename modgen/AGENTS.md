@@ -23,6 +23,12 @@ python -m modgen.cli validate --section 分类 --entry entry.json [--prefix 前�
 
 # 合并条目进工程（同 type 去重，自动备份 .bak）
 python -m modgen.cli merge 工程.CIV <分类> --entry entry.json [--prefix 前缀] [--infix 编号]
+
+# 修改器四类生成（EffectType/RequirementType 存在性与参数骨架自动处理）
+python -m modgen.cli generate-modifier --effect EFFECT_XXX --collection COLLECTION_XXX --desc 效果描述 [--params '{"Amount":2,"YieldType":"YIELD_PRODUCTION"}']
+python -m modgen.cli generate-requirement --type REQUIREMENT_XXX --desc 条件描述 [--params '{"...":...}']
+python -m modgen.cli generate-reqset --desc 集合描述 --logic ALL [--requirements '["REQUIREMENT_A"]']
+python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中文描述]
 ```
 
 `--prefix`/`--infix` 来自工程"基础信息"（前缀如 SIQI、中缀编号如 35）。
@@ -65,6 +71,18 @@ python -m modgen.cli merge 工程.CIV <分类> --entry entry.json [--prefix 前�
 | 项目 | PROJECT | abbr | |
 | 信仰 | BELIEF | abbr | |
 | 议程 | AGENDA | (type) | 顶层无 abbr |
+
+## 修改器规则（generate-modifier 等）
+
+- **ModifierId 命名**：`MODIFIER_{前缀}_{项目号:04d}_{描述}`（如 `MODIFIER_SIQI_0035_ADJ_STRENGTH`）；
+  Requirement 用 `REQUIREMENT_`、ReqSet 用 `REQSET_`、Ability 用 `ABILITY_{前缀}_{中缀}{编号:04d}_{简称}`。
+- **EffectType / RequirementType / CollectionType 必须真实存在**——generator 会校验并拒绝未知类型，
+  validate 也会对未知类型报错（参数集合来自 `schemas/modifier_schemas.json`，源自游戏库权威数据）。
+- **参数名必须属于该 Effect/Requirement 的参数集合**（多写/拼错报 error，标准参数缺失给 warning）。
+- **引用**：`owner_reqset` / `subject_reqset` / `bound_requirements` 必须指向工程内存在的 ReqSet/Requirement。
+- 生成的 Modifier 参数骨架 value 为 null，AI 需填入实际值（数值/Type/文本）。
+- 注意：`generate-modifier` 产物是"自定义 ModifierType"（modifier_type = modifier_id），
+  若要用游戏内置 ModifierType，需另行指定。
 
 ## 外部知识库（生成前建议查阅字段语义）
 

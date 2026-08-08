@@ -20,6 +20,13 @@ from modgen.generator import (  # noqa: E402
     generate_promotion_tree,
     required_fields_to_fill,
 )
+from modgen.modifier_generator import (  # noqa: E402
+    generate_ability,
+    generate_modifier,
+    generate_requirement,
+    generate_requirement_set,
+)
+from modgen.modifier_validator import check_modifier_data  # noqa: E402
 from modgen.merger import load_civ, merge_entry, save_civ  # noqa: E402
 from modgen.rules import build_entity_type  # noqa: E402
 from modgen.validator import validate_entry, validate_project  # noqa: E402
@@ -198,6 +205,104 @@ class MergerTestCase(unittest.TestCase):
         payload = {"workspace": {}}
         with self.assertRaises(Exception):
             merge_entry(payload, "区域", {"type": "BAD", "abbr": "", "name": ""}, prefix="SIQI", infix=1)
+
+
+class ModifierTestCase(unittest.TestCase):
+    def test_generate_modifier(self) -> None:
+        entry = generate_modifier(
+            prefix="SIQI", infix=35, effect_type="EFFECT_DISTRICT_ADJACENCY",
+            collection_type="COLLECTION_OWNER", desc="ADJ_STRENGTH",
+            parameters=[{"name": "Amount", "value": 2}],
+        )
+        self.assertEqual(entry["modifier_id"], "MODIFIER_SIQI_0035_ADJ_STRENGTH")
+        self.assertEqual(entry["effect_type"], "EFFECT_DISTRICT_ADJACENCY")
+        self.assertEqual(entry["parameters"], [{"name": "Amount", "value": 2}])
+
+    def test_generate_modifier_rejects_unknown_effect(self) -> None:
+        with self.assertRaises(ValueError):
+            generate_modifier(prefix="SIQI", infix=1, effect_type="EFFECT_NOT_EXIST", desc="X")
+
+    def test_generate_modifier_param_skeleton(self) -> None:
+        entry = generate_modifier(prefix="SIQI", infix=1, effect_type="EFFECT_DISTRICT_ADJACENCY", desc="X")
+        names = {p["name"] for p in entry["parameters"]}
+        self.assertIn("Amount", names)
+        self.assertIn("YieldType", names)
+        self.assertIn("DistrictType", names)
+
+    def test_generate_requirement(self) -> None:
+        entry = generate_requirement(
+            prefix="SIQI", infix=35, requirement_type="REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES",
+            desc="ADJ_FOREST",
+        )
+        self.assertEqual(entry["requirement_id"], "REQUIREMENT_SIQI_0035_ADJ_FOREST")
+        self.assertEqual(entry["requirement_type"], "REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES")
+
+    def test_generate_requirement_rejects_unknown(self) -> None:
+        with self.assertRaises(ValueError):
+            generate_requirement(prefix="SIQI", infix=1, requirement_type="REQUIREMENT_NOT_EXIST", desc="X")
+
+    def test_generate_reqset(self) -> None:
+        entry = generate_requirement_set(
+            prefix="SIQI", infix=35, desc="MILITARY", logic="ANY",
+            requirements=["REQUIREMENT_SIQI_0035_A", "REQUIREMENT_SIQI_0035_B"],
+        )
+        self.assertEqual(entry["requirement_set_id"], "REQSET_SIQI_0035_MILITARY")
+        self.assertEqual(entry["logic"], "ANY")
+        self.assertEqual(len(entry["bound_requirements"]), 2)
+
+    def test_generate_ability(self) -> None:
+        entry = generate_ability(prefix="SIQI", infix=35, abbr="DEMO_ABILITY", name_zh="测试能力")
+        self.assertEqual(entry["unit_ability_type"], "ABILITY_SIQI_A0035_DEMO_ABILITY")
+
+    def test_check_modifier_data_catches_bad_params(self) -> None:
+        data = {
+            "modifiers": [{
+                "modifier_id": "MODIFIER_X",
+                "modifier_type": "MODIFIER_X",
+                "effect_type": "EFFECT_DISTRICT_ADJACENCY",
+                "collection_type": "COLLECTION_OWNER",
+                "parameters": [{"name": "WrongParam", "value": 1}],
+                "owner_reqset": "REQSET_MISSING",
+            }],
+            "requirement_sets": [],
+            "requirements": [],
+            "unit_abilities": [],
+        }
+        errors, warnings = check_modifier_data(data)
+        joined = "\n".join(errors)
+        self.assertIn("WrongParam", joined, "参数名不属于 EffectType 应报错")
+        self.assertIn("REQSET_MISSING", joined, "引用不存在的 reqset 应报错")
+
+    def test_check_modifier_data_pass_on_generated(self) -> None:
+        data = {
+            "modifiers": [
+                generate_modifier(prefix="SIQI", infix=35, effect_type="EFFECT_DISTRICT_ADJACENCY",
+                                  collection_type="COLLECTION_OWNER", desc="A",
+                                  parameters=[{"name": "Amount", "value": 1},
+                                              {"name": "YieldType", "value": "YIELD_PRODUCTION"},
+                                              {"name": "DistrictType", "value": "DISTRICT_CITY_CENTER"}]),
+            ],
+            "requirement_sets": [],
+            "requirements": [],
+            "unit_abilities": [],
+        }
+        errors, _warnings = check_modifier_data(data)
+        self.assertEqual(errors, [], f"{errors}")
+
+    def test_validate_project_checks_modifier_section(self) -> None:
+        project = {"workspace": {
+            "修改器": {"data": {
+                "modifiers": [{
+                    "modifier_id": "MODIFIER_X",
+                    "modifier_type": "MODIFIER_X",
+                    "effect_type": "EFFECT_NOT_REAL",
+                    "parameters": [],
+                }],
+                "requirement_sets": [], "requirements": [], "unit_abilities": [],
+            }},
+        }}
+        errors = validate_project(project)
+        self.assertTrue(any("EffectType" in e for e in errors), errors)
 
 
 if __name__ == "__main__":

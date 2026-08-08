@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-02 - 修复：相邻加成描述自动生成取值与按钮样式
+
+### 问题
+- 自动生成读到的是模板控件 export 的 dict（如 `{'yield_type': 'YIELD_PRODUCTION', 'display': '生产力', 'value': ...}`），直接 `str()` 导致描述变成 `+1{'yield_type': ...}（与{'district_type': ...}相邻）`。
+- "自动生成"按钮未套用小按钮样式，文本显示不全。
+
+### 修复
+- 新增 `_extract_param_scalar`：从模板控件 export 的 dict 提取实际值（对齐 `_param_to_sql` 的 key 顺序 value/id/type/unit_type/display/text/name）。
+- `_collect_param_values_dict` 对模板控件值统一归一化；`_auto_build_text` 防御性归一化。
+- 按钮套用 `SMALL_BUTTON_QSS`（与其它小按钮一致）+ 固定高度；输入框设最小宽度 220 防截断。
+
+### 测试
+- 新增回归用例 `test_auto_build_text_accepts_template_dict_values`（共 68）：dict 值归一化、描述不含 dict repr。
+
 ## 2026-08-02 - 新增：相邻加成效果器 Description 自动命名（UI→SQL→Text.sql 全链路）
 
 ### 功能

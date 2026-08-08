@@ -39,6 +39,18 @@ class AdjacencyDescriptionTestCase(unittest.TestCase):
         self.assertIn("生产力", text)
         self.assertNotIn("DISTRICT_CITY_CENTER", text, "来源 Type 应本地化为中文")
 
+    def test_auto_build_text_accepts_template_dict_values(self) -> None:
+        """模板控件 export 的 dict（如 yield/district 搜索）应归一化为标量。"""
+        widget = _AdjacencyDescriptionEdit(sibling_values_provider=lambda: {
+            "Amount": 1,
+            "YieldType": {"yield_type": "YIELD_PRODUCTION", "display": "生产力", "name": "生产力", "value": "YIELD_PRODUCTION"},
+            "DistrictType": {"district_type": "DISTRICT_THEATER", "display": "DISTRICT_THEATER", "value": "DISTRICT_THEATER"},
+        })
+        text = widget._auto_build_text()
+        self.assertNotIn("{", text, "dict repr 不应出现在描述中")
+        self.assertIn("+1", text)
+        self.assertIn("生产力", text)
+
     def test_auto_build_text_negative_and_tiles(self) -> None:
         widget = _AdjacencyDescriptionEdit(sibling_values_provider=lambda: {
             "Amount": -1,

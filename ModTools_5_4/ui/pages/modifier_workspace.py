@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence
 
-from .group_workspace import _build_entity_type
+from .group_workspace import SMALL_BUTTON_QSS, _build_entity_type
 
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence, QShortcut
@@ -623,6 +623,17 @@ def _adjacency_source_label(param_key: str, value: str) -> str:
     return YIELD_VALUE_TO_NAME.get(value, value)
 
 
+def _extract_param_scalar(value: object) -> object:
+    """从参数控件值提取标量：模板控件 export 的 dict 取其实际值（对齐 _param_to_sql）。"""
+    if not isinstance(value, dict):
+        return value
+    for key in ("value", "id", "type", "unit_type", "display", "text", "name"):
+        entry = value.get(key)
+        if entry not in (None, ""):
+            return entry
+    return None
+
+
 class _AdjacencyDescriptionEdit(QWidget):
     """相邻加成 Description 参数控件：输入框 + 自动生成按钮。
 
@@ -648,10 +659,13 @@ class _AdjacencyDescriptionEdit(QWidget):
         layout.setSpacing(6)
         self._edit = QLineEdit()
         self._edit.setPlaceholderText("中文描述（自动注册LOC）或 LOC_ 标签")
+        self._edit.setMinimumWidth(220)
         self._edit.textChanged.connect(self._on_text_edited)
         layout.addWidget(self._edit, 1)
         self._gen_btn = QPushButton("自动生成")
         self._gen_btn.setToolTip("按相邻加成参数生成描述；不覆盖手动填写的内容")
+        self._gen_btn.setStyleSheet(SMALL_BUTTON_QSS)
+        self._gen_btn.setFixedHeight(26)
         self._gen_btn.clicked.connect(self._auto_generate)
         layout.addWidget(self._gen_btn)
 
@@ -671,8 +685,8 @@ class _AdjacencyDescriptionEdit(QWidget):
     def _auto_build_text(self) -> str:
         values = self._sibling_values_provider() if callable(self._sibling_values_provider) else {}
         values = values if isinstance(values, dict) else {}
-        amount = values.get("Amount")
-        yield_type = str(values.get("YieldType") or "").strip()
+        amount = _extract_param_scalar(values.get("Amount"))
+        yield_type = str(_extract_param_scalar(values.get("YieldType")) or "").strip()
         try:
             amount_int = int(amount)
         except (TypeError, ValueError):
@@ -683,12 +697,12 @@ class _AdjacencyDescriptionEdit(QWidget):
         base = f"{change_prefix}{abs_amount}{yield_label}" if yield_type else f"{change_prefix}{abs_amount}"
         source_parts: list[str] = []
         for key, template in _ADJACENCY_SOURCE_LABELS.items():
-            value = str(values.get(key) or "").strip()
+            value = str(_extract_param_scalar(values.get(key)) or "").strip()
             if not value:
                 continue
             label = _adjacency_source_label(key, value)
             source_parts.append(template.format(value=label))
-        tiles_required = values.get("TilesRequired")
+        tiles_required = _extract_param_scalar(values.get("TilesRequired"))
         try:
             tiles_int = int(tiles_required)
         except (TypeError, ValueError):
@@ -6774,7 +6788,7 @@ class HomePage(BasePage):
             elif isinstance(value_widget, _AdjacencyDescriptionEdit):
                 value = value_widget.current_value()
             elif isinstance(value_widget, BaseTemplateWidget):
-                value = value_widget.export_data()
+                value = _extract_param_scalar(value_widget.export_data())
             else:
                 value = None
             values[name] = value

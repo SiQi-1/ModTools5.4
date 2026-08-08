@@ -4263,25 +4263,617 @@ class FormationClassSelectorTemplate(_DatasetComboTemplate):
         self._populate_options(FORMATION_CLASS_OPTIONS)
 
 
-class UnitPromotionClassSelectorTemplate(_DatasetComboTemplate):
-    """Dropdown sourcing UnitPromotionClasses."""
+# ── 通用数据源：数据库表 / 工程工作区 / 实际参数值 ──────────────────
+
+
+def _fetch_db_name_rows(table: str, type_col: str) -> List[Tuple[str, str]]:
+    """从游戏库读取 (显示名, Type) 行；Name 列为 LOC tag 时本地化。"""
+    if not DEFAULT_GAME_DB.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(DEFAULT_GAME_DB))
+    except sqlite3.Error:
+        return []
+    try:
+        cursor = conn.cursor()
+        columns = _fetch_table_columns(cursor, table)
+        if type_col not in columns:
+            return []
+        name_col = "Name" if "Name" in columns else None
+        if name_col is None:
+            raw = cursor.execute(f"SELECT {type_col} FROM {table}").fetchall()
+            return [(str(r[0]), str(r[0])) for r in raw if str(r[0] or "").strip()]
+        raw = cursor.execute(f"SELECT {type_col}, {name_col} FROM {table}").fetchall()
+        rows: List[Tuple[str, str]] = []
+        for type_value, name_value in raw:
+            type_text = str(type_value or "").strip()
+            if not type_text:
+                continue
+            name = str(name_value or "").strip()
+            if name.startswith("LOC_"):
+                localized = _localize_tag(name)
+                if localized and localized != "未知":
+                    name = localized
+            rows.append((name or type_text, type_text))
+        return rows
+    except sqlite3.Error:
+        return []
+    finally:
+        conn.close()
+
+
+def _fetch_arg_value_rows(param_name: str) -> List[Tuple[str, str]]:
+    """从游戏库 ModifierArguments 读取该参数出现过的实际值作为选项。"""
+    if not DEFAULT_GAME_DB.exists():
+        return []
+    try:
+        conn = sqlite3.connect(str(DEFAULT_GAME_DB))
+    except sqlite3.Error:
+        return []
+    try:
+        rows = conn.execute(
+            "SELECT DISTINCT Value FROM ModifierArguments "
+            "WHERE Name = ? AND Value IS NOT NULL AND Value != '' ORDER BY Value",
+            (param_name,),
+        ).fetchall()
+        return [(str(r[0]), str(r[0])) for r in rows]
+    except sqlite3.Error:
+        return []
+    finally:
+        conn.close()
+
+
+def _workspace_section_rows(section: str) -> Callable[[], List[Tuple[str, str]]]:
+    """工程工作区某分类条目的 (显示名, type) 行提供者。"""
+
+    def provider() -> List[Tuple[str, str]]:
+        rows: List[Tuple[str, str]] = []
+        for entry in _workspace_entries(section):
+            type_text = _workspace_entry_type(entry)
+            if type_text:
+                rows.append((_workspace_entry_display_name(entry), type_text))
+        return rows
+
+    return provider
+
+
+def _workspace_promotion_class_rows() -> List[Tuple[str, str]]:
+    """工程"单位晋升"树对应的晋升职业类型（entry.type = PROMOTION_CLASS_*）。"""
+    return _workspace_section_rows("单位晋升")()
+
+
+def _workspace_promotion_node_rows() -> List[Tuple[str, str]]:
+    """工程"单位晋升"树节点生成的晋升类型（PROMOTION_{前缀}_{中缀}_{简称}）。"""
+    sections = _get_workspace_sections()
+    basic = sections.get("基础信息")
+    basic = basic if isinstance(basic, dict) else {}
+    prefix = str(basic.get("prefix") or "").strip().upper()
+    try:
+        infix = max(0, int(basic.get("infix", 0) or 0))
+    except (TypeError, ValueError):
+        infix = 0
+    rows: List[Tuple[str, str]] = []
+    for entry in _workspace_entries("单位晋升"):
+        nodes = entry.get("nodes")
+        if not isinstance(nodes, list):
+            continue
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            abbr = str(node.get("abbr") or "").strip()
+            if not abbr:
+                continue
+            name = str(node.get("name_cn") or "").strip() or abbr
+            parts = ["PROMOTION"]
+            if prefix:
+                parts.append(prefix)
+            if infix > 0:
+                parts.append("P%04d" % infix)
+            parts.append(abbr)
+            rows.append((name, "_".join(parts)))
+    return rows
+
+
+def _workspace_trait_rows() -> List[Tuple[str, str]]:
+    """工程中各分类生成的 TRAIT_* 类型。"""
+    rows: List[Tuple[str, str]] = []
+    seen: set[str] = set()
+    for section in ("文明", "领袖", "区域", "建筑", "单位", "改良设施", "总督", "伟人"):
+        for entry in _workspace_entries(section):
+            type_text = _workspace_entry_type(entry)
+            if type_text and type_text.startswith("TRAIT_") and type_text not in seen:
+                seen.add(type_text)
+                rows.append((_workspace_entry_display_name(entry), type_text))
+    return rows
+
+
+def _workspace_great_person_individual_rows() -> List[Tuple[str, str]]:
+    """工程"伟人"分类下的伟人个体类型。"""
+    rows: List[Tuple[str, str]] = []
+    for entry in _workspace_entries("伟人"):
+        individuals = entry.get("individuals")
+        if not isinstance(individuals, list):
+            continue
+        for individual in individuals:
+            if not isinstance(individual, dict):
+                continue
+            type_text = str(individual.get("GreatPersonIndividualType") or "").strip()
+            if not type_text:
+                continue
+            name = str(individual.get("Name") or "").strip() or type_text
+            rows.append((name, type_text))
+    return rows
+
+
+def _workspace_governor_promotion_rows() -> List[Tuple[str, str]]:
+    """工程"总督"分类下的总督晋升类型。"""
+    rows: List[Tuple[str, str]] = []
+    for entry in _workspace_entries("总督"):
+        promotions = entry.get("promotions")
+        if not isinstance(promotions, list):
+            continue
+        for promotion in promotions:
+            if not isinstance(promotion, dict):
+                continue
+            type_text = str(
+                promotion.get("GovernorPromotionType")
+                or promotion.get("type")
+                or ""
+            ).strip()
+            if not type_text:
+                continue
+            name = str(promotion.get("Name") or "").strip() or type_text
+            rows.append((name, type_text))
+    return rows
+
+
+def _collection_type_rows() -> List[Tuple[str, str]]:
+    """收集类型（来自 effect_type_parameters.json 的 collection_types）。"""
+    import json as _json
+
+    try:
+        path = Path(__file__).resolve().parent.parent / "data" / "effect_type_parameters.json"
+        payload = _json.loads(path.read_text(encoding="utf-8"))
+        values = payload.get("collection_types") if isinstance(payload, dict) else None
+        if isinstance(values, list):
+            return [(str(v), str(v)) for v in values if str(v or "").strip()]
+    except Exception:
+        pass
+    return []
+
+
+class _EditableComboTemplate(BaseTemplateWidget):
+    """可输入 + 可下拉选择：选项来自多个提供者（游戏库/工程/固定值），支持手输新值。"""
+
+    def __init__(
+        self,
+        display_name: str,
+        label_text: str,
+        type_key: str,
+        option_providers: Sequence[Callable[[], Sequence[Tuple[str, str]]]] = (),
+        placeholder: str = "",
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(display_name, parent)
+        self._type_key = type_key
+        self._options: List[Tuple[str, str]] = []
+        self._option_providers = list(option_providers)
+        self._placeholder = placeholder or f"选择或输入{label_text}"
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(6)
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(8)
+        self._label = QLabel(f"{label_text}：")
+        row.addWidget(self._label)
+        self._combo = QComboBox()
+        self._combo.setEditable(True)
+        self._combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self._combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+        self._combo.setMinimumContentsLength(26)
+        self._combo.currentTextChanged.connect(self.dataChanged.emit)
+        row.addWidget(self._combo, 1)
+        layout.addLayout(row)
+        layout.addStretch(1)
+        self.refresh_options()
+
+    def _current_value(self) -> str:
+        data = self._combo.currentData()
+        if data:
+            return str(data)
+        text = self._combo.currentText().strip()
+        if " | " in text:
+            return text.split(" | ", 1)[-1].strip()
+        return text
+
+    def refresh_options(self) -> None:
+        merged: dict[str, str] = {}
+        for provider in self._option_providers:
+            try:
+                rows = provider() or []
+            except Exception:
+                rows = []
+            for display, value in rows:
+                value_text = str(value or "").strip()
+                if not value_text or value_text in merged:
+                    continue
+                merged[value_text] = str(display or "").strip() or value_text
+        self._options = [(display, value) for value, display in merged.items()]
+        self._combo.blockSignals(True)
+        self._combo.clear()
+        self._combo.addItem(self._placeholder, None)
+        for display, value in sorted(self._options, key=lambda item: item[0].lower()):
+            self._combo.addItem(f"{display} | {value}", value)
+        self._combo.setCurrentIndex(0)
+        self._combo.blockSignals(False)
+
+    def export_data(self) -> Dict[str, object]:
+        value = self._current_value()
+        display = ""
+        for display_name, option_value in self._options:
+            if option_value == value:
+                display = display_name
+                break
+        return {
+            self._type_key: value or None,
+            "display": display or value,
+            "name": display or value,
+            "value": value or None,
+        }
+
+    def summary_text(self) -> str:
+        value = self._current_value()
+        return value or "未选择"
+
+    def set_label_text(self, text: str) -> None:
+        self._label.setText(text)
+
+    def set_current_value(self, value: Optional[str]) -> None:
+        if value is None:
+            self._combo.setCurrentIndex(0)
+            return
+        value_text = str(value).strip()
+        index = self._combo.findData(value_text)
+        self._combo.blockSignals(True)
+        if index >= 0:
+            self._combo.setCurrentIndex(index)
+        else:
+            self._combo.setEditText(value_text)
+        self._combo.blockSignals(False)
+        self.dataChanged.emit()
+
+
+class LeaderSearchSelectorTemplate(_EditableComboTemplate):
+    """领袖搜索选择（游戏库 + 工程领袖）。"""
 
     def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__("单位晋升类型选择框", "晋升类型", "promotion_class", parent)
-        rows = _fetch_promotion_class_rows()
-        class_to_name: Dict[str, str] = {}
-        for class_type, name_tag in rows:
-            class_type_text = str(class_type or "").strip()
-            if not class_type_text:
-                continue
-            localized = _localize_tag(name_tag)
-            display_name = (localized or str(name_tag or "").strip() or class_type_text).strip()
-            class_to_name[class_type_text] = display_name
-        options = sorted(
-            [(display_name, class_type) for class_type, display_name in class_to_name.items()],
-            key=lambda item: item[0],
+        super().__init__(
+            "领袖搜索选择", "领袖", "leader_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Leaders", "LeaderType"),
+                _workspace_section_rows("领袖"),
+            ],
+            parent=parent,
         )
-        self._populate_options(options)
+
+
+class CivilizationSearchSelectorTemplate(_EditableComboTemplate):
+    """文明搜索选择（游戏库 + 工程文明）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "文明搜索选择", "文明", "civilization_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Civilizations", "CivilizationType"),
+                _workspace_section_rows("文明"),
+            ],
+            parent=parent,
+        )
+
+
+class ProjectSearchSelectorTemplate(_EditableComboTemplate):
+    """项目搜索选择（游戏库 + 工程项目）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "项目搜索选择", "项目", "project_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Projects", "ProjectType"),
+                _workspace_section_rows("项目"),
+            ],
+            parent=parent,
+        )
+
+
+class TraitSearchSelectorTemplate(_EditableComboTemplate):
+    """特质搜索选择（游戏库 + 工程 TRAIT_*）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "特质搜索选择", "特质", "trait_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Traits", "TraitType"),
+                _workspace_trait_rows,
+            ],
+            parent=parent,
+        )
+
+
+class PolicySearchSelectorTemplate(_EditableComboTemplate):
+    """政策卡搜索选择（游戏库 + 工程政策卡）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "政策卡搜索选择", "政策卡", "policy_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Policies", "PolicyType"),
+                _workspace_section_rows("政策卡"),
+            ],
+            parent=parent,
+        )
+
+
+class BeliefSearchSelectorTemplate(_EditableComboTemplate):
+    """信仰搜索选择（游戏库 + 工程信仰）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "信仰搜索选择", "信仰", "belief_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("Beliefs", "BeliefType"),
+                _workspace_section_rows("信仰"),
+            ],
+            parent=parent,
+        )
+
+
+class UnitPromotionSearchSelectorTemplate(_EditableComboTemplate):
+    """单位晋升（节点）搜索选择（游戏库 + 工程晋升树节点）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "单位晋升搜索选择", "单位晋升", "unit_promotion_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("UnitPromotions", "UnitPromotionType"),
+                _workspace_promotion_node_rows,
+            ],
+            parent=parent,
+        )
+
+
+class GovernorPromotionSearchSelectorTemplate(_EditableComboTemplate):
+    """总督晋升搜索选择（游戏库 + 工程总督晋升）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "总督晋升搜索选择", "总督晋升", "governor_promotion_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("GovernorPromotions", "GovernorPromotionType"),
+                _workspace_governor_promotion_rows,
+            ],
+            parent=parent,
+        )
+
+
+class GreatPersonIndividualSearchSelectorTemplate(_EditableComboTemplate):
+    """伟人个体搜索选择（游戏库 + 工程伟人个体）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "伟人个体搜索选择", "伟人个体", "great_person_individual_type",
+            option_providers=[
+                lambda: _fetch_db_name_rows("GreatPersonIndividuals", "GreatPersonIndividualType"),
+                _workspace_great_person_individual_rows,
+            ],
+            parent=parent,
+        )
+
+
+class RouteSearchSelectorTemplate(_EditableComboTemplate):
+    """道路类型搜索选择（游戏库 Routes）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "道路类型搜索选择", "道路类型", "route_type",
+            option_providers=[lambda: _fetch_db_name_rows("Routes", "RouteType")],
+            parent=parent,
+        )
+
+
+class DiplomaticActionSearchSelectorTemplate(_EditableComboTemplate):
+    """外交行动搜索选择（游戏库 DiplomaticActions）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "外交行动搜索选择", "外交行动", "diplomatic_action_type",
+            option_providers=[lambda: _fetch_db_name_rows("DiplomaticActions", "DiplomaticActionType")],
+            parent=parent,
+        )
+
+
+class RandomEventSearchSelectorTemplate(_EditableComboTemplate):
+    """随机事件搜索选择（游戏库 RandomEvents）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "随机事件搜索选择", "随机事件", "random_event_type",
+            option_providers=[lambda: _fetch_db_name_rows("RandomEvents", "RandomEventType")],
+            parent=parent,
+        )
+
+
+class VictorySearchSelectorTemplate(_EditableComboTemplate):
+    """胜利类型搜索选择（游戏库 Victories）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "胜利类型搜索选择", "胜利类型", "victory_type",
+            option_providers=[lambda: _fetch_db_name_rows("Victories", "VictoryType")],
+            parent=parent,
+        )
+
+
+class WarSearchSelectorTemplate(_EditableComboTemplate):
+    """战争类型搜索选择（游戏库 Wars）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "战争类型搜索选择", "战争类型", "war_type",
+            option_providers=[lambda: _fetch_db_name_rows("Wars", "WarType")],
+            parent=parent,
+        )
+
+
+class ResolutionSearchSelectorTemplate(_EditableComboTemplate):
+    """决议类型搜索选择（游戏库 Resolutions）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "决议类型搜索选择", "决议类型", "resolution_type",
+            option_providers=[lambda: _fetch_db_name_rows("Resolutions", "ResolutionType")],
+            parent=parent,
+        )
+
+
+class OperationSearchSelectorTemplate(_EditableComboTemplate):
+    """行动（UNITOPERATION_*）选择（以游戏库实际参数值为选项）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "行动类型选择", "行动类型", "operation_type",
+            option_providers=[lambda: _fetch_arg_value_rows("OperationType")],
+            parent=parent,
+        )
+
+
+class EmergencySearchSelectorTemplate(_EditableComboTemplate):
+    """紧急事件选择（以游戏库实际参数值为选项）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "紧急事件选择", "紧急事件", "emergency_type",
+            option_providers=[lambda: _fetch_arg_value_rows("EmergencyType")],
+            parent=parent,
+        )
+
+
+class MilitaryFormationSearchSelectorTemplate(_EditableComboTemplate):
+    """军事编队选择（CORPS/ARMY_MILITARY_FORMATION）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "军事编队选择", "军事编队", "military_formation_type",
+            option_providers=[
+                lambda: _fetch_arg_value_rows("MilitaryFormationType")
+                or [("军团编队", "CORPS_MILITARY_FORMATION"), ("集团军编队", "ARMY_MILITARY_FORMATION")]
+            ],
+            parent=parent,
+        )
+
+
+class ResourceUsageSearchSelectorTemplate(_EditableComboTemplate):
+    """资源用途选择（RESOURCE_USAGE_*）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "资源用途选择", "资源用途", "resource_usage_type",
+            option_providers=[lambda: _fetch_arg_value_rows("ResourceUsageType")],
+            parent=parent,
+        )
+
+
+class DiplomaticYieldSourceSearchSelectorTemplate(_EditableComboTemplate):
+    """外交产出来源选择（以游戏库实际参数值为选项）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "外交产出来源选择", "外交产出来源", "diplomatic_yield_source",
+            option_providers=[lambda: _fetch_arg_value_rows("DiplomaticYieldSource")],
+            parent=parent,
+        )
+
+
+class BonusTypeSearchSelectorTemplate(_EditableComboTemplate):
+    """政府加成类型选择（GOVERNMENTBONUS_*）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "政府加成类型选择", "加成类型", "bonus_type",
+            option_providers=[lambda: _fetch_arg_value_rows("BonusType")],
+            parent=parent,
+        )
+
+
+class BeliefYieldTypeSearchSelectorTemplate(_EditableComboTemplate):
+    """信仰产出类型选择（BELIEF_YIELD_*）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "信仰产出类型选择", "信仰产出类型", "belief_yield_type",
+            option_providers=[lambda: _fetch_arg_value_rows("BeliefYieldType")],
+            parent=parent,
+        )
+
+
+class RelicSourceSearchSelectorTemplate(_EditableComboTemplate):
+    """遗物来源选择（RELIC_SOURCE_*）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "遗物来源选择", "遗物来源", "relic_source",
+            option_providers=[lambda: _fetch_arg_value_rows("RelicSource")],
+            parent=parent,
+        )
+
+
+class EffectTypeSearchSelectorTemplate(_EditableComboTemplate):
+    """外交事件效果选择（以游戏库实际参数值为选项）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "效果类型选择", "效果类型", "effect_type",
+            option_providers=[lambda: _fetch_arg_value_rows("EffectType")],
+            parent=parent,
+        )
+
+
+class CollectionTypeSearchSelectorTemplate(_EditableComboTemplate):
+    """收集类型选择（来自 effect_type_parameters.json）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "收集类型选择", "收集类型", "collection_type",
+            option_providers=[_collection_type_rows],
+            parent=parent,
+        )
+
+
+class HappinessSelectorTemplate(_DatasetComboTemplate):
+    """快乐度选择（只能选择，游戏库 Happinesses 固定表）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__("快乐度选择", "快乐度", "happiness_type", parent)
+        self._populate_options(_fetch_db_name_rows("Happinesses", "HappinessType"))
+
+
+
+
+
+class UnitPromotionClassSelectorTemplate(_EditableComboTemplate):
+    """单位晋升职业：可输入 + 下拉（游戏库 + 工程晋升树）。"""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(
+            "单位晋升职业选择", "晋升职业", "promotion_class",
+            option_providers=[
+                lambda: _fetch_db_name_rows("UnitPromotionClasses", "PromotionClassType"),
+                _workspace_promotion_class_rows,
+            ],
+            placeholder="选择或输入 PromotionClass",
+            parent=parent,
+        )
 
 
 class YieldSelectorTemplate(_DatasetComboTemplate):
@@ -6195,7 +6787,33 @@ TEMPLATE_SPECS: tuple[UITemplateSpec, ...] = (
     UITemplateSpec("improvement_search", "改良设施搜索选择框", ImprovementSearchSelectorTemplate),
     UITemplateSpec("technology_search", "科技搜索选择框", TechnologySearchSelectorTemplate),
     UITemplateSpec("civic_search", "市政搜索选择框", CivicSearchSelectorTemplate),
-    UITemplateSpec("moment_texture_search", "历史时刻Texture搜索选择框", MomentTextureSearchTemplate),
+    UITemplateSpec("promotion_class_search", "晋升职业可输入选择框", UnitPromotionClassSelectorTemplate),
+    UITemplateSpec("leader_search", "领袖可输入选择框", LeaderSearchSelectorTemplate),
+    UITemplateSpec("civilization_search", "文明可输入选择框", CivilizationSearchSelectorTemplate),
+    UITemplateSpec("project_search", "项目可输入选择框", ProjectSearchSelectorTemplate),
+    UITemplateSpec("trait_search", "特质可输入选择框", TraitSearchSelectorTemplate),
+    UITemplateSpec("policy_search", "政策卡可输入选择框", PolicySearchSelectorTemplate),
+    UITemplateSpec("belief_search", "信仰可输入选择框", BeliefSearchSelectorTemplate),
+    UITemplateSpec("unit_promotion_search", "单位晋升可输入选择框", UnitPromotionSearchSelectorTemplate),
+    UITemplateSpec("governor_promotion_search", "总督晋升可输入选择框", GovernorPromotionSearchSelectorTemplate),
+    UITemplateSpec("great_person_individual_search", "伟人个体可输入选择框", GreatPersonIndividualSearchSelectorTemplate),
+    UITemplateSpec("route_search", "道路类型可输入选择框", RouteSearchSelectorTemplate),
+    UITemplateSpec("diplomatic_action_search", "外交行动可输入选择框", DiplomaticActionSearchSelectorTemplate),
+    UITemplateSpec("random_event_search", "随机事件可输入选择框", RandomEventSearchSelectorTemplate),
+    UITemplateSpec("victory_search", "胜利类型可输入选择框", VictorySearchSelectorTemplate),
+    UITemplateSpec("war_search", "战争类型可输入选择框", WarSearchSelectorTemplate),
+    UITemplateSpec("resolution_search", "决议类型可输入选择框", ResolutionSearchSelectorTemplate),
+    UITemplateSpec("operation_search", "行动类型可输入选择框", OperationSearchSelectorTemplate),
+    UITemplateSpec("emergency_search", "紧急事件可输入选择框", EmergencySearchSelectorTemplate),
+    UITemplateSpec("military_formation_search", "军事编队可输入选择框", MilitaryFormationSearchSelectorTemplate),
+    UITemplateSpec("resource_usage_search", "资源用途可输入选择框", ResourceUsageSearchSelectorTemplate),
+    UITemplateSpec("diplomatic_yield_source_search", "外交产出来源可输入选择框", DiplomaticYieldSourceSearchSelectorTemplate),
+    UITemplateSpec("bonus_type_search", "加成类型可输入选择框", BonusTypeSearchSelectorTemplate),
+    UITemplateSpec("belief_yield_type_search", "信仰产出类型可输入选择框", BeliefYieldTypeSearchSelectorTemplate),
+    UITemplateSpec("relic_source_search", "遗物来源可输入选择框", RelicSourceSearchSelectorTemplate),
+    UITemplateSpec("effect_type_search", "效果类型可输入选择框", EffectTypeSearchSelectorTemplate),
+    UITemplateSpec("collection_type_search", "收集类型可输入选择框", CollectionTypeSearchSelectorTemplate),
+    UITemplateSpec("happiness_search", "快乐度选择框", HappinessSelectorTemplate),
 )
 
 

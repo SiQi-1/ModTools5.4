@@ -41,6 +41,7 @@ class AdjacencyDescriptionTestCase(unittest.TestCase):
         text = widget._auto_build_text()
         self.assertIn("+1", text)
         self.assertIn("[ICON_Production]", text)
+        self.assertIn("生产力", text, "产出后应接产出名称而非字面'产出'")
         self.assertIn("来自每个相邻的", text)
         self.assertNotIn("DISTRICT_THEATER", text, "DistrictType 是归属方，不参与描述")
 
@@ -59,6 +60,7 @@ class AdjacencyDescriptionTestCase(unittest.TestCase):
         self.assertNotIn("{", text, "dict repr 不应出现在描述中")
         self.assertIn("+1", text)
         self.assertIn("[ICON_Production]", text)
+        self.assertIn("生产力", text)
         self.assertNotIn("DISTRICT_THEATER", text)
 
     def test_auto_build_text_negative_and_tiles(self) -> None:

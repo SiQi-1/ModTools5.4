@@ -706,7 +706,8 @@ class _AdjacencyDescriptionEdit(QWidget):
         change_prefix = "+" if amount_int > 0 else "-" if amount_int < 0 else ""
         abs_amount = abs(amount_int)
         yield_icon = _YIELD_ICON_MAP.get(yield_type, "")
-        base = f"{change_prefix}{abs_amount}{yield_icon}产出"
+        yield_label = YIELD_VALUE_TO_NAME.get(yield_type, yield_type) if yield_type else "产出"
+        base = f"{change_prefix}{abs_amount}{yield_icon}{yield_label}"
 
         source_text = self._source_description(values)
         if not source_text:

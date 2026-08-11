@@ -49,6 +49,10 @@ modgen/
 python -m unittest discover -s modgen/tests -v
 ```
 
+## 临时文件
+
+AI 会话的临时条目文件一律放仓库根 `modgen_work/`（已 gitignore，绝不提交 git）；`generate` 输出为 stdout 可直接消费。merge 备份 `.CIV.bak` 自动生成、下次覆盖。
+
 ## schema 更新
 
 编辑器字段变化后：`python modgen/tools/extract_schemas.py`（需 PyQt 环境，offscreen）。

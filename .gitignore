@@ -29,6 +29,14 @@ __pycache__/
 *.pyc
 .venv/
 
+# Temporary / AI working files (never commit)
+*.bak
+modgen_work/
+entry_*.json
+_work/
+*.tmp
+~$*
+
 # Old ad-hoc patterns (kept for legacy)
 ai_*
 tools/

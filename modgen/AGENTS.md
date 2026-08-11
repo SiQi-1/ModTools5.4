@@ -43,6 +43,13 @@ python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中
 4. 修正后 `merge` 进工程
 5. 切勿跳过 validate 直接 merge——merge 默认校验，不合格会拒绝
 
+## 临时文件约定（必须遵守）
+
+- **所有临时条目文件（entry 等）一律写入 `modgen_work/` 目录**（仓库根下，已 gitignore，绝不提交 git）。
+- 不要在任何其他位置留下生成中间文件（工程目录、仓库根、modgen/ 内）。
+- `generate` 输出是 stdout——能直接消费就不要落盘；必须落盘时用 `modgen_work/`。
+- merge 会在工程旁生成 `.CIV.bak`（自动备份，已 gitignore，下次覆盖）。
+
 ## 硬规则（生成/校验的依据）
 
 - **Type 命名**：`{HEAD}_{前缀}_{中缀}{编号:04d}_{简称}`（如 `CIVILIZATION_SIQI_C0035_1`）。

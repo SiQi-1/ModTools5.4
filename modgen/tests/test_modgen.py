@@ -80,6 +80,18 @@ class GenerateTestCase(unittest.TestCase):
         self.assertEqual(entry["leader_name"], "示例领袖")
         self.assertEqual(entry["type"], "LEADER_SIQI_L0035_DEMO")
 
+    def test_generate_project_has_icon_size(self) -> None:
+        entry = generate_entry("项目", prefix="SIQI", infix=35, name="测试项目", abbr="TEST")
+        icon = entry["images"].get("icon", {})
+        self.assertEqual(icon.get("target_width"), 256)
+        self.assertEqual(icon.get("target_height"), 256)
+        self.assertEqual(entry["icon_image_name"], "ICON_PROJECT_SIQI_P0035_TEST")
+
+    def test_generate_belief_no_image_slot(self) -> None:
+        entry = generate_entry("信仰", prefix="SIQI", infix=35, name="测试信仰", abbr="TEST")
+        self.assertEqual(entry["images"], {})
+        self.assertEqual(entry["icon_image_name"], "ICON_BELIEF_SIQI_B0035_TEST")
+
     def test_generate_unknown_section_raises(self) -> None:
         with self.assertRaises(GenerateError):
             generate_entry("不存在", prefix="X", infix=0, name="x", abbr="x")

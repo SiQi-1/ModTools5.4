@@ -107,6 +107,20 @@ def _build_base_entry(section: str, *, prefix: str, infix: int, name: str, abbr:
     elif section == "领袖":
         entry["leader_name"] = name
         entry["leader_text"] = ""
+    elif section == "项目":
+        # 项目有图片槽（256×256），预填目标尺寸骨架供 AI 填图
+        entry["images"] = {
+            "icon": {
+                "path": "",
+                "scale": 1.0,
+                "offset_x": 0.0,
+                "offset_y": 0.0,
+                "target_width": 256,
+                "target_height": 256,
+            }
+        }
+    # 信仰 has_images=False（GUI 无图片槽），保持 images={}，
+    # 图标经美术页别名/数据库处理，无需导入图片。
 
     return entry
 

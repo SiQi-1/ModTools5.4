@@ -57,8 +57,8 @@ python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中
 - **必填字段**：条目必须有 `name`（中文名）+ 分类标识（多数分类 `abbr`，总督用 `code`）。
   主表必填字段见 `schemas/entry_schemas.json` 中 `required` 字段；无默认值的必填字段（如单位 `FormationClass`）必须由 AI 填写。
 - **LOC**：文本字段存中文，不写 `LOC_` 前缀 tag；导出时自动注册。
-- **图片**：一律空 `images: {}`，路径由用户提供，AI 不生成图片数据。
-- **图标名**：约定 `ICON_{Type}`，由生成器自动填。
+- **图片**：项目图标有图片槽（目标 **256×256**，`images.icon` 已预填尺寸骨架，AI 只需填 `path`）；信仰 `has_images=False`（GUI 无图片槽，图标经美术页别名/数据库处理，无需导入图片）；其余分类一律空 `images: {}`，路径由用户提供。
+- **图标名**：约定 `ICON_{Type}`，由生成器自动填（如 `ICON_PROJECT_SIQI_P0035_TEST`）。
 - **引用**：`bindings` / `trait_bindings` 中的 section/name 必须指向存在的对象。
 
 ## 分类说明

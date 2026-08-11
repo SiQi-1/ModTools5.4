@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-08-02 - 修复：信仰编辑器缺失图标图片槽
+
+### 问题
+- 信仰（Beliefs）编辑器 `has_images=False`，主表编辑器不创建图标图片槽——游戏里信仰有图标（Icons.xml 输出 SIZE_BELIEF 多尺寸），但 UI 无法导入/编辑信仰图标。
+- 项目（Projects）已正常（`has_images=True`，256×256 图片槽），无需改动。
+
+### 修复
+- `build_beliefs_main_schema` 的 `has_images` 改为 `True`（icon_size 本已为 256×256）。
+- 美术页 Icons 链路本就支持（`_image_path` 判断有图则不生成别名行、SIZE_BELIEF 图集尺寸已定义），开启图片槽后全链路生效。
+
+### 验证
+- 信仰主表编辑器 icon 槽创建、set_entry/export 图片往返、GUI SQL 导出均正常。
+
 ## 2026-08-02 - 修正：相邻加成描述语义（DistrictType 不参与、产出带图标、按效果器区分来源）
 
 ### 问题

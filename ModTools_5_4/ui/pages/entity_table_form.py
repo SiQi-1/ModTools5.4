@@ -1351,7 +1351,7 @@ def build_beliefs_main_schema() -> MainTableSchema:
         icon_size=(256, 256),
         fields=fields,
         linked_groups=[],
-        has_images=False,
+        has_images=True,
         top_basic_visual_limit=16,
     )
 

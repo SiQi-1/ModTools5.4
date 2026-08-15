@@ -20,7 +20,7 @@ from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PyQt6.QtWidgets import QApplication, QWidget  # noqa: E402
+from PyQt6.QtWidgets import QApplication, QMessageBox, QWidget  # noqa: E402
 
 from ModTools_5_4.app.config import load_config  # noqa: E402
 from ModTools_5_4.app.logging_setup import configure_logging  # noqa: E402
@@ -287,6 +287,82 @@ class LegacyFlatBasicInfoTestCase(unittest.TestCase):
         # 保持原样（平铺旧值未被空 prefix 覆盖、未被改写）
         self.assertEqual(section.get("prefix"), "OLD")
         self.assertEqual(section.get("infix"), 7)
+
+
+class RemoveSessionTestCase(unittest.TestCase):
+    """删除工程：仅关闭当前页面（tab），不删除磁盘文件。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        config = load_config()
+        configure_logging(config.log_dir, config.debug)
+        cls.app = QApplication.instance() or QApplication([])
+
+    def _page_with_sessions(self, count: int) -> WorkspacePage:
+        """WorkspacePage 构造时自带一个空工程会话（__init__ 末尾 _add_session），
+        再追加 count 个命名工程会话。"""
+        page = WorkspacePage()
+        for i in range(count):
+            page.create_new_project(f"工程{i + 1}")
+        return page
+
+    def test_remove_closes_current_tab_only(self) -> None:
+        page = self._page_with_sessions(3)
+        # 会话：空工程(0)、工程1(1)、工程2(2)、工程3(3)
+        page._set_active_session(1)
+        with mock.patch(
+            "ModTools_5_4.ui.pages.workspace_page.QMessageBox.question",
+            return_value=QMessageBox.StandardButton.Yes,
+        ):
+            removed = page.remove_active_session()
+        self.assertTrue(removed)
+        self.assertEqual(len(page._sessions), 3)
+        self.assertEqual(page._project_tabs.count(), 3)
+        # 删除中间的"工程1"后切到相邻会话（原"工程2"）
+        self.assertEqual(page._active_session_index, 1)
+        self.assertEqual(page._sessions[1].project.project_name, "工程2")
+
+    def test_remove_last_session_resets_to_empty(self) -> None:
+        page = self._page_with_sessions(1)
+        with mock.patch(
+            "ModTools_5_4.ui.pages.workspace_page.QMessageBox.question",
+            return_value=QMessageBox.StandardButton.Yes,
+        ):
+            # 先删"工程1"（index 1），再删初始空工程会话（index 0）
+            self.assertTrue(page.remove_active_session())
+            self.assertTrue(page.remove_active_session())
+        self.assertEqual(page._sessions, [])
+        self.assertEqual(page._project_tabs.count(), 0)
+        self.assertFalse(page.has_active_session())
+        # 回到空工程状态，不残留文件路径
+        self.assertIsNone(page._project_file_path)
+        self.assertNotIn("工程1", page._project.project_name)
+
+    def test_remove_cancelled_keeps_session(self) -> None:
+        page = self._page_with_sessions(2)
+        count_before = len(page._sessions)
+        with mock.patch(
+            "ModTools_5_4.ui.pages.workspace_page.QMessageBox.question",
+            return_value=QMessageBox.StandardButton.No,
+        ):
+            removed = page.remove_active_session()
+        self.assertFalse(removed)
+        self.assertEqual(len(page._sessions), count_before)
+
+    def test_remove_without_session_returns_false(self) -> None:
+        page = WorkspacePage()
+        page._sessions.clear()
+        page._project_tabs.removeTab(0)
+        page._active_session_index = -1
+        self.assertFalse(page.remove_active_session())
+
+    def test_delete_project_action_in_menu(self) -> None:
+        from ModTools_5_4.ui.main_window import MainWindow
+
+        window = MainWindow(load_config())
+        file_menu = window.menuBar().actions()[0].menu()
+        labels = [action.text() for action in file_menu.actions()]
+        self.assertIn("删除工程", labels)
 
 
 if __name__ == "__main__":

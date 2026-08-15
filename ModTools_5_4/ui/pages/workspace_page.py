@@ -7457,6 +7457,51 @@ class WorkspacePage(BasePage):
         self._load_workspace_sections_into_editors()
         self._rebuild_tree()
 
+    def has_active_session(self) -> bool:
+        return 0 <= self._active_session_index < len(self._sessions)
+
+    def remove_active_session(self) -> bool:
+        """关闭当前工程页面（仅移除会话与 tab，不删除磁盘上任何文件）。
+
+        返回 True 表示页面已关闭；False 表示无会话或用户取消。
+        """
+        if not self.has_active_session():
+            return False
+        session = self._sessions[self._active_session_index]
+        title = self._session_title(session)
+        path_hint = f"\n路径：{session.file_path}" if session.file_path else "\n（尚未保存到磁盘）"
+        answer = QMessageBox.question(
+            self,
+            "删除工程",
+            f"确定关闭工程「{title}」？{path_hint}\n\n"
+            "仅关闭当前页面，不会删除任何文件。\n未保存的修改将丢失。",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if answer != QMessageBox.StandardButton.Yes:
+            return False
+
+        # 与 tab 切换一致：先同步当前编辑状态回会话，再移除
+        self._sync_workspace_sections_from_editors()
+        self._sessions[self._active_session_index].project = self._project
+        self._sessions[self._active_session_index].file_path = self._project_file_path
+
+        index = self._active_session_index
+        self._handling_tab_change = True
+        self._project_tabs.removeTab(index)
+        self._handling_tab_change = False
+        self._sessions.pop(index)
+
+        if self._sessions:
+            self._set_active_session(min(index, len(self._sessions) - 1))
+        else:
+            self._active_session_index = -1
+            self._project = create_empty_project()
+            self._project_file_path = None
+            self._workspace_editors_loaded = False
+            self._rebuild_tree()
+        return True
+
     def _save_basic_info_payload_to_project(self, payload: dict[str, object]) -> None:
         self._project.sections["基础信息"] = {
             "format": BASIC_INFO_SECTION_FORMAT,

@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self._add_action(file_menu, "新建工程", self._handle_new_project)
         self._add_action(file_menu, "打开工程", self._handle_open_project)
         self._add_action(file_menu, "保存工程", self._handle_save_project)
+        self._add_action(file_menu, "删除工程", self._handle_delete_project)
 
         view_menu = menu_bar.addMenu("窗口")
         for page_id, label in (
@@ -108,6 +109,15 @@ class MainWindow(QMainWindow):
         self._stack.setCurrentWidget(page)
         page.on_activate()
         self.statusBar().showMessage(f"当前页面: {page.display_name or page_id}", 1600)
+
+    def _handle_delete_project(self) -> None:
+        if self._workspace_page is None:
+            return
+        if not self._workspace_page.has_active_session():
+            self.statusBar().showMessage("当前没有打开的工程", 2000)
+            return
+        # 仅关闭当前页面，不删除磁盘文件；确认/结果由工作区方法处理
+        self._workspace_page.remove_active_session()
 
     def _handle_new_project(self) -> None:
         if self._workspace_page is None:

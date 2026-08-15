@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-08-16 - 修复：阶段 2 数据安全与性能（连接/缓存/输入安全/边界）
+
+### A. 资源与性能
+1. **sqlite 连接统一**：`art_workspace.py:1027` 与 workspace_page 4 处 `with sqlite3.connect()` 只管理事务不关闭连接（ResourceWarning 来源）→ 全部改用 `contextlib.closing`；group_workspace 4 处查询仅成功路径 close → 统一 try/finally。
+2. **LOC 查询缓存**（`db/interface.py`）：settings.json 与活动文本库路径按文件 mtime 自动失效缓存（不再每次查询重读磁盘）；tag→中文结果缓存随文本库 mtime 失效（重新导入后自动刷新）。
+3. **artdef 解析缓存**（`artdef_parser.py`）：新增按文件 mtime 自动失效的根元素缓存（`_parse_file_cached`），`get_*_entry_element` 不再每条目整文件重解析多 MB XML；`invalidate_cache()` 接入 `ArtWorkspacePanel.refresh_from_sections`（From 参考文件更换后刷新即失效）。
+
+### B. 输入安全
+4. **delete_requests 路径穿越**：新增 `_safe_delete_relative_path`（拒绝绝对路径/盘符/`..`），删除计划的预览与执行两处统一使用；删除与再生成路径重叠时跳过删除（不再"先删后写"）。
+5. **必填校验不再改写工程数据**：`_validate_required_main_table_fields` 取消"空 table_data 写回 + 默认值写回"，取消生成后内存态不再被污染（生成器按同默认值兜底，行为不变）。
+6. **Type 净化**：`great_people_editor._sanitize_short_token` 的 `isalnum()` 放行 CJK（可生成 `GREAT_PERSON_CLASS_孔子`）→ 改为仅 ASCII 字母/数字/下划线。
+7. **脏数据兜底**：议程 AiFavoredItems 的 `Favored`/`Value` `int()` 加 try/except；`_build_colors_sql` 8 个球衣色全空时跳过该领袖（不再输出 `''` 颜色引用）；议程无 historical_agendas 且 AiLists 无 LeaderType 时的 `leader_type` 未定义崩溃（初始化空串）。
+
+### C. 边界
+8. **复制政策卡/信仰重算 type**：`_handle_duplicate_section_item` 复制后按新 abbr 重算 `type` 与 `icon_image_name`（原只改 abbr，两份条目 Type 相同导致 SQL 重复行）。
+9. **晋升树跨树 abbr 全局去重**：`_build_promotion_tree_parts` 节点 abbr 全局唯一化（两棵同模板树不再生成相同 `PROMOTION_*` Type），prereq 引用按同一映射自洽。
+10. **美术渲染不写状态**：`_moment_meta` 默认不再写回 state（moments_map 不被 prune、纯查看不再累积空 moment 配置；交互路径自行写回）；`_civ_meta` 保持写回——审查发现 `_prune_orphan_state` 每次刷新清理无配置残留、带配置残留有意保留（恢复回填），civs 不会无限膨胀，此点原判断不成立（回归测试锁定）。
+11. **批量生成 ModifierId 去重**：`_deduplicate_modifier_id` 加 `exclude_current` 参数，批量生成不再排除当前选中行（模板生成同名 id 不再与现有行重复）；批量生成只写已填参数（不再写入整表 None 空行）。
+
+### D. 真实工程收尾（52/53.CIV 全 builder 扫描发现的最后 2 处 `''`）
+12. 晋升类 `UnitPromotionClasses.DefaultUnitType` 空值输出 `''`（外键语义列）→ `NULL`。
+13. 项目文本行：`Description`/`PopupText` 为空时跳过文本行（主表引用已是 None，空 LOC 文本行无意义）。
+
+### 验证
+- 新增 `tests/test_stage2_regressions.py`（16 项回归）；全量 148 项单元测试通过（132 旧 + 16 新）。
+- 真实工程 52.CIV / 53.CIV 全部 16 个 builder（含统一文本/Configs/XML）零 `''` 字面量。
+
 ## 2026-08-16 - 新增：文件菜单「删除工程」（关闭页面，不删文件）
 
 ### 功能

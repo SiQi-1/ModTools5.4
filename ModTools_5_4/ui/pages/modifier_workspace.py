@@ -2152,7 +2152,7 @@ class BatchGenerateDialog(QDialog):
         created: list = []
         mt = self._mt_combo.currentText().strip()
         for pv in combos:
-            mid = self._home._deduplicate_modifier_id(self._compute_batch_id(pv))
+            mid = self._home._deduplicate_modifier_id(self._compute_batch_id(pv), exclude_current=False)
             rec = self._create_record(mid, self._compute_batch_comment(pv), pv, mt)
             self._home._modifiers.append(rec)
             self._home._append_modifier_row(rec)
@@ -2191,11 +2191,14 @@ class BatchGenerateDialog(QDialog):
                 effect_type=self._effect_type,
                 owner_reqset=str(owner_r) if owner_r else None,
                 subject_reqset=str(subject_r) if subject_r else None,
-                parameters=[{"name": str(k), "value": v} for k, v in pv.items() if k not in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT)],
+                parameters=[{"name": str(k), "value": v} for k, v in pv.items() if k not in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT) and v is not None],
             )
         params = []
         for pn, v in pv.items():
             if pn in (self.REQSET_KEY_OWNER, self.REQSET_KEY_SUBJECT):
+                continue
+            if v is None:
+                # 批量生成只写已填参数，避免 .CIV 记录膨胀为整表空参数行
                 continue
             params.append({"name": pn, "value": v})
         return type(src)(
@@ -7251,8 +7254,10 @@ class HomePage(BasePage):
         if self._comment_input is not None:
             self._comment_input.setText(self._build_modifier_comment_auto())
 
-    def _deduplicate_modifier_id(self, base_id: str) -> str:
-        current_index = self._modifier_editor_index
+    def _deduplicate_modifier_id(self, base_id: str, *, exclude_current: bool = True) -> str:
+        # 注意：批量生成场景中"当前选中行"是真实存在的 modifier，
+        # 若排除它会让模板生成的同名 id 与现有行重复，故批量调用传 exclude_current=False。
+        current_index = self._modifier_editor_index if exclude_current else -1
         existing_ids: set[str] = set()
         for idx, m in enumerate(self._modifiers):
             if idx != current_index:

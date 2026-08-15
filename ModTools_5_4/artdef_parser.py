@@ -41,6 +41,28 @@ def _find_artdef_files(file_names: set[str]) -> list[Path]:
     return hits
 
 
+# 文件级解析缓存：按文件 mtime 自动失效（From/ 参考文件被替换后自动重解析），
+# 避免 get_*_entry_element 每次调用都整文件重解析多 MB XML。
+_parsed_artdef_roots: dict[Path, tuple[float | None, ET.Element | None]] = {}
+
+
+def _parse_file_cached(path: Path) -> ET.Element | None:
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        mtime = None
+    cached = _parsed_artdef_roots.get(path)
+    if cached is not None and cached[0] == mtime:
+        return cached[1]
+    try:
+        tree = ET.parse(path)
+        root = tree.getroot()
+    except Exception:
+        root = None
+    _parsed_artdef_roots[path] = (mtime, root)
+    return root
+
+
 def _candidate_civilization_files() -> list[Path]:
     return _find_artdef_files({"Civilizations.artdef", "Civilizations_Shared.artdef"})
 
@@ -64,10 +86,8 @@ def _candidate_unit_files() -> list[Path]:
 def _list_names_from_files(paths: Iterable[Path], prefix: str) -> list[str]:
     names: set[str] = set()
     for path in paths:
-        try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-        except Exception:
+        root = _parse_file_cached(path)
+        if root is None:
             continue
         for node in root.iter("m_Name"):
             text = str(node.attrib.get("text") or "").strip()
@@ -93,10 +113,8 @@ def _find_entries(root: ET.Element, collection_name: str) -> list[ET.Element]:
 
 def _find_entry_from_files(paths: Iterable[Path], collection_name: str, target_name: str) -> Optional[ET.Element]:
     for path in paths:
-        try:
-            tree = ET.parse(path)
-            root = tree.getroot()
-        except Exception:
+        root = _parse_file_cached(path)
+        if root is None:
             continue
         for entry in _find_entries(root, collection_name):
             m_name = entry.find("m_Name")

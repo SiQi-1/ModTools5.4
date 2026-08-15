@@ -48,7 +48,8 @@ def _sanitize_short_token(value: object | None) -> str:
         return ""
     cleaned = []
     for ch in raw:
-        if ch.isalnum() or ch == "_":
+        # isalnum() 会放行 CJK 等 Unicode 字母（如"孔子"），Type 必须仅 ASCII
+        if ch == "_" or (ch.isascii() and ch.isalnum()):
             cleaned.append(ch)
     return "".join(cleaned).upper()
 

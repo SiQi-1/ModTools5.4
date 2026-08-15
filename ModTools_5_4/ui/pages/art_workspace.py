@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 import json
 import logging
@@ -58,6 +59,7 @@ try:
         list_district_artdef_names,
         list_improvement_artdef_names,
         list_unit_artdef_names,
+        invalidate_cache,
     )
 except Exception:
     get_building_entry_element = None  # type: ignore[assignment]
@@ -70,6 +72,7 @@ except Exception:
     list_district_artdef_names = None  # type: ignore[assignment]
     list_improvement_artdef_names = None  # type: ignore[assignment]
     list_unit_artdef_names = None  # type: ignore[assignment]
+    invalidate_cache = None  # type: ignore[assignment]
 
 LOGGER = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
@@ -891,6 +894,10 @@ class ArtWorkspacePanel(QWidget):
 
     def refresh_from_sections(self, sections: dict[str, object]) -> None:
         self._sections = sections if isinstance(sections, dict) else {}
+        # From/ 参考文件可能在会话中被替换（换 DLC 版本），刷新时失效 artdef 名称缓存；
+        # 文件级解析缓存按 mtime 自动失效，这里只需清 list 结果缓存。
+        if invalidate_cache is not None:
+            invalidate_cache()
         self._prune_orphan_state()
         self._replacement_maps = self._load_replacement_maps()
         self._civ_source_options = self._load_civ_source_options()
@@ -998,7 +1005,9 @@ class ArtWorkspacePanel(QWidget):
             cleaned[key] = v
         return cleaned
 
-    def _moment_meta(self, key: str) -> dict[str, object]:
+    def _moment_meta(self, key: str, *, persist: bool = False) -> dict[str, object]:
+        """取 moment 配置；persist=False（默认，渲染路径）不写回 state，
+        避免纯查看也让 .CIV 的 moments_map 无限膨胀。交互路径自行写回。"""
         moments = self._state_moments_map()
         meta = moments.get(key)
         if not isinstance(meta, dict):
@@ -1011,8 +1020,9 @@ class ArtWorkspacePanel(QWidget):
             meta["image"] = {}
         if "db_texture" not in meta:
             meta["db_texture"] = ""
-        moments[key] = meta
-        self._state["moments_map"] = moments
+        if persist:
+            moments[key] = meta
+            self._state["moments_map"] = moments
         return meta
 
     def _load_moment_texture_options(self) -> list[str]:
@@ -1024,7 +1034,7 @@ class ArtWorkspacePanel(QWidget):
 
         textures: list[str] = []
         try:
-            with sqlite3.connect(str(db_path)) as conn:
+            with closing(sqlite3.connect(str(db_path))) as conn:
                 rows = conn.execute(
                     "SELECT DISTINCT Texture FROM MomentIllustrations WHERE IFNULL(Texture,'') <> '' ORDER BY Texture"
                 ).fetchall()
@@ -1461,6 +1471,11 @@ class ArtWorkspacePanel(QWidget):
         return rows
 
     def _civ_meta(self, civ_type: str) -> dict[str, object]:
+        """取文明美术配置并写回 state（civs 键集合=当前渲染基线）。
+
+        注：_prune_orphan_state 每次刷新先清理无配置残留，带配置残留有意保留
+        （对象恢复后配置回填），因此写回不会造成 .CIV 无限膨胀。
+        """
         civs = self._state_civ_art_map()
         meta = civs.get(civ_type)
         if not isinstance(meta, dict):

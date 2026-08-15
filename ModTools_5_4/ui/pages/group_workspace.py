@@ -245,12 +245,14 @@ def _query_random_agendas() -> list[tuple[str, str]]:
         return []
     try:
         conn = sqlite3.connect(str(gdb))
-        rows = conn.execute(
-            "SELECT ra.AgendaType, a.Name FROM RandomAgendas ra "
-            "LEFT JOIN Agendas a ON ra.AgendaType = a.AgendaType "
-            "ORDER BY ra.AgendaType"
-        ).fetchall()
-        conn.close()
+        try:
+            rows = conn.execute(
+                "SELECT ra.AgendaType, a.Name FROM RandomAgendas ra "
+                "LEFT JOIN Agendas a ON ra.AgendaType = a.AgendaType "
+                "ORDER BY ra.AgendaType"
+            ).fetchall()
+        finally:
+            conn.close()
         result: list[tuple[str, str]] = []
         for agenda_type, name_tag in rows:
             chinese_name = resolve_chinese_text_or_unknown(str(name_tag or ""))
@@ -268,8 +270,10 @@ def _query_ai_list_types() -> list[str]:
         return []
     try:
         conn = sqlite3.connect(str(gdb))
-        rows = conn.execute("SELECT DISTINCT System FROM AiLists ORDER BY System").fetchall()
-        conn.close()
+        try:
+            rows = conn.execute("SELECT DISTINCT System FROM AiLists ORDER BY System").fetchall()
+        finally:
+            conn.close()
         return [str(r[0]) for r in rows if r[0]]
     except sqlite3.Error:
         return []
@@ -282,14 +286,16 @@ def _query_agenda_reqset_options() -> list[tuple[str, str]]:
         return []
     try:
         conn = sqlite3.connect(str(gdb))
-        rows = conn.execute(
-            "SELECT DISTINCT m.SubjectRequirementSetId "
-            "FROM Modifiers m "
-            "WHERE m.ModifierType = 'MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER' "
-            "AND m.SubjectRequirementSetId IS NOT NULL "
-            "ORDER BY m.SubjectRequirementSetId"
-        ).fetchall()
-        conn.close()
+        try:
+            rows = conn.execute(
+                "SELECT DISTINCT m.SubjectRequirementSetId "
+                "FROM Modifiers m "
+                "WHERE m.ModifierType = 'MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER' "
+                "AND m.SubjectRequirementSetId IS NOT NULL "
+                "ORDER BY m.SubjectRequirementSetId"
+            ).fetchall()
+        finally:
+            conn.close()
         return [(str(r[0]), str(r[0])) for r in rows]
     except sqlite3.Error:
         return []
@@ -309,11 +315,13 @@ def _resolve_loc_text(tag: str) -> str:
         if base_path and Path(base_path).exists():
             try:
                 conn = sqlite3.connect(str(base_path))
-                row = conn.execute(
-                    "SELECT Text FROM LocalizedText WHERE Tag = ? AND lower(Language) = 'zh_hans_cn' LIMIT 1",
-                    (tag,),
-                ).fetchone()
-                conn.close()
+                try:
+                    row = conn.execute(
+                        "SELECT Text FROM LocalizedText WHERE Tag = ? AND lower(Language) = 'zh_hans_cn' LIMIT 1",
+                        (tag,),
+                    ).fetchone()
+                finally:
+                    conn.close()
                 if row:
                     return str(row[0] or "") or tag
             except sqlite3.Error:

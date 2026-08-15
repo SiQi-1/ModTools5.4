@@ -1,6 +1,7 @@
 """Workspace page with project tree and content area."""
 from __future__ import annotations
 
+from contextlib import closing
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
@@ -1953,6 +1954,10 @@ class WorkspacePage(BasePage):
                         colors_rows.append(f"('{self._sql_escape(name)}', '{r}, {g}, {b}, {a}')")
                 resolved.append(color_name_map.get(hex_val, ""))
 
+            if not any(resolved):
+                # 8 个球衣色全空：不输出空颜色引用（'' 会导致外键/解析失败）
+                continue
+
             primaries = resolved[0::2]  # j1p, j2p, j3p, j4p
             secondaries = resolved[1::2]  # j1s, j2s, j3s, j4s
 
@@ -2133,6 +2138,19 @@ class WorkspacePage(BasePage):
         prereqs_rows: list[str] = []
         text_rows: list[str] = []
 
+        # 跨树节点 abbr 全局去重：不同晋升树的默认模板节点都叫 L1C1，
+        # 若不唯一化会生成相同的 PROMOTION_* Type（撞名、UnitPromotions 错连）。
+        used_node_abbrs: set[str] = set()
+
+        def _unique_node_abbr(base: str) -> str:
+            candidate = base
+            suffix = 2
+            while candidate in used_node_abbrs:
+                candidate = f"{base}_{suffix}"
+                suffix += 1
+            used_node_abbrs.add(candidate)
+            return candidate
+
         for entry in tree_entries:
             class_type = str(entry.get("type") or "").strip()
             if not class_type:
@@ -2141,17 +2159,28 @@ class WorkspacePage(BasePage):
 
             types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
             promotion_class_rows.append(
-                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', '', 0)"
+                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', NULL, 0)"
             )
             text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
             text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_DESC','{self._sql_escape(class_name)}')")
 
             nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
+
+            # 先为每棵树内全部节点分配全局唯一 abbr（prereq 引用按同一映射取）
+            node_abbrs: dict[int, str] = {}
+            for idx, node_data in enumerate(nodes):
+                if not isinstance(node_data, dict):
+                    continue
+                raw_abbr = str(node_data.get("abbr") or "").strip()
+                if not raw_abbr:
+                    continue
+                node_abbrs[idx] = _unique_node_abbr(raw_abbr)
+
             for idx, node_data in enumerate(nodes):
                 if not isinstance(node_data, dict):
                     continue
                 n = node_data
-                node_abbr = str(n.get("abbr") or "").strip()
+                node_abbr = node_abbrs.get(idx)
                 if not node_abbr:
                     continue
                 shared = _shared_params_from_basic_section(self._project.sections.get("基础信息", {}))
@@ -2174,12 +2203,10 @@ class WorkspacePage(BasePage):
                 if isinstance(prereq_indices, list):
                     for pi in prereq_indices:
                         if isinstance(pi, int) and 0 <= pi < len(nodes):
-                            pre_data = nodes[pi]
-                            if isinstance(pre_data, dict):
-                                pre_abbr = str(pre_data.get("abbr") or "").strip()
-                                if pre_abbr:
-                                    pre_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=pre_abbr)
-                                    prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
+                            pre_abbr = node_abbrs.get(pi)
+                            if pre_abbr:
+                                pre_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=pre_abbr)
+                                prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
 
         return (
             list(dict.fromkeys(types_rows)),
@@ -3241,7 +3268,7 @@ class WorkspacePage(BasePage):
         db_path = self._resolve_preview_game_db_path()
         if db_path is not None:
             try:
-                with sqlite3.connect(str(db_path)) as conn:
+                with closing(sqlite3.connect(str(db_path))) as conn:
                     cursor = conn.execute("SELECT Tag FROM Tags WHERE Vocabulary = 'ABILITY_CLASS'")
                     existing_ability_class_tags = {
                         str(row[0] or "").strip()
@@ -4438,8 +4465,10 @@ class WorkspacePage(BasePage):
 
             text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_NAME','{self._sql_escape(project_name)}')")
             text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_SHORT_NAME','{self._sql_escape(short_name)}')")
-            text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_DESCRIPTION','{self._sql_escape(description)}')")
-            text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_POPUP_TEXT','{self._sql_escape(popup_text)}')")
+            if description:
+                text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_DESCRIPTION','{self._sql_escape(description)}')")
+            if popup_text:
+                text_rows.append(f"('zh_Hans_CN','LOC_{project_type}_POPUP_TEXT','{self._sql_escape(popup_text)}')")
 
             project_values: dict[str, object | None] = {
                 "ProjectType": project_type,
@@ -4803,6 +4832,9 @@ class WorkspacePage(BasePage):
             agenda_type = str(entry.get("type") or "").strip()
             if not agenda_type:
                 agenda_type = f"AGENDA_CUSTOM_{index}"
+            # 由 historical_agendas 填充；无历史议程时 AiLists 行必须自带 LeaderType，
+            # 否则下方 `al.get("LeaderType") or leader_type` 会访问未定义变量崩溃
+            leader_type = ""
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             agenda_name = str(_value_or_default(table_data, "Name") or "")
@@ -4885,8 +4917,14 @@ class WorkspacePage(BasePage):
                             item = str(fi.get("Item") or "").strip()
                             if not item:
                                 continue
-                            favored = 1 if int(fi.get("Favored", 1)) else 0
-                            value = int(fi.get("Value", 0))
+                            try:
+                                favored = 1 if int(fi.get("Favored", 1)) else 0
+                            except (TypeError, ValueError):
+                                favored = 1
+                            try:
+                                value = int(fi.get("Value", 0))
+                            except (TypeError, ValueError):
+                                value = 0
                             sv = _opt_str(fi.get("StringVal"))
                             md_min = _opt_str(fi.get("MinDifficulty"))
                             md_max = _opt_str(fi.get("MaxDifficulty"))
@@ -6139,7 +6177,7 @@ class WorkspacePage(BasePage):
 
         rows: list[dict[str, object]] = []
         try:
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 cursor = conn.execute(
                     """
                     SELECT GreatPersonClassType, Name, UnitType, DistrictType
@@ -6311,7 +6349,7 @@ class WorkspacePage(BasePage):
 
         rows: list[dict[str, object]] = []
         try:
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 cursor = conn.execute(
                     "SELECT PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType "
                     "FROM Policies ORDER BY PolicyType"
@@ -7201,7 +7239,7 @@ class WorkspacePage(BasePage):
             return None
 
         try:
-            with sqlite3.connect(db_path) as conn:
+            with closing(sqlite3.connect(db_path)) as conn:
                 conn.row_factory = sqlite3.Row
                 row = conn.execute(
                     "SELECT * FROM GreatPersonClasses WHERE GreatPersonClassType = ?",
@@ -7372,6 +7410,17 @@ class WorkspacePage(BasePage):
         source_abbr = str(clone.get("abbr") or "").strip()
         new_abbr = self._next_copied_abbr(source_abbr, existing_abbrs)
         clone["abbr"] = new_abbr
+
+        # 复制后必须按新 abbr 重算 type/图标名：否则两份条目 Type 相同，
+        # Types/Policies 重复行冲突（去重后静默丢一条）。
+        shared = self.shared_workspace_parameters()
+        if section == "政策卡":
+            new_type = _build_entity_type(shared, head="POLICY", midfix_code="P", short_name=new_abbr)
+        else:  # 信仰
+            new_type = _build_entity_type(shared, head="BELIEF", midfix_code="B", short_name=new_abbr)
+        clone["type"] = new_type
+        if "icon_image_name" in clone:
+            clone["icon_image_name"] = f"ICON_{new_type}"
 
         entries.append(clone)
         new_index = len(entries) - 1
@@ -10135,10 +10184,10 @@ class WorkspacePage(BasePage):
             root = self._civ6proj_target_path()
             root_dir = root.parent if isinstance(root, Path) else None
             for item in delete_requests:
-                rel = str(item or "").replace("\\", "/").strip()
+                rel = WorkspacePage._safe_delete_relative_path(item)
                 if not rel:
                     continue
-                if root_dir is not None and (root_dir / rel).exists():
+                if root_dir is not None and (root_dir / Path(rel)).exists():
                     delete_marked.add(rel)
         self._project_root_workspace.set_manifest(files, folders, can_generate, delete_marked)
         img_rows: list[dict[str, str]] = []
@@ -10233,9 +10282,9 @@ class WorkspacePage(BasePage):
                         obj_type = f"CUSTOM_{index}"
 
                 table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
-                if not isinstance(table_data, dict) or not table_data:
+                if not table_data:
+                    # 仅校验，不写回工程数据（生成时按字段默认值兜底）
                     table_data = {}
-                    entry["table_data"] = table_data
 
                 for field_key, rule in rules.items():
                     if not isinstance(rule, dict) or not bool(rule.get("required")):
@@ -10245,7 +10294,7 @@ class WorkspacePage(BasePage):
                         continue
                     default_value = str(rule.get("default") or "").strip()
                     if default_value:
-                        table_data[field_key] = default_value
+                        # 有默认值视为满足（生成器会按相同默认值输出），但不写回工程数据
                         continue
                     missing_required.append((section, obj_type, field_key))
 
@@ -10382,6 +10431,17 @@ class WorkspacePage(BasePage):
             f"{target_message}\n图片输出：写入 {image_written}，跳过 {image_skipped}。\n纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
         )
 
+    @staticmethod
+    def _safe_delete_relative_path(rel: object) -> str | None:
+        """规范化删除计划的相对路径；拒绝绝对路径/盘符/`..` 穿越，非法返回 None。"""
+        text = str(rel or "").replace("\\", "/").strip()
+        if not text or text.startswith("/") or re.match(r"^[A-Za-z]:", text):
+            return None
+        parts = [part for part in text.split("/") if part not in ("", ".")]
+        if any(part == ".." for part in parts):
+            return None
+        return "/".join(parts)
+
     def _generate_all_output_files(self) -> None:
         if not self._validate_required_main_table_fields(
             validate_units=self._section_has_entries("单位"),
@@ -10414,7 +10474,7 @@ class WorkspacePage(BasePage):
         delete_candidates: list[str] = []
         if isinstance(delete_requests, list):
             for item in delete_requests:
-                rel = str(item or "").replace("\\", "/").strip()
+                rel = WorkspacePage._safe_delete_relative_path(item)
                 if not rel:
                     continue
                 target = root_dir / Path(rel)
@@ -10457,10 +10517,16 @@ class WorkspacePage(BasePage):
         delete_skipped = 0
         cancelled = False
 
+        batch_paths = {rel for rel, _content in batch_items}
+
         for rel_path in sorted(delete_set):
             if _is_cancelled():
                 cancelled = True
                 break
+            if rel_path in batch_paths:
+                # 该路径同时在本轮重新生成：跳过删除，避免"先删后写"静默撤销用户删除意图
+                delete_skipped += 1
+                continue
             target = root_dir / Path(rel_path)
             _step(f"删除文件: {rel_path}")
             if not target.exists() or not target.is_file():

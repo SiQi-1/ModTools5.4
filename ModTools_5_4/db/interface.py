@@ -13,20 +13,45 @@ from pathlib import Path
 import sqlite3
 import re
 
-from ..app.settings_store import load_settings
+from ..app.settings_store import load_settings, SETTINGS_FILE
 
 
 _LOC_TOKEN_PATTERN = re.compile(r"\{\s*(LOC_[^}\s]+)\s*\}", re.IGNORECASE)
 
+# ── 缓存（阶段2）：settings.json 与活动文本库路径按文件 mtime 自动失效，
+#    不再每次 LOC 查询都重读磁盘；tag 结果缓存随文本库 mtime 失效。
+_SETTINGS_MTIME: float | None = None
+_SETTINGS_LOADED = False
+_CACHED_ACTIVE_TEXT_DB_PATH: Path | None = None
+
+_TAG_CACHE: dict[str, str | None] = {}
+_TAG_CACHE_DB_MTIME: float | None = None
+
+
+def _invalidate_caches() -> None:
+    global _SETTINGS_LOADED, _CACHED_ACTIVE_TEXT_DB_PATH, _TAG_CACHE, _TAG_CACHE_DB_MTIME
+    _SETTINGS_LOADED = False
+    _CACHED_ACTIVE_TEXT_DB_PATH = None
+    _TAG_CACHE = {}
+    _TAG_CACHE_DB_MTIME = None
+
 
 def _active_text_db_path() -> Path | None:
-    settings = load_settings()
-    if not settings.active_text_db_path:
-        return None
-    path = Path(settings.active_text_db_path)
-    if not path.exists():
-        return None
-    return path
+    global _SETTINGS_MTIME, _SETTINGS_LOADED, _CACHED_ACTIVE_TEXT_DB_PATH
+    try:
+        settings_mtime = SETTINGS_FILE.stat().st_mtime
+    except OSError:
+        settings_mtime = None
+    if settings_mtime != _SETTINGS_MTIME or not _SETTINGS_LOADED:
+        _SETTINGS_MTIME = settings_mtime
+        _SETTINGS_LOADED = True
+        settings = load_settings()
+        configured = str(settings.active_text_db_path or "").strip()
+        if configured and Path(configured).exists():
+            _CACHED_ACTIVE_TEXT_DB_PATH = Path(configured)
+        else:
+            _CACHED_ACTIVE_TEXT_DB_PATH = None
+    return _CACHED_ACTIVE_TEXT_DB_PATH
 
 
 def get_chinese_text_for_tag(tag: str) -> str | None:
@@ -39,6 +64,19 @@ def get_chinese_text_for_tag(tag: str) -> str | None:
     if db_path is None:
         return None
 
+    # 文本库文件变化（重新导入/替换）时清空 tag 缓存
+    global _TAG_CACHE, _TAG_CACHE_DB_MTIME
+    try:
+        db_mtime = db_path.stat().st_mtime
+    except OSError:
+        db_mtime = None
+    if db_mtime != _TAG_CACHE_DB_MTIME:
+        _TAG_CACHE = {}
+        _TAG_CACHE_DB_MTIME = db_mtime
+
+    if normalized in _TAG_CACHE:
+        return _TAG_CACHE[normalized]
+
     conn = sqlite3.connect(str(db_path))
     try:
         row = conn.execute(
@@ -46,9 +84,13 @@ def get_chinese_text_for_tag(tag: str) -> str | None:
             (normalized, "zh_hans_cn"),
         ).fetchone()
         if row is None:
+            _TAG_CACHE[normalized] = None
             return None
-        return str(row[0] or "").strip() or None
+        result = str(row[0] or "").strip() or None
+        _TAG_CACHE[normalized] = result
+        return result
     except sqlite3.Error:
+        _TAG_CACHE[normalized] = None
         return None
     finally:
         conn.close()

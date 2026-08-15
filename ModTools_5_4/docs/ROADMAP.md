@@ -74,13 +74,13 @@
 - 现状：已有 39 个用例，覆盖工程模型、artdef、文本导入、设置、全部 13 分类 SQL/XML 预览与无头 GUI 冒烟。
 - 目标：生成链路测试（`_generate_all_output_files` 写出文件树）、图片导出（PNG/DDS/TEX）、GUI 交互测试（QTest）可按需补充。
 
-### P2：阶段 2 数据安全与性能（2026-08 审查发现，待排期）
-- sqlite 连接统一：`art_workspace.py:1027` 的 `with sqlite3.connect()` 不关闭连接（ResourceWarning 来源）；group_workspace 4 处仅成功路径 close；建议抽 `_with_game_db()`/`_query_db()` 助手。
-- LOC 查询无缓存：`db/interface.py` 每次调用重读 settings.json + 新建连接（20+ 调用点，批量渲染卡顿主因）；三份「tag→中文」解析（interface/group_workspace/search_page）收敛为单一入口 + 批查询 API。
-- artdef 缓存失效：5 个 `lru_cache` 永不过期、`invalidate_cache()` 零调用；`get_*_entry_element` 整文件重解析无缓存。
-- 输入安全：delete_requests 路径穿越（`../` 可删工程外文件）；校验函数生成时静默改写工程数据；中文/未净化简称进 Type（伟人 `isalnum()`、晋升树简称）。
-- 边界健壮性：议程 AiFavoredItems `int()` 无兜底、批量生成重复 ModifierId、SQL/XML 自定义 ModifierType 判定不一致、`_build_colors_sql` 全空输出 `''` 颜色。
-- 复制政策卡/信仰只改 abbr 不改 type → SQL 重复行；晋升树 abbr 仅树内去重 → 跨树撞 Type；`_moment_meta`/`_civ_meta` 渲染即写状态 → .CIV 膨胀。
+### P2：阶段 2 数据安全与性能（2026-08 审查发现，已部分完成）
+- ✅ sqlite 连接统一：art_workspace/workspace_page 5 处 `with connect` 泄漏 → `contextlib.closing`；group_workspace 4 处异常路径不 close → try/finally。
+- ✅ LOC 查询缓存：db/interface 按文件 mtime 自动失效（settings + tag 结果），不再每次重读磁盘。
+- ✅ artdef 缓存：文件级 mtime 解析缓存 + `invalidate_cache()` 接入美术页刷新。
+- ✅ 输入安全：delete_requests 路径穿越校验、必填校验不再改写工程数据、伟人 Type 净化（CJK 移除）、AiFavoredItems/colors/leader_type 脏数据兜底。
+- ✅ 复制政策卡/信仰重算 type；晋升树跨树 abbr 全局去重；美术渲染不写状态；批量生成 ModifierId 去重 + 只写已填参数。
+- ⏳ 未做：三份「tag→中文」解析收敛为单一入口 + 批查询 API（`_resolve_loc_text`/`_active_text_db_path`/`_load_civ*` 重复样板）；`import_dlc_texts` 等死代码清理（归入阶段 3）。
 
 ### P3：阶段 3 去臃肿（2026-08 审查拆分蓝图，改动大、单独排期）
 - workspace_page（10,498 行）：SQL 预览构建器群拆 `sql_builders/` 子包；公共 `_sql_literal`/`_normalized`/`_render_plan_table` 提为工具函数。

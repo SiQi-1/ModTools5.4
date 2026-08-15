@@ -13,6 +13,7 @@
 - 文明、领袖、区域、建筑、单位、单位晋升、改良设施、总督、伟人、政策卡、项目、信仰、议程。
 - 议程已完整接入：复合编辑器（主表 + HistoricalAgendas / ExclusiveAgendas / AgendaModifiers / AI 偏好）→ SQL/XML 预览 → 生成输出，不再有占位。
 - 单位晋升为独立画布式晋升树编辑器（卡片拖拽 + 端口连线 + 2221/2212 模板 + 随机模式）。
+- 修复：晋升节点类型按 .CIV 包装式「基础信息」payload 解析前缀/中缀（`_shared_params_from_basic_section`），晋升类型正确生成 `PROMOTION_SIQI_P0053_*` 全名（2026-08-14）。
 
 ### 3) 修改器工作区
 - Modifier / RequirementSet / Requirement / UnitAbility 全链路编辑。
@@ -26,7 +27,7 @@
 
 ### 5) 文本与搜索
 - 文本工作区统一承载 Text.sql / Text.xml 预览；描述框右键 `[ICON_XXX]` 插入。
-- 搜索页：文本搜索 ✓、ModifierType 搜索 ✓。
+- 小工具页（搜索子页）：文本搜索 ✓、ModifierType 搜索 ✓；图片工具（圆裁/黑白/区域图标/PSD模板总结）✓。
 
 ### 6) 数据库导入能力（游戏库）
 - 区域、建筑、单位、单位晋升、改良设施、伟人、政策卡（逻辑已实现）。
@@ -38,11 +39,29 @@
 - `tests/sample_project.py` 共享示例工程（测试与截图脚本共用）。
 - MIT LICENSE、requirements.txt（PyQt6 + Pillow）、.gitattributes、README 截图自动生成脚本（tools/make_screenshots.py，13 张）。
 
+### 8) 2026-08-16 全量代码审查 + 阶段 1 数据安全修复
+- 7 路并行审查（工作区全部页面/核心层/生成链路）+ 手工验证，产出 bug 清单与拆分蓝图（见 CHANGELOG 2026-08-16 条目）。
+- 阶段 1 已修（数据丢失/损坏类，127 项测试全过）：
+  - 空值输出 NULL 而非 `''`（7 处 `_sql_literal` 统一，修复 fixture 自带 `PrereqTech: ""` 病态样本）；
+  - SQL 文本内分号不再截断（Text.sql 静默丢失）；
+  - 修改器条件编辑即时落库；可输入选择框占位文案不再进 .CIV；
+  - 议程 AiLists LeaderType 过期残留；.civ6proj Teaser 保留原始值；
+  - 旧式平铺基础信息 prefix/infix 迁移 + 加载中禁止回写。
+- 明确设计意图不改：改良设施相邻加成 Description 用 "Placeholder"（游戏无改良相邻加成文本）。
+
 ## 二、当前缺口（TODO）
 
+### P2：响应式布局继续推广
+- 现状：主表编辑器（顶部表单/数字区/布尔区）、复合编辑器 `_pair_row`、单行子表编辑器已接入 ResponsiveGrid/ResponsiveSplit（`ui/responsive.py`）；其余页面（修改器、基本信息、美术、伟人等）仍为固定双列/网格布局。
+- 目标：全工作区统一窄窗降列/堆叠；`_pair_row` 断点阈值按实际面板宽度统一。
+
 ### P1：全局搜索接入真实逻辑
-- 现状：搜索页"全局搜索"只有按分类的占位面板。
+- 现状：小工具页「搜索」子页的"全局搜索"只有按分类的占位面板。
 - 目标：按分类提供可检索结果，并支持定位到对应工作区条目。
+
+### P2：图片工具扩展
+- 现状：小工具页已有 圆形裁切/黑白图标/区域图标(人工确认+底图复制)/PSD模板总结；区域图标六边形检查为人工确认。
+- 目标：区域图标自动几何检测；模板总结的 recipe 接入合成器（自动拼合+多尺寸导出）；打包 exe 时决定是否内置 psd-tools。
 
 ### P1：导入按钮开放与补齐
 - 现状：分组面板"导入"按钮仅对 区域/建筑/单位/单位晋升/改良设施/伟人 显示；政策卡导入逻辑已实现但按钮未开放（`group_workspace.py` 显隐名单需加入政策卡）。
@@ -51,6 +70,21 @@
 ### P2：测试与回归扩展
 - 现状：已有 39 个用例，覆盖工程模型、artdef、文本导入、设置、全部 13 分类 SQL/XML 预览与无头 GUI 冒烟。
 - 目标：生成链路测试（`_generate_all_output_files` 写出文件树）、图片导出（PNG/DDS/TEX）、GUI 交互测试（QTest）可按需补充。
+
+### P2：阶段 2 数据安全与性能（2026-08 审查发现，待排期）
+- sqlite 连接统一：`art_workspace.py:1027` 的 `with sqlite3.connect()` 不关闭连接（ResourceWarning 来源）；group_workspace 4 处仅成功路径 close；建议抽 `_with_game_db()`/`_query_db()` 助手。
+- LOC 查询无缓存：`db/interface.py` 每次调用重读 settings.json + 新建连接（20+ 调用点，批量渲染卡顿主因）；三份「tag→中文」解析（interface/group_workspace/search_page）收敛为单一入口 + 批查询 API。
+- artdef 缓存失效：5 个 `lru_cache` 永不过期、`invalidate_cache()` 零调用；`get_*_entry_element` 整文件重解析无缓存。
+- 输入安全：delete_requests 路径穿越（`../` 可删工程外文件）；校验函数生成时静默改写工程数据；中文/未净化简称进 Type（伟人 `isalnum()`、晋升树简称）。
+- 边界健壮性：议程 AiFavoredItems `int()` 无兜底、批量生成重复 ModifierId、SQL/XML 自定义 ModifierType 判定不一致、`_build_colors_sql` 全空输出 `''` 颜色。
+- 复制政策卡/信仰只改 abbr 不改 type → SQL 重复行；晋升树 abbr 仅树内去重 → 跨树撞 Type；`_moment_meta`/`_civ_meta` 渲染即写状态 → .CIV 膨胀。
+
+### P3：阶段 3 去臃肿（2026-08 审查拆分蓝图，改动大、单独排期）
+- workspace_page（10,498 行）：SQL 预览构建器群拆 `sql_builders/` 子包；公共 `_sql_literal`/`_normalized`/`_render_plan_table` 提为工具函数。
+- modifier_workspace（8,4xx 行）：拆 modifier_data/modifier_widgets/batch_generate_dialog/modifier_preview/modifier_id_templates；`HomePage` 改名 `ModifierEditorPage`。
+- ui_widget_kit（7,121 行）：9 个搜索对话框抽 `_SearchDialogBase`；20+ 同构可输入选择器改数据驱动注册表；TEMPLATE_SPECS 去重复键。
+- entity_table_form（6,742 行）：三大复合编辑器抽「子表配置表 + 驱动助手」；group_workspace：SectionItemWorkspacePanel if-链数据表驱动、`_CityNamesTable`/`_CitizenTable` 抽基类、needs_import 名单收敛。
+- 死代码清理：`_BuildingSearchDialog`、`_query_agenda_reqset_options`、modifier snapshot×3、reqset 菜单机制、`export_main_table_row`/`build_main_table_insert_sql`、17 处死 import 等。
 
 ### P2：打包配置收敛
 - 现状：`build_release.ps1` 与本地 `ModTools5.4.spec` 各维护一份数据清单，易漂移。

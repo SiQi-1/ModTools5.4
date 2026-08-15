@@ -48,7 +48,7 @@ from .base_page import BasePage
 from .art_workspace import ArtWorkspacePanel
 from .basic_info_workspace import BasicInfoWorkspacePanel
 from .entity_table_form import REQUIRED_MAIN_TABLE_FIELD_RULES, _NO_SQL_DEFAULT, build_agendas_main_schema, build_beliefs_main_schema, build_buildings_main_schema, build_districts_main_schema, build_improvements_main_schema, build_policies_main_schema, build_projects_main_schema, build_units_main_schema
-from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel, _build_entity_type
+from .group_workspace import SectionGroupWorkspacePanel, SectionItemWorkspacePanel, _build_entity_type, _shared_params_from_basic_section
 from .modifier_workspace import ModifierWorkspacePanel
 from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDialog, _ImprovementSearchDialog, _UnitSearchDialog
 from ..ui_widget_kit import set_workspace_sections_provider
@@ -72,6 +72,25 @@ MODIFIER_SECTION_SCHEMA = "1.0.0"
 BASIC_INFO_SECTION_FORMAT = "MODTOOLS54_BASIC_INFO_WORKSPACE"
 BASIC_INFO_SECTION_SCHEMA = "1.0.0"
 LOGGER = logging.getLogger(__name__)
+
+
+def _fill_replace_target(
+    payload: dict[str, object],
+    subtable_key: str,
+    target_key: str,
+    target_value: str,
+) -> None:
+    """导入勾选"取代该对象"时填充取代目标。
+
+    仅当 DB 原值未填（导入对象本身是普通单位/建筑/区域）时填充；
+    若导入对象本身已是特色且 DB 自带取代值，保留原值不覆盖。
+    """
+    replaces = payload.get(subtable_key)
+    if not isinstance(replaces, dict):
+        return
+    current = str(replaces.get(target_key) or "").strip()
+    if not current:
+        replaces[target_key] = target_value
 
 
 def _greatwork_slot_short(slot_type: str) -> str:
@@ -419,6 +438,7 @@ class WorkspacePage(BasePage):
         super().__init__()
         self.setObjectName("workspacePage")
         self._loading_project = False
+        self._workspace_editors_loaded = False
         self._project: CivProject = create_empty_project()
         self._project_file_path: Path | None = None
         self._sessions: list[ProjectSession] = []
@@ -620,9 +640,11 @@ class WorkspacePage(BasePage):
         return str(self.shared_workspace_parameters().get("file_name") or "")
 
     def _handle_basic_workspace_params_changed(self) -> None:
-        self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
         if self._loading_project:
+            # 加载过程中编辑器处于未完全装载状态（如旧式平铺工程迁移中），
+            # 立即回写会把空/错误前缀覆盖进工程内存，随后保存即永久丢失，故禁止。
             return
+        self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
 
         self._art_workspace.refresh_from_sections(self._project.sections)
 
@@ -1034,6 +1056,39 @@ class WorkspacePage(BasePage):
             desc_row = f"('zh_Hans_CN','{self._sql_escape(desc_tag)}','{self._sql_escape(desc_text)}')"
             modifier_desc_groups.append((desc_tag, [desc_row]))
 
+        # 晋升树文本：并入统一 Text 文件（不单独产出 UnitPromotions_Text.sql）
+        promotion_rows_list = self._build_promotion_tree_text_rows()
+        promotion_text_sql = (
+            self._build_insert_block("LocalizedText", "LocalizedText", ["Language", "Tag", "Text"], promotion_rows_list)
+            if promotion_rows_list
+            else ""
+        )
+        promotion_infos = self._extract_localized_row_infos(promotion_text_sql)
+        promotion_groups: list[tuple[str, list[str]]] = []
+        promotion_entries = self._project.sections.get("单位晋升")
+        promotion_section_entries = (
+            [entry for entry in promotion_entries if isinstance(entry, dict)]
+            if isinstance(promotion_entries, list)
+            else []
+        )
+        shared_promo = _shared_params_from_basic_section(self._project.sections.get("基础信息", {}))
+        for idx, item in enumerate(promotion_section_entries, start=1):
+            class_type = str(item.get("type") or "").strip() or f"晋升树_CUSTOM_{idx}"
+            display_name = _entry_name(item, "name", class_type)
+            tree_tags = {f"LOC_{class_type}_NAME", f"LOC_{class_type}_DESC"}
+            nodes = item.get("nodes") if isinstance(item.get("nodes"), list) else []
+            for node_data in nodes:
+                if not isinstance(node_data, dict):
+                    continue
+                node_abbr = str(node_data.get("abbr") or "").strip()
+                if not node_abbr:
+                    continue
+                promo_type = _build_entity_type(shared_promo, head="PROMOTION", midfix_code="P", short_name=node_abbr)
+                tree_tags.add(f"LOC_{promo_type}_NAME")
+                tree_tags.add(f"LOC_{promo_type}_DESC")
+            rows = [row for row, tag, _text in promotion_infos if tag in tree_tags]
+            promotion_groups.append((display_name, rows))
+
         sections: list[tuple[str, list[tuple[str, list[str]]]]] = [
             ("文明基础文本", civ_base_groups),
             ("领袖基础文本", leader_base_groups),
@@ -1043,6 +1098,7 @@ class WorkspacePage(BasePage):
             ("单位Ability文本", ability_text_groups),
             ("修改器预览文本", modifier_preview_groups),
             ("修改器描述文本", modifier_desc_groups),
+            ("晋升树文本", promotion_groups),
             ("改良基础文本", improvement_groups),
             ("总督基础文本", governor_groups),
             ("伟人基础文本", great_people_groups),
@@ -1377,14 +1433,37 @@ class WorkspacePage(BasePage):
         return plans
 
     @staticmethod
+    def _find_statement_end(sql_text: str, start: int) -> int:
+        """返回从 start 起第一个引号外的 ';' 的索引；找不到返回 -1。
+
+        处理 SQL 单引号字符串（含 '' 转义），避免文本值内的 ';' 截断语句。
+        """
+        in_single = False
+        i = start
+        while i < len(sql_text):
+            ch = sql_text[i]
+            if ch == "'":
+                if in_single and i + 1 < len(sql_text) and sql_text[i + 1] == "'":
+                    i += 2
+                    continue
+                in_single = not in_single
+            elif ch == ";" and not in_single:
+                return i
+            i += 1
+        return -1
+
+    @staticmethod
     def _extract_insert_rows(sql_text: str, table: str) -> list[str]:
         pattern = re.compile(
-            rf"INSERT\s+INTO\s+{re.escape(table)}\s*\((.*?)\)\s*VALUES\s*(.*?);",
+            rf"INSERT\s+INTO\s+{re.escape(table)}\s*\((.*?)\)\s*VALUES",
             re.IGNORECASE | re.DOTALL,
         )
         rows: list[str] = []
         for match in pattern.finditer(sql_text):
-            values_blob = match.group(2)
+            end = WorkspacePage._find_statement_end(sql_text, match.end())
+            if end < 0:
+                continue
+            values_blob = sql_text[match.end() : end]
             tuples = WorkspacePage._split_sql_tuples(values_blob)
             rows.extend([f"({item.strip()})" for item in tuples if item.strip()])
         return rows
@@ -1991,71 +2070,10 @@ class WorkspacePage(BasePage):
         return (c.red(), c.green(), c.blue(), c.alpha())
 
     def _build_promotion_tree_sql_bundle(self) -> dict[str, str] | None:
-        entries = self._project.sections.get("单位晋升")
-        tree_entries = [e for e in entries if isinstance(e, dict)] if isinstance(entries, list) else []
-        if not tree_entries:
+        parts = self._build_promotion_tree_parts()
+        if parts is None:
             return None
-
-        types_rows: list[str] = []
-        promotion_class_rows: list[str] = []
-        promotions_rows: list[str] = []
-        prereqs_rows: list[str] = []
-        text_rows: list[str] = []
-
-        for entry in tree_entries:
-            class_type = str(entry.get("type") or "").strip()
-            if not class_type:
-                continue
-            class_name = str(entry.get("name") or "").strip()
-
-            types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
-            promotion_class_rows.append(
-                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', '', 0)"
-            )
-            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
-            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_DESC','{self._sql_escape(class_name)}')")
-
-            nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
-            for idx, node_data in enumerate(nodes):
-                if not isinstance(node_data, dict):
-                    continue
-                n = node_data
-                node_abbr = str(n.get("abbr") or "").strip()
-                if not node_abbr:
-                    continue
-                shared = self._project.sections.get("基础信息", {})
-                promo_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=node_abbr)
-                node_name = str(n.get("name_cn") or node_abbr).strip()
-                node_desc = str(n.get("desc_cn") or "").strip()
-                level = int(n.get("level", 1) or 1)
-                column = int(n.get("column", 1) or 1)
-                mode = str(entry.get("mode", "tree")).strip()
-
-                types_rows.append(f"('{promo_type}', 'KIND_PROMOTION')")
-                promotions_rows.append(
-                    f"('{promo_type}', '{class_type}', 'LOC_{promo_type}_NAME', "
-                    f"'LOC_{promo_type}_DESC', {level}, {column}, 0, 0)"
-                )
-                text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_NAME','{self._sql_escape(node_name)}')")
-                if node_desc:
-                    text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_DESC','{self._sql_escape(node_desc)}')")
-
-                prereq_indices = n.get("prereq_indices", [])
-                if isinstance(prereq_indices, list):
-                    for pi in prereq_indices:
-                        if isinstance(pi, int) and 0 <= pi < len(nodes):
-                            pre_data = nodes[pi]
-                            if isinstance(pre_data, dict):
-                                pre_abbr = str(pre_data.get("abbr") or "").strip()
-                                if pre_abbr:
-                                    pre_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=pre_abbr)
-                                    prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
-
-        types_rows = list(dict.fromkeys(types_rows))
-        promotion_class_rows = list(dict.fromkeys(promotion_class_rows))
-        promotions_rows = list(dict.fromkeys(promotions_rows))
-        prereqs_rows = list(dict.fromkeys(prereqs_rows))
-        text_rows = list(dict.fromkeys(text_rows))
+        types_rows, promotion_class_rows, promotions_rows, prereqs_rows, _text_rows = parts
 
         classes_sql_parts: list[str] = [
             "-- UnitPromotionClasses.sql",
@@ -2091,19 +2109,85 @@ class WorkspacePage(BasePage):
                 )
             )
 
-        text_sql_parts: list[str] = [
-            "-- UnitPromotion_Text.sql",
-            "",
-        ]
-        if text_rows:
-            text_sql_parts.append(
-                self._build_insert_block("LocalizedText", "LocalizedText", ["Language", "Tag", "Text"], text_rows)
-            )
-
         return {
             "PromotionClasses.sql": "\n".join(classes_sql_parts + promotions_sql_parts + prereqs_sql_parts).rstrip(),
-            "UnitPromotions_Text.sql": "\n".join(text_sql_parts).rstrip(),
         }
+
+    def _build_promotion_tree_text_rows(self) -> list[str]:
+        """晋升树文本行（并入统一 Text 文件，不再单独产出 Text.sql）。"""
+        parts = self._build_promotion_tree_parts()
+        if parts is None:
+            return []
+        _types_rows, _promotion_class_rows, _promotions_rows, _prereqs_rows, text_rows = parts
+        return text_rows
+
+    def _build_promotion_tree_parts(self):
+        entries = self._project.sections.get("单位晋升")
+        tree_entries = [e for e in entries if isinstance(e, dict)] if isinstance(entries, list) else []
+        if not tree_entries:
+            return None
+
+        types_rows: list[str] = []
+        promotion_class_rows: list[str] = []
+        promotions_rows: list[str] = []
+        prereqs_rows: list[str] = []
+        text_rows: list[str] = []
+
+        for entry in tree_entries:
+            class_type = str(entry.get("type") or "").strip()
+            if not class_type:
+                continue
+            class_name = str(entry.get("name") or "").strip()
+
+            types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
+            promotion_class_rows.append(
+                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', '', 0)"
+            )
+            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
+            text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_DESC','{self._sql_escape(class_name)}')")
+
+            nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
+            for idx, node_data in enumerate(nodes):
+                if not isinstance(node_data, dict):
+                    continue
+                n = node_data
+                node_abbr = str(n.get("abbr") or "").strip()
+                if not node_abbr:
+                    continue
+                shared = _shared_params_from_basic_section(self._project.sections.get("基础信息", {}))
+                promo_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=node_abbr)
+                node_name = str(n.get("name_cn") or node_abbr).strip()
+                node_desc = str(n.get("desc_cn") or "").strip()
+                level = int(n.get("level", 1) or 1)
+                column = int(n.get("column", 1) or 1)
+
+                types_rows.append(f"('{promo_type}', 'KIND_PROMOTION')")
+                promotions_rows.append(
+                    f"('{promo_type}', '{class_type}', 'LOC_{promo_type}_NAME', "
+                    f"'LOC_{promo_type}_DESC', {level}, {column}, 0, 0)"
+                )
+                text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_NAME','{self._sql_escape(node_name)}')")
+                if node_desc:
+                    text_rows.append(f"('zh_Hans_CN','LOC_{promo_type}_DESC','{self._sql_escape(node_desc)}')")
+
+                prereq_indices = n.get("prereq_indices", [])
+                if isinstance(prereq_indices, list):
+                    for pi in prereq_indices:
+                        if isinstance(pi, int) and 0 <= pi < len(nodes):
+                            pre_data = nodes[pi]
+                            if isinstance(pre_data, dict):
+                                pre_abbr = str(pre_data.get("abbr") or "").strip()
+                                if pre_abbr:
+                                    pre_type = _build_entity_type(shared, head="PROMOTION", midfix_code="P", short_name=pre_abbr)
+                                    prereqs_rows.append(f"('{promo_type}', '{pre_type}')")
+
+        return (
+            list(dict.fromkeys(types_rows)),
+            list(dict.fromkeys(promotion_class_rows)),
+            list(dict.fromkeys(promotions_rows)),
+            list(dict.fromkeys(prereqs_rows)),
+            list(dict.fromkeys(text_rows)),
+        )
 
     def _build_district_sql_pair(self) -> tuple[str, str]:
         entries = self._project.sections.get("区域")
@@ -2161,13 +2245,20 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
+            if value is None:
+                return "NULL"
             if isinstance(value, bool):
                 return "1" if value else "0"
             if isinstance(value, int):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            return f"'{self._sql_escape(str(value))}'"
+            text = str(value)
+            if not text.strip():
+                return "NULL"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         def _append_grouped_row(groups: dict[tuple[str, ...], list[str]], columns: list[str], values: list[object]) -> None:
             key = tuple(columns)
@@ -2594,13 +2685,20 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
+            if value is None:
+                return "NULL"
             if isinstance(value, bool):
                 return "1" if value else "0"
             if isinstance(value, int):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            return f"'{self._sql_escape(str(value))}'"
+            text = str(value)
+            if not text.strip():
+                return "NULL"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         for index, entry in enumerate(building_entries, start=1):
             building_type = str(entry.get("type") or "").strip()
@@ -3184,9 +3282,12 @@ class WorkspacePage(BasePage):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            if isinstance(value, str) and value.strip().lower() == "none":
+            text = str(value)
+            if not text.strip():
                 return "NULL"
-            return f"'{self._sql_escape(str(value))}'"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         for index, entry in enumerate(unit_entries, start=1):
             unit_type = str(entry.get("type") or "").strip()
@@ -3634,7 +3735,12 @@ class WorkspacePage(BasePage):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            return f"'{self._sql_escape(str(value))}'"
+            text = str(value)
+            if not text.strip():
+                return "NULL"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         def _append_grouped_row(groups: dict[tuple[str, ...], list[str]], columns: list[str], values: list[object]) -> None:
             key = tuple(columns)
@@ -4088,7 +4194,7 @@ class WorkspacePage(BasePage):
                     return int(default)
             return str(value or "").strip()
 
-        def _sql_literal(value: object | None) -> str:
+        def _sql_literal(value: object) -> str:
             if value is None:
                 return "NULL"
             if isinstance(value, bool):
@@ -4097,7 +4203,12 @@ class WorkspacePage(BasePage):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            return f"'{self._sql_escape(str(value))}'"
+            text = str(value)
+            if not text.strip():
+                return "NULL"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         for index, entry in enumerate(policy_entries, start=1):
             policy_type = str(entry.get("type") or "").strip()
@@ -4246,7 +4357,7 @@ class WorkspacePage(BasePage):
                     return int(default)
             return str(value or "").strip()
 
-        def _sql_literal(value: object | None) -> str:
+        def _sql_literal(value: object) -> str:
             if value is None:
                 return "NULL"
             if isinstance(value, bool):
@@ -4255,7 +4366,12 @@ class WorkspacePage(BasePage):
                 return str(value)
             if isinstance(value, float):
                 return format(value, ".15g")
-            return f"'{self._sql_escape(str(value))}'"
+            text = str(value)
+            if not text.strip():
+                return "NULL"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         def _is_default(value: object | None, default: object | None) -> bool:
             if value is None:
@@ -5176,13 +5292,20 @@ class WorkspacePage(BasePage):
         }
 
         def _sql_literal(value: object) -> str:
+            if value is None:
+                return "NULL"
             if isinstance(value, bool):
                 return "1" if value else "0"
             if isinstance(value, int):
                 return str(value)
-            if value is None:
+            if isinstance(value, float):
+                return format(value, ".15g")
+            text = str(value)
+            if not text.strip():
                 return "NULL"
-            return f"'{self._sql_escape(str(value))}'"
+            if text.strip().lower() == "none":
+                return "NULL"
+            return f"'{self._sql_escape(text)}'"
 
         for entry in great_entries:
             class_data = entry.get("class_data") if isinstance(entry.get("class_data"), dict) else {}
@@ -5618,13 +5741,16 @@ class WorkspacePage(BasePage):
         table_map: dict[str, ElementTree.Element] = {}
 
         pattern = re.compile(
-            r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)\s*VALUES\s*(.*?);",
+            r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)\s*VALUES",
             re.IGNORECASE | re.DOTALL,
         )
         for match in pattern.finditer(sql_text):
             table_name = match.group(1).strip()
             columns = [col.strip() for col in match.group(2).split(",") if col.strip()]
-            values_blob = match.group(3)
+            statement_end = WorkspacePage._find_statement_end(sql_text, match.end())
+            if statement_end < 0:
+                continue
+            values_blob = sql_text[match.end() : statement_end]
             if not table_name or not columns:
                 continue
 
@@ -6066,7 +6192,7 @@ class WorkspacePage(BasePage):
             QMessageBox.warning(self, "导入区域", "未能从数据库读取区域列表。")
             return
 
-        dialog = _DistrictSearchDialog(rows, self)
+        dialog = _DistrictSearchDialog(rows, self, replace_option=True)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         district_type = dialog.selected_type()
@@ -6077,6 +6203,8 @@ class WorkspacePage(BasePage):
         if payload is None:
             QMessageBox.warning(self, "导入区域", f"未找到区域数据：{district_type}")
             return
+        if dialog.replace_selected():
+            _fill_replace_target(payload, "district_replaces", "ReplacesDistrictType", district_type)
 
         entries = self._project.sections.setdefault("区域", [])
         if not isinstance(entries, list):
@@ -6093,7 +6221,7 @@ class WorkspacePage(BasePage):
             QMessageBox.warning(self, "导入建筑", "未能从数据库读取建筑列表。")
             return
 
-        dialog = _BuildingSearchByDistrictDialog(rows, self, include_wonders=True)
+        dialog = _BuildingSearchByDistrictDialog(rows, self, include_wonders=True, replace_option=True)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         building_type = dialog.selected_type()
@@ -6104,6 +6232,8 @@ class WorkspacePage(BasePage):
         if payload is None:
             QMessageBox.warning(self, "导入建筑", f"未找到建筑数据：{building_type}")
             return
+        if dialog.replace_selected():
+            _fill_replace_target(payload, "building_replaces", "ReplacesBuildingType", building_type)
 
         entries = self._project.sections.setdefault("建筑", [])
         if not isinstance(entries, list):
@@ -6120,7 +6250,7 @@ class WorkspacePage(BasePage):
             QMessageBox.warning(self, "导入单位", "未能从数据库读取单位列表。")
             return
 
-        dialog = _UnitSearchDialog(rows, self)
+        dialog = _UnitSearchDialog(rows, self, replace_option=True)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         unit_type = dialog.selected_type()
@@ -6131,6 +6261,8 @@ class WorkspacePage(BasePage):
         if payload is None:
             QMessageBox.warning(self, "导入单位", f"未找到单位数据：{unit_type}")
             return
+        if dialog.replace_selected():
+            _fill_replace_target(payload, "unit_replaces", "ReplacesUnitType", unit_type)
 
         entries = self._project.sections.setdefault("单位", [])
         if not isinstance(entries, list):
@@ -7407,6 +7539,9 @@ class WorkspacePage(BasePage):
         return {}
 
     def _sync_workspace_sections_from_editors(self) -> None:
+        if not self._workspace_editors_loaded:
+            # 编辑器尚未装载工程数据时，导出会以空状态覆盖工程（如清空前缀），禁止同步
+            return
         self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
         self._save_art_payload_to_project(self._art_workspace.export_project_payload())
         payload = self._modifier_workspace.export_project_payload()
@@ -7437,6 +7572,7 @@ class WorkspacePage(BasePage):
             self._modifier_workspace.sync_owners_from_sections(self._project.sections)
         finally:
             self._loading_project = False
+            self._workspace_editors_loaded = True
 
     def _refresh_all_workspaces_after_project_open(self) -> None:
         # 注意：刚打开工程时不要立即把"编辑器当前状态"回写到 project。
@@ -8234,6 +8370,9 @@ class WorkspacePage(BasePage):
         special_thanks = str(project_info.get("thanks") or "").strip()
         authors = str(project_info.get("authors") or "").strip()
         guid = str(project_info.get("guid") or "").strip()
+        # Teaser 优先保留原始值（导入 .civ6proj 时解析的 teaser_raw，可能是 LOC tag 或原文），
+        # 避免被 Description 覆盖导致原工程 Teaser 永久丢失；无原始值时回落 Description tag。
+        teaser_value = str(project_info.get("teaser_raw") or "").strip() or loc_desc
 
         front_entries = file_info.get("front_end_actions") if isinstance(file_info.get("front_end_actions"), list) else []
         in_game_entries = file_info.get("in_game_actions") if isinstance(file_info.get("in_game_actions"), list) else []
@@ -8348,7 +8487,7 @@ class WorkspacePage(BasePage):
                 project_guid_value = existing_project_guid or guid_value
 
                 _set_child_text(base_group, "Name", loc_name)
-                _set_child_text(base_group, "Teaser", loc_desc)
+                _set_child_text(base_group, "Teaser", teaser_value)
                 _set_child_text(base_group, "Description", loc_desc)
                 _set_child_text(base_group, "SpecialThanks", special_thanks)
                 _set_child_text(base_group, "Authors", authors)
@@ -8486,7 +8625,7 @@ class WorkspacePage(BasePage):
             f"    <Guid>{self._xml_text(guid)}</Guid>",
             f"    <ProjectGuid>{self._xml_text(guid)}</ProjectGuid>",
             "    <ModVersion>1</ModVersion>",
-            f"    <Teaser>{loc_desc}</Teaser>",
+            f"    <Teaser>{self._xml_text(teaser_value)}</Teaser>",
             f"    <Description>{loc_desc}</Description>",
             f"    <Authors>{self._xml_text(authors)}</Authors>",
             f"    <SpecialThanks>{self._xml_text(special_thanks)}</SpecialThanks>",

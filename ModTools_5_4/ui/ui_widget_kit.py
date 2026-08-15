@@ -2386,6 +2386,7 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
                 "name": _workspace_entry_display_name(entry),
                 "indent": 0,
                 "trait": str(table_data.get("TraitType") or "").strip(),
+                "replaces": "",
                 "_workspace_pin": True,
             }
         )
@@ -2412,6 +2413,9 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
             base_types.append(district_type)
 
     replacements = _fetch_district_replace_rows()
+    replaces_map: Dict[str, str] = {
+        str(unique_type): str(replaces_type) for unique_type, replaces_type in replacements
+    }
     children_map: Dict[str, List[str]] = {parent: [] for parent in base_types}
     handled_children: set[str] = set()
     for unique_type, replaces_type in replacements:
@@ -2431,6 +2435,7 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
                 "name": info[parent_type]["name"],
                 "indent": 0,
                 "trait": info[parent_type]["trait"],
+                "replaces": replaces_map.get(parent_type, ""),
             }
         )
         seen.add(parent_type)
@@ -2441,6 +2446,7 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
                     "name": info[child_type]["name"],
                     "indent": 1,
                     "trait": info[child_type]["trait"],
+                    "replaces": replaces_map.get(child_type, ""),
                 }
             )
             seen.add(child_type)
@@ -2454,6 +2460,7 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
                 "name": info[district_type]["name"],
                 "indent": 0,
                 "trait": info[district_type]["trait"],
+                "replaces": replaces_map.get(district_type, ""),
             }
         )
         seen.add(district_type)
@@ -2467,6 +2474,7 @@ def _build_district_hierarchy() -> List[Dict[str, object]]:
                 "name": info[district_type]["name"],
                 "indent": 0,
                 "trait": info[district_type]["trait"],
+                "replaces": replaces_map.get(district_type, ""),
             }
         )
 
@@ -3768,7 +3776,9 @@ class UnitAbilityTypeTemplate(BaseTemplateWidget):
             current_value = str(self._combo.currentData() or "").strip()
             if not current_value:
                 current_value = self._combo.currentText().strip()
-                if "|" in current_value:
+                if current_value == self._placeholder:
+                    current_value = ""
+                elif "|" in current_value:
                     current_value = current_value.split("|", 1)[-1].strip()
         normalized: List[Tuple[str, str]] = []
         seen: set[str] = set()
@@ -3800,11 +3810,14 @@ class UnitAbilityTypeTemplate(BaseTemplateWidget):
         # Export should always be the raw UnitAbilityType (English Type), not the display text.
         value = str(self._combo.currentData() or "").strip()
         if not value:
-            value = self._combo.currentText().strip()
+            text = self._combo.currentText().strip()
+            if not text or text == self._placeholder:
+                return {"ability_type": None, "value": None, "display": None}
+            value = text
             if "|" in value:
                 value = value.split("|", 1)[-1].strip()
         if not value:
-            return {"ability_type": "", "value": "", "display": ""}
+            return {"ability_type": None, "value": None, "display": None}
         matched = next((item for item in self._options if item[1] == value), None)
         display = matched[0] if matched is not None else value
         return {"ability_type": value, "value": value, "display": display}
@@ -4484,6 +4497,8 @@ class _EditableComboTemplate(BaseTemplateWidget):
         if data:
             return str(data)
         text = self._combo.currentText().strip()
+        if not text or text == self._placeholder:
+            return ""
         if " | " in text:
             return text.split(" | ", 1)[-1].strip()
         return text
@@ -4518,8 +4533,8 @@ class _EditableComboTemplate(BaseTemplateWidget):
                 break
         return {
             self._type_key: value or None,
-            "display": display or value,
-            "name": display or value,
+            "display": (display or value) if value else None,
+            "name": (display or value) if value else None,
             "value": value or None,
         }
 
@@ -4532,7 +4547,9 @@ class _EditableComboTemplate(BaseTemplateWidget):
 
     def set_current_value(self, value: Optional[str]) -> None:
         if value is None:
+            self._combo.blockSignals(True)
             self._combo.setCurrentIndex(0)
+            self._combo.blockSignals(False)
             return
         value_text = str(value).strip()
         index = self._combo.findData(value_text)
@@ -5692,7 +5709,7 @@ class ResourceStrategicTemplate(_DatasetComboTemplate):
 class _DistrictSearchDialog(QDialog):
     """Dialog presenting districts with parent-child ordering."""
 
-    def __init__(self, rows: Sequence[Dict[str, object]], parent: QWidget | None = None) -> None:
+    def __init__(self, rows: Sequence[Dict[str, object]], parent: QWidget | None = None, *, replace_option: bool = False) -> None:
         super().__init__(parent)
         self.setWindowTitle("选择区域")
         self.setModal(True)
@@ -5703,6 +5720,8 @@ class _DistrictSearchDialog(QDialog):
         self._filtered = list(rows)
         self._selected: Dict[str, object] | None = None
         self._ignore_unknown = False
+        self._ignore_replacing = False
+        self._replace_selected = False
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -5725,6 +5744,14 @@ class _DistrictSearchDialog(QDialog):
         self._ignore_unknown_toggle = QCheckBox("忽视未知")
         self._ignore_unknown_toggle.stateChanged.connect(self._handle_ignore_unknown_toggle)
         toggle_row.addWidget(self._ignore_unknown_toggle)
+        self._ignore_replacing_toggle = QCheckBox("仅显示非取代区域")
+        self._ignore_replacing_toggle.stateChanged.connect(self._handle_ignore_replacing_toggle)
+        toggle_row.addWidget(self._ignore_replacing_toggle)
+        if replace_option:
+            self._replace_toggle = QCheckBox("导入后取代该对象")
+            toggle_row.addWidget(self._replace_toggle)
+        else:
+            self._replace_toggle = None
         toggle_row.addStretch(1)
         layout.addLayout(toggle_row)
 
@@ -5778,6 +5805,10 @@ class _DistrictSearchDialog(QDialog):
         for entry in self._rows:
             if self._ignore_unknown and str(entry.get("name") or "").strip() == "未知":
                 continue
+            if self._ignore_replacing and not bool(entry.get("_workspace_pin")) and str(
+                entry.get("replaces") or ""
+            ).strip():
+                continue
             type_name = str(entry.get("type") or "").lower()
             name = str(entry.get("name") or "").lower()
             if not key or key in type_name or key in name:
@@ -5801,6 +5832,15 @@ class _DistrictSearchDialog(QDialog):
     def _handle_ignore_unknown_toggle(self, _state: int) -> None:
         self._ignore_unknown = self._ignore_unknown_toggle.isChecked()
         self._apply_filter(self._search_edit.text())
+
+    def _handle_ignore_replacing_toggle(self, _state: int) -> None:
+        self._ignore_replacing = self._ignore_replacing_toggle.isChecked()
+        self._apply_filter(self._search_edit.text())
+
+    def replace_selected(self) -> bool:
+        if self._replace_toggle is None:
+            return False
+        return self._replace_toggle.isChecked()
 
     def selected_type(self) -> str | None:
         if self._selected is None:
@@ -5989,6 +6029,7 @@ class _BuildingSearchByDistrictDialog(QDialog):
         parent: QWidget | None = None,
         *,
         include_wonders: bool = False,
+        replace_option: bool = False,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle("选择建筑")
@@ -6006,7 +6047,8 @@ class _BuildingSearchByDistrictDialog(QDialog):
         self._show_cost_one = False
         self._ignore_unknown = False
         self._include_wonders = include_wonders
-        self._expand_all_default = not include_wonders
+        self._replace_selected = False
+        self._expand_state_initialized = False
 
         group_keys = self._group_key_sequence(self._rows)
         self._group_colors = _generate_group_colors(group_keys)
@@ -6036,9 +6078,14 @@ class _BuildingSearchByDistrictDialog(QDialog):
         self._ignore_unknown_toggle.stateChanged.connect(self._handle_ignore_unknown_toggle)
         toggle_row.addWidget(self._ignore_unknown_toggle)
         self._expand_all_toggle = QCheckBox("展开/折叠")
-        self._expand_all_toggle.setChecked(self._expand_all_default)
         self._expand_all_toggle.stateChanged.connect(self._apply_expand_state)
+        self._expand_all_toggle.setChecked(False)
         toggle_row.addWidget(self._expand_all_toggle)
+        if replace_option:
+            self._replace_toggle = QCheckBox("导入后取代该对象")
+            toggle_row.addWidget(self._replace_toggle)
+        else:
+            self._replace_toggle = None
         toggle_row.addStretch(1)
         layout.addLayout(toggle_row)
 
@@ -6113,6 +6160,10 @@ class _BuildingSearchByDistrictDialog(QDialog):
 
         ordered_labels = self._group_key_sequence(self._filtered)
         self._group_labels_in_view = ordered_labels
+        if not self._expand_state_initialized:
+            self._expand_state_initialized = True
+            if not self._expand_all_toggle.isChecked():
+                self._collapsed_groups = set(ordered_labels)
         self._collapsed_groups = {label for label in self._collapsed_groups if label in set(ordered_labels)}
         for label in ordered_labels:
             entries = groups.get(label, [])
@@ -6224,6 +6275,11 @@ class _BuildingSearchByDistrictDialog(QDialog):
         self._ignore_unknown = self._ignore_unknown_toggle.isChecked()
         self._apply_filter(self._search_edit.text())
 
+    def replace_selected(self) -> bool:
+        if self._replace_toggle is None:
+            return False
+        return self._replace_toggle.isChecked()
+
     def selected_type(self) -> str | None:
         if self._selected is None:
             return None
@@ -6305,7 +6361,7 @@ class BuildingSearchNoTraitSelectorTemplate(_TypeSearchTemplate):
 class _UnitSearchDialog(QDialog):
     """Dialog presenting units grouped by promotion class."""
 
-    def __init__(self, rows: Sequence[Dict[str, object]], parent: QWidget | None = None) -> None:
+    def __init__(self, rows: Sequence[Dict[str, object]], parent: QWidget | None = None, *, replace_option: bool = False) -> None:
         super().__init__(parent)
         self.setWindowTitle("选择单位")
         self.setModal(True)
@@ -6317,6 +6373,7 @@ class _UnitSearchDialog(QDialog):
         self._selected: Dict[str, object] | None = None
         self._show_cost_one = False
         self._ignore_unknown = False
+        self._replace_selected = False
 
         class_sequence: List[str] = []
         for entry in self._rows:
@@ -6352,6 +6409,11 @@ class _UnitSearchDialog(QDialog):
         self._ignore_unknown_toggle = QCheckBox("忽视未知")
         self._ignore_unknown_toggle.stateChanged.connect(self._handle_ignore_unknown_toggle)
         toggle_row.addWidget(self._ignore_unknown_toggle)
+        if replace_option:
+            self._replace_toggle = QCheckBox("导入后取代该对象")
+            toggle_row.addWidget(self._replace_toggle)
+        else:
+            self._replace_toggle = None
         toggle_row.addStretch(1)
         layout.addLayout(toggle_row)
 
@@ -6387,6 +6449,11 @@ class _UnitSearchDialog(QDialog):
     def _handle_ignore_unknown_toggle(self, _state: int) -> None:
         self._ignore_unknown = self._ignore_unknown_toggle.isChecked()
         self._apply_filter(self._search_edit.text())
+
+    def replace_selected(self) -> bool:
+        if self._replace_toggle is None:
+            return False
+        return self._replace_toggle.isChecked()
 
     def _emit_rows(self, rows: Sequence[Dict[str, object]]) -> None:
         self._table.setRowCount(len(rows))

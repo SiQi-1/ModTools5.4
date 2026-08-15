@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import QApplication  # noqa: E402
 
 from ModTools_5_4.app.config import load_config  # noqa: E402
 from ModTools_5_4.app.logging_setup import configure_logging  # noqa: E402
+from ModTools_5_4.ui.pages.modifier_workspace import ModifierWorkspacePanel  # noqa: E402
 from ModTools_5_4.ui.pages.workspace_page import WorkspacePage  # noqa: E402
 
 from sample_project import build_sample_project  # noqa: E402
@@ -99,12 +100,24 @@ class SqlPreviewsTestCase(unittest.TestCase):
     def test_promotion_tree_bundle(self) -> None:
         bundle = self.page._build_promotion_tree_sql_bundle()
         self.assertIsNotNone(bundle)
-        self.assertEqual(set(bundle.keys()), {"PromotionClasses.sql", "UnitPromotions_Text.sql"})
+        self.assertEqual(set(bundle.keys()), {"PromotionClasses.sql"})
         combined = "\n".join(bundle.values())
         self.assertIn("PROMOTION_CLASS_SIQI_DEMO", combined)
         self.assertIn("PROMOTION_DEMO_DEMO_A", combined)
         self.assertIn("UnitPromotionPrereqs", combined)
         self.assertIn("'PROMOTION_DEMO_DEMO_B', 'PROMOTION_DEMO_DEMO_A'", combined)
+
+    def test_promotion_text_merged_into_unified_text(self) -> None:
+        text_sql = self.page._build_text_workspace_preview("sql")
+        self.assertIn("PROMOTION_DEMO_DEMO_A", text_sql, "晋升文本应并入统一 Text.sql")
+        self.assertIn("示例晋升一", text_sql)
+        # 晋升文本不再单独产出文件
+        manifest_files, _folders, _ok, _path = self.page._project_root_manifest()
+        self.assertNotIn(
+            True,
+            [name.lower().endswith("unitpromotions_text.sql") for name in manifest_files.keys()],
+            "不应再生成 UnitPromotions_Text.sql",
+        )
 
     def test_agenda_preview_content(self) -> None:
         sql = self._preview("议程", "sql")
@@ -176,6 +189,53 @@ class SqlPreviewsTestCase(unittest.TestCase):
         self.page._project = project
         sql = self._preview("区域", "sql")
         self.assertIn("RequiresPlacement", sql)
+
+
+class EmptyParamHandlingTestCase(unittest.TestCase):
+    """AI 写入 \"\"/null 的参数必须被跳过或输出 NULL，绝不输出 '' 字面量。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.app = QApplication.instance() or QApplication([])
+
+    def test_empty_modifier_params_skipped(self) -> None:
+        panel = ModifierWorkspacePanel()
+        panel._handle_add_modifier()
+        record = panel._modifiers[0]
+        record.modifier_id = "MODIFIER_TEST_X"
+        record.modifier_type = "MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_STRENGTH"
+        record.effect_type = "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER"
+        record.parameters = [
+            {"name": "Amount", "value": 5},
+            {"name": "BadEmpty", "value": ""},
+            {"name": "BadNone", "value": None},
+            {"name": "BadDict", "value": {}},
+            {"name": "Good", "value": "TEXT"},
+        ]
+        sql = panel.generate_sql_preview_text()
+        self.assertNotIn("BadEmpty", sql)
+        self.assertNotIn("BadNone", sql)
+        self.assertNotIn("BadDict", sql)
+        self.assertIn("'MODIFIER_TEST_X', 'Amount', 5", sql)
+        self.assertIn("'MODIFIER_TEST_X', 'Good', 'TEXT'", sql)
+        self.assertNotIn("''", sql)
+
+    def test_empty_requirement_params_skipped(self) -> None:
+        from ModTools_5_4.ui.pages.modifier_workspace import RequirementRecord
+        panel = ModifierWorkspacePanel()
+        panel._requirements.append(
+            RequirementRecord(
+                requirement_id="REQ_TEST_X",
+                requirement_type="REQUIREMENT_PLAYER_IS_HUMAN",
+                parameters=[
+                    {"name": "Flag", "value": ""},
+                    {"name": "Real", "value": 1},
+                ],
+            )
+        )
+        sql = panel.generate_sql_preview_text()
+        self.assertNotIn("'REQ_TEST_X', 'Flag'", sql)
+        self.assertIn("'REQ_TEST_X', 'Real', 1", sql)
 
 
 if __name__ == "__main__":

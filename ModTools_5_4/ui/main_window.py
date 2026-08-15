@@ -14,10 +14,9 @@ from ..project import CIV_FILE_EXTENSION
 from .assets import app_icon_path
 from .theme import load_base_qss
 from .pages.base_page import BasePage
-from .pages.debug_page import DebugPage
 from .pages.home_page import HomePage
-from .pages.search_page import SearchPage
 from .pages.settings_page import SettingsPage
+from .pages.tools_page import ToolsPage
 from .pages.workspace_page import WorkspacePage
 
 LOGGER = logging.getLogger(__name__)
@@ -61,9 +60,8 @@ class MainWindow(QMainWindow):
         self._add_page(HomePage(self.show_page))
         self._workspace_page = WorkspacePage()
         self._add_page(self._workspace_page)
-        self._add_page(SearchPage())
+        self._add_page(ToolsPage())
         self._add_page(SettingsPage())
-        self._add_page(DebugPage())
 
     def _build_menu(self) -> None:
         menu_bar = self.menuBar()
@@ -77,9 +75,8 @@ class MainWindow(QMainWindow):
         for page_id, label in (
             ("home", "主页"),
             ("workspace", "工作区"),
-            ("search", "搜索"),
+            ("tools", "小工具"),
             ("settings", "设置"),
-            ("debug", "DEBUG"),
         ):
             action = QAction(label, self)
             action.triggered.connect(partial(self.show_page, page_id))

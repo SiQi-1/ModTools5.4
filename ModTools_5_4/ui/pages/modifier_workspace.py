@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence
 
-from .group_workspace import SMALL_BUTTON_QSS, _build_entity_type
+from .group_workspace import SMALL_BUTTON_QSS, _build_entity_type, _shared_params_from_basic_section
 
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence, QShortcut
@@ -164,6 +164,48 @@ class IntParamSpinBox(QDoubleSpinBox):
         return text if text else "0"
 
 
+
+
+# 操作按钮样式：普通（白底描边）与主按钮（蓝底）形成视觉层级，竖线分隔功能组
+_ACTION_BUTTON_QSS = SMALL_BUTTON_QSS
+_PRIMARY_BUTTON_QSS = (
+    "QPushButton {"
+    "padding: 4px 12px;"
+    "font-size: 12px;"
+    "min-height: 24px;"
+    "border: 1px solid #2563eb;"
+    "border-radius: 8px;"
+    "background: #2563eb;"
+    "color: #ffffff;"
+    "}"
+    "QPushButton:hover { background: #1d4ed8; }"
+    "QPushButton:pressed { background: #1e40af; }"
+    "QPushButton:disabled { background: #a5c0f2; border-color: #a5c0f2; color: #eef2ff; }"
+)
+
+
+def _action_button(text: str, tooltip: str = "") -> QPushButton:
+    btn = QPushButton(text)
+    btn.setStyleSheet(_ACTION_BUTTON_QSS)
+    if tooltip:
+        btn.setToolTip(tooltip)
+    return btn
+
+
+def _primary_button(text: str, tooltip: str = "") -> QPushButton:
+    btn = QPushButton(text)
+    btn.setStyleSheet(_PRIMARY_BUTTON_QSS)
+    if tooltip:
+        btn.setToolTip(tooltip)
+    return btn
+
+
+def _button_separator() -> QFrame:
+    line = QFrame()
+    line.setFrameShape(QFrame.Shape.VLine)
+    line.setFixedWidth(1)
+    line.setStyleSheet("color:#cbd5e1;")
+    return line
 
 
 # 表名 -> 类型字段 映射表（可扩展）
@@ -2592,6 +2634,8 @@ class HomePage(BasePage):
 
         # Part 3 widgets
         self._modifier_list: QTableWidget | None = None
+        self._modifier_copy_btn: QPushButton | None = None
+        self._modifier_del_btn: QPushButton | None = None
         self._prefix_input: QLineEdit | None = None
         self._prefix2_input: QLineEdit | None = None
         self._modifier_id_input: QLineEdit | None = None
@@ -2635,6 +2679,7 @@ class HomePage(BasePage):
 
         self._req_id_input: QLineEdit | None = None
         self._req_comment_input: QLineEdit | None = None
+        self._req_del_btn: QPushButton | None = None
         self._save_req_template_btn: QPushButton | None = None
         self._req_type_combo: QComboBox | None = None
         self._req_type_search_btn: QPushButton | None = None
@@ -2972,11 +3017,18 @@ class HomePage(BasePage):
         self._owner_type_input = type_input
         layout.addWidget(type_input, 1)
 
-        add_btn = QPushButton("添加")
+        add_btn = _primary_button("添加")
         add_btn.clicked.connect(self._handle_add_owner)
         layout.addWidget(add_btn)
 
-        add_ability_btn = QPushButton("新增Ability")
+        layout.addWidget(_button_separator())
+
+        add_ability_btn = _action_button(
+            "新增Ability（单位技能）",
+            "为单位新建技能按钮（如游戏内单位面板的命令按钮）。\n"
+            "新建后会自动加入下方所有者列表，再给它绑定 ModifierId 实现效果。\n"
+            "表名不是 UnitAbilityModifiers 时点击会自动切换。",
+        )
         add_ability_btn.clicked.connect(self._handle_add_unit_ability)
         self._owner_add_ability_btn = add_ability_btn
         layout.addWidget(add_ability_btn)
@@ -3010,26 +3062,29 @@ class HomePage(BasePage):
         header.addWidget(selected_label)
 
         header.addStretch(1)
-        add_btn = QPushButton("添加")
-        add_btn.clicked.connect(self._handle_add_owner)
-        header.addWidget(add_btn)
 
-        delete_btn = QPushButton("删除")
-        delete_btn.clicked.connect(self._handle_delete_owner)
-        self._owner_delete_btn = delete_btn
-        header.addWidget(delete_btn)
+        edit_ability_btn = _action_button("编辑Ability", "编辑当前选中的单位技能（仅可回填编辑本工具新建的 Ability）")
+        edit_ability_btn.clicked.connect(self._handle_edit_selected_unit_ability)
+        self._owner_edit_ability_btn = edit_ability_btn
+        header.addWidget(edit_ability_btn)
 
-        toggle_btn = QPushButton("折叠")
+        toggle_btn = _action_button("折叠详情")
         toggle_btn.setCheckable(True)
         toggle_btn.setChecked(False)
         toggle_btn.clicked.connect(self._toggle_owner_section)
         self._owner_toggle_btn = toggle_btn
         header.addWidget(toggle_btn)
 
-        edit_ability_btn = QPushButton("编辑Ability")
-        edit_ability_btn.clicked.connect(self._handle_edit_selected_unit_ability)
-        self._owner_edit_ability_btn = edit_ability_btn
-        header.addWidget(edit_ability_btn)
+        header.addWidget(_button_separator())
+
+        delete_btn = _action_button("删除")
+        delete_btn.clicked.connect(self._handle_delete_owner)
+        self._owner_delete_btn = delete_btn
+        header.addWidget(delete_btn)
+
+        add_btn = _primary_button("添加")
+        add_btn.clicked.connect(self._handle_add_owner)
+        header.addWidget(add_btn)
 
         outer.addLayout(header)
 
@@ -3123,9 +3178,7 @@ class HomePage(BasePage):
             return
         collapsed = self._owner_toggle_btn.isChecked()
         self._owner_section_body.setVisible(not collapsed)
-        self._owner_toggle_btn.setText("展开" if collapsed else "折叠")
-        if self._owner_delete_btn is not None:
-            self._owner_delete_btn.setVisible(not collapsed)
+        self._owner_toggle_btn.setText("展开详情" if collapsed else "折叠详情")
         if self._owner_bind_compact_bar is not None:
             self._owner_bind_compact_bar.setVisible(collapsed)
         self._update_owner_section_state()
@@ -3136,7 +3189,7 @@ class HomePage(BasePage):
             self._owner_toggle_btn.setEnabled(has_owner)
             if not has_owner:
                 self._owner_toggle_btn.setChecked(False)
-                self._owner_toggle_btn.setText("折叠")
+                self._owner_toggle_btn.setText("折叠详情")
                 if self._owner_section_body is not None:
                     self._owner_section_body.setVisible(True)
                 if self._owner_bind_compact_bar is not None:
@@ -3148,10 +3201,6 @@ class HomePage(BasePage):
         self._update_ability_buttons_state()
 
     def _update_ability_buttons_state(self) -> None:
-        if self._owner_add_ability_btn is not None and self._owner_table_combo is not None:
-            table_name = self._owner_table_combo.currentText().strip()
-            self._owner_add_ability_btn.setVisible(table_name == "UnitAbilityModifiers")
-
         if self._owner_edit_ability_btn is not None:
             enabled = False
             if 0 <= self._selected_owner_index < len(self._owners):
@@ -3550,17 +3599,28 @@ class HomePage(BasePage):
         layout.setSpacing(6)
 
         button_row = QHBoxLayout()
-        add_btn = QPushButton("新增")
+        add_btn = _primary_button("新增")
         add_btn.clicked.connect(self._handle_add_modifier)
-        copy_btn = QPushButton("复制")
-        copy_btn.clicked.connect(self._handle_duplicate_modifier)
-        del_btn = QPushButton("删除")
-        del_btn.clicked.connect(self._handle_delete_modifier)
-        batch_btn = QPushButton("批量生成")
-        batch_btn.clicked.connect(self._handle_open_batch_generate)
         button_row.addWidget(add_btn)
+
+        button_row.addWidget(_button_separator())
+
+        copy_btn = _action_button("复制", "复制当前选中的 Modifier")
+        copy_btn.setEnabled(False)
+        copy_btn.clicked.connect(self._handle_duplicate_modifier)
+        self._modifier_copy_btn = copy_btn
         button_row.addWidget(copy_btn)
+
+        del_btn = _action_button("删除")
+        del_btn.setEnabled(False)
+        del_btn.clicked.connect(self._handle_delete_modifier)
+        self._modifier_del_btn = del_btn
         button_row.addWidget(del_btn)
+
+        button_row.addWidget(_button_separator())
+
+        batch_btn = _action_button("批量生成", "按需求组批量生成 Modifier")
+        batch_btn.clicked.connect(self._handle_open_batch_generate)
         button_row.addWidget(batch_btn)
         button_row.addStretch(1)
         layout.addLayout(button_row)
@@ -3780,6 +3840,7 @@ class HomePage(BasePage):
         layout.addWidget(table, 1)
 
         preview_container = QWidget()
+        preview_container.setMinimumHeight(96)
         preview_layout = QVBoxLayout(preview_container)
         preview_layout.setContentsMargins(0, 0, 0, 0)
         preview_layout.setSpacing(4)
@@ -3911,19 +3972,26 @@ class HomePage(BasePage):
 
         header_row = QHBoxLayout()
         header_row.addWidget(QLabel("条件集对象"))
-        add_btn = QPushButton("新增")
-        add_btn.clicked.connect(self._handle_add_reqset)
-        del_btn = QPushButton("删除")
-        del_btn.clicked.connect(self._handle_delete_reqset)
-        self._reqset_delete_btn = del_btn
-        toggle_btn = QPushButton("折叠")
+        header_row.addStretch(1)
+
+        toggle_btn = _action_button("折叠详情")
         toggle_btn.setCheckable(True)
         toggle_btn.clicked.connect(self._toggle_reqset_section)
         self._reqset_toggle_btn = toggle_btn
-        header_row.addWidget(add_btn)
-        header_row.addWidget(del_btn)
-        header_row.addStretch(1)
         header_row.addWidget(toggle_btn)
+
+        header_row.addWidget(_button_separator())
+
+        del_btn = _action_button("删除")
+        del_btn.setEnabled(False)
+        del_btn.clicked.connect(self._handle_delete_reqset)
+        self._reqset_delete_btn = del_btn
+        header_row.addWidget(del_btn)
+
+        add_btn = _primary_button("新增")
+        add_btn.clicked.connect(self._handle_add_reqset)
+        header_row.addWidget(add_btn)
+
         layout.addLayout(header_row)
 
         body = QWidget()
@@ -4037,11 +4105,16 @@ class HomePage(BasePage):
         layout.setSpacing(6)
 
         button_row = QHBoxLayout()
-        add_btn = QPushButton("新增")
+        add_btn = _primary_button("新增")
         add_btn.clicked.connect(self._handle_add_requirement)
-        del_btn = QPushButton("删除")
-        del_btn.clicked.connect(self._handle_delete_requirement)
         button_row.addWidget(add_btn)
+
+        button_row.addWidget(_button_separator())
+
+        del_btn = _action_button("删除")
+        del_btn.setEnabled(False)
+        del_btn.clicked.connect(self._handle_delete_requirement)
+        self._req_del_btn = del_btn
         button_row.addWidget(del_btn)
         button_row.addStretch(1)
         layout.addLayout(button_row)
@@ -4393,8 +4466,7 @@ class HomePage(BasePage):
         if self._owner_table_combo is None:
             return
         if self._owner_table_combo.currentText().strip() != "UnitAbilityModifiers":
-            QMessageBox.information(self, "提示", "仅在表名为 UnitAbilityModifiers 时可新增Ability。")
-            return
+            self._owner_table_combo.setCurrentText("UnitAbilityModifiers")
 
         prefix, infix = self._workspace_prefix_infix()
         dialog = UnitAbilityEditorDialog(self, prefix=prefix, infix=infix)
@@ -4866,6 +4938,11 @@ class HomePage(BasePage):
         if 0 <= prev_index < len(self._modifiers):
             self._persist_modifier_by_index(prev_index)
         self._current_modifier_index = row
+        has_modifier = 0 <= row < len(self._modifiers)
+        if self._modifier_copy_btn is not None:
+            self._modifier_copy_btn.setEnabled(has_modifier)
+        if self._modifier_del_btn is not None:
+            self._modifier_del_btn.setEnabled(has_modifier)
         if row < 0 or row >= len(self._modifiers):
             self._clear_modifier_editor()
             self._set_modifier_editor_enabled(False)
@@ -5211,6 +5288,8 @@ class HomePage(BasePage):
         row = self._get_selected_row(self._req_list)
         self._persist_current_requirement()
         self._current_req_index = row
+        if self._req_del_btn is not None:
+            self._req_del_btn.setEnabled(0 <= row < len(self._requirements))
         if row < 0 or row >= len(self._requirements):
             self._clear_requirement_editor()
             self._set_requirement_editor_enabled(False)
@@ -5391,9 +5470,7 @@ class HomePage(BasePage):
             return
         collapsed = self._reqset_toggle_btn.isChecked()
         self._reqset_section_body.setVisible(not collapsed)
-        self._reqset_toggle_btn.setText("展开" if collapsed else "折叠")
-        if self._reqset_delete_btn is not None:
-            self._reqset_delete_btn.setVisible(not collapsed)
+        self._reqset_toggle_btn.setText("展开详情" if collapsed else "折叠详情")
 
     def _update_reqset_section_state(self) -> None:
         has_reqset = bool(self._requirement_sets)
@@ -5401,7 +5478,7 @@ class HomePage(BasePage):
             self._reqset_toggle_btn.setEnabled(has_reqset)
             if not has_reqset:
                 self._reqset_toggle_btn.setChecked(False)
-                self._reqset_toggle_btn.setText("折叠")
+                self._reqset_toggle_btn.setText("折叠详情")
                 if self._reqset_section_body is not None:
                     self._reqset_section_body.setVisible(True)
         if self._reqset_delete_btn is not None:
@@ -5554,6 +5631,9 @@ class HomePage(BasePage):
             return
         if self._current_req_index < 0 or self._current_req_index >= len(self._requirements):
             return
+        # 条件编辑必须即时持久化：_bind_selected_requirement / 快捷 Ctrl+B 等
+        # 读 record.requirement_id/requirement_type，未持久化时会拿到旧 id 造成悬空引用。
+        self._persist_current_requirement()
 
     def _snapshot_modifier_editor(self) -> Dict[str, object]:
         owner_text = self._owner_reqset_input.text().strip() if self._owner_reqset_input else ""
@@ -5924,9 +6004,9 @@ class HomePage(BasePage):
             for key in ("value", "id", "type", "unit_type", "display", "text", "name"):
                 if key in value and value[key] not in (None, ""):
                     return self._param_to_sql(value[key])
-            return "''"
+            return "NULL"
         if value is None:
-            return "''"
+            return "NULL"
         return self._sql_text_or_empty(value)
 
     def _format_number_sql(self, value: float | int) -> str:
@@ -6122,6 +6202,17 @@ class HomePage(BasePage):
                             f"('zh_Hans_CN','{self._sql_escape(desc_tag)}','{self._sql_escape(desc_text)}')"
                         )
                 else:
+                    if raw_value is None:
+                        continue
+                    if isinstance(raw_value, str) and not raw_value.strip():
+                        continue
+                    if isinstance(raw_value, dict):
+                        has_inner = any(
+                            key in raw_value and raw_value[key] not in (None, "")
+                            for key in ("value", "id", "type", "unit_type", "display", "text", "name")
+                        )
+                        if not has_inner:
+                            continue
                     value = self._param_to_sql(raw_value)
                 arg_lines.append(
                     f"('{self._sql_escape(modifier_id)}', '{self._sql_escape(name)}', {value})"
@@ -6250,7 +6341,19 @@ class HomePage(BasePage):
                 name = str(param.get("name", "")).strip()
                 if not name:
                     continue
-                value = self._param_to_sql(param.get("value"))
+                raw_value = param.get("value")
+                if raw_value is None:
+                    continue
+                if isinstance(raw_value, str) and not raw_value.strip():
+                    continue
+                if isinstance(raw_value, dict):
+                    has_inner = any(
+                        key in raw_value and raw_value[key] not in (None, "")
+                        for key in ("value", "id", "type", "unit_type", "display", "text", "name")
+                    )
+                    if not has_inner:
+                        continue
+                value = self._param_to_sql(raw_value)
                 req_arg_lines.append(
                     f"('{self._sql_escape(record.requirement_id)}', '{self._sql_escape(name)}', {value})"
                 )
@@ -8128,7 +8231,7 @@ class ModifierWorkspacePanel(HomePage):
 
         for tree_index, entry in enumerate(iter_entries("单位晋升")):
             tree_name = str(entry.get("name") or "").strip() or f"晋升树{tree_index + 1}"
-            shared = sections.get("基础信息", {}) if isinstance(sections, dict) else {}
+            shared = _shared_params_from_basic_section(sections.get("基础信息", {}))
             nodes = entry.get("nodes", []) if isinstance(entry.get("nodes"), list) else []
             for node_index, node_data in enumerate(nodes):
                 if not isinstance(node_data, dict):

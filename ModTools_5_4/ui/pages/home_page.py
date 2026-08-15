@@ -56,7 +56,7 @@ class HomePage(BasePage):
 
         for target, text in (
             ("workspace", "进入工作区"),
-            ("search", "进入搜索页"),
+            ("tools", "进入小工具页（搜索/图片工具/模板总结）"),
             ("settings", "进入设置页"),
         ):
             button = QPushButton(text)

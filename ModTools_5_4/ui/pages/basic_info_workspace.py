@@ -1201,9 +1201,15 @@ class BasicInfoWorkspacePanel(QWidget):
         file_info = payload.get("file_info")
 
         if not isinstance(global_settings, dict):
-            global_settings = {}
+            # 兼容旧式平铺结构：prefix/infix/mod_name 直接存放在"基础信息"节顶层
+            # （当前格式为 {format, schema_version, data: {global_settings, project_info, ...}}）。
+            # 若不迁移，旧工程加载后 prefix 显示为空，且保存时会被回写为空前缀。
+            global_settings = {
+                "prefix": payload.get("prefix", ""),
+                "infix": payload.get("infix", 0),
+            }
         if not isinstance(project_info, dict):
-            project_info = {}
+            project_info = {"mod_name": payload.get("mod_name", "")}
         if not isinstance(file_info, dict):
             file_info = {}
 

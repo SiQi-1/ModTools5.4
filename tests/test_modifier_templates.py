@@ -72,5 +72,29 @@ class ModifierTemplateTestCase(unittest.TestCase):
         self.assertFalse(widget._combo.isEditable())
 
 
+class ModifierPreviewStringTestCase(unittest.TestCase):
+    """ModifierStrings（Context=Preview）仅支持 EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.app = QApplication.instance() or QApplication([])
+
+    def test_only_strength_modifier_supported(self) -> None:
+        from ModTools_5_4.ui.pages.modifier_workspace import HomePage
+        page = HomePage()
+        self.assertTrue(page._supports_modifier_preview_string("EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER"))
+        self.assertTrue(page._supports_modifier_preview_string("effect_adjust_player_strength_modifier"))
+        for effect in (
+            "EFFECT_ADJUST_ATTACKER_STRENGTH_MODIFIER",
+            "EFFECT_ADJUST_DEFENDER_STRENGTH_MODIFIER",
+            "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_COMBAT",
+            "EFFECT_ADJUST_UNIT_ATTACK_RANGE",
+            "EFFECT_ADJUST_CITY_YIELD",
+            "",
+            None,
+        ):
+            self.assertFalse(page._supports_modifier_preview_string(effect), effect)
+
+
 if __name__ == "__main__":
     unittest.main()

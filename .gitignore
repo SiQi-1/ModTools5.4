@@ -30,7 +30,7 @@ __pycache__/
 .venv/
 
 # Temporary / AI working files (never commit)
-*.bak
+*.bak*
 modgen_work/
 entry_*.json
 _work/

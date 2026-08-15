@@ -1,5 +1,258 @@
 # Changelog
 
+## 2026-08-16 - 修复：阶段 1 数据安全七项（全量代码审查后的首批修复）
+
+### 背景
+- 对工作区代码做了全量审查（7 路并行 + 手工验证），按严重度排出修复清单；本批为阶段 1（数据丢失/损坏类），改良设施相邻加成 "Placeholder" 描述经确认是设计意图，不动。
+
+### 修复
+1. **空值输出 NULL 而非 `''`**（违反 AGENT.md 硬规则：仅文本可填 `''`，其余必须 NULL）：区域/建筑/单位/改良设施/政策卡/项目/伟人 7 处 `_sql_literal` 副本统一为同一语义——`None`/空串/`"none"` → `NULL`（此前 district/building 版甚至会把 `None` 输出成字符串 `'None'`）。
+2. **SQL 文本值内分号不再截断**：新增 `_find_statement_end`（引号感知、处理 `''` 转义）；`_extract_insert_rows` 与 `_sql_preview_to_xml` 改用其定位语句结束，修复文本含 `;` 时整节 Text.sql 静默丢失的问题。
+3. **修改器「条件」编辑即时落库**：`_on_requirement_editor_changed` 原为空实现，改字段不持久化导致 ReqSet 绑定/快捷 Ctrl+B 读到旧 id 悬空引用；现补 `_persist_current_requirement()`。
+4. **可输入选择框占位文案不再污染 .CIV**：`_EditableComboTemplate._current_value` 将占位文本视为空、空值导出为 None（含 display/name）；`set_current_value(None)` 补 blockSignals；`UnitAbilityTypeTemplate.export_data` 占位视为空且空值返回 None（原返回 `""`）。
+5. **议程 AiLists LeaderType 过期残留**：`AgendaCompositeEditor.set_entry` 在历史议程加载完成后二次 `_sync_agenda_context()`，避免切换条目瞬间把 AI 偏好绑到上一个领袖。
+6. **.civ6proj Teaser 保留原始值**：`_build_civ6proj_preview` 的 Teaser 优先用导入时解析的 `teaser_raw`（LOC tag 或原文），不再被 Description 覆盖；无原始值时回落 Description tag。
+7. **旧式平铺「基础信息」迁移**：`import_project_payload` 兼容顶层平铺 prefix/infix/mod_name（旧格式加载后 prefix 不再显示为空）；`_handle_basic_workspace_params_changed` 的 `_loading_project` 守卫提前到回写之前，加载过程中禁止以空编辑器状态覆盖工程。
+
+### 验证
+- 新增 `tests/test_stage1_regressions.py`（17 项回归，覆盖上述 7 项 + 引号转义/加载守卫边界）。
+- 全量 127 项单元测试通过（110 旧 + 17 新）。
+- 真实工程验证：52.CIV / 53.CIV 的区域/建筑/单位/改良/政策/项目 SQL 预览零 `''` 字面量、零 `'None'` 字符串。
+
+## 2026-08-16 - 收尾确认：52.CIV / 53.CIV 工程完成
+
+### 完成确认（用户确认，仅更新记录）
+- **52.CIV（黑珍珠 / 杰克斯派洛，Siqi_Leaders_0052）**：工程已生成并验证通过（modgen validate + GUI 全部 13 分类 SQL/修改器/文本/Configs 导出），修改器全部改用游戏库已有 ModifierType（无自定义 DynamicModifiers，38 个 modifier），图片资源（AI 生图 v2 + 抠图处理）已就位；用户在 GUI 完成一键生成并进游戏验证通过。交接文档 `docs/52_进度交接.md` 状态更新为已完成。
+- **53.CIV（大炎 / 司霆惊蛰，Siqi_Leaders_0053）**：端到端验证通过（晋升树 bundle 带前缀类型、统一 Text 含全部晋升文本、修改器绑定 SQL 正确、无游离文本文件），确认完成、无需修改。
+
+### 验证
+- 全量 110 项单元测试通过（无代码改动，仅文档状态更新）。
+
+## 2026-08-14 - 验证：53.CIV 生成链路 + 编辑器未装载同步防护
+
+### 验证（53.CIV 无需修改）
+- 按真实流程（装载编辑器 → 刷新 → 生成）完整验证 53.CIV：晋升树 bundle 类型带前缀（`PROMOTION_SIQI_P0053_M4C2` 等）、统一 Text 含全部晋升文本（引雷/雷工/连环雷）、修改器绑定 SQL 使用带前缀的晋升类型、无游离 `UnitPromotions_Text.sql`。文件本身数据正确。
+
+### 修复（顺带发现的隐患）
+- `_sync_workspace_sections_from_editors` 在编辑器尚未装载工程数据时，会以空编辑器状态覆盖工程（前缀被清空、绑定 owner 名被改坏）。新增 `_workspace_editors_loaded` 标记（装载完成后置位），未装载时禁止同步导出。
+
+### 验证
+- 全量 110 项单元测试通过；53.CIV 端到端生成断言全部通过。
+
+## 2026-08-14 - 修复：单位晋升不再单独产出 UnitPromotions_Text.sql
+
+### 问题
+- 单位晋升的生成 bundle 单独返回 `UnitPromotions_Text.sql`（且被写进 Data/ 目录），绕过统一的文本工作区：晋升树的名字/描述文本不在 Text.sql 里，多出一个游离文本文件。
+
+### 修复
+- `_build_promotion_tree_sql_bundle` 重构出 `_build_promotion_tree_parts()`：bundle 只返回数据文件（`PromotionClasses.sql`）；晋升文本行经新方法 `_build_promotion_tree_text_rows()` 汇入统一 Text 预览（`_build_text_workspace_preview` 新增「晋升树文本」分组，按晋升树条目聚合 CLASS 与节点 LOC 文本）。
+- 生成链路不再输出 `Data/{前缀}_UnitPromotions_Text.sql`；已存在的旧文件不会被自动删除，可在工程根手动删除或加入删除计划。
+
+### 验证
+- 更新 `test_promotion_tree_bundle`（bundle 仅含 PromotionClasses.sql）+ 新增 `test_promotion_text_merged_into_unified_text`（统一 Text 含晋升文本、manifest 不含游离文本文件）。全量 110 项单元测试通过。
+
+## 2026-08-14 - 新增：AGENT.md 统一知识库（合并外部 skills/reference）
+
+### 新增
+- 根目录 `AGENT.md`：AI/agent 在仓库内工作、编写 .CIV 工程文件时的强制阅读规范与知识库，合并自外部知识库（`D:\文明6mod用文件夹\AI制作Mod`）的已验证内容：
+  - 硬规则：ModifierType 优先引用游戏库已有类型；JSON 禁止写 `""`；
+  - 命名规范（Type/ModifierId/REQ/LOC_ 前缀体系）；
+  - 相邻加成（Adjacency_YieldChanges 20 列规则与模板）；
+  - 数据库查询参考（表速查 + 常见坑）；
+  - TypeProperties 参考（Name×Type 对照与硬编码规则）；
+  - 常见陷阱速查与 .CIV 自检清单。
+- **Lua 声明**：本项目不生成/不支持 Lua；用户需求涉及 Lua 时必须明确告知"本工具无法编写 Lua 能力"。
+- 未合并：外部 CLAUDE.md（工作流与本工具不符）、教程视频文案（未验证）、Lua 技能与工坊分类、22MB sqlite/CSV/二进制。
+- CLAUDE.md 顶部与 Key Design Decisions 指向 AGENT.md；删除已合并的 `docs/AI_CIV_AUTHORING.md`。
+
+## 2026-08-14 - 修复：单位晋升树类型名丢失前缀 + 新增 53.CIV（大炎/司霆惊蛰）
+
+### 修复
+- 单位晋升树的晋升节点类型此前由 `_build_entity_type(shared=基础信息 section)` 计算，而 .CIV 中「基础信息」是带 `format/schema_version/data` 包装的 payload（prefix/infix 位于 `data.shared_workspace_params`），导致晋升类型被生成为无前缀的 `PROMOTION_L1C1` 之类，与修改器工作区里带前缀的 UnitPromotionModifiers 归属不一致（外键不匹配、且跨 Mod 易撞名）。
+- 新增 `group_workspace._shared_params_from_basic_section()`：同时支持包装 payload（取 `data.shared_workspace_params`/`data.global_settings`）与旧式平铺格式；`workspace_page._build_promotion_tree_sql_bundle` 与 `modifier_workspace._build_owner_candidates_from_sections`（晋升节点部分）改用该函数，晋升类型现在正确生成 `PROMOTION_SIQI_P0053_*` 全名。
+
+### 新增工程
+- 新增 `53.CIV`：文明 **大炎** / 领袖 **司霆惊蛰**（链接 Siqi_Leaders_0053 工程），严格遵循 `D:\文明6mod用文件夹\AI制作Mod\skills` 规范：
+  - 领袖特质「明断追责」：GRANT ABILITY 链实现——`ABILITY_SIQI_A0053_1`（Inactive，Tag `CLASS_ALL_COMBAT_UNITS` 过滤军事单位）由领袖特质在战争期间授予（`MODIFIER_PLAYER_UNITS_GRANT_ABILITY` + AT_WAR 条件集），+12 战斗力 / +1 移动力挂在 UnitAbilityModifiers 上；`ABILITY_SIQI_A0053_2`（Tag `CLASS_ALL_UNITS`）授予全体单位无视控制区。全 Mod 无自定义 ModifierType。
+  - 文明特质「千秋一粟，万顷良田」：购地 -50%、农场 +2 食物 +1 生产力、水渠后农场 +2 生产力、轮子/工业化/化学各 +1 生产力（每相邻农场 +1 食物暂搁置——无现成效果器，待 Lua）。
+  - 特色区域「天师府」（取代学院）：建成地块 +1 科技、大学 → +1 文化、实验室 → +1 信仰、三学院建筑齐备时每人口 +1 科技/文化/金币；建成时当前城市创建一名天师。
+  - 特色区域「界园」：相邻区域 +4 文化 +4 信仰（修改器实现）、+2 宜居度、+8 旅游业绩。
+  - 特色单位「天师」：20 战斗力 / Cost 9999 / 使用最高近战战斗力 / 3 劳动力 / 视野无视地形 / 防御 +10 / 独特晋升树（7 节点：左 引雷·疾霆·千里目 / 中 雷工 / 右 镇岳·踏浪·连环雷）。
+  - 特色项目「开放界园」（需界园）：进行中每回合 100% 生产力转文化、200% 转金币（Project_YieldConversions），完成永久 +1 旅游业绩（`MODIFIER_CITY_DISTRICTS_ADJUST_TOURISM_CHANGE`，Permanent + RunOnce）。
+
+### 验证
+- 53.CIV 通过离屏加载 + 全 section SQL 预览校验（晋升类型全名、GRANT ABILITY 链、ProjectCompletionModifiers、全部 requirement/参数、无 `''`）；全量 109 项单元测试通过。
+
+## 2026-08-13 - 修复：AI 编写 .CIV 两大问题（ModifierType 发明 + 空串参数）
+
+### 文档
+- 新增 `docs/AI_CIV_AUTHORING.md`：约束 AI/agent 直接编写 .CIV JSON 的行为。核心规则：
+  1. ModifierType **必须优先**引用游戏库 DynamicModifiers 已存在的类型，确需新建时才允许（且必须同时写 DynamicModifiers 行）；
+  2. **禁止写 `""`**——空值必须省略字段或写 `null`，并说明 `""`/`null`/`"NONE"` 三者的语义差异与报错后果。
+- CLAUDE.md 同步加入 AI 编写规则指引。
+
+### 生成器兜底
+- ModifierArguments / RequirementArguments 导出：值为 `None`、`""`、空 dict 的参数行直接跳过，不再生成 `''` 字面量。
+- `_param_to_sql`：`None`/空 dict → `NULL`（原为 `''`）。
+- `workspace_page._sql_literal`：`None` → `NULL`。
+
+### 验证
+- 新增 2 例回归（修改器/需求参数空值跳过、无 `''` 输出）；全量 109 项单元测试通过。
+
+## 2026-08-13 - 修复：修改器参数面板高度自适应恢复
+
+### 问题
+- 上一版把参数面板包进 QScrollArea 后，滚动区在分割器内不传播内容高度，参数表被压到不足一行，破坏原有"内容多高区域就多高"的自适应行为。
+
+### 修复
+- 回滚 QScrollArea 包装，参数面板恢复直接布局（自适应高度）。
+- ModifierString 编辑容器加 `setMinimumHeight(96)`：显示时参与分割器最小尺寸约束，不会再被压缩到不可见。
+
+### 验证
+- 离屏断言：参数表 ≥100px、ModifierString 容器可见且 ≥70px、切走效果器后隐藏；全量 107 项单元测试通过。
+
+## 2026-08-13 - 修复：ModifierString 显示恢复 + 参数面板防裁剪
+
+### 恢复
+- ModifierString（Context=Preview）支持判定恢复为**仅 EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER** 一种（此前误扩展为 25 种效果器白名单，已全部回滚）。
+
+### 验证
+- 新增回归锁定单效果器判定（含大小写不敏感与空值）；主编辑器/批量生成对话框两条路径显示与隐藏行为验证通过。
+
+## 2026-08-13 - 新增：小工具页（搜索子页 + 图片工具 + PSD 模板总结）
+
+### 新增页面
+- 新增「小工具」页（`tools_page.py`）取代原顶层搜索页：QTabWidget 三个子页——**搜索**（原 SearchPage 原样嵌入）、**图片工具**、**PSD模板总结**；主页导航与窗口菜单同步（顶层页面：主页/工作区/小工具/设置）。
+
+### 图片工具（`ui/image_ops.py`，纯 Pillow，供 UI 与未来 AI 工具共用）
+- **圆形裁切**（领袖头像）：按比例内缩圆裁（边距默认 10px@256，可调；非顶边裁切）+ 可选黑边环（默认 3px@256），4x 超采样抗锯齿，实时预览 + 导出 PNG。
+- **黑白图标**（文明/单位/改良设施）：灰度化 + 对比度滑块，按对象类型批量输出多尺寸（尺寸表来自图标尺寸参考）。
+- **区域图标**：大图预览 + 人工确认六边形格式；不符合时从区域底图（默认 `D:\文明6mod用文件夹\区域底图`）复制并改名到目标目录，供编辑。
+
+### PSD 模板总结（`ui/psd_summarizer.py`）
+- 选择 PSD → 每层连同特效烘焙导出 PNG（特效由 psd-tools 渲染引擎烘焙，不重画）+ `recipe.json`（图层树/类型/位置/可见性）+ 合成图 composite.png。拼合效果与 PS 人工合成一致。
+- 已验证可解析 Photopea 风格非标准 PSD（领袖头像模板 0.7s、区域图标模板）；psd-tools 为可选依赖（缺失时提示安装）。
+
+### 环境
+- 开发环境新增 `psd-tools 1.18.0`（官方 PyPI；清华镜像缺此包）。
+
+### 验证
+- 新增 `tests/test_image_tools.py`（8 例）：圆裁边距/黑边/缩放、灰度、尺寸表、工具页构造、PSD 总结往返。全量 106 项单元测试通过。
+
+## 2026-08-13 - 移除：DEBUG 页面
+
+### 移除
+- 删除 `ModTools_5_4/ui/pages/debug_page.py` 及主窗口导航/菜单入口（页面从 5 页减为 4 页：主页/工作区/搜索/设置）。
+- 同步更新测试断言与 CLAUDE.md 架构树。
+
+### 环境
+- 开发环境新增 `psd-tools 1.18.0`（解析 PSD 模板用；官方 PyPI 安装，清华镜像缺此包）。已验证可解析 Photopea 风格的非标准 PSD（领袖头像/区域图标模板）。
+
+## 2026-08-13 - 改进：修改器页按钮布局重构（全可见 + 视觉层级）
+
+### 新增
+- 「新增Ability」按钮**常驻可见**（原仅在表名为 UnitAbilityModifiers 时显示，新手难发现）；文案「新增Ability（单位技能）」+ tooltip 说明用途；表名不符时点击**自动切换**后打开对话框。
+
+### 布局重构（按钮全部可见，靠样式与分组做层级）
+- 放弃「⋯ 更多菜单」折叠方案（隐藏操作反而更难用），改为：所有操作按钮**始终可见**，小号圆角样式；主操作（新增/添加）用**蓝底主按钮**，其余白底描边；竖分隔线划分功能组。
+- 布局模式统一：`[输入区] …… [次要操作] | [删除] [主按钮]`，右对齐。
+  - 所有者绑定：`[类型名输入] [添加(主)] | [新增Ability（单位技能）]`
+  - 所有者管理：`[编辑Ability] [折叠详情] | [删除] [添加(主)]`
+  - ModifierId 编辑：`[新增(主)] | [复制] [删除] | [批量生成]`
+  - 条件集：`[折叠详情] | [删除] [新增(主)]`
+  - 条件对象：`[新增(主)] | [删除]`
+- 复制/删除/编辑Ability 选中对象后才启用（原来常亮）。
+
+### 验证
+- 离屏断言：无 ⋯ 菜单残留、全部按钮可见、启用状态随选中变化、折叠/展开、Ability 自动切表名；像素级验证主按钮蓝底渲染。全量 98 项单元测试通过。
+
+## 2026-08-13 - 改进：修改器页按钮收敛 + 新增Ability 常驻入口
+
+### 新增
+- 「新增Ability」按钮**常驻可见**（原仅在表名为 UnitAbilityModifiers 时显示，新手难发现）；文案改为「新增Ability（单位技能）」并带 tooltip 说明用途；点击时表名不是 UnitAbilityModifiers 会**自动切换**后打开对话框。
+
+### 优化（按钮收敛：主按钮 + ⋯ 更多菜单）
+- 所有者对象管理：header 只留 [添加] [删除]，「折叠详情」「编辑Ability」收进「⋯」菜单（编辑Ability 仅选中可回填的 Ability 所有者时启用）。
+- ModifierId 编辑左面板：只留 [新增]，「复制」「删除」「批量生成」收进「⋯」菜单；复制/删除仅在选中 Modifier 时启用。
+- 条件集对象：只留 [新增]，「删除」「折叠详情」收进「⋯」菜单（删除仅选中时启用）。
+- 条件对象列表：只留 [新增]，「删除」收进「⋯」菜单（选中才启用）。
+
+### 验证
+- 离屏断言：Ability 按钮常驻+自动切表名、各菜单项存在与启用状态随选中变化、折叠/展开行为、Modifier 增删后菜单状态正确。全量 98 项单元测试通过。
+
+## 2026-08-13 - 改进：晋升树卡片直接编辑（改字即存，零额外操作）
+
+### 改进
+- 晋升树卡片改为真实控件（`_PromotionNodeCard`）：内嵌名字/描述两个输入框，**直接点击输入、改字即存**，无需双击/回车（对齐总督晋升树的直接编辑体验）。
+- 卡片顶部为拖拽条（⠿ 图标 + 有效 Type 提示）：按住拖动改 Level/Column，点击即选中；选中卡片蓝色边框高亮。
+- 上下端口移到卡片外侧（画布区域），连线交互不变；画布只负责连线/端口/层级标签绘制。
+- 随机模式卡片同样改为直接编辑控件，与树模式共用同一节点数据。
+- 移除原悬浮内联编辑器（`_NodeInlineEditor`）与双击流程。
+
+### 保留
+- 一键模版 abbr 自动补全（L{级}C{列}，冲突加后缀）与手动 abbr 保留逻辑不变；导出格式不变。
+
+### 验证
+- 更新 `tests/test_promotion_tree.py`（10 例）：直改即存、拖拽条移动、点击选中、随机模式直改、set_entry 重载、删除刷新卡片、abbr 补全/冲突/保留。全量 98 项单元测试通过。
+- 像素级渲染验证：选中边框、卡片文字均正常渲染。
+
+## 2026-08-13 - 改进：晋升树卡片直显内联编辑（免弹窗）+ 一键模版自动补 Type
+
+### 改进
+- 晋升树卡片加大至 200×76，直接显示名字（加粗）+ 描述（灰字），右下角小字显示有效 Type。
+- **双击卡片原位内联编辑**名字/描述（Enter 提交 / Esc 取消 / 点别处自动提交），移除原"编辑节点"弹窗（含 Level/Column spinbox——位置由树结构+拖拽决定）；随机模式卡片同样双击编辑，卡片显示名字+描述。
+- 底部节点条只保留"删除节点"；提示文案同步更新。
+
+### 修复
+- 一键模版（2221/2212）创建的节点 abbr 为空，SQL 生成时被跳过（`if not node_abbr: continue`），模版实际不生成晋升。现 `export_entry` 自动补全：按位置生成 `L{级}C{列}`（如 L1C1），冲突自动加后缀；已有手动 abbr 的老工程原样保留。
+- 双击信号 `_edit_requested` 为死代码，改为 `nodeEditRequested` 信号真正打开编辑器。
+
+### 验证
+- 离屏功能断言：模版 7 节点 abbr 自动补全且唯一、内联提交/取消、删除时编辑器关闭、随机模式双击链路、老数据手动 abbr 保留；像素级验证编辑器蓝色边框在编辑态渲染存在、提交后消失；卡片几何无重叠。全量 88 项单元测试通过。
+
+## 2026-08-13 - 新增：导入可选取代对象 + 搜索窗口优化
+
+### 新增
+- 导入 区域/建筑/单位 时，选择窗口新增勾选项「导入后取代该对象」（默认不勾选，仅导入流程显示）。勾选后自动把被导入对象填入对应取代表（DistrictReplaces / BuildingReplaces / UnitReplaces 的 ReplacesX 字段）。
+- 填充规则：仅当 DB 原值未填时填充；导入对象本身已是特色（取代表已填）则保留原值，不覆盖。
+
+### 优化
+- 区域选择窗口新增「仅显示非取代区域」筛选（默认不勾选），过滤掉作为 CivUniqueDistrictType 出现的特色区域；工作区已钉选条目始终可见。
+- `_build_district_hierarchy` 每行新增 `replaces` 字段（含取代表映射）。
+
+### 修复
+- 建筑选择窗口展开按钮 bug：`setChecked` 在 `stateChanged.connect` 之前调用且默认态不触发信号，导致 `_collapsed_groups` 恒为空、进入即全展开。现所有建筑选择窗口默认全部折叠（含奇观分组），且首次填充时按勾选态初始化折叠集合。
+
+### 验证
+- 新增 `tests/test_import_replace.py`（11 例）：填充规则、非取代筛选（钉选豁免）、默认折叠、展开/折叠切换、选项显隐。全量 88 项单元测试通过。
+
+## 2026-08-13 - 修复：响应式布局切换导致子表重叠
+
+### 问题
+- 首版 `responsive.py` 切换列数/堆叠时用 `deleteLater()` 异步删除旧布局，随后立刻 `QGridLayout(self)` 安装新布局——旧布局尚未删除，`setLayout` 冲突失败，新布局从未安装到容器上，子控件失去布局管理、全部堆叠在原点上（区域编辑区子表重合）。
+
+### 修复
+- 布局对象只创建一次并永久安装，切换时清空重填（`_clear_layout`），不再替换布局对象。
+- ResponsiveSplit 改用单个 QGridLayout 表达并排/堆叠两种排列（0 行 vs 第 1 行），无需 HBox/VBox 互换。
+
+### 验证
+- 新增 `tests/test_responsive.py`（7 例）：校验真实几何而非内部状态——布局始终安装、子控件全部受管理、任意宽度重排后互不重叠、并排/堆叠顺序正确。
+- 区域复合编辑器端到端检查：1300/900/600px 下所有 ResponsiveGrid/Split 的直接子控件均被布局管理。
+- 全量 77 项单元测试通过。
+
+## 2026-08-13 - 新增：宽度响应式布局（小窗口自动降列/堆叠）
+
+### 新增
+- 新增 `ModTools_5_4/ui/responsive.py`：`ResponsiveGrid`（按可用宽度切换列数 3→2→1）与 `ResponsiveSplit`（宽时并排、窄时上下堆叠），跟随 resize 即时切换；构造后 400ms 兜底重算一次，避免初始宽度为 0 时停留降级态。
+
+### 接入
+- 主表编辑器（`entity_table_form.py` MainTableEditor）：顶部表单（基础信息/图片）+ 数字区 + 布尔区改用 ResponsiveGrid/ResponsiveSplit；数字区与布尔区按 1100/750px 断点 3→2→1 列。
+- 复合编辑器（区域/建筑/单位/改良/项目/信仰/议程/政策）`_pair_row` 改用 ResponsiveSplit（<750px 上下堆叠）。
+- 单行子表编辑器 `_SingleRowTableEditor`（如 Districts_XP2、UnitReplaces 等）grid 改为 ResponsiveGrid（模板字段整行、其余两两配对，<750px 单列）。
+
+### 验证
+- 全部 8 个复合编辑器 + 单行编辑器离屏实例化通过；ResponsiveGrid/Split 宽度切换断言通过；70 项单元测试全部通过。
+
 ## 2026-08-02 - 修复：信仰编辑器缺失图标图片槽
 
 ### 问题

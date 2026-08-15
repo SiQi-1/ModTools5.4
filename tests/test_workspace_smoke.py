@@ -35,7 +35,7 @@ class WorkspaceSmokeTestCase(unittest.TestCase):
     def test_main_window_has_five_pages(self) -> None:
         self.assertEqual(
             set(self.window._pages.keys()),
-            {"home", "workspace", "search", "settings", "debug"},
+            {"home", "workspace", "tools", "settings"},
         )
 
     def test_create_project_and_rebuild_tree(self) -> None:

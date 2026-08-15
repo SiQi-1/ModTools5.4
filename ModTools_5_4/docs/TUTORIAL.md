@@ -413,19 +413,27 @@ Modifier 不直接写进对象表，而是通过"挂载"绑定：
 点击左侧树中的 **修改器** 页。
 
 **创建 Modifier**
-1. 在「Modifiers」表格中新增一行
+1. 在「Modifiers」表格上方点击「新增」（蓝底主按钮）
 2. `ModifierType`：选择效果类型，如 `MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_STRENGTH`
 3. `RunOnce`：是否只运行一次
 4. `Permanent`：是否永久生效
 5. 参数表：根据 EffectType 填入参数（如 `Amount=5` 代表 +5 战斗力）
+6. 「复制」「删除」「批量生成」按钮在「新增」右侧（选中 Modifier 后 复制/删除 才可用）
 
 **创建 RequirementSet**
-1. 在「RequirementSets」表格中新增一行
+1. 在「RequirementSets」表格上方点击「新增」
 2. 在「Requirements」表格中添加条件行，每个 Requirement 选择 `RequirementType` 和填入参数
+
+**新建单位 Ability（单位技能）**
+1. 点击「所有者绑定」行的「新增Ability（单位技能）」（表名不是 UnitAbilityModifiers 时会自动切换）
+2. 填写技能类型/名称/描述，保存后自动加入所有者列表
+3. 选中该所有者，为其绑定 ModifierId 实现效果
 
 **挂载到对象**
 1. 在挂载工具区选择目标对象和 Modifier
 2. ModTools 自动生成 `TraitModifiers` 或对应的实体 Modifier 关联 SQL
+
+> 提示：各列表的删除等操作按钮会随选中状态启用/置灰。
 
 ### 9.4 常用 EffectType
 
@@ -675,8 +683,8 @@ INSERT INTO LocalizedText (Language, Tag, Text) VALUES
 ### 14.4 单位晋升（UnitPromotions）
 
 晋升树编辑器支持两种模式：
-- **树形**：卡片拖拽定位（Level 1→4），上下端口连线建立前置关系。支持 2221 / 2212 一键模板
-- **随机**：按 Level 分组列表排列
+- **树形**：卡片本身就是编辑框——名字/描述**直接改、改字即存**（无需双击/回车）；拖拽卡片顶部拖拽条改定位（Level 1→4），卡片上下端口连线建立前置关系；卡片右上角显示 Type（未手动填写时按位置自动生成 L级C列）。支持 2221 / 2212 一键模板
+- **随机**：按 Level 分组列表排列，卡片同样直接编辑
 
 晋升节点自动注册到修改器的 `UnitPromotionModifiers`。
 

@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Agent 知识统一在根目录 `AGENT.md`**：涉及文明6 mod 制作知识、编写 `.CIV` 工程文件时，**先读 AGENT.md**（含两大硬规则：ModifierType 优先引用游戏库已有类型；JSON 禁止写 `""`；以及"本项目不写 Lua"的声明）。
+
 ## Project Overview
 
 ModTools 5.4 is a PyQt6-based visual editor for creating Civilization VI mods (Chinese UI). It saves editing state in `.CIV` project files (JSON) and generates SQL/XML/Icons/ArtDef/XLP/Art.xml/Textures output files into a linked `.civ6proj` ModBuddy project directory.
@@ -53,12 +55,15 @@ ModTools_5_4/
 │   └── text_database.py        # Text DB creation, import (XML/SQL/DLC/modinfo), query
 ├── artdef_parser.py            # ArtDef XML parsing (From/{Base,DLC}/ scanner, lru_cache)
 ├── ui/
-│   ├── main_window.py          # QMainWindow: menu bar + QStackedWidget (5 pages)
+│   ├── main_window.py          # QMainWindow: menu bar + QStackedWidget (4 pages: 主页/工作区/小工具/设置)
 │   ├── theme.py / assets.py    # QSS loader / icon+image resource path helpers
 │   ├── font_icons.py           # FontIcons registry loader (data/font_icons_registry.json)
 │   ├── font_icon_popup.py      # Right-click icon picker popup for text editors
+│   ├── image_ops.py            # Pillow image ops: circle crop (margin+border), grayscale, icon size table
+│   ├── psd_summarizer.py       # PSD template summarizer: baked layer PNGs + recipe JSON (psd-tools, optional dep)
 │   ├── ui_widget_kit.py        # ★ Reusable template widget system (~5,500 lines):
 │   │                           #   TEMPLATE_SPECS + build_template_widget(), image slots, search dialogs
+│   ├── responsive.py           # Width-responsive layout: ResponsiveGrid (3→2→1 cols), ResponsiveSplit
 │   ├── dialogs/
 │   │   └── conflict_file_dialog.py  # Conflict resolution dialog for text imports
 │   └── pages/
@@ -70,10 +75,10 @@ ModTools_5_4/
 │       ├── art_workspace.py    # XLP/ArtDef/Icons/Art.xml/Textures/Moments config
 │       ├── great_people_editor.py   # Specialized GreatPersonClasses + Individuals editor
 │       ├── entity_table_form.py     # ★ Main table + subtable form generation, composite editors (~6,600 lines)
+│       ├── tools_page.py       # 小工具 page: 搜索(嵌入子页) + 图片工具 + PSD模板总结
+│       ├── search_page.py      # Text search + Modifiers search (embedded as tools-page tab)
 │       ├── settings_page.py    # Game DB + text DB configuration
-│       ├── search_page.py      # Text search + Modifiers search (global search is placeholder)
-│       ├── home_page.py        # Welcome/landing page
-│       └── debug_page.py       # Debug tools page (UI template test bench)
+│       └── home_page.py        # Welcome/landing page
 ├── data/
 │   ├── settings.json           # Runtime config (DB paths, active text DB)
 │   ├── art_xml_rules.json      # Art.xml mapping rules for ArtConsumer/Library
@@ -104,6 +109,8 @@ ModTools_5_4/
 - When adding/renaming fields in preview builders, update the fixture if the affected section's sample entry is minimal.
 
 ## Key Design Decisions
+
+**AI authoring rules (agent 直接写 .CIV 时)**: 见根目录 `AGENT.md`（权威，合并自 skills/reference 知识库）。两大硬规则：(1) ModifierType 必须优先引用游戏库 DynamicModifiers 已存在的类型，禁止发明新类型（确需新建时才允许，且必须同时写 DynamicModifiers 行）；(2) JSON 值**禁止写 `""`**——空值必须省略字段或写 `null`，`""` 会生成 SQL `''` 字面量导致类型/外键报错（生成器已兜底：空参数行跳过、`None` 输出 `NULL`）。另外本项目**不写 Lua**。
 
 **Project files**: `.CIV` files are JSON with a `meta` (format marker + schema version 0.1.0) and `workspace` (section-indexed dict). Sections follow a fixed order (`CIV_SECTION_ORDER`, 17 sections). "Direct workspace" sections (基础信息, 美术, 文本, 修改器) store a dict; all other sections store a list of objects.
 

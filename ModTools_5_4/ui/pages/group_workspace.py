@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from PyQt6.QtCore import QPoint, QPointF, QRectF, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QColor, QImage, QKeySequence, QPainter, QPainterPath, QPen, QPixmap
+from PyQt6.QtGui import QColor, QFontMetrics, QImage, QKeySequence, QPainter, QPainterPath, QPen, QPixmap
 from PyQt6.QtWidgets import (
     QApplication,
     QAbstractItemView,
@@ -196,6 +196,25 @@ def _build_entity_type(shared: dict[str, object], *, head: str, midfix_code: str
     if short:
         parts.append(short)
     return "_".join(parts)
+
+
+def _shared_params_from_basic_section(section: object) -> dict[str, object]:
+    """Extract the flat shared params (prefix/infix) from a 基础信息 section payload.
+
+    Supports both the wrapped MODTOOLS54 payload (prefix/infix live inside
+    ``data.shared_workspace_params`` / ``data.global_settings``) and the
+    legacy flat dict format.
+    """
+    if not isinstance(section, dict):
+        return {}
+    data = section.get("data")
+    if isinstance(data, dict):
+        for key in ("shared_workspace_params", "global_settings"):
+            inner = data.get(key)
+            if isinstance(inner, dict):
+                return inner
+        return data
+    return section
 
 
 def _first_non_empty_value(data: dict[str, object]) -> str:
@@ -2626,14 +2645,26 @@ class _PromotionNode:
 
 
 # ── Canvas dimensions ──
-_CARD_W, _CARD_H = 140, 64
+_CARD_W, _CARD_H = 200, 76
 _PORT_R = 5
 _LEVEL_GAP = 32
 _COL_GAP = 20
 
 
+def _effective_node_abbr(node: _PromotionNode) -> str:
+    """节点有效 abbr：手动填写优先，否则按位置自动生成 L{级}C{列}。"""
+    abbr = (node.abbr or "").strip()
+    if abbr:
+        return abbr
+    return f"L{node.level}C{node.column}"
+
+
 class _PromotionTreeCanvas(QWidget):
-    """Canvas with tree nodes and user-drawn prerequisite lines."""
+    """Canvas with tree nodes and user-drawn prerequisite lines.
+
+    卡片为真实控件（内嵌名字/描述输入框，改字即存），画布只负责
+    连线/端口/层级标签绘制与端口连线交互；拖拽由卡片顶部拖拽条驱动。
+    """
 
     nodeSelected = pyqtSignal(int)
     nodeChanged = pyqtSignal()
@@ -2641,11 +2672,12 @@ class _PromotionTreeCanvas(QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._nodes: list[_PromotionNode] = []
+        self._cards: list[_PromotionNodeCard] = []
         self._selected_idx: int = -1
         self._linking_from: int = -1   # bottom port clicked: source index
         self._linking_to: int = -1     # top port clicked: target index
         self._dragging_idx: int = -1
-        self._drag_start = QPoint()
+        self._drag_start_local = QPoint()
         self._drag_level0: int = 0
         self._drag_col0: int = 0
         self.setMouseTracking(True)
@@ -2657,11 +2689,41 @@ class _PromotionTreeCanvas(QWidget):
         self._selected_idx = -1
         self._linking_from = -1
         self._linking_to = -1
+        self._rebuild_cards()
         self.updateGeometry()
         self.update()
 
+    def _rebuild_cards(self) -> None:
+        for card in self._cards:
+            card.deleteLater()
+        self._cards = []
+        for idx, node in enumerate(self._nodes):
+            card = _PromotionNodeCard(idx, self)
+            card.selected.connect(self._on_card_selected)
+            card.textEdited.connect(self._on_card_text_edited)
+            card.dragPressed.connect(self._on_card_drag_pressed)
+            card.dragMoved.connect(self._on_card_drag_moved)
+            card.dragReleased.connect(self._on_card_drag_released)
+            card.set_node_texts(node.name_cn, node.desc_cn, _effective_node_abbr(node))
+            card.setFixedSize(_CARD_W, _CARD_H)
+            rect = self._card_rect(node)
+            card.move(int(rect.x()), int(rect.y()))
+            card.show()
+            self._cards.append(card)
+        self._apply_selection_style()
+
+    def _apply_selection_style(self) -> None:
+        for idx, card in enumerate(self._cards):
+            card.set_selected(idx == self._selected_idx)
+
     def selected_index(self) -> int:
         return self._selected_idx
+
+    def card_rect(self, idx: int) -> QRectF:
+        """卡片矩形（画布坐标）。"""
+        if 0 <= idx < len(self._nodes):
+            return self._card_rect(self._nodes[idx])
+        return QRectF()
 
     # ── geometry ──
 
@@ -2676,11 +2738,11 @@ class _PromotionTreeCanvas(QWidget):
 
     def _top_port_center(self, node: _PromotionNode) -> QPointF:
         r = self._card_rect(node)
-        return QPointF(r.center().x(), r.top())
+        return QPointF(r.center().x(), r.top() - _PORT_R)
 
     def _bot_port_center(self, node: _PromotionNode) -> QPointF:
         r = self._card_rect(node)
-        return QPointF(r.center().x(), r.bottom())
+        return QPointF(r.center().x(), r.bottom() + _PORT_R)
 
     def _max_col(self) -> int:
         return max((n.column for n in self._nodes), default=1)
@@ -2697,6 +2759,68 @@ class _PromotionTreeCanvas(QWidget):
         w = self._card_x(self._max_col()) + _CARD_W + _COL_GAP + 30
         h = self._card_y(self._max_level()) + _CARD_H + _LEVEL_GAP + 10
         return QSize(max(w, 300), max(h, 200))
+
+    # ── card signals ──
+
+    def _on_card_selected(self, idx: int) -> None:
+        if 0 <= idx < len(self._nodes):
+            self._select(idx)
+
+    def _on_card_text_edited(self, idx: int) -> None:
+        if not 0 <= idx < len(self._nodes) or idx >= len(self._cards):
+            return
+        card = self._cards[idx]
+        node = self._nodes[idx]
+        node.name_cn = card.name_text()
+        node.desc_cn = card.desc_text()
+        self.nodeChanged.emit()
+
+    def _on_card_drag_pressed(self, idx: int, global_pos: QPoint) -> None:
+        if not 0 <= idx < len(self._nodes):
+            return
+        self._select(idx)
+        self._dragging_idx = idx
+        self._drag_start_local = self.mapFromGlobal(global_pos)
+        node = self._nodes[idx]
+        self._drag_level0 = node.level
+        self._drag_col0 = node.column
+
+    def _on_card_drag_moved(self, idx: int, global_pos: QPoint) -> None:
+        if self._dragging_idx != idx or not 0 <= idx < len(self._nodes):
+            return
+        local = self.mapFromGlobal(global_pos)
+        delta = local - self._drag_start_local
+        if abs(delta.x()) <= 4 and abs(delta.y()) <= 4:
+            return
+        node = self._nodes[idx]
+        new_col = max(1, self._drag_col0 + delta.x() // (_CARD_W + _COL_GAP))
+        new_level = max(1, min(4, self._drag_level0 + delta.y() // (_CARD_H + _LEVEL_GAP)))
+        if new_col == node.column and new_level == node.level:
+            return
+        node.column = new_col
+        node.level = new_level
+        rect = self._card_rect(node)
+        self._cards[idx].move(int(rect.x()), int(rect.y()))
+        self._cards[idx].set_type_hint(_effective_node_abbr(node))
+        self.updateGeometry()
+        self.update()
+
+    def _on_card_drag_released(self, idx: int) -> None:
+        if self._dragging_idx != idx or idx < 0 or idx >= len(self._nodes):
+            self._dragging_idx = -1
+            return
+        node = self._nodes[idx]
+        if node.level != self._drag_level0 or node.column != self._drag_col0:
+            self.nodeChanged.emit()
+        self._dragging_idx = -1
+
+    def _select(self, idx: int) -> None:
+        self._selected_idx = idx
+        self._linking_from = -1
+        self._linking_to = -1
+        self._apply_selection_style()
+        self.update()
+        self.nodeSelected.emit(idx)
 
     # ── paint ──
 
@@ -2737,183 +2861,88 @@ class _PromotionTreeCanvas(QWidget):
                 path.lineTo(to_pt)
                 p.drawPath(path)
 
-        # Cards
+        # Ports
         for idx, node in enumerate(self._nodes):
-            rect = self._card_rect(node)
-            sel = idx == self._selected_idx
-            if sel:
-                p.setBrush(QColor("#eff6ff"))
-                p.setPen(QPen(QColor("#3b82f6"), 2))
-            else:
-                p.setBrush(QColor("#ffffff"))
-                p.setPen(QPen(QColor("#cbd5e1"), 1))
-            p.drawRoundedRect(rect, 6, 6)
-
-            # Type name
-            p.setPen(QColor("#1e293b"))
-            font = p.font()
-            font.setPointSize(9)
-            font.setBold(True)
-            p.setFont(font)
-            p.drawText(rect.adjusted(8, 4, -8, -28), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                       node.abbr or f"PROMOTION_{idx + 1}")
-
-            # Name / Description
-            p.setPen(QColor("#475569"))
-            font.setPointSize(8)
-            font.setBold(False)
-            p.setFont(font)
-            label = node.name_cn or node.desc_cn or "(未命名)"
-            if len(label) > 16:
-                label = label[:15] + "…"
-            p.drawText(rect.adjusted(8, 20, -8, -4), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, label)
-
-            # Ports
             top_c = self._top_port_center(node)
             bot_c = self._bot_port_center(node)
-            # Top port — prerequisite
             top_hl = idx == self._linking_to
             p.setBrush(QColor("#22c55e") if top_hl else QColor("#e2e8f0"))
             p.setPen(QPen(QColor("#16a34a") if top_hl else QColor("#94a3b8"), 2))
             p.drawEllipse(top_c, _PORT_R, _PORT_R)
-            p.setPen(QColor("#16a34a" if top_hl else "#64748b"))
-            font.setPointSize(7)
-            p.setFont(font)
-            p.drawText(QRectF(top_c.x() - 10, top_c.y() - 14, 20, 10), Qt.AlignmentFlag.AlignCenter, "▲")
-
-            # Bottom port — dependent
             bot_hl = idx == self._linking_from
             p.setBrush(QColor("#f59e0b") if bot_hl else QColor("#e2e8f0"))
             p.setPen(QPen(QColor("#d97706") if bot_hl else QColor("#94a3b8"), 2))
             p.drawEllipse(bot_c, _PORT_R, _PORT_R)
-            p.setPen(QColor("#d97706" if bot_hl else "#64748b"))
-            p.drawText(QRectF(bot_c.x() - 10, bot_c.y() + 4, 20, 10), Qt.AlignmentFlag.AlignCenter, "▼")
 
         p.end()
 
     # ── interaction ──
 
-    def _node_at(self, pos: QPointF) -> int:
+    def _port_hit(self, pos: QPointF) -> tuple[int, int]:
+        """返回 (节点索引, 端口类型) 或 (-1, 0)。端口 1=上(前置), 2=下(后继)。"""
         for idx, node in enumerate(self._nodes):
-            if self._card_rect(node).contains(pos):
-                return idx
-        return -1
-
-    def _port_hit(self, pos: QPointF, node: _PromotionNode) -> int:
-        """Return 1 for top port, 2 for bottom port, 0 for no port."""
-        top = self._top_port_center(node)
-        bot = self._bot_port_center(node)
-        d_top = ((pos.x() - top.x()) ** 2 + (pos.y() - top.y()) ** 2) ** 0.5
-        d_bot = ((pos.x() - bot.x()) ** 2 + (pos.y() - bot.y()) ** 2) ** 0.5
-        if d_top <= _PORT_R + 4:
-            return 1
-        if d_bot <= _PORT_R + 4:
-            return 2
-        return 0
+            top = self._top_port_center(node)
+            bot = self._bot_port_center(node)
+            d_top = ((pos.x() - top.x()) ** 2 + (pos.y() - top.y()) ** 2) ** 0.5
+            d_bot = ((pos.x() - bot.x()) ** 2 + (pos.y() - bot.y()) ** 2) ** 0.5
+            if d_top <= _PORT_R + 4:
+                return idx, 1
+            if d_bot <= _PORT_R + 4:
+                return idx, 2
+        return -1, 0
 
     def mousePressEvent(self, event) -> None:
         if event.button() != Qt.MouseButton.LeftButton:
             return
         pos = event.position()
 
-        # Check ports first
-        for idx, node in enumerate(self._nodes):
-            port = self._port_hit(pos, node)
-            if port == 1:  # top port (prerequisite target)
-                if self._linking_from >= 0:
-                    # Complete link: from bottom → to this top
-                    if idx != self._linking_from:
-                        if self._linking_from not in self._nodes[idx].prereq_indices:
-                            self._nodes[idx].prereq_indices.append(self._linking_from)
-                    self._linking_from = -1
-                    self._linking_to = -1
-                    self.update()
-                    self.nodeChanged.emit()
-                    return
-                self._linking_to = idx
+        idx, port = self._port_hit(pos)
+        if port == 1:  # top port (prerequisite target)
+            if self._linking_from >= 0:
+                if idx != self._linking_from and self._linking_from not in self._nodes[idx].prereq_indices:
+                    self._nodes[idx].prereq_indices.append(self._linking_from)
                 self._linking_from = -1
-                self.update()
-                return
-            if port == 2:  # bottom port (prerequisite source)
-                if self._linking_to >= 0:
-                    # Complete link: from this bottom → to top
-                    if self._linking_to != idx:
-                        if idx not in self._nodes[self._linking_to].prereq_indices:
-                            self._nodes[self._linking_to].prereq_indices.append(idx)
-                    self._linking_from = -1
-                    self._linking_to = -1
-                    self.update()
-                    self.nodeChanged.emit()
-                    return
-                self._linking_from = idx
                 self._linking_to = -1
                 self.update()
+                self.nodeChanged.emit()
                 return
-
-        target = self._node_at(pos)
-        if target >= 0:
-            self._selected_idx = target
+            self._linking_to = idx
             self._linking_from = -1
-            self._linking_to = -1
-            self._dragging_idx = target
-            self._drag_start = event.pos()
-            n = self._nodes[target]
-            self._drag_level0 = n.level
-            self._drag_col0 = n.column
             self.update()
-            self.nodeSelected.emit(target)
+            return
+        if port == 2:  # bottom port (prerequisite source)
+            if self._linking_to >= 0:
+                if self._linking_to != idx and idx not in self._nodes[self._linking_to].prereq_indices:
+                    self._nodes[self._linking_to].prereq_indices.append(idx)
+                self._linking_from = -1
+                self._linking_to = -1
+                self.update()
+                self.nodeChanged.emit()
+                return
+            self._linking_from = idx
+            self._linking_to = -1
+            self.update()
             return
 
         self._selected_idx = -1
         self._linking_from = -1
         self._linking_to = -1
+        self._apply_selection_style()
         self.update()
         self.nodeSelected.emit(-1)
 
-    def mouseMoveEvent(self, event) -> None:
-        if self._dragging_idx >= 0:
-            delta = event.pos() - self._drag_start
-            if abs(delta.x()) > 4 or abs(delta.y()) > 4:
-                n = self._nodes[self._dragging_idx]
-                new_col = max(1, self._drag_col0 + delta.x() // (_CARD_W + _COL_GAP))
-                new_level = max(1, min(4, self._drag_level0 + delta.y() // (_CARD_H + _LEVEL_GAP)))
-                n.column = new_col
-                n.level = new_level
-                self.updateGeometry()
-                self.update()
-
-    def mouseReleaseEvent(self, event) -> None:
-        if self._dragging_idx >= 0:
-            n = self._nodes[self._dragging_idx]
-            if n.level != self._drag_level0 or n.column != self._drag_col0:
-                self.nodeChanged.emit()
-        self._dragging_idx = -1
-
-    def mouseDoubleClickEvent(self, event) -> None:
-        pos = event.position()
-        target = self._node_at(pos)
-        if target >= 0:
-            self._selected_idx = target
-            self.update()
-            self.nodeSelected.emit(target)
-            # signal to parent to open edit dialog
-            self._edit_requested = True
-        else:
-            self._edit_requested = False
-
     def keyPressEvent(self, event) -> None:
         if event.key() == Qt.Key.Key_Delete and self._selected_idx >= 0:
-            # Remove all connections
             idx = self._selected_idx
             for n in self._nodes:
                 n.prereq_indices = [i for i in n.prereq_indices if i != idx]
-            # Fix indices
             for n in self._nodes:
                 n.prereq_indices = [i - 1 if i > idx else i for i in n.prereq_indices if i != idx]
             del self._nodes[idx]
             self._selected_idx = -1
             self._linking_from = -1
             self._linking_to = -1
+            self._rebuild_cards()
             self.updateGeometry()
             self.update()
             self.nodeChanged.emit()
@@ -2921,49 +2950,134 @@ class _PromotionTreeCanvas(QWidget):
         super().keyPressEvent(event)
 
 
-class _NodeEditDialog(QDialog):
-    """Edit a single promotion node (name, description, level, column)."""
+_PROMO_CARD_QSS = (
+    "#promoCard { background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; }"
+    ' #promoCard[selected="true"] { border:2px solid #3b82f6; background:#eff6ff; }'
+    " #promoCard QLineEdit { border:none; background:transparent; padding:0 2px;"
+    "   selection-background-color:#bfdbfe; }"
+    " #promoCard QLabel { background:transparent; border:none; color:#94a3b8; font-size:9px; }"
+)
 
-    def __init__(self, node: _PromotionNode, parent=None) -> None:
+
+class _CardDragStrip(QWidget):
+    """卡片顶部拖拽条：按下拖动改 Level/Column，点击即选中。"""
+
+    pressed = pyqtSignal(QPoint)
+    moved = pyqtSignal(QPoint)
+    released = pyqtSignal()
+
+    def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("编辑晋升节点")
-        self._node = node
-        self._result: _PromotionNode | None = None
+        self.setFixedHeight(16)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
 
-        layout = QFormLayout(self)
-        self._name_edit = QLineEdit(node.name_cn)
-        self._desc_edit = QLineEdit(node.desc_cn)
-        self._level_spin = QSpinBox()
-        self._level_spin.setRange(1, 4)
-        self._level_spin.setValue(node.level)
-        self._col_spin = QSpinBox()
-        self._col_spin.setRange(1, 7)
-        self._col_spin.setValue(node.column)
+    def mousePressEvent(self, event) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.pressed.emit(event.globalPosition().toPoint())
+            event.accept()
+            return
+        super().mousePressEvent(event)
 
-        layout.addRow("名字（中文）", self._name_edit)
-        layout.addRow("描述（中文）", self._desc_edit)
-        layout.addRow("Level", self._level_spin)
-        layout.addRow("Column", self._col_spin)
+    def mouseMoveEvent(self, event) -> None:
+        if event.buttons() & Qt.MouseButton.LeftButton:
+            self.moved.emit(event.globalPosition().toPoint())
+            event.accept()
+            return
+        super().mouseMoveEvent(event)
 
-        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        btns.accepted.connect(self._on_ok)
-        btns.rejected.connect(self.reject)
-        layout.addRow(btns)
+    def mouseReleaseEvent(self, event) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.released.emit()
+            event.accept()
+            return
+        super().mouseReleaseEvent(event)
 
-    def _on_ok(self) -> None:
-        self._result = _PromotionNode(
-            abbr=self._node.abbr,
-            name_cn=_safe_text(self._name_edit.text()),
-            desc_cn=_safe_text(self._desc_edit.text()),
-            level=self._level_spin.value(),
-            column=self._col_spin.value(),
-            prereq_indices=list(self._node.prereq_indices),
-            modifier_ids=list(self._node.modifier_ids),
-        )
-        self.accept()
 
-    def result(self) -> _PromotionNode | None:
-        return self._result
+class _CardLineEdit(QLineEdit):
+    """带焦点信号的输入框：点进即通知卡片选中。"""
+
+    focusGained = pyqtSignal()
+
+    def focusInEvent(self, event) -> None:
+        super().focusInEvent(event)
+        self.focusGained.emit()
+
+
+class _PromotionNodeCard(QFrame):
+    """晋升卡片：内嵌名字/描述输入框，改字即存；顶部拖拽条改位置。"""
+
+    selected = pyqtSignal(int)
+    textEdited = pyqtSignal(int)
+    dragPressed = pyqtSignal(int, QPoint)
+    dragMoved = pyqtSignal(int, QPoint)
+    dragReleased = pyqtSignal(int)
+
+    def __init__(self, idx: int, parent: QWidget | None = None, *, compact: bool = False) -> None:
+        super().__init__(parent)
+        self._idx = idx
+        self.setObjectName("promoCard")
+        self.setStyleSheet(_PROMO_CARD_QSS)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(6, 3, 6, 4)
+        layout.setSpacing(2)
+
+        self._strip: _CardDragStrip | None = None
+        self._type_label: QLabel | None = None
+        if not compact:
+            self._strip = _CardDragStrip(self)
+            self._strip.pressed.connect(lambda p: self.dragPressed.emit(self._idx, p))
+            self._strip.moved.connect(lambda p: self.dragMoved.emit(self._idx, p))
+            self._strip.released.connect(lambda: self.dragReleased.emit(self._idx))
+            strip_layout = QHBoxLayout(self._strip)
+            strip_layout.setContentsMargins(4, 0, 4, 0)
+            strip_layout.setSpacing(4)
+            grip = QLabel("⣿")
+            grip.setStyleSheet("color:#cbd5e1; font-size:10px;")
+            strip_layout.addWidget(grip)
+            self._type_label = QLabel("")
+            strip_layout.addWidget(self._type_label)
+            strip_layout.addStretch(1)
+            layout.addWidget(self._strip)
+
+        self._name_edit = _CardLineEdit()
+        self._name_edit.setPlaceholderText("名字（中文）")
+        self._name_edit.setStyleSheet("font-weight:bold; font-size:10px; color:#1e293b;")
+        self._name_edit.textChanged.connect(lambda _t: self.textEdited.emit(self._idx))
+        self._name_edit.focusGained.connect(lambda: self.selected.emit(self._idx))
+        layout.addWidget(self._name_edit)
+
+        self._desc_edit = _CardLineEdit()
+        self._desc_edit.setPlaceholderText("描述（中文）")
+        self._desc_edit.setStyleSheet("font-size:9px; color:#64748b;")
+        self._desc_edit.textChanged.connect(lambda _t: self.textEdited.emit(self._idx))
+        self._desc_edit.focusGained.connect(lambda: self.selected.emit(self._idx))
+        layout.addWidget(self._desc_edit)
+
+    def set_node_texts(self, name: str, desc: str, abbr_hint: str) -> None:
+        self._name_edit.blockSignals(True)
+        self._name_edit.setText(name)
+        self._name_edit.blockSignals(False)
+        self._desc_edit.blockSignals(True)
+        self._desc_edit.setText(desc)
+        self._desc_edit.blockSignals(False)
+        if self._type_label is not None:
+            self._type_label.setText(abbr_hint)
+
+    def name_text(self) -> str:
+        return self._name_edit.text()
+
+    def desc_text(self) -> str:
+        return self._desc_edit.text()
+
+    def set_selected(self, selected: bool) -> None:
+        self.setProperty("selected", "true" if selected else "false")
+        self.style().unpolish(self)
+        self.style().polish(self)
+
+    def set_type_hint(self, abbr_hint: str) -> None:
+        if self._type_label is not None:
+            self._type_label.setText(abbr_hint)
 
 
 class PromotionTreeEditor(QWidget):
@@ -3023,12 +3137,9 @@ class PromotionTreeEditor(QWidget):
         bar_layout = QHBoxLayout(self._node_edit_bar)
         bar_layout.setContentsMargins(0, 0, 0, 0)
         self._node_sel_label = QLabel("选中: —")
-        self._node_edit_btn = QPushButton("编辑节点")
-        self._node_edit_btn.clicked.connect(self._edit_selected_node)
         self._node_del_btn = QPushButton("删除节点")
         self._node_del_btn.clicked.connect(self._delete_selected)
         bar_layout.addWidget(self._node_sel_label)
-        bar_layout.addWidget(self._node_edit_btn)
         bar_layout.addWidget(self._node_del_btn)
         bar_layout.addStretch(1)
         self._node_edit_bar.setVisible(False)
@@ -3072,7 +3183,7 @@ class PromotionTreeEditor(QWidget):
         root.addLayout(mode_row)
 
         # Hint bar
-        hint = QLabel("树形模式: 点卡片下方 ▼ → 点另一卡片上方 ▲ 建立前置关系  |  拖拽卡片改 Level/Column  |  双击编辑  |  Delete 删除")
+        hint = QLabel("树形模式: 拖拽卡片顶部拖拽条改 Level/Column  |  点卡片下方 ▼ → 点另一卡片上方 ▲ 建立前置关系  |  卡片上直接编辑名字/描述（改字即存）  |  Delete 删除")
         hint.setStyleSheet("color:#94a3b8; font-size:10px; padding:2px 4px;")
         root.addWidget(hint)
 
@@ -3148,18 +3259,11 @@ class PromotionTreeEditor(QWidget):
             self._node_edit_bar.setVisible(False)
             return
         node = self._nodes[idx]
-        self._node_sel_label.setText(f"选中: [{idx + 1}] {node.abbr or 'PROMOTION_' + str(idx + 1)}")
+        label = f"选中: [{idx + 1}] {_effective_node_abbr(node)}"
+        if node.name_cn.strip():
+            label += f"  {node.name_cn.strip()}"
+        self._node_sel_label.setText(label)
         self._node_edit_bar.setVisible(True)
-
-    def _edit_selected_node(self) -> None:
-        idx = self._tree_canvas.selected_index()
-        if idx < 0 or idx >= len(self._nodes):
-            return
-        dlg = _NodeEditDialog(self._nodes[idx], self)
-        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result() is not None:
-            self._nodes[idx] = dlg.result()  # type: ignore[assignment]
-            self._refresh_views()
-            self._emit_changed()
 
     def _delete_selected(self) -> None:
         idx = self._tree_canvas.selected_index()
@@ -3170,6 +3274,7 @@ class PromotionTreeEditor(QWidget):
             n.prereq_indices = [i for i in n.prereq_indices if 0 <= i < len(self._nodes) - 1]
         del self._nodes[idx]
         self._tree_canvas.set_nodes(self._nodes)
+        self._rebuild_random_view()
         self._node_edit_bar.setVisible(False)
         self._emit_changed()
 
@@ -3196,13 +3301,24 @@ class PromotionTreeEditor(QWidget):
             fl.setContentsMargins(0, 0, 0, 0)
             fl.setSpacing(4)
             for idx, node in level_nodes:
-                card = QPushButton(f"{node.abbr or f'PROMOTION_{idx+1}'}\n{node.name_cn or ''}")
-                card.setFixedSize(130, 48)
-                card.setStyleSheet("text-align:left; font-size:9px; padding:4px;")
-                card.clicked.connect(lambda checked, i=idx: self._on_canvas_select(i))
+                card = _PromotionNodeCard(idx, compact=True)
+                card.selected.connect(self._on_canvas_select)
+                card.textEdited.connect(self._on_random_card_text_edited)
+                card.set_node_texts(node.name_cn, node.desc_cn, _effective_node_abbr(node))
+                card.setFixedSize(150, 56)
                 fl.addWidget(card)
             fl.addStretch(1)
             self._random_layout.addWidget(flow)
+
+    def _on_random_card_text_edited(self, idx: int) -> None:
+        """随机模式卡片改字即存（卡内节点对象与树模式共用）。"""
+        if not 0 <= idx < len(self._nodes):
+            return
+        sender = self.sender()
+        if isinstance(sender, _PromotionNodeCard):
+            self._nodes[idx].name_cn = sender.name_text()
+            self._nodes[idx].desc_cn = sender.desc_text()
+            self._emit_changed()
 
     def _emit_changed(self) -> None:
         if self._loading:
@@ -3228,12 +3344,27 @@ class PromotionTreeEditor(QWidget):
         self._loading = False
 
     def export_entry(self) -> dict[str, object]:
+        used_abbrs: set[str] = set()
+        nodes_payload: list[dict[str, object]] = []
+        for n in self._nodes:
+            node_dict = n.to_dict()
+            abbr = _safe_text(node_dict.get("abbr")).strip()
+            if not abbr:
+                base = _effective_node_abbr(n)
+                abbr = base
+                suffix = 2
+                while abbr in used_abbrs:
+                    abbr = f"{base}_{suffix}"
+                    suffix += 1
+            node_dict["abbr"] = abbr
+            used_abbrs.add(abbr)
+            nodes_payload.append(node_dict)
         return {
             "abbr": _safe_text(self._abbr_edit.text()),
             "type": _safe_text(self._type_label.text()),
             "name": _safe_text(self._name_edit.text()),
             "mode": "tree" if self._mode_tree else "random",
-            "nodes": [n.to_dict() for n in self._nodes],
+            "nodes": nodes_payload,
         }
 
 

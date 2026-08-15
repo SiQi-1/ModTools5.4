@@ -53,12 +53,18 @@ from PyQt6.QtWidgets import (
 
 from ..ui_widget_kit import BaseTemplateWidget, IconTokenTextEdit, NewlineTokenTextEdit, build_template_widget
 from ..ui_widget_kit import AdjacencyAutoContext, AdjacencyEditorWidget
+from ..responsive import ResponsiveGrid, ResponsiveSplit
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
 
 
 BASIC_WITH_ICON_ROWS_LIMIT = 8
+
+# 响应式布局阈值（面板内可用宽度，主窗口右侧面板 = 窗口宽 - 树宽）
+GRID_BREAKPOINTS_3 = [(1100, 3), (750, 2), (0, 1)]
+GRID_BREAKPOINTS_2 = [(750, 2), (0, 1)]
+SPLIT_MIN_WIDTH = 750
 BASIC_ROWS_PER_COLUMN_LIMIT = 8
 LOGGER = logging.getLogger(__name__)
 
@@ -1406,9 +1412,8 @@ class MainTableEditor(QWidget):
         basic_group = QGroupBox(f"{self._schema.table_name} 基础信息")
         basic_layout = QVBoxLayout()
 
-        top_row = QHBoxLayout()
         top_entries: list[tuple[object, QWidget]] = [
-            ("简称", self._abbr_edit),
+            ("名称", self._abbr_edit),
             ("完整Type", self._type_label),
         ]
 
@@ -1439,7 +1444,6 @@ class MainTableEditor(QWidget):
         left_holder_layout.addWidget(self._build_form_widget(top_entries), 1)
         left_holder.setLayout(left_holder_layout)
 
-        top_row.addWidget(left_holder, 1)
         if self._schema.has_images and self._icon_widget is not None:
             right_holder = QWidget()
             right_layout = QVBoxLayout()
@@ -1453,8 +1457,11 @@ class MainTableEditor(QWidget):
             right_layout.addStretch(1)
             right_holder.setLayout(right_layout)
             right_holder.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
-            top_row.addWidget(right_holder, 0)
-        basic_layout.addLayout(top_row)
+            basic_layout.addWidget(
+                ResponsiveSplit(left_holder, right_holder, min_width=SPLIT_MIN_WIDTH, left_stretch=1, right_stretch=0)
+            )
+        else:
+            basic_layout.addWidget(left_holder)
 
         if remain_entries:
             self._append_balanced_basic_rows(
@@ -1490,8 +1497,8 @@ class MainTableEditor(QWidget):
         number_fields = [f for f in self._schema.fields if f.section == "number"]
         if number_fields:
             number_group = QGroupBox("数值参数")
-            number_layout = QGridLayout()
-            for index, field in enumerate(number_fields):
+            number_cells: list[QWidget] = []
+            for field in number_fields:
                 cell = QWidget()
                 cell_layout = QHBoxLayout()
                 cell_layout.setContentsMargins(0, 0, 0, 0)
@@ -1500,23 +1507,25 @@ class MainTableEditor(QWidget):
                 self._field_widgets[field.key] = widget
                 cell_layout.addWidget(widget, 1)
                 cell.setLayout(cell_layout)
-                row = index // 3
-                col = index % 3
-                number_layout.addWidget(cell, row, col)
-            number_group.setLayout(number_layout)
+                number_cells.append(cell)
+            number_layout = ResponsiveGrid(number_cells, GRID_BREAKPOINTS_3)
+            number_group.setLayout(QVBoxLayout())
+            number_group.layout().setContentsMargins(8, 6, 8, 6)
+            number_group.layout().addWidget(number_layout)
             root.addWidget(number_group)
 
         bool_fields = [f for f in self._schema.fields if f.section == "bool"]
         if bool_fields:
             bool_group = QGroupBox("布尔参数")
-            bool_layout = QGridLayout()
-            for index, field in enumerate(bool_fields):
+            bool_cells: list[QWidget] = []
+            for field in bool_fields:
                 widget = self._create_widget(field)
                 self._field_widgets[field.key] = widget
-                row = index // 3
-                col = index % 3
-                bool_layout.addWidget(widget, row, col)
-            bool_group.setLayout(bool_layout)
+                bool_cells.append(widget)
+            bool_layout = ResponsiveGrid(bool_cells, GRID_BREAKPOINTS_3)
+            bool_group.setLayout(QVBoxLayout())
+            bool_group.layout().setContentsMargins(8, 6, 8, 6)
+            bool_group.layout().addWidget(bool_layout)
             root.addWidget(bool_group)
 
         root.addStretch(1)
@@ -1545,14 +1554,15 @@ class MainTableEditor(QWidget):
             left_entries = block[:split_at]
             right_entries = block[split_at:]
 
-            row = QHBoxLayout()
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(12)
-
-            row.addWidget(self._build_form_widget(left_entries), 1)
-            row.addWidget(self._build_form_widget(right_entries), 1)
-
-            target_layout.addLayout(row)
+            left_form = self._build_form_widget(left_entries)
+            if right_entries:
+                right_form = self._build_form_widget(right_entries)
+                target_layout.addWidget(
+                    ResponsiveSplit(left_form, right_form, min_width=SPLIT_MIN_WIDTH,
+                                    left_stretch=1, right_stretch=1)
+                )
+            else:
+                target_layout.addWidget(left_form)
 
     def _build_form_widget(self, entries: list[tuple[object, QWidget]]) -> QWidget:
         holder = QWidget()
@@ -1940,13 +1950,13 @@ def _top_cell(widget: QWidget) -> QWidget:
 
 
 def _pair_row(left: QWidget, right: QWidget) -> QWidget:
-    row_holder = QWidget()
-    row_layout = QHBoxLayout(row_holder)
-    row_layout.setContentsMargins(0, 0, 0, 0)
-    row_layout.setSpacing(10)
-    row_layout.addWidget(_top_cell(left), 1)
-    row_layout.addWidget(_top_cell(right), 1)
-    return row_holder
+    return ResponsiveSplit(
+        _top_cell(left),
+        _top_cell(right),
+        min_width=SPLIT_MIN_WIDTH,
+        left_stretch=1,
+        right_stretch=1,
+    )
 
 
 class DistrictCompositeEditor(QWidget):
@@ -2988,11 +2998,6 @@ class _SingleRowTableEditor(QWidget):
         tip.setWordWrap(True)
         layout.addWidget(tip)
 
-        grid = QGridLayout()
-        grid.setContentsMargins(8, 6, 8, 6)
-        grid.setHorizontalSpacing(12)
-        grid.setVerticalSpacing(8)
-
         self._owner_display = QLineEdit()
         self._owner_display.setReadOnly(True)
 
@@ -3007,11 +3012,9 @@ class _SingleRowTableEditor(QWidget):
             row.addWidget(widget, 1)
             return holder
 
-        current_row = 0
-        grid.addWidget(_cell(owner_key, self._owner_display), current_row, 0, 1, 2)
-        current_row += 1
-
-        pending_half_row: QWidget | None = None
+        grid_items: list[tuple[QWidget, int]] = [
+            (_cell(owner_key, self._owner_display), 2),
+        ]
 
         for spec in columns:
             widget: QWidget
@@ -3035,22 +3038,7 @@ class _SingleRowTableEditor(QWidget):
                 _attach_hover_param_tooltip(widget, spec.key)
             self._widgets[spec.key] = widget
 
-            cell_widget = _cell(spec.label, widget)
-            if spec.kind == "template":
-                if pending_half_row is not None:
-                    grid.addWidget(pending_half_row, current_row, 0)
-                    current_row += 1
-                    pending_half_row = None
-                grid.addWidget(cell_widget, current_row, 0, 1, 2)
-                current_row += 1
-            else:
-                if pending_half_row is None:
-                    pending_half_row = cell_widget
-                else:
-                    grid.addWidget(pending_half_row, current_row, 0)
-                    grid.addWidget(cell_widget, current_row, 1)
-                    current_row += 1
-                    pending_half_row = None
+            grid_items.append((_cell(spec.label, widget), 2 if spec.kind == "template" else 1))
 
             if isinstance(widget, BaseTemplateWidget):
                 widget.dataChanged.connect(self.dataChanged.emit)
@@ -3061,10 +3049,8 @@ class _SingleRowTableEditor(QWidget):
             elif isinstance(widget, QLineEdit):
                 widget.textChanged.connect(lambda _v: self.dataChanged.emit())
 
-        if pending_half_row is not None:
-            grid.addWidget(pending_half_row, current_row, 0)
-
-        layout.addLayout(grid)
+        responsive = ResponsiveGrid(grid_items, GRID_BREAKPOINTS_2)
+        layout.addWidget(responsive)
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.addWidget(group)
@@ -6438,6 +6424,11 @@ class AgendaCompositeEditor(QWidget):
         historical = entry.get("historical_agendas")
         historical_dict = dict(historical) if isinstance(historical, dict) else {}
         self._historical_editor.set_entry(historical_dict)
+
+        # 历史议程加载完成后必须重新同步上下文：_sync_agenda_context 读取
+        # _historical_editor.current_leader_type()，若在加载前调用会拿到上一个条目的
+        # 残留 leader，导致 AiLists 的 LeaderType 在切换条目瞬间被错误持久化。
+        self._sync_agenda_context()
 
         # Sub tables
         subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}

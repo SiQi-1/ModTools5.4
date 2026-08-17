@@ -22,7 +22,7 @@ from PyQt6.QtWidgets import QApplication, QTabWidget  # noqa: E402
 from ModTools_5_4.ui.image_ops import ICON_SIZE_TABLE, circle_crop, grayscale_icon  # noqa: E402
 from ModTools_5_4.ui.psd_summarizer import summarize_psd  # noqa: E402
 from ModTools_5_4.ui.pages.search_page import SearchPage  # noqa: E402
-from ModTools_5_4.ui.pages.tools_page import ToolsPage  # noqa: E402
+from ModTools_5_4.ui.pages.tools_page import ToolsWindow  # noqa: E402
 
 try:
     import psd_tools  # noqa: F401
@@ -77,14 +77,16 @@ class IconSizeTableTestCase(unittest.TestCase):
             self.assertEqual(len(sizes), len(set(sizes)), "尺寸不应重复")
 
 
-class ToolsPageTestCase(unittest.TestCase):
+class ToolsWindowTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.app = QApplication.instance() or QApplication([])
 
     def test_tabs_and_search_embedded(self) -> None:
-        page = ToolsPage()
-        tabs = page.findChild(QTabWidget)
+        from ModTools_5_4.ui.pages.tools_page import ToolsWindow
+
+        window = ToolsWindow()
+        tabs = window.findChild(QTabWidget)
         self.assertIsNotNone(tabs)
         self.assertEqual(tabs.count(), 3)
         labels = [tabs.tabText(i) for i in range(tabs.count())]

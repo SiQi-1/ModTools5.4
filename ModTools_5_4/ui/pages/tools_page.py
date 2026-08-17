@@ -25,7 +25,6 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from .base_page import BasePage
 from .search_page import SearchPage
 from ..image_ops import ICON_SIZE_TABLE, circle_crop, grayscale_icon
 from ..psd_summarizer import summarize_psd
@@ -460,14 +459,17 @@ class _PsdSummarizePanel(QGroupBox):
         )
 
 
-class ToolsPage(BasePage):
-    """小工具页：搜索 + 图片工具 + PSD 模板总结。"""
+class ToolsWindow(QWidget):
+    """小工具独立窗口：搜索（能力实现/文本/Modifiers）+ 图片工具 + PSD 模板总结。
 
-    page_id = "tools"
-    display_name = "小工具"
+    设计：独立窗口便于与主窗口并排使用（边搜索边做 Mod）。
+    关闭窗口 = 隐藏（保留搜索/操作状态），再次打开恢复。
+    """
 
     def __init__(self) -> None:
         super().__init__()
+        self.setWindowTitle("ModTools 小工具")
+        self.resize(1100, 720)
         root = QVBoxLayout(self)
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(8)
@@ -481,6 +483,11 @@ class ToolsPage(BasePage):
         tabs.addTab(self._build_image_tools_tab(), "图片工具")
         tabs.addTab(self._build_psd_tab(), "PSD模板总结")
         root.addWidget(tabs, 1)
+
+    def closeEvent(self, event) -> None:  # type: ignore[override]
+        """关闭即隐藏：保留搜索历史/图片状态，重新打开时恢复。"""
+        self.hide()
+        event.ignore()
 
     def _build_image_tools_tab(self) -> QWidget:
         scroll = QScrollArea()

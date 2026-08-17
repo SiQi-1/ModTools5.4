@@ -16,7 +16,7 @@ from .theme import load_base_qss
 from .pages.base_page import BasePage
 from .pages.home_page import HomePage
 from .pages.settings_page import SettingsPage
-from .pages.tools_page import ToolsPage
+from .pages.tools_page import ToolsWindow
 from .pages.workspace_page import WorkspacePage
 
 LOGGER = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
         self._stack = QStackedWidget()
         self._pages: Dict[str, BasePage] = {}
         self._workspace_page: WorkspacePage | None = None
+        self._tools_window: ToolsWindow | None = None
 
         self._build_pages()
         self._build_menu()
@@ -57,10 +58,9 @@ class MainWindow(QMainWindow):
         self.resize(width, height)
 
     def _build_pages(self) -> None:
-        self._add_page(HomePage(self.show_page))
+        self._add_page(HomePage(self.show_page, open_tools=self._open_tools_window))
         self._workspace_page = WorkspacePage()
         self._add_page(self._workspace_page)
-        self._add_page(ToolsPage())
         self._add_page(SettingsPage())
 
     def _build_menu(self) -> None:
@@ -73,10 +73,11 @@ class MainWindow(QMainWindow):
         self._add_action(file_menu, "删除工程", self._handle_delete_project)
 
         view_menu = menu_bar.addMenu("窗口")
+        self._add_action(view_menu, "小工具", self._open_tools_window)
+        view_menu.addSeparator()
         for page_id, label in (
             ("home", "主页"),
             ("workspace", "工作区"),
-            ("tools", "小工具"),
             ("settings", "设置"),
         ):
             action = QAction(label, self)
@@ -94,6 +95,14 @@ class MainWindow(QMainWindow):
 
     def _show_about_dialog(self) -> None:
         QMessageBox.information(self, "版本信息", "ModTools 5.4")
+
+    def _open_tools_window(self) -> None:
+        """打开小工具独立窗口（单例，关闭=隐藏保留状态）。"""
+        if self._tools_window is None:
+            self._tools_window = ToolsWindow()
+        self._tools_window.show()
+        self._tools_window.raise_()
+        self._tools_window.activateWindow()
 
     def _add_page(self, page: BasePage) -> None:
         if page.page_id in self._pages:

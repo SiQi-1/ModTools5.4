@@ -19,9 +19,10 @@ class HomePage(BasePage):
     page_id = "home"
     display_name = "主页"
 
-    def __init__(self, navigate_to: NavigationTarget) -> None:
+    def __init__(self, navigate_to: NavigationTarget, open_tools: Callable[[], None] | None = None) -> None:
         super().__init__()
         self._navigate_to = navigate_to
+        self._open_tools = open_tools
         self._background_pixmap = QPixmap()
         bg_path = home_hero_bg_path()
         if bg_path.exists():
@@ -56,7 +57,6 @@ class HomePage(BasePage):
 
         for target, text in (
             ("workspace", "进入工作区"),
-            ("tools", "进入小工具页（搜索/图片工具/模板总结）"),
             ("settings", "进入设置页"),
         ):
             button = QPushButton(text)
@@ -65,6 +65,16 @@ class HomePage(BasePage):
             button.setFixedHeight(58)
             button.clicked.connect(lambda checked=False, t=target: self._navigate_to(t))
             card_layout.addWidget(button)
+
+        tools_button = QPushButton("打开小工具（搜索/图片工具/模板总结）")
+        tools_button.setObjectName("homeButton_tools")
+        tools_button.setProperty("homePrimary", "true")
+        tools_button.setFixedHeight(58)
+        if self._open_tools is not None:
+            tools_button.clicked.connect(lambda checked=False: self._open_tools())
+        else:
+            tools_button.clicked.connect(lambda checked=False: self._navigate_to("tools"))
+        card_layout.addWidget(tools_button)
 
         layout.addStretch(1)
         layout.addWidget(content_card, 0, Qt.AlignmentFlag.AlignHCenter)

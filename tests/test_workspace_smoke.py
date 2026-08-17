@@ -32,11 +32,26 @@ class WorkspaceSmokeTestCase(unittest.TestCase):
         cls.window.show()
         cls.page = cls.window._workspace_page
 
-    def test_main_window_has_five_pages(self) -> None:
+    def test_main_window_has_three_pages(self) -> None:
         self.assertEqual(
             set(self.window._pages.keys()),
-            {"home", "workspace", "tools", "settings"},
+            {"home", "workspace", "settings"},
         )
+
+    def test_tools_window_opens_as_independent_window(self) -> None:
+        self.window._tools_window = None  # 重置单例
+        self.window._open_tools_window()
+        self.assertIsNotNone(self.window._tools_window)
+        tools = self.window._tools_window
+        self.assertTrue(tools.isVisible() or not tools.isHidden())
+        self.assertEqual(tools.windowTitle(), "ModTools 小工具")
+        # 关闭 = 隐藏（保留状态），不销毁
+        tools.close()
+        self.assertFalse(tools.isVisible())
+        self.assertIs(self.window._tools_window, tools, "关闭后单例应保留（隐藏）")
+        # 再次打开恢复显示
+        self.window._open_tools_window()
+        self.assertTrue(tools.isVisible())
 
     def test_create_project_and_rebuild_tree(self) -> None:
         self.page.create_new_project("冒烟测试")

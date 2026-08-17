@@ -7,6 +7,8 @@ import sqlite3
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QAbstractItemView,
+    QApplication,
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFrame,
@@ -15,6 +17,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMenu,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
@@ -23,12 +26,21 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QTableWidget,
     QTableWidgetItem,
+    QTreeWidget,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
 
 from .base_page import BasePage
 from ...app.settings_store import load_settings
+from ...db.ability_search import (
+    OBJECT_CATEGORY_LABELS,
+    OBJECT_TYPE_ORDER,
+    fetch_object_detail,
+    open_dbs,
+    search_all,
+)
 from ...db.text_database import SIMPLIFIED_LANGUAGE_NORMALIZED, query_text_by_tag
 
 
@@ -323,37 +335,13 @@ class SearchPage(BasePage):
         return tab
 
     def _build_global_search_tab(self) -> QWidget:
+        """能力实现搜索：按名字/描述/能力/条件搜索，反查对象与 Modifier 全链路。"""
         tab = QWidget()
         layout = QVBoxLayout(tab)
         layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(8)
-
-        info = QLabel("全局搜索用于跨分类定位内容；可先使用文本搜索与 ModifierType 搜索完成常用检索。")
-        info.setObjectName("pageInfoLabel")
-        info.setWordWrap(True)
-        layout.addWidget(info)
-
-        category_tabs = QTabWidget()
-        for name in ("文明", "领袖", "区域", "单位", "建筑", "改良设施", "总督", "伟人", "信仰", "政策卡", "项目"):
-            category_tabs.addTab(self._build_placeholder_panel(name), name)
-        layout.addWidget(category_tabs, 1)
+        layout.addWidget(AbilitySearchTab(self))
         return tab
-
-    def _build_placeholder_panel(self, title: str) -> QWidget:
-        panel = QWidget()
-        panel_layout = QVBoxLayout(panel)
-        panel_layout.setContentsMargins(8, 8, 8, 8)
-
-        card = QFrame()
-        card.setFrameShape(QFrame.Shape.StyledPanel)
-        card_layout = QVBoxLayout(card)
-        text = QLabel(f"{title}搜索入口已预留，可先通过工作区与上方专题搜索进行定位。")
-        text.setObjectName("pageInfoLabel")
-        text.setWordWrap(True)
-        card_layout.addWidget(text)
-        panel_layout.addWidget(card)
-        panel_layout.addStretch(1)
-        return panel
 
     def _is_tag_query(self, query: str) -> bool:
         normalized = query.strip().upper()
@@ -737,3 +725,360 @@ class SearchPage(BasePage):
             return value
         except Exception:
             return ""
+
+
+class AbilitySearchTab(QWidget):
+    """能力实现搜索：三通道搜索（对象文本 / 能力层 / 效果词扩展）→ 对象详情。
+
+    详情 = 数据表（主表+副表，相邻加成专门渲染）+ 能力树（Modifier 全链路，
+    ATTACH/GRANT_ABILITY 嵌套递归展开）。支持前进/后退导航与树内过滤。
+    """
+
+    def __init__(self, host: QWidget | None = None) -> None:
+        super().__init__()
+        self._host = host
+        self._current_results: list[dict[str, object]] = []
+        self._history: list[tuple[str, str]] = []
+        self._history_index = -1
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        root = QVBoxLayout(self)
+        root.setContentsMargins(4, 4, 4, 4)
+        root.setSpacing(6)
+
+        search_box = QGroupBox("搜索")
+        search_layout = QHBoxLayout(search_box)
+        self._query_input = QLineEdit()
+        self._query_input.setPlaceholderText(
+            '输入中文（名字/描述/效果词）或英文（Type/ModifierId/参数），如 "宣战"、"WAR"、"港口"'
+        )
+        self._query_input.returnPressed.connect(self._run_search)
+        search_layout.addWidget(self._query_input, 1)
+        self._category_combo = QComboBox()
+        self._category_combo.addItem("全部对象", None)
+        for key in OBJECT_TYPE_ORDER:
+            self._category_combo.addItem(OBJECT_CATEGORY_LABELS[key], key)
+        search_layout.addWidget(self._category_combo)
+        search_btn = QPushButton("搜索")
+        search_btn.clicked.connect(self._run_search)
+        search_layout.addWidget(search_btn)
+        root.addWidget(search_box)
+
+        self._hint_label = QLabel("提示：中文搜名字/描述/效果（如“宣战”）；英文搜 Type/能力/条件（如 WAR）。双击结果打开详情。")
+        self._hint_label.setStyleSheet("color:#64748b; font-size:11px;")
+        self._hint_label.setWordWrap(True)
+        root.addWidget(self._hint_label)
+
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # ── 左侧：结果表 ──
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(4)
+        self._result_table = QTableWidget()
+        self._result_table.setColumnCount(5)
+        self._result_table.setHorizontalHeaderLabels(["分类", "名称", "Type", "命中", "摘要"])
+        self._result_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._result_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._result_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._result_table.setAlternatingRowColors(True)
+        self._result_table.verticalHeader().setVisible(False)
+        header = self._result_table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        self._result_table.itemDoubleClicked.connect(self._on_result_activated)
+        self._result_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._result_table.customContextMenuRequested.connect(self._show_result_menu)
+        left_layout.addWidget(self._result_table, 1)
+        self._result_status = QLabel("输入关键词开始搜索")
+        self._result_status.setStyleSheet("color:#64748b; font-size:11px;")
+        left_layout.addWidget(self._result_status)
+        splitter.addWidget(left)
+
+        # ── 右侧：详情 ──
+        right = QWidget()
+        right_layout = QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(4)
+
+        nav_row = QHBoxLayout()
+        self._back_btn = QPushButton("← 后退")
+        self._back_btn.clicked.connect(self._nav_back)
+        self._back_btn.setEnabled(False)
+        nav_row.addWidget(self._back_btn)
+        self._forward_btn = QPushButton("前进 →")
+        self._forward_btn.clicked.connect(self._nav_forward)
+        self._forward_btn.setEnabled(False)
+        nav_row.addWidget(self._forward_btn)
+        self._title_label = QLabel("未选择对象")
+        self._title_label.setStyleSheet("font-weight:600;")
+        self._title_label.setWordWrap(True)
+        nav_row.addWidget(self._title_label, 1)
+        right_layout.addLayout(nav_row)
+
+        self._filter_input = QLineEdit()
+        self._filter_input.setPlaceholderText("过滤树节点（表名/字段/ModifierId/参数名）")
+        self._filter_input.textChanged.connect(self._apply_filter)
+        right_layout.addWidget(self._filter_input)
+
+        detail_splitter = QSplitter(Qt.Orientation.Vertical)
+        self._modifier_tree = QTreeWidget()
+        self._modifier_tree.setHeaderHidden(True)
+        self._data_tree = QTreeWidget()
+        self._data_tree.setHeaderHidden(True)
+        detail_splitter.addWidget(self._modifier_tree)
+        detail_splitter.addWidget(self._data_tree)
+        detail_splitter.setSizes([340, 260])
+        right_layout.addWidget(detail_splitter, 1)
+
+        splitter.addWidget(right)
+        splitter.setSizes([380, 640])
+        root.addWidget(splitter, 1)
+
+        for tree in (self._modifier_tree, self._data_tree):
+            tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            tree.customContextMenuRequested.connect(self._show_tree_menu)
+
+    # ── 搜索 ──
+    def _run_search(self) -> None:
+        keyword = self._query_input.text().strip()
+        if not keyword:
+            return
+        settings = load_settings()
+        if not settings.game_db_path or not Path(settings.game_db_path).exists():
+            QMessageBox.warning(self, "提示", "未配置游戏数据库（DebugGameplay.sqlite），请先到设置页配置。")
+            return
+        category = self._category_combo.currentData()
+        try:
+            with open_dbs(settings.game_db_path, settings.active_text_db_path) as (game_conn, loc_conn):
+                result = search_all(game_conn, loc_conn, keyword, category=category)
+        except Exception as exc:
+            QMessageBox.warning(self, "提示", f"搜索失败：{exc}")
+            return
+        self._current_results = result["results"]
+        self._fill_result_table(result["results"])
+        hint = str(result.get("hint") or "")
+        if hint:
+            self._hint_label.setText(hint)
+        else:
+            self._hint_label.setText("提示：中文搜名字/描述/效果；英文搜 Type/能力/条件。双击结果打开详情。")
+        self._result_status.setText(f"命中 {len(result['results'])} 个对象")
+
+    def _fill_result_table(self, results: list[dict[str, object]]) -> None:
+        self._result_table.setRowCount(len(results))
+        for row_index, item in enumerate(results):
+            for col_index, key in enumerate(("label", "name", "type", "hit", "summary")):
+                cell = QTableWidgetItem(str(item.get(key) or ""))
+                cell.setFlags(cell.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                cell.setData(Qt.ItemDataRole.UserRole, (item.get("category"), item.get("type")))
+                self._result_table.setItem(row_index, col_index, cell)
+
+    def _on_result_activated(self, item: QTableWidgetItem) -> None:
+        data = item.data(Qt.ItemDataRole.UserRole)
+        if isinstance(data, tuple) and len(data) == 2 and data[0] and data[1]:
+            self._open_detail(str(data[0]), str(data[1]))
+
+    def _show_result_menu(self, pos) -> None:
+        item = self._result_table.itemAt(pos)
+        if item is None:
+            return
+        data = item.data(Qt.ItemDataRole.UserRole)
+        menu = QMenu(self)
+        open_act = menu.addAction("打开详情")
+        copy_act = menu.addAction("复制 Type")
+        chosen = menu.exec(self._result_table.viewport().mapToGlobal(pos))
+        if not isinstance(data, tuple) or len(data) != 2:
+            return
+        if chosen == open_act and data[0] and data[1]:
+            self._open_detail(str(data[0]), str(data[1]))
+        elif chosen == copy_act:
+            QApplication.clipboard().setText(str(data[1]))
+
+    # ── 详情与导航 ──
+    def _open_detail(self, category: str, type_value: str) -> None:
+        settings = load_settings()
+        try:
+            with open_dbs(settings.game_db_path, settings.active_text_db_path) as (game_conn, loc_conn):
+                detail = fetch_object_detail(game_conn, loc_conn, category, type_value)
+        except Exception as exc:
+            QMessageBox.warning(self, "提示", f"加载详情失败：{exc}")
+            return
+        if not detail:
+            self._title_label.setText(f"未找到对象：{type_value}")
+            return
+        self._nav_push(category, type_value)
+        self._filter_input.clear()
+        self._title_label.setText(f"{detail.get('label', '')}：{detail.get('name', '')}（{detail.get('type', '')}）")
+        self._render_detail(detail)
+
+    def _nav_push(self, category: str, type_value: str) -> None:
+        if self._history and self._history[self._history_index] == (category, type_value):
+            return
+        self._history = self._history[: self._history_index + 1]
+        self._history.append((category, type_value))
+        self._history_index = len(self._history) - 1
+        self._update_nav_buttons()
+
+    def _nav_back(self) -> None:
+        if self._history_index <= 0:
+            return
+        self._history_index -= 1
+        self._reopen_history()
+
+    def _nav_forward(self) -> None:
+        if self._history_index >= len(self._history) - 1:
+            return
+        self._history_index += 1
+        self._reopen_history()
+
+    def _reopen_history(self) -> None:
+        category, type_value = self._history[self._history_index]
+        self._open_detail(category, type_value)
+
+    def _update_nav_buttons(self) -> None:
+        self._back_btn.setEnabled(self._history_index > 0)
+        self._forward_btn.setEnabled(self._history_index < len(self._history) - 1)
+
+    # ── 详情渲染 ──
+    def _render_detail(self, detail: dict[str, object]) -> None:
+        self._modifier_tree.clear()
+        self._data_tree.clear()
+        self._render_data_tree(detail)
+        self._render_modifier_tree(detail)
+
+    def _render_data_tree(self, detail: dict[str, object]) -> None:
+        data_root = QTreeWidgetItem(self._data_tree, ["📄 数据表"])
+        main = detail.get("main") if isinstance(detail.get("main"), dict) else {}
+        main_values = main.get("values") if isinstance(main.get("values"), dict) else {}
+        main_node = QTreeWidgetItem(data_root, [f"主表 {main.get('table', '')}（{len(main_values)} 列）"])
+        for key, value in main_values.items():
+            QTreeWidgetItem(main_node, [f"{key}: {value}"])
+        main_node.setExpanded(True)
+
+        for st in detail.get("sub_tables", []):
+            if not isinstance(st, dict):
+                continue
+            rows = st.get("rows", [])
+            if st.get("kind") == "adjacency":
+                table_node = QTreeWidgetItem(data_root, [f"{st.get('table', '')}（{len(rows)} 条相邻加成）"])
+                for r in rows:
+                    if not isinstance(r, dict):
+                        continue
+                    row_node = QTreeWidgetItem(table_node, [f"🏷️ {r.get('description', '')}"])
+                    for s in r.get("sources", []):
+                        if isinstance(s, dict) and s.get("cn"):
+                            QTreeWidgetItem(row_node, [f"条件: {s['cn']}"])
+                    QTreeWidgetItem(
+                        row_node,
+                        [f"产出: {r.get('yield_type', '')} ×{r.get('yield_change', '')}（每 {r.get('tiles_required', '')} 格）"],
+                    )
+                    original = str(r.get("original_description") or "").strip()
+                    if original:
+                        QTreeWidgetItem(row_node, [f"原始描述: {original}"])
+                    row_node.setToolTip(0, f"ID: {r.get('id', '')}")
+            else:
+                table_node = QTreeWidgetItem(data_root, [f"{st.get('table', '')}（{len(rows)} 行）"])
+                for r in rows:
+                    if isinstance(r, dict):
+                        QTreeWidgetItem(table_node, [" | ".join(f"{k}={v}" for k, v in r.items())])
+        for binder in detail.get("binders", []):
+            QTreeWidgetItem(data_root, [f"被使用: {binder}"])
+        data_root.setExpanded(True)
+
+    def _render_modifier_tree(self, detail: dict[str, object]) -> None:
+        mod_root = QTreeWidgetItem(self._modifier_tree, ["⚡ 能力 Modifiers"])
+        groups = detail.get("modifier_groups", [])
+        for group in groups:
+            if not isinstance(group, dict):
+                continue
+            modifiers = group.get("modifiers", [])
+            group_node = QTreeWidgetItem(mod_root, [f"{group.get('source', '')}（{len(modifiers)}）"])
+            for m in modifiers:
+                if isinstance(m, dict):
+                    self._append_modifier_node(group_node, m, 0)
+            group_node.setExpanded(True)
+        if not groups:
+            QTreeWidgetItem(mod_root, ["（该对象无直接绑定 Modifier，能力可能来自建筑/特质/相邻加成）"])
+        mod_root.setExpanded(True)
+
+    def _append_modifier_node(self, parent: QTreeWidgetItem, m: dict[str, object], depth: int) -> None:
+        effect = str(m.get("effect_type") or "")
+        title = str(m.get("modifier_id") or "")
+        if effect:
+            title = f"{title}  [{effect}]"
+        node = QTreeWidgetItem(parent, [title])
+        node.setData(0, Qt.ItemDataRole.UserRole, str(m.get("modifier_id") or ""))
+
+        for arg in m.get("args", []):
+            if isinstance(arg, dict):
+                QTreeWidgetItem(node, [f"参数: {arg.get('name', '')} = {arg.get('value', '')}"])
+        for rs in m.get("reqsets", []):
+            if not isinstance(rs, dict):
+                continue
+            rs_node = QTreeWidgetItem(node, [f"条件集({rs.get('role', '')}): {rs.get('id', '')}"])
+            for req in rs.get("requirements", []):
+                if not isinstance(req, dict):
+                    continue
+                req_text = f"{req.get('requirement_id', '')}  [{req.get('requirement_type', '')}]"
+                if req.get("inverse"):
+                    req_text += " (Inverse)"
+                req_node = QTreeWidgetItem(rs_node, [req_text])
+                for a in req.get("args", []):
+                    if isinstance(a, dict):
+                        QTreeWidgetItem(req_node, [f"参数: {a.get('name', '')} = {a.get('value', '')}"])
+                nested_rs = req.get("nested_reqset")
+                if isinstance(nested_rs, dict) and nested_rs.get("id"):
+                    nested_node = QTreeWidgetItem(req_node, [f"嵌套条件集: {nested_rs.get('id', '')}"])
+                    for nreq in nested_rs.get("requirements", []):
+                        if isinstance(nreq, dict):
+                            QTreeWidgetItem(
+                                nested_node,
+                                [f"{nreq.get('requirement_id', '')}  [{nreq.get('requirement_type', '')}]"],
+                            )
+        for child in m.get("nested", []):
+            if isinstance(child, dict):
+                self._append_modifier_node(node, child, depth + 1)
+        for s in m.get("strings", []):
+            if isinstance(s, dict):
+                QTreeWidgetItem(node, [f"Strings({s.get('context', '')}): {s.get('text', '')}"])
+        node.setExpanded(depth < 2)
+
+    # ── 过滤 ──
+    def _apply_filter(self, text: str) -> None:
+        keyword = text.strip().lower()
+        for tree in (self._modifier_tree, self._data_tree):
+            self._filter_tree_recursive(tree.invisibleRootItem(), keyword)
+
+    def _filter_tree_recursive(self, root: QTreeWidgetItem, keyword: str) -> None:
+        for i in range(root.childCount()):
+            item = root.child(i)
+            self._filter_tree_recursive(item, keyword)
+            text = (item.text(0) or "").lower()
+            visible = (not keyword) or (keyword in text) or self._has_visible_child(item)
+            item.setHidden(not visible)
+
+    @staticmethod
+    def _has_visible_child(item: QTreeWidgetItem) -> bool:
+        for i in range(item.childCount()):
+            if not item.child(i).isHidden():
+                return True
+        return False
+
+    # ── 右键复制 ──
+    def _show_tree_menu(self, pos) -> None:
+        tree = self.sender()
+        if not isinstance(tree, QTreeWidget):
+            return
+        item = tree.itemAt(pos)
+        if item is None:
+            return
+        menu = QMenu(self)
+        copy_act = menu.addAction("复制文本")
+        chosen = menu.exec(tree.viewport().mapToGlobal(pos))
+        if chosen == copy_act:
+            QApplication.clipboard().setText(item.text(0))

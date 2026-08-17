@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-16 - 新增：能力实现搜索（小工具页「全局搜索」占位 → 完整功能）
+
+### 功能（参考旧版 ModTools4.5 搜索页的理念，全新 PyQt6 UI）
+- 三通道搜索（`db/ability_search.py` 查询层，纯函数可单测）：
+  - 通道① 对象文本：中文搜名字/描述（文本库反查 LOC tag），英文搜 Type/Tag；
+  - 通道② 能力层：ModifierId/ModifierType/EffectType/参数/RequirementType/条件参数 LIKE（各表 1-6ms）→ 反向经绑定表找持有该能力的对象；
+  - 通道③ 效果词映射：中文效果词（"宣战"→WAR、"产能"→PRODUCTION 等 40+ 词）自动附加英文能力搜索。
+- 对象范围 14 类：文明/领袖/特质/区域/建筑/单位/改良设施/项目/政策卡/总督/总督晋升/伟人/单位能力/单位晋升。
+- 对象详情 = 数据表 + 能力树两大区：
+  - 📄 数据表：主表（仅非空列，LOC 值解析中文）+ 副表动态发现（含该对象主键列的表自动列出）；
+  - **相邻加成专门渲染**：`Adjacency_YieldChanges` 结构化解析（12 条件列识别 + TilesRequired + 前置），自动生成描述（参考编辑窗口同款逻辑：`+2[ICON_Gold]金币 来自每2个相邻的{来源}（需要科技）`），并与游戏库原始描述并排对照；
+  - ⚡ 能力树：Modifier 全链路按绑定来源分组（DistrictModifiers/TraitType→TraitModifiers/...），**ATTACH_MODIFIER 与 GRANT_ABILITY 嵌套递归展开**（参数 ModifierId → 被挂载者；AbilityType → UnitAbilities → UnitAbilityModifiers），防环 + 限深 8；条件集（Subject/Owner）→ 条件 + 条件参数；ModifierStrings 预览。
+- UI（`search_page.py` AbilitySearchTab）：搜索区（关键词 + 分类范围下拉）→ 结果表格（分类/名称/Type/命中方式/摘要，双击打开、右键复制）→ 详情面板（←后退/前进→ 浏览历史导航 + 树内过滤框 + 上下分栏的能力树/数据树 + 节点右键复制）。
+- 已知边界：mod 自制对象（游戏库无记录）名称/相邻加成来源显示原文 Type。
+
+### 验证
+- 新增 `tests/test_ability_search.py`（10 项，无游戏库时自动 skip）：三通道命中、效果词扩展、相邻加成描述、嵌套展开、防环、未知对象。
+- 全量 158 项单元测试通过（148 旧 + 10 新）；离屏 UI 冒烟（搜索→详情→过滤→导航）通过。
+
 ## 2026-08-16 - 修复：阶段 2 数据安全与性能（连接/缓存/输入安全/边界）
 
 ### A. 资源与性能

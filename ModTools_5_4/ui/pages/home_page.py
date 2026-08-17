@@ -66,7 +66,7 @@ class HomePage(BasePage):
             button.clicked.connect(lambda checked=False, t=target: self._navigate_to(t))
             card_layout.addWidget(button)
 
-        tools_button = QPushButton("打开小工具（搜索/图片工具/模板总结）")
+        tools_button = QPushButton("小工具")
         tools_button.setObjectName("homeButton_tools")
         tools_button.setProperty("homePrimary", "true")
         tools_button.setFixedHeight(58)

@@ -1,10 +1,10 @@
-"""小工具页与图片操作测试。
+"""图片操作与底层工具模块测试。
 
 - 圆形裁切：边距（非顶边）、黑边环、透明角、无黑边模式
 - 灰度图标
 - 图标尺寸表
 - PSD 总结往返（依赖 psd-tools，未安装时跳过）
-- 工具页构造（搜索子页嵌入）
+- 小工具窗口构造（搜索页嵌入；图片工具/PSD 面板已移除，底层模块保留）
 """
 from __future__ import annotations
 
@@ -82,18 +82,19 @@ class ToolsWindowTestCase(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.app = QApplication.instance() or QApplication([])
 
-    def test_tabs_and_search_embedded(self) -> None:
+    def test_search_embedded(self) -> None:
         from ModTools_5_4.ui.pages.tools_page import ToolsWindow
 
         window = ToolsWindow()
-        tabs = window.findChild(QTabWidget)
-        self.assertIsNotNone(tabs)
-        self.assertEqual(tabs.count(), 3)
-        labels = [tabs.tabText(i) for i in range(tabs.count())]
-        self.assertIn("搜索", labels)
-        self.assertIn("图片工具", labels)
-        self.assertIn("PSD模板总结", labels)
-        self.assertTrue(any(isinstance(tabs.widget(i), SearchPage) for i in range(tabs.count())))
+        self.assertIsNotNone(window.findChild(SearchPage), "小工具窗口应直接嵌入搜索页")
+        # 图片工具/PSD 面板已移除：任何嵌套 tab 中都不应出现这两个页签
+        all_labels = [
+            tabs.tabText(i)
+            for tabs in window.findChildren(QTabWidget)
+            for i in range(tabs.count())
+        ]
+        self.assertNotIn("图片工具", all_labels)
+        self.assertNotIn("PSD模板总结", all_labels)
 
 
 @unittest.skipUnless(HAS_PSD_TOOLS, "psd-tools 未安装")

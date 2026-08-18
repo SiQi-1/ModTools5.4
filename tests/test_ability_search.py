@@ -141,6 +141,36 @@ class AbilitySearchTestCase(unittest.TestCase):
             detail = fetch_object_detail(gc, lc, "district", "DISTRICT_NOT_EXISTS_XYZ")
         self.assertIsNone(detail)
 
+    # ── Modifier 标志（仅非默认）与 ModifierStrings ──
+    def test_modifier_flags_only_non_default(self) -> None:
+        with self.conn_ctx as (gc, lc):
+            detail = fetch_object_detail(gc, lc, "building", "BUILDING_BARRACKS")
+        self.assertIsNotNone(detail)
+        mods = [m for g in detail["modifier_groups"] for m in g["modifiers"]]
+        barracks_mod = next(
+            (m for m in mods if m["modifier_id"] == "BARRACKS_TRAINED_UNIT_XP_MODIFIER"), None
+        )
+        self.assertIsNotNone(barracks_mod, "兵营的训练经验 modifier 应存在")
+        self.assertIn("永久", barracks_mod["flags"], "Permanent=1 应显示为'永久'")
+        # 默认值不显示：所有 flag 值必须来自非默认规则（白名单）
+        allowed = {"永久", "仅一次", "仅新对象", "可重复"}
+        for flag in barracks_mod["flags"]:
+            self.assertTrue(
+                flag in allowed or flag.startswith("所有者上限") or flag.startswith("主体上限"),
+                f"意外标志: {flag}",
+            )
+
+    def test_modifier_strings_resolved_to_chinese(self) -> None:
+        with self.conn_ctx as (gc, lc):
+            detail = fetch_object_detail(gc, lc, "unit_ability", "ABILITY_RELIGIOUS_IGNORE_TERRAIN_COST")
+        mods = [m for g in detail["modifier_groups"] for m in g["modifiers"]]
+        terrain_mod = next((m for m in mods if m["modifier_id"] == "MOD_IGNORE_TERRAIN_COST"), None)
+        self.assertIsNotNone(terrain_mod)
+        self.assertTrue(terrain_mod["strings"], "该 modifier 应有 ModifierStrings")
+        text = str(terrain_mod["strings"][0].get("text") or "")
+        self.assertNotIn("LOC_", text, "ModifierStrings 文本应已解析为中文")
+        self.assertTrue(any("\u4e00" <= ch <= "\u9fff" for ch in text), "应包含中文字符")
+
 
 if __name__ == "__main__":
     unittest.main()

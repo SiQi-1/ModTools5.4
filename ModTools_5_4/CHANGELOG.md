@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-16 - 修复：能力搜索 UI 字体重叠 + Modifier 标志/Strings 显示规则
+
+### 修复
+- **字体重叠**：结果表格垂直头改为 `ResizeToContents`（此前固定行高不采用 delegate 的 sizeHint，多行文本画在单行高度内）；`WordWrapDelegate` 的 paint/sizeHint 统一宽度来源（树=视口宽保守估计、表格=列宽），换行行数与行高严格一致。
+- **Modifier 标志只显示非默认值**：`Modifiers` 表布尔/数值字段——`Permanent=1`→"永久"、`RunOnce=1`→"仅一次"、`NewOnly=1`→"仅新对象"、`Repeatable=1`→"可重复"、`OwnerStackLimit/SubjectStackLimit≠0`→"所有者上限 N/主体上限 N"；默认值一律不显示。
+- **ModifierStrings 按需显示**：有内容才显示（无则无节点），且文本已在查询层解析为中文（如"穿越河流忽略移动力消耗。"）；显示为"预览文本(Context): …"。
+
+### 验证
+- test_ability_search 新增 2 例（flags 非默认白名单、strings 中文解析）；全量 161 项测试通过。
+
 ## 2026-08-16 - 优化：能力实现搜索 UI（描述完整展示 + 自动换行）
 
 ### 变更

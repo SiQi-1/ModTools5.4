@@ -822,19 +822,41 @@ def _expand_modifier(
         reqsets.append(_expand_reqset(game_conn, loc_conn, role, rsid))
 
     strings = [
-        {"context": str(r.get("Context") or ""), "text": r.get("Text")}
+        {"context": str(r.get("Context") or ""), "text": resolve_loc(loc_conn, r.get("Text"))}
         for r in _fetch_all_row_dicts(
             game_conn, "SELECT Context, Text FROM ModifierStrings WHERE ModifierId = ?", (modifier_id,)
         )
     ]
+
+    # Modifiers 表标志：仅显示非默认值（布尔 True / 上限不为 0）
+    flags: list[str] = []
+    if int(mod_row.get("Permanent") or 0):
+        flags.append("永久")
+    if int(mod_row.get("RunOnce") or 0):
+        flags.append("仅一次")
+    if int(mod_row.get("NewOnly") or 0):
+        flags.append("仅新对象")
+    if int(mod_row.get("Repeatable") or 0):
+        flags.append("可重复")
+    try:
+        owner_limit = int(mod_row.get("OwnerStackLimit") or 0)
+    except (TypeError, ValueError):
+        owner_limit = 0
+    if owner_limit:
+        flags.append(f"所有者上限 {owner_limit}")
+    try:
+        subject_limit = int(mod_row.get("SubjectStackLimit") or 0)
+    except (TypeError, ValueError):
+        subject_limit = 0
+    if subject_limit:
+        flags.append(f"主体上限 {subject_limit}")
 
     node: dict[str, Any] = {
         "modifier_id": modifier_id,
         "modifier_type": modifier_type,
         "effect_type": effect_type,
         "collection_type": collection_type,
-        "run_once": mod_row.get("RunOnce"),
-        "permanent": mod_row.get("Permanent"),
+        "flags": flags,
         "args": args,
         "reqsets": reqsets,
         "strings": strings,

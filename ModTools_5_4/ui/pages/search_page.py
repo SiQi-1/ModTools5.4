@@ -757,14 +757,19 @@ class WordWrapDelegate(QStyledItemDelegate):
         return lines
 
     def _item_width(self, option, index) -> int:
-        width = option.rect.width()
-        if width > 0:
-            return width
+        """换行宽度：paint 与 sizeHint 必须使用同一来源，否则行高与绘制行数不一致导致字体重叠。
+
+        树：按视口宽度保守估计（扣除缩进/滚动条余量）；表格：取列宽。
+        """
         view = self.parent()
         if isinstance(view, QTreeWidget):
-            width = view.viewport().width() - 24
+            width = view.viewport().width() - 40
         elif isinstance(view, QTableWidget):
             width = view.columnWidth(index.column())
+            if width <= 0:
+                width = option.rect.width()
+        else:
+            width = option.rect.width()
         if width <= 0:
             width = 320
         return width
@@ -871,7 +876,8 @@ class AbilitySearchTab(QWidget):
         self._result_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self._result_table.setAlternatingRowColors(True)
         self._result_table.verticalHeader().setVisible(False)
-        # 描述列自动换行（完整文本，行高自适应）
+        # 描述列自动换行（完整文本，行高按内容自适应——必须 ResizeToContents 才会采用 sizeHint 行高）
+        self._result_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self._result_table.setItemDelegateForColumn(4, WordWrapDelegate(self._result_table))
         header = self._result_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
@@ -1136,6 +1142,11 @@ class AbilitySearchTab(QWidget):
         node = QTreeWidgetItem(parent, [title])
         node.setData(0, Qt.ItemDataRole.UserRole, str(m.get("modifier_id") or ""))
 
+        # Modifiers 表标志：仅显示非默认值（永久/仅一次/上限等）
+        flags = [str(f) for f in m.get("flags", []) if str(f)]
+        if flags:
+            QTreeWidgetItem(node, ["标志: " + "、".join(flags)])
+
         for arg in m.get("args", []):
             if isinstance(arg, dict):
                 QTreeWidgetItem(node, [f"参数: {arg.get('name', '')} = {arg.get('value', '')}"])
@@ -1165,9 +1176,12 @@ class AbilitySearchTab(QWidget):
         for child in m.get("nested", []):
             if isinstance(child, dict):
                 self._append_modifier_node(node, child, depth + 1)
+        # ModifierStrings：有内容才显示（Text 已在查询层解析为中文）
         for s in m.get("strings", []):
-            if isinstance(s, dict):
-                QTreeWidgetItem(node, [f"Strings({s.get('context', '')}): {s.get('text', '')}"])
+            if isinstance(s, dict) and str(s.get("text") or "").strip():
+                context = str(s.get("context") or "").strip()
+                label = f"预览文本: {s.get('text')}" if not context else f"预览文本({context}): {s.get('text')}"
+                QTreeWidgetItem(node, [label])
         node.setExpanded(depth < 2)
 
     # ── 过滤 ──

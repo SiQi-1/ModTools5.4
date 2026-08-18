@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-16 - 优化：能力搜索描述中的 [ICON_XXX] 渲染为实际图标
+
+### 变更
+- `WordWrapDelegate` 支持行内图标渲染：文本中的 `[ICON_XXX]` token 从 FontIcons 图集（DDS 切片）解析为 16px 内联图标（复用 `_get_font_icon_registry`/`_get_font_icon_atlas`，带缓存），解析失败回退纯文本；
+- 应用范围：结果表格「描述」列、详情面板能力树/数据树（主表 Description、相邻加成、参数值等）；
+- 选中结果的**预览面板**升级为富文本 QTextEdit：描述中的图标渲染为内联图片（QTextDocument 资源，垂直居中，与工作区 IconTokenTextEdit 同款渲染）。
+
 ## 2026-08-16 - 修复：能力搜索 UI 字体重叠 + Modifier 标志/Strings 显示规则
 
 ### 修复

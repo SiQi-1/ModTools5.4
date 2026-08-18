@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 import sqlite3
 
-from PyQt6.QtCore import QRect, Qt
-from PyQt6.QtGui import QFontMetrics, QPainter
+from PyQt6.QtCore import QRect, Qt, QUrl
+from PyQt6.QtGui import QFontMetrics, QPainter, QTextCharFormat, QTextCursor, QTextDocument, QTextImageFormat
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -29,6 +30,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QTableWidget,
     QTableWidgetItem,
+    QTextEdit,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
@@ -45,6 +47,7 @@ from ...db.ability_search import (
     search_all,
 )
 from ...db.text_database import SIMPLIFIED_LANGUAGE_NORMALIZED, query_text_by_tag
+from ..ui_widget_kit import _get_font_icon_atlas, _get_font_icon_registry
 
 
 class ModifierTypePickerDialog(QDialog):
@@ -731,29 +734,108 @@ class SearchPage(BasePage):
 
 
 class WordWrapDelegate(QStyledItemDelegate):
-    """自动换行绘制 delegate（表格/树通用）：长文本按列宽换行，行高自适应。"""
+    """自动换行 + [ICON_XXX] 行内图标渲染 delegate（表格/树通用）。
+
+    - 长文本按列宽换行，行高自适应（paint 与 sizeHint 宽度来源一致，不重叠）；
+    - [ICON_XXX] token 渲染为 FontIcons 图集小图标（解析失败回退纯文本）。
+    """
+
+    _ICON_TOKEN_RE = re.compile(r"\[ICON_([^\]]+)\]")
+    ICON_SIZE = 16  # 行内图标渲染尺寸（px）
 
     def __init__(self, parent: QWidget | None = None, max_lines: int | None = None) -> None:
         super().__init__(parent)
         self._max_lines = max_lines
+        self._icon_cache: dict[str, object] = {}
 
-    @staticmethod
-    def _wrap(text: str, metrics: QFontMetrics, width: int) -> list[str]:
-        lines: list[str] = []
-        for paragraph in str(text).split("\n"):
-            if not paragraph:
-                lines.append("")
+    def _icon_pixmap(self, name: str):
+        """按名称取图标 pixmap（失败返回 None）。"""
+        cached = self._icon_cache.get(name)
+        if cached is not None:
+            return cached if cached is not False else None
+        try:
+            from PyQt6.QtGui import QPixmap
+
+            registry = _get_font_icon_registry()
+            sheet, idx = registry.resolve(name)
+            if sheet is None or idx is None:
+                self._icon_cache[name] = False
+                return None
+            atlas = _get_font_icon_atlas(sheet.filename)
+            pix = atlas.pixmap_for_index(icon_size=sheet.icon_size, cols=sheet.cols, index=idx, scale=1)
+            if pix is None:
+                self._icon_cache[name] = False
+                return None
+            scaled = pix.scaled(
+                self.ICON_SIZE,
+                self.ICON_SIZE,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self._icon_cache[name] = scaled
+            return scaled
+        except Exception:
+            self._icon_cache[name] = False
+            return None
+
+    def _segments(self, text: str) -> list[tuple[str, object]]:
+        """文本 → 段序列：("icon", pixmap) 或 ("text", str)。"""
+        parts = self._ICON_TOKEN_RE.split(text)
+        segments: list[tuple[str, object]] = []
+        for i, part in enumerate(parts):
+            if not part:
                 continue
-            current = ""
-            for ch in paragraph:
-                trial = current + ch
-                if current and metrics.horizontalAdvance(trial) > width:
+            if i % 2 == 1:
+                segments.append(("icon", self._icon_pixmap(part) or ""))
+            else:
+                segments.append(("text", part))
+        return segments
+
+    def _wrap_segments(self, segments: list[tuple[str, object]], metrics: QFontMetrics, width: int) -> list[list[tuple[str, object]]]:
+        """段序列按宽度换行：文本逐字符断行，图标作为固定宽元素。"""
+        lines: list[list[tuple[str, object]]] = []
+        current: list[tuple[str, object]] = []
+        current_w = 0
+        pending_text = ""
+
+        def flush_text() -> None:
+            nonlocal pending_text
+            if pending_text:
+                current.append(("text", pending_text))
+                pending_text = ""
+
+        for kind, payload in segments:
+            if kind == "icon":
+                flush_text()
+                icon_w = (self.ICON_SIZE + 2) if payload else 0
+                if current and current_w + icon_w > width:
                     lines.append(current)
-                    current = ch
-                else:
-                    current = trial
-            if current:
-                lines.append(current)
+                    current = []
+                    current_w = 0
+                current.append((kind, payload))
+                current_w += icon_w
+            else:
+                text = str(payload)
+                for ch in text:
+                    ch_w = metrics.horizontalAdvance(ch)
+                    if current and current_w + ch_w > width:
+                        flush_text()
+                        lines.append(current)
+                        current = []
+                        current_w = 0
+                    pending_text += ch
+                    current_w += ch_w
+        flush_text()
+        if current:
+            lines.append(current)
+        return lines
+
+    def _wrapped_lines(self, option, index, text: str):
+        metrics = QFontMetrics(option.font)
+        width = self._item_width(option, index) - 8
+        lines = self._wrap_segments(self._segments(text), metrics, max(width, 10))
+        if self._max_lines:
+            lines = lines[: self._max_lines]
         return lines
 
     def _item_width(self, option, index) -> int:
@@ -786,21 +868,30 @@ class WordWrapDelegate(QStyledItemDelegate):
         else:
             color = option.palette.text().color()
         metrics = QFontMetrics(option.font)
-        width = self._item_width(option, index) - 8
-        lines = self._wrap(text, metrics, max(width, 10))
-        if self._max_lines and len(lines) > self._max_lines:
-            lines = lines[: self._max_lines]
-        line_height = metrics.height()
+        lines = self._wrapped_lines(option, index, text)
+        text_height = metrics.height()
+        icon_height = self.ICON_SIZE
         rect = option.rect.adjusted(4, 2, -4, -2)
         painter.setFont(option.font)
         painter.setPen(color)
         y = rect.top()
         for line in lines:
-            painter.drawText(
-                QRect(rect.left(), y, rect.width(), line_height),
-                Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                line,
-            )
+            x = rect.left()
+            line_height = text_height
+            for kind, payload in line:
+                if kind == "icon" and payload:
+                    pix = payload
+                    painter.drawPixmap(x, y + max(0, (line_height - pix.height()) // 2), pix)
+                    x += pix.width() + 2
+                    line_height = max(line_height, pix.height())
+                elif kind == "text":
+                    text_w = metrics.horizontalAdvance(str(payload))
+                    painter.drawText(
+                        QRect(x, y, max(text_w, 1), text_height),
+                        Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                        str(payload),
+                    )
+                    x += text_w
             y += line_height
         painter.restore()
 
@@ -810,11 +901,9 @@ class WordWrapDelegate(QStyledItemDelegate):
         if not isinstance(text, str) or not text.strip():
             return hint
         metrics = QFontMetrics(option.font)
-        width = self._item_width(option, index) - 8
-        lines = self._wrap(text, metrics, max(width, 10))
-        if self._max_lines:
-            lines = lines[: self._max_lines]
-        height = max(int(hint.height()), len(lines) * metrics.height() + 6)
+        lines = self._wrapped_lines(option, index, text)
+        line_height = max(metrics.height(), self.ICON_SIZE)
+        height = max(int(hint.height()), len(lines) * line_height + 6)
         return QRect(0, 0, int(hint.width()), height).size()
 
 
@@ -891,8 +980,8 @@ class AbilitySearchTab(QWidget):
         self._result_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._result_table.customContextMenuRequested.connect(self._show_result_menu)
         left_layout.addWidget(self._result_table, 1)
-        # 选中行完整描述预览
-        self._result_preview = QPlainTextEdit()
+        # 选中行完整描述预览（富文本：[ICON_XXX] 渲染为内联图标）
+        self._result_preview = QTextEdit()
         self._result_preview.setReadOnly(True)
         self._result_preview.setPlaceholderText("选中搜索结果后在此显示完整描述")
         self._result_preview.setMaximumHeight(110)
@@ -982,8 +1071,45 @@ class AbilitySearchTab(QWidget):
                 self._result_table.setItem(row_index, col_index, cell)
         self._result_preview.clear()
 
+    def _render_preview_text(self, text: str) -> None:
+        """把 [ICON_XXX] token 渲染为内联图标写入预览面板（富文本）。"""
+        document = self._result_preview.document()
+        document.clear()
+        cursor = QTextCursor(document)
+        pattern = re.compile(r"(\[ICON_[^\]]+\])")
+        for part in pattern.split(str(text)):
+            if not part:
+                continue
+            match = re.fullmatch(r"\[ICON_([^\]]+)\]", part)
+            if match:
+                name = str(match.group(1) or "").strip()
+                if name:
+                    try:
+                        registry = _get_font_icon_registry()
+                        sheet, idx = registry.resolve(name)
+                        if sheet is not None and idx is not None:
+                            atlas = _get_font_icon_atlas(sheet.filename)
+                            pix = atlas.pixmap_for_index(
+                                icon_size=sheet.icon_size, cols=sheet.cols, index=idx, scale=1
+                            )
+                            if pix is not None:
+                                url = QUrl(f"civ6icon:{name}")
+                                document.addResource(QTextDocument.ResourceType.ImageResource, url, pix.toImage())
+                                fmt = QTextImageFormat()
+                                fmt.setName(url.toString())
+                                fmt.setWidth(float(sheet.icon_size))
+                                fmt.setHeight(float(sheet.icon_size))
+                                fmt.setVerticalAlignment(QTextCharFormat.VerticalAlignment.AlignMiddle)
+                                cursor.insertImage(fmt)
+                                continue
+                    except Exception:
+                        pass
+                cursor.insertText(part)
+                continue
+            cursor.insertText(part)
+
     def _show_result_preview(self) -> None:
-        """选中结果行 → 底部预览完整描述。"""
+        """选中结果行 → 底部预览完整描述（含图标渲染）。"""
         row_index = self._result_table.currentRow()
         if row_index < 0:
             return
@@ -993,18 +1119,17 @@ class AbilitySearchTab(QWidget):
         data = item.data(Qt.ItemDataRole.UserRole)
         if not isinstance(data, tuple) or len(data) != 2:
             return
-        category, type_value = str(data[0]), str(data[1])
         label = self._result_table.item(row_index, 0).text() if self._result_table.item(row_index, 0) else ""
         name = self._result_table.item(row_index, 1).text() if self._result_table.item(row_index, 1) else ""
         hit = self._result_table.item(row_index, 3).text() if self._result_table.item(row_index, 3) else ""
         description = self._result_table.item(row_index, 4).text() if self._result_table.item(row_index, 4) else ""
         summary = self._result_table.item(row_index, 5).text() if self._result_table.item(row_index, 5) else ""
-        lines = [f"【{label}】{name}  （{type_value}）  命中：{hit}"]
+        lines = [f"【{label}】{name}  （{data[1]}）  命中：{hit}"]
         if description:
             lines.append(description)
         if summary and summary != name:
             lines.append(f"命中详情：{summary}")
-        self._result_preview.setPlainText("\n".join(lines))
+        self._render_preview_text("\n".join(lines))
 
     def _on_result_activated(self, item: QTableWidgetItem) -> None:
         data = item.data(Qt.ItemDataRole.UserRole)

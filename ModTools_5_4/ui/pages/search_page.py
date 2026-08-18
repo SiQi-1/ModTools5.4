@@ -4,7 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 import sqlite3
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QRect, Qt
+from PyQt6.QtGui import QFontMetrics, QPainter
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -23,6 +24,8 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSplitter,
+    QStyledItemDelegate,
+    QStyle,
     QTabWidget,
     QTableWidget,
     QTableWidgetItem,
@@ -727,6 +730,89 @@ class SearchPage(BasePage):
             return ""
 
 
+class WordWrapDelegate(QStyledItemDelegate):
+    """自动换行绘制 delegate（表格/树通用）：长文本按列宽换行，行高自适应。"""
+
+    def __init__(self, parent: QWidget | None = None, max_lines: int | None = None) -> None:
+        super().__init__(parent)
+        self._max_lines = max_lines
+
+    @staticmethod
+    def _wrap(text: str, metrics: QFontMetrics, width: int) -> list[str]:
+        lines: list[str] = []
+        for paragraph in str(text).split("\n"):
+            if not paragraph:
+                lines.append("")
+                continue
+            current = ""
+            for ch in paragraph:
+                trial = current + ch
+                if current and metrics.horizontalAdvance(trial) > width:
+                    lines.append(current)
+                    current = ch
+                else:
+                    current = trial
+            if current:
+                lines.append(current)
+        return lines
+
+    def _item_width(self, option, index) -> int:
+        width = option.rect.width()
+        if width > 0:
+            return width
+        view = self.parent()
+        if isinstance(view, QTreeWidget):
+            width = view.viewport().width() - 24
+        elif isinstance(view, QTableWidget):
+            width = view.columnWidth(index.column())
+        if width <= 0:
+            width = 320
+        return width
+
+    def paint(self, painter: QPainter, option, index) -> None:  # type: ignore[override]
+        text = index.data(Qt.ItemDataRole.DisplayRole)
+        if not isinstance(text, str) or not text.strip():
+            super().paint(painter, option, index)
+            return
+        painter.save()
+        if option.state & QStyle.StateFlag.State_Selected:
+            painter.fillRect(option.rect, option.palette.highlight())
+            color = option.palette.highlightedText().color()
+        else:
+            color = option.palette.text().color()
+        metrics = QFontMetrics(option.font)
+        width = self._item_width(option, index) - 8
+        lines = self._wrap(text, metrics, max(width, 10))
+        if self._max_lines and len(lines) > self._max_lines:
+            lines = lines[: self._max_lines]
+        line_height = metrics.height()
+        rect = option.rect.adjusted(4, 2, -4, -2)
+        painter.setFont(option.font)
+        painter.setPen(color)
+        y = rect.top()
+        for line in lines:
+            painter.drawText(
+                QRect(rect.left(), y, rect.width(), line_height),
+                Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+                line,
+            )
+            y += line_height
+        painter.restore()
+
+    def sizeHint(self, option, index) -> object:  # type: ignore[override]
+        hint = super().sizeHint(option, index)
+        text = index.data(Qt.ItemDataRole.DisplayRole)
+        if not isinstance(text, str) or not text.strip():
+            return hint
+        metrics = QFontMetrics(option.font)
+        width = self._item_width(option, index) - 8
+        lines = self._wrap(text, metrics, max(width, 10))
+        if self._max_lines:
+            lines = lines[: self._max_lines]
+        height = max(int(hint.height()), len(lines) * metrics.height() + 6)
+        return QRect(0, 0, int(hint.width()), height).size()
+
+
 class AbilitySearchTab(QWidget):
     """能力实现搜索：三通道搜索（对象文本 / 能力层 / 效果词扩展）→ 对象详情。
 
@@ -778,23 +864,33 @@ class AbilitySearchTab(QWidget):
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(4)
         self._result_table = QTableWidget()
-        self._result_table.setColumnCount(5)
-        self._result_table.setHorizontalHeaderLabels(["分类", "名称", "Type", "命中", "摘要"])
+        self._result_table.setColumnCount(6)
+        self._result_table.setHorizontalHeaderLabels(["分类", "名称", "Type", "命中", "描述", "摘要"])
         self._result_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self._result_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self._result_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self._result_table.setAlternatingRowColors(True)
         self._result_table.verticalHeader().setVisible(False)
+        # 描述列自动换行（完整文本，行高自适应）
+        self._result_table.setItemDelegateForColumn(4, WordWrapDelegate(self._result_table))
         header = self._result_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
         self._result_table.itemDoubleClicked.connect(self._on_result_activated)
+        self._result_table.itemSelectionChanged.connect(self._show_result_preview)
         self._result_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._result_table.customContextMenuRequested.connect(self._show_result_menu)
         left_layout.addWidget(self._result_table, 1)
+        # 选中行完整描述预览
+        self._result_preview = QPlainTextEdit()
+        self._result_preview.setReadOnly(True)
+        self._result_preview.setPlaceholderText("选中搜索结果后在此显示完整描述")
+        self._result_preview.setMaximumHeight(110)
+        left_layout.addWidget(self._result_preview)
         self._result_status = QLabel("输入关键词开始搜索")
         self._result_status.setStyleSheet("color:#64748b; font-size:11px;")
         left_layout.addWidget(self._result_status)
@@ -841,6 +937,7 @@ class AbilitySearchTab(QWidget):
         root.addWidget(splitter, 1)
 
         for tree in (self._modifier_tree, self._data_tree):
+            tree.setItemDelegate(WordWrapDelegate(tree))
             tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             tree.customContextMenuRequested.connect(self._show_tree_menu)
 
@@ -872,11 +969,36 @@ class AbilitySearchTab(QWidget):
     def _fill_result_table(self, results: list[dict[str, object]]) -> None:
         self._result_table.setRowCount(len(results))
         for row_index, item in enumerate(results):
-            for col_index, key in enumerate(("label", "name", "type", "hit", "summary")):
+            for col_index, key in enumerate(("label", "name", "type", "hit", "description", "summary")):
                 cell = QTableWidgetItem(str(item.get(key) or ""))
                 cell.setFlags(cell.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 cell.setData(Qt.ItemDataRole.UserRole, (item.get("category"), item.get("type")))
                 self._result_table.setItem(row_index, col_index, cell)
+        self._result_preview.clear()
+
+    def _show_result_preview(self) -> None:
+        """选中结果行 → 底部预览完整描述。"""
+        row_index = self._result_table.currentRow()
+        if row_index < 0:
+            return
+        item = self._result_table.item(row_index, 0)
+        if item is None:
+            return
+        data = item.data(Qt.ItemDataRole.UserRole)
+        if not isinstance(data, tuple) or len(data) != 2:
+            return
+        category, type_value = str(data[0]), str(data[1])
+        label = self._result_table.item(row_index, 0).text() if self._result_table.item(row_index, 0) else ""
+        name = self._result_table.item(row_index, 1).text() if self._result_table.item(row_index, 1) else ""
+        hit = self._result_table.item(row_index, 3).text() if self._result_table.item(row_index, 3) else ""
+        description = self._result_table.item(row_index, 4).text() if self._result_table.item(row_index, 4) else ""
+        summary = self._result_table.item(row_index, 5).text() if self._result_table.item(row_index, 5) else ""
+        lines = [f"【{label}】{name}  （{type_value}）  命中：{hit}"]
+        if description:
+            lines.append(description)
+        if summary and summary != name:
+            lines.append(f"命中详情：{summary}")
+        self._result_preview.setPlainText("\n".join(lines))
 
     def _on_result_activated(self, item: QTableWidgetItem) -> None:
         data = item.data(Qt.ItemDataRole.UserRole)

@@ -406,6 +406,8 @@ def search_objects(
                         break
             if hit:
                 name = _object_display_name(meta, row, loc_conn)
+                desc_raw = str(row.get(desc_col) or "") if desc_col else ""
+                description = resolve_loc(loc_conn, desc_raw) if desc_raw.strip().startswith("LOC_") else desc_raw
                 results.append({
                     "category": key,
                     "label": meta["label"],
@@ -413,6 +415,7 @@ def search_objects(
                     "type": type_value,
                     "hit": hit,
                     "summary": summary or name,
+                    "description": description,
                 })
     return results[:limit]
 
@@ -542,6 +545,8 @@ def search_by_modifier_keyword(
             meta = OBJECT_TYPES[category_key]
             detail = _fetch_row_dict(game_conn, f"SELECT * FROM {meta['table']} WHERE {meta['type_col']} = ?", (obj_type,))
             name = _object_display_name(meta, detail or {}, loc_conn) if detail else obj_type
+            desc_raw = str(detail.get(meta.get("desc_col") or "") or "") if detail and meta.get("desc_col") else ""
+            description = resolve_loc(loc_conn, desc_raw) if desc_raw.strip().startswith("LOC_") else desc_raw
             results.append({
                 "category": category_key,
                 "label": meta["label"],
@@ -549,6 +554,7 @@ def search_by_modifier_keyword(
                 "type": obj_type,
                 "hit": "能力",
                 "summary": hit_summary.get(mid, mid),
+                "description": description,
             })
     return results[:limit]
 

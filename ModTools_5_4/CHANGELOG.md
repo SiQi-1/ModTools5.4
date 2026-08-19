@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-16 - 优化：游戏文本标记完整渲染（图标大小写 / [NEWLINE] / [COLOR]）
+
+### 变更
+- **图标名归一化**：`[ICON_XXX]` 解析先去掉 `ICON_` 前缀（FontIcons 注册表键无前缀），且 **6 产出图标大小写不敏感**（`[ICON_production]` 等效 `[ICON_Production]`，其余图标名大小写敏感）；解析失败保留原文 token；
+- **[NEWLINE] 渲染为换行**：预览面板与卡片（QTextEdit 富文本）插入段落分隔；树 delegate（纯文本绘制）转换为换行；
+- **[COLOR:X]/[ENDCOLOR] 渲染为前景色**：支持直接 RGB（"r,g,b[,a]"）与内置预设表；新增 `data/text_color_presets.json`（44 种预设，覆盖文本库实际用到的全部预设名，exe 旁同路径可覆盖）；未知预设忽略标记不显示；
+- 纯文本绘制（树 delegate）自动剔除 `[COLOR:X]/[ENDCOLOR]` 标记。
+
 ## 2026-08-16 - 优化：搜索结果改卡片列表（无横向滚动，描述完整可见）
 
 ### 变更（结果表格 → 卡片）

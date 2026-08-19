@@ -1,12 +1,21 @@
 """Search page with text search and staged placeholders."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import re
 import sqlite3
 
 from PyQt6.QtCore import QRect, Qt, QUrl, pyqtSignal
-from PyQt6.QtGui import QFontMetrics, QPainter, QTextCharFormat, QTextCursor, QTextDocument, QTextImageFormat
+from PyQt6.QtGui import (
+    QColor,
+    QFontMetrics,
+    QPainter,
+    QTextCharFormat,
+    QTextCursor,
+    QTextDocument,
+    QTextImageFormat,
+)
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -48,6 +57,7 @@ from ...db.ability_search import (
     open_dbs,
     search_all,
 )
+from ...db.paths import _resolve_data_path
 from ...db.text_database import SIMPLIFIED_LANGUAGE_NORMALIZED, query_text_by_tag
 from ..ui_widget_kit import _get_font_icon_atlas, _get_font_icon_registry
 
@@ -751,7 +761,8 @@ class WordWrapDelegate(QStyledItemDelegate):
         self._icon_cache: dict[str, object] = {}
 
     def _icon_pixmap(self, name: str):
-        """按名称取图标 pixmap（失败返回 None）。"""
+        """按名称取图标 pixmap（失败返回 None）；6 产出大小写不敏感。"""
+        name = normalize_icon_name(name)
         cached = self._icon_cache.get(name)
         if cached is not None:
             return cached if cached is not False else None
@@ -781,14 +792,23 @@ class WordWrapDelegate(QStyledItemDelegate):
             return None
 
     def _segments(self, text: str) -> list[tuple[str, object]]:
-        """文本 → 段序列：("icon", pixmap) 或 ("text", str)。"""
-        parts = self._ICON_TOKEN_RE.split(text)
+        """文本 → 段序列：("icon", pixmap) 或 ("text", str)。
+
+        纯文本绘制不支持颜色：[COLOR:X]/[ENDCOLOR] 剔除；[NEWLINE] → 换行。
+        """
+        cleaned = clean_text_tokens(text)
+        parts = self._ICON_TOKEN_RE.split(cleaned)
         segments: list[tuple[str, object]] = []
         for i, part in enumerate(parts):
             if not part:
                 continue
             if i % 2 == 1:
-                segments.append(("icon", self._icon_pixmap(part) or ""))
+                pix = self._icon_pixmap(part)
+                if pix is None:
+                    # 解析失败：保留原文 token
+                    segments.append(("text", f"[ICON_{part}]"))
+                else:
+                    segments.append(("icon", pix))
             else:
                 segments.append(("text", part))
         return segments
@@ -819,6 +839,12 @@ class WordWrapDelegate(QStyledItemDelegate):
             else:
                 text = str(payload)
                 for ch in text:
+                    if ch == "\n":
+                        flush_text()
+                        lines.append(current)
+                        current = []
+                        current_w = 0
+                        continue
                     ch_w = metrics.horizontalAdvance(ch)
                     if current and current_w + ch_w > width:
                         flush_text()
@@ -910,21 +936,123 @@ class WordWrapDelegate(QStyledItemDelegate):
 
 
 _ICON_TOKEN_FULL_RE = re.compile(r"\[ICON_([^\]]+)\]")
+_COLOR_TOKEN_RE = re.compile(r"\[COLOR:([^\]]*)\]")
+_ENDCOLOR_TOKEN = "[ENDCOLOR]"
+_NEWLINE_TOKEN = "[NEWLINE]"
+
+# 6 产出图标名大小写不敏感（官方约定）：[ICON_production] 等效 [ICON_Production]，
+# 其余图标名大小写敏感。
+_YIELD_ICON_CANON = {
+    "GOLD": "Gold",
+    "PRODUCTION": "Production",
+    "SCIENCE": "Science",
+    "CULTURE": "Culture",
+    "FAITH": "Faith",
+    "FOOD": "Food",
+}
+
+
+def normalize_icon_name(name: str) -> str:
+    """图标名归一化：去掉 ICON_ 前缀（registry 键无前缀），6 产出大小写归一化。
+
+    [ICON_production] → 'Production'；[ICON_Gold] → 'Gold'；[ICON_UNIT_WARRIOR] → 'UNIT_WARRIOR'。
+    """
+    text = str(name or "").strip()
+    if text.upper().startswith("ICON_"):
+        text = text[len("ICON_"):]
+    canonical = _YIELD_ICON_CANON.get(text.upper())
+    if canonical:
+        return canonical
+    return text
+
+
+def _parse_color_text(text: str) -> QColor | None:
+    """"r,g,b[,a]" → QColor；失败返回 None。"""
+    parts = [p.strip() for p in str(text or "").split(",")]
+    if len(parts) < 3:
+        return None
+    try:
+        r, g, b = int(parts[0]), int(parts[1]), int(parts[2])
+        a = int(parts[3]) if len(parts) > 3 else 255
+    except (TypeError, ValueError):
+        return None
+    if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
+        return None
+    return QColor(r, g, b, max(0, min(255, a)))
+
+
+_COLOR_PRESETS: dict[str, str] | None = None
+
+
+def _load_color_presets() -> dict[str, str]:
+    """加载 [COLOR:Name] 预设（data/text_color_presets.json，exe 旁可覆盖）。"""
+    global _COLOR_PRESETS
+    if _COLOR_PRESETS is None:
+        try:
+            payload = json.loads(
+                _resolve_data_path("text_color_presets.json").read_text(encoding="utf-8")
+            )
+            raw = payload.get("presets") if isinstance(payload, dict) else {}
+            _COLOR_PRESETS = {
+                str(key): str(value)
+                for key, value in raw.items()
+                if isinstance(value, str)
+            }
+        except Exception:
+            _COLOR_PRESETS = {}
+    return _COLOR_PRESETS
+
+
+def resolve_text_color(name: str) -> QColor | None:
+    """[COLOR:X] 颜色解析：直接 RGB > 内置预设表。未知返回 None。"""
+    text = str(name or "").strip()
+    color = _parse_color_text(text)
+    if color is not None:
+        return color
+    rgb = _load_color_presets().get(text)
+    if rgb:
+        return _parse_color_text(rgb)
+    return None
+
+
+def clean_text_tokens(text: str) -> str:
+    """去掉文本中的渲染标记（供纯文本绘制 delegate 使用）：
+    [COLOR:X] / [ENDCOLOR] 剔除；[NEWLINE] → 换行。"""
+    cleaned = _COLOR_TOKEN_RE.sub("", str(text))
+    cleaned = cleaned.replace(_ENDCOLOR_TOKEN, "")
+    return cleaned.replace(_NEWLINE_TOKEN, "\n")
 
 
 def render_icons_into_document(document: QTextDocument, text: str) -> None:
-    """把 [ICON_XXX] token 渲染为内联图标写入 QTextDocument（与工作区同款）。
+    """把游戏文本标记渲染进 QTextDocument：
 
-    解析失败回退纯文本 token。
+    - [ICON_XXX] → FontIcons 图集内联图标（6 产出大小写不敏感；解析失败回退纯文本）
+    - [NEWLINE] → 换行
+    - [COLOR:X] / [ENDCOLOR] → 前景色（直接 RGB 或内置预设表）
     """
     cursor = QTextCursor(document)
-    pattern = re.compile(r"(\[ICON_[^\]]+\])")
+    default_format = cursor.charFormat()
+    pattern = re.compile(r"(\[ICON_[^\]]+\]|\[COLOR:[^\]]*\]|\[ENDCOLOR\]|\[NEWLINE\])")
     for part in pattern.split(str(text)):
         if not part:
             continue
-        match = re.fullmatch(r"\[ICON_([^\]]+)\]", part)
-        if match:
-            name = str(match.group(1) or "").strip()
+        if part == _NEWLINE_TOKEN:
+            cursor.insertText("\n")
+            continue
+        if part == _ENDCOLOR_TOKEN:
+            cursor.setCharFormat(default_format)
+            continue
+        color_match = re.fullmatch(r"\[COLOR:([^\]]*)\]", part)
+        if color_match:
+            color = resolve_text_color(color_match.group(1))
+            fmt = QTextCharFormat()
+            if color is not None:
+                fmt.setForeground(color)
+            cursor.setCharFormat(fmt)
+            continue
+        icon_match = re.fullmatch(r"\[ICON_([^\]]+)\]", part)
+        if icon_match:
+            name = normalize_icon_name(str(icon_match.group(1) or "").strip())
             if name:
                 try:
                     registry = _get_font_icon_registry()
@@ -946,7 +1074,7 @@ def render_icons_into_document(document: QTextDocument, text: str) -> None:
                             continue
                 except Exception:
                     pass
-            cursor.insertText(part)
+            cursor.insertText(f"[ICON_{name}]")
             continue
         cursor.insertText(part)
 

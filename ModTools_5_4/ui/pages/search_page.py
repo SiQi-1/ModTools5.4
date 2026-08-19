@@ -967,8 +967,25 @@ def normalize_icon_name(name: str) -> str:
 
 
 def _parse_color_text(text: str) -> QColor | None:
-    """"r,g,b[,a]" → QColor；失败返回 None。"""
-    parts = [p.strip() for p in str(text or "").split(",")]
+    """颜色文本 → QColor；失败返回 None。
+
+    支持格式（自定义颜色直接写这里，无需新增预设）：
+    - 十进制 RGB： "r,g,b" / "r, g, b, a"（官方格式）
+    - 十六进制：  "#RRGGBB" / "#RRGGBBAA"
+    """
+    value = str(text or "").strip()
+    if not value:
+        return None
+    if value.startswith("#"):
+        try:
+            hex_part = value[1:]
+            if len(hex_part) in (6, 8):
+                color = QColor(f"#{hex_part}")
+                return color if color.isValid() else None
+        except Exception:
+            return None
+        return None
+    parts = [p.strip() for p in value.split(",")]
     if len(parts) < 3:
         return None
     try:

@@ -1,5 +1,5 @@
 {
-  "_comment": "文明6 文本标记 [COLOR:Name] 的颜色预设。96 个官方预设提取自 Base/Assets/UI/Civ6_ColorAtlas.xml（Color Name→r,g,b[,a]）；其余为 Flash UI 层预设（无明文源文件）的近似值。exe 同目录 data/text_color_presets.json 可覆盖。解析顺序：直接 RGB（r,g,b[,a]）> 本表 > 游戏库 Colors 表 > 忽略标记。",
+  "_comment": "文明6 文本标记 [COLOR:Name] 的颜色预设。96 个官方预设提取自 Base/Assets/UI/Civ6_ColorAtlas.xml（Color Name→r,g,b[,a]）；其余为 Flash UI 层预设（无明文源文件）的近似值。自定义颜色请直接在文本中写 [COLOR:r,g,b] 或 [COLOR:#RRGGBB]（十进制/十六进制），无需新增预设；exe 同目录 data/text_color_presets.json 可覆盖。解析顺序：直接 RGB > 本表 > 游戏库 Colors 表 > 忽略标记。",
   "presets": {
     "Beige": "255,255,200,255",
     "Black": "0,0,0,255",

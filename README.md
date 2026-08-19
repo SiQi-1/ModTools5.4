@@ -15,7 +15,7 @@
 | ![单位晋升树](ModTools_5_4/docs/screenshots/05_promotion_tree_editor.png) | ![议程编辑器](ModTools_5_4/docs/screenshots/06_agenda_editor.png) |
 | ![伟人编辑器](ModTools_5_4/docs/screenshots/07_great_people_editor.png) | ![基础信息](ModTools_5_4/docs/screenshots/08_basic_info.png) |
 | ![美术工作区](ModTools_5_4/docs/screenshots/09_art_workspace.png) | ![修改器工作区](ModTools_5_4/docs/screenshots/10_modifier_workspace.png) |
-| ![文本工作区](ModTools_5_4/docs/screenshots/11_text_workspace.png) | ![搜索页](ModTools_5_4/docs/screenshots/12_search.png) |
+| ![文本工作区](ModTools_5_4/docs/screenshots/11_text_workspace.png) | ![小工具（能力实现搜索）](ModTools_5_4/docs/screenshots/12_search.png) |
 | ![设置页](ModTools_5_4/docs/screenshots/13_settings.png) | |
 
 > 截图由 `tools/make_screenshots.py` 自动生成（加载内置示例工程后逐页渲染，示例数据与测试共用 `tests/sample_project.py`）。
@@ -24,18 +24,47 @@
 
 ## 快速上手（5 步）
 
-1. **设置 → 配置文本数据库**：新建文本库并导入 DLC 文本（否则中文全显示"未知"）
+1. **设置 → 配置文本/游戏数据库**：文本库选发布包自带的 `local_text_New.sqlite`（中文显示必需）；游戏库选 `DebugGameplay.sqlite`（导入原版对象、能力搜索必需）
 2. **文件 → 新建工程** → 输入工程名 → 保存为 `.CIV`
 3. **基础信息 → 选择 .civ6proj**：指向你的 ModBuddy 工程文件，设置前缀/中缀
-4. **左侧树选择分类 → 新增/导入对象** → 编辑
-5. **工程根节点 → 生成所有文件**
+4. **左侧树选择分类 → 新增/导入对象** → 编辑（必填字段标红 `*`）
+5. **工程根节点 → 生成所有文件**：一键输出 SQL/XML/图标/ArtDef 等到 `.civ6proj` 目录
+
+> 也可以直接**双击 .CIV 文件**打开工程，见下文「双击 .CIV 打开」。
+
+---
+
+## 界面导览
+
+主窗口 3 页（主页 / 工作区 / 设置），**小工具是独立窗口**（窗口菜单或主页按钮打开，可与主窗口并排使用）：
+
+- **主页**：入口导航
+- **工作区**：工程树 + 分类编辑（文明/领袖/区域/建筑/单位/晋升/改良/总督/伟人/政策/项目/信仰/议程）+ 基础信息 + 美术 + 修改器 + 文本
+- **设置**：文本库/游戏库配置与导入
+- **小工具（独立窗口）**：搜索三件套——**能力实现搜索** / 文本搜索 / Modifiers 搜索
+
+---
+
+## 能力实现搜索（小工具）
+
+**"某个能力是怎么实现的？"** —— 不用记名字，按效果搜：
+
+- **中文搜名字/描述/效果**：如输入"宣战"，自动按效果词映射（"宣战"→WAR）扩展搜索，命中所有相关能力
+- **英文搜 Type/能力/条件**：如 `WAR`、`YIELD_PRODUCTION`、`REQUIREMENT_IS_AT_WAR`
+- **14 类对象全覆盖**：文明/领袖/特质/区域/建筑/单位/改良/项目/政策卡/总督/伟人/单位能力/单位晋升
+
+打开对象后，右侧详情分两区：
+
+- **⚡ 能力 Modifiers**：按绑定来源分组（DistrictModifiers / TraitType→TraitModifiers…），每个 Modifier 展示 效果类型 + 参数 + 条件集→条件→条件参数；**ATTACH_MODIFIER 与 GRANT_ABILITY 嵌套自动递归展开**（防环限深）；只显示非默认标志（永久/仅一次/上限…）；ModifierStrings 预览文本
+- **📄 数据表**：主表（仅非空列）+ 全部副表自动发现；**相邻加成专门渲染**——自动生成描述（+2[ICON_Gold]金币 来自每2个相邻的…）并与游戏原文对照
+
+交互：双击结果打开详情；`←后退 / 前进→` 浏览历史；树内过滤框；右键复制 Type/文本；描述中的 `[ICON_XXX]`（含 6 产出大小写不敏感）、`[NEWLINE]`、`[COLOR:XXX]`（官方 Civ6_ColorAtlas 预设）全部真实渲染。
 
 ---
 
 ## 双击 .CIV 文件直接打开
 
-程序支持启动参数传工程路径（`ModTools5.4.exe "xx.CIV"` 或 `python ModTools5.4.py "xx.CIV"`），
-因此可以注册 Windows 文件关联，实现**双击 .CIV 直接打开工程**：
+程序支持启动参数传工程路径（`ModTools5.4.exe "xx.CIV"` 或 `python ModTools5.4.py "xx.CIV"`），注册 Windows 文件关联后即可双击打开：
 
 **方式一：运行注册脚本（推荐）**
 
@@ -45,8 +74,7 @@ python tools/register_file_association.py --unregister  # 解除
 python tools/register_file_association.py --status      # 查看状态
 ```
 
-只写当前用户注册表（`HKCU\Software\Classes`），无需管理员权限。源码运行时关联到
-`python + ModTools5.4.py`；打包 exe 运行时自动关联到 exe 自身。
+只写当前用户注册表（`HKCU\Software\Classes`），无需管理员权限。源码运行时关联到 `python + ModTools5.4.py`；打包 exe 运行时自动关联到 exe 自身。
 
 **方式二：手动注册（.reg）**
 
@@ -71,9 +99,9 @@ Windows Registry Editor Version 5.00
 | 步骤 | 操作 |
 |------|------|
 | 文本数据库 | 发布包自带 `local_text_New.sqlite`（已含基础游戏中文文本），设置页直接选它即可。如需 DLC 文本，点"导入 DLC"选择游戏 DLC 目录追加导入 |
-| 游戏数据库 | 选择 `DebugGameplay.sqlite`（`%LOCALAPPDATA%/Firaxis Games/.../Cache/`），用于导入原版对象和修改器搜索 |
+| 游戏数据库 | 选择 `DebugGameplay.sqlite`（`%LOCALAPPDATA%/Firaxis Games/.../Cache/`），用于导入原版对象、修改器搜索与能力实现搜索 |
 
-> 没配文本库 → 中文预览大量"未知"。没配游戏库 → 导入/修改器搜索不可用。
+> 没配文本库 → 中文预览大量"未知"。没配游戏库 → 导入/能力搜索不可用。
 
 ---
 
@@ -161,16 +189,6 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 ---
 
-## 搜索页
-
-| 搜索类型 | 状态 | 说明 |
-|----------|:--:|------|
-| 文本搜索 | ✓ | 按中文或 LOC Tag 检索当前文本库 |
-| Modifiers 搜索 | ✓ | 按 ModifierType 查游戏数据库 |
-| 全局搜索 | ✗ | 预留入口，尚未接入 |
-
----
-
 ## 常见问题
 
 **Q: 中文大量显示"未知"**
@@ -182,15 +200,14 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 **Q: 生成时提示文件已存在**
 → 会弹窗让你选择覆盖哪些文件，其余跳过。
 
-**Q: 修改器导入/搜索不可用**
-→ 设置页没配游戏数据库（`DebugGameplay.sqlite`）。
+**Q: 能力实现搜索搜不到结果**
+→ 设置页没配游戏数据库（`DebugGameplay.sqlite`）；中文搜不到时可试试英文关键词（如"宣战"→`WAR`）。
 
 **Q: 颜色配置里颜色全被当成自定义重新定义了**
 → 标准色匹配依赖 `standard_colors.json`，确保文件未被删除。
 
 **Q: 双击 exe 毫无反应/没有界面**
 → 打包版无控制台，启动期异常会被静默吞掉。请检查 exe 所在目录（或 `%LOCALAPPDATA%\ModTools5.4\logs`）下的 `crash.log`，按其中报错排查；另外请确认系统为 Windows 10 或更高版本（Qt6 不支持 Win7/8）。
-→ 重新打开图片选择一次即可（已修复导出端强制缩放问题，旧状态需刷新）。
 
 **Q: 我的文明6装D盘，影响使用吗**
 → 不影响。游戏 Cache 永远在 C 盘 `%LOCALAPPDATA%`，跟安装位置无关。配置文件里手动选一次即可。
@@ -212,6 +229,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 - `ModTools_5_4/From/{Base,DLC}/`：官方 ModBuddy 附带的 artdef 参考文件（仅用于解析艺术层条目名称与结构）。
 - `ModTools_5_4/data/FontIcons.dds` / `FontIconsXP1.dds`：游戏界面图标图集（用于编辑器内图标插入与预览）。
+- `ModTools_5_4/data/text_color_presets.json`：从游戏 `Base/Assets/UI/Civ6_ColorAtlas.xml` 提取的文本颜色预设。
 - `local_text_New.sqlite`：由游戏文本（XML/SQL/DLC）导入生成的本地化文本数据库，仅作中文文本解析与预览用途。
 - 应用图标与部分图片为基于游戏素材的二次创作。
 

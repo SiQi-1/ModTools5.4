@@ -45,3 +45,4 @@ tools/
 _gen_*.py
 _tmp_*.py
 ModTools_5_4/data/local_text_New.sqlite
+/_*.py

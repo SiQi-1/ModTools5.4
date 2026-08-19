@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import sqlite3
 
-from PyQt6.QtCore import QRect, Qt, QUrl
+from PyQt6.QtCore import QRect, Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QFontMetrics, QPainter, QTextCharFormat, QTextCursor, QTextDocument, QTextImageFormat
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -19,6 +19,8 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QMenu,
     QMessageBox,
     QPlainTextEdit,
@@ -907,6 +909,130 @@ class WordWrapDelegate(QStyledItemDelegate):
         return QRect(0, 0, int(hint.width()), height).size()
 
 
+_ICON_TOKEN_FULL_RE = re.compile(r"\[ICON_([^\]]+)\]")
+
+
+def render_icons_into_document(document: QTextDocument, text: str) -> None:
+    """把 [ICON_XXX] token 渲染为内联图标写入 QTextDocument（与工作区同款）。
+
+    解析失败回退纯文本 token。
+    """
+    cursor = QTextCursor(document)
+    pattern = re.compile(r"(\[ICON_[^\]]+\])")
+    for part in pattern.split(str(text)):
+        if not part:
+            continue
+        match = re.fullmatch(r"\[ICON_([^\]]+)\]", part)
+        if match:
+            name = str(match.group(1) or "").strip()
+            if name:
+                try:
+                    registry = _get_font_icon_registry()
+                    sheet, idx = registry.resolve(name)
+                    if sheet is not None and idx is not None:
+                        atlas = _get_font_icon_atlas(sheet.filename)
+                        pix = atlas.pixmap_for_index(
+                            icon_size=sheet.icon_size, cols=sheet.cols, index=idx, scale=1
+                        )
+                        if pix is not None:
+                            url = QUrl(f"civ6icon:{name}")
+                            document.addResource(QTextDocument.ResourceType.ImageResource, url, pix.toImage())
+                            fmt = QTextImageFormat()
+                            fmt.setName(url.toString())
+                            fmt.setWidth(float(sheet.icon_size))
+                            fmt.setHeight(float(sheet.icon_size))
+                            fmt.setVerticalAlignment(QTextCharFormat.VerticalAlignment.AlignMiddle)
+                            cursor.insertImage(fmt)
+                            continue
+                except Exception:
+                    pass
+            cursor.insertText(part)
+            continue
+        cursor.insertText(part)
+
+
+class SearchResultCard(QWidget):
+    """搜索结果卡片：头行（分类徽章+名称+Type+命中）+ 命中详情 + 完整描述。
+
+    描述区为只读 QTextEdit（自动换行 + [ICON_XXX] 渲染），宽度跟随视口，
+    高度按内容自适应——列表无需横向滚动。
+    """
+
+    def __init__(self, result: dict[str, object], parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._result = result
+        self._desc_edit: QTextEdit | None = None
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(10, 8, 10, 8)
+        root.setSpacing(4)
+
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        badge = QLabel(str(result.get("label") or ""))
+        badge.setStyleSheet(
+            "background:#e2e8f0; color:#475569; border-radius:4px; padding:1px 6px; font-size:11px;"
+        )
+        head.addWidget(badge)
+        name_label = QLabel(str(result.get("name") or ""))
+        name_label.setStyleSheet("font-weight:600;")
+        head.addWidget(name_label)
+        type_label = QLabel(str(result.get("type") or ""))
+        type_label.setStyleSheet("color:#64748b; font-size:11px;")
+        head.addWidget(type_label, 1)
+        hit_label = QLabel(f"命中: {result.get('hit') or ''}")
+        hit_label.setStyleSheet("color:#0f766e; font-size:11px;")
+        head.addWidget(hit_label)
+        root.addLayout(head)
+
+        summary = str(result.get("summary") or "").strip()
+        if summary and summary != str(result.get("name") or ""):
+            summary_label = QLabel(f"命中详情: {summary}")
+            summary_label.setStyleSheet("color:#64748b; font-size:11px;")
+            summary_label.setWordWrap(True)
+            root.addWidget(summary_label)
+
+        desc = str(result.get("description") or "").strip()
+        if desc:
+            desc_edit = QTextEdit()
+            desc_edit.setReadOnly(True)
+            desc_edit.setFrameShape(QFrame.Shape.NoFrame)
+            desc_edit.setStyleSheet("background:transparent;")
+            desc_edit.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            desc_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            render_icons_into_document(desc_edit.document(), desc)
+            desc_edit.document().contentsChanged.connect(self._fit_description_height)
+            self._desc_edit = desc_edit
+            root.addWidget(desc_edit)
+
+    def result(self) -> dict[str, object]:
+        return self._result
+
+    def set_width(self, width: int) -> None:
+        """视口宽度变化时调用：重排描述并自适应高度。"""
+        if self._desc_edit is not None:
+            self._desc_edit.setFixedWidth(max(width - 20, 60))
+            self._fit_description_height()
+
+    def _fit_description_height(self) -> None:
+        if self._desc_edit is None:
+            return
+        document = self._desc_edit.document()
+        document.setTextWidth(self._desc_edit.viewport().width())
+        height = int(document.size().height()) + 6
+        self._desc_edit.setFixedHeight(max(height, 18))
+
+
+class _ResultList(QListWidget):
+    """卡片列表：视口宽度变化时通知宿主重排卡片。"""
+
+    viewportResized = pyqtSignal()
+
+    def resizeEvent(self, event) -> None:  # type: ignore[override]
+        super().resizeEvent(event)
+        self.viewportResized.emit()
+
+
 class AbilitySearchTab(QWidget):
     """能力实现搜索：三通道搜索（对象文本 / 能力层 / 效果词扩展）→ 对象详情。
 
@@ -952,35 +1078,21 @@ class AbilitySearchTab(QWidget):
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
 
-        # ── 左侧：结果表 ──
+        # ── 左侧：结果卡片列表（无横向滚动，描述完整换行显示）──
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.setSpacing(4)
-        self._result_table = QTableWidget()
-        self._result_table.setColumnCount(6)
-        self._result_table.setHorizontalHeaderLabels(["分类", "名称", "Type", "命中", "描述", "摘要"])
-        self._result_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._result_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self._result_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self._result_table.setAlternatingRowColors(True)
-        self._result_table.verticalHeader().setVisible(False)
-        # 描述列自动换行（完整文本，行高按内容自适应——必须 ResizeToContents 才会采用 sizeHint 行高）
-        self._result_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-        self._result_table.setItemDelegateForColumn(4, WordWrapDelegate(self._result_table))
-        header = self._result_table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
-        self._result_table.itemDoubleClicked.connect(self._on_result_activated)
-        self._result_table.itemSelectionChanged.connect(self._show_result_preview)
-        self._result_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self._result_table.customContextMenuRequested.connect(self._show_result_menu)
-        left_layout.addWidget(self._result_table, 1)
-        # 选中行完整描述预览（富文本：[ICON_XXX] 渲染为内联图标）
+        self._result_list = _ResultList()
+        self._result_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._result_list.setSpacing(2)
+        self._result_list.itemDoubleClicked.connect(self._on_card_activated)
+        self._result_list.itemSelectionChanged.connect(self._show_result_preview)
+        self._result_list.viewportResized.connect(self._relayout_cards)
+        self._result_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._result_list.customContextMenuRequested.connect(self._show_card_menu)
+        left_layout.addWidget(self._result_list, 1)
+        # 选中卡片完整描述预览（富文本：[ICON_XXX] 渲染为内联图标）
         self._result_preview = QTextEdit()
         self._result_preview.setReadOnly(True)
         self._result_preview.setPlaceholderText("选中搜索结果后在此显示完整描述")
@@ -1053,7 +1165,7 @@ class AbilitySearchTab(QWidget):
             QMessageBox.warning(self, "提示", f"搜索失败：{exc}")
             return
         self._current_results = result["results"]
-        self._fill_result_table(result["results"])
+        self._populate_cards(result["results"])
         hint = str(result.get("hint") or "")
         if hint:
             self._hint_label.setText(hint)
@@ -1061,96 +1173,76 @@ class AbilitySearchTab(QWidget):
             self._hint_label.setText("提示：中文搜名字/描述/效果；英文搜 Type/能力/条件。双击结果打开详情。")
         self._result_status.setText(f"命中 {len(result['results'])} 个对象")
 
-    def _fill_result_table(self, results: list[dict[str, object]]) -> None:
-        self._result_table.setRowCount(len(results))
-        for row_index, item in enumerate(results):
-            for col_index, key in enumerate(("label", "name", "type", "hit", "description", "summary")):
-                cell = QTableWidgetItem(str(item.get(key) or ""))
-                cell.setFlags(cell.flags() & ~Qt.ItemFlag.ItemIsEditable)
-                cell.setData(Qt.ItemDataRole.UserRole, (item.get("category"), item.get("type")))
-                self._result_table.setItem(row_index, col_index, cell)
-        self._result_preview.clear()
+    def _populate_cards(self, results: list[dict[str, object]]) -> None:
+        """结果 → 卡片列表（宽度=视口，无横向滚动；描述完整换行）。"""
+        self._result_list.clear()
+        for result in results:
+            item = QListWidgetItem()
+            card = SearchResultCard(result)
+            item.setData(Qt.ItemDataRole.UserRole, result)
+            item.setSizeHint(card.sizeHint())
+            self._result_list.addItem(item)
+            self._result_list.setItemWidget(item, card)
+        self._relayout_cards()
+        if self._result_list.count() > 0:
+            self._result_list.setCurrentRow(0)
+        else:
+            self._result_preview.clear()
 
-    def _render_preview_text(self, text: str) -> None:
-        """把 [ICON_XXX] token 渲染为内联图标写入预览面板（富文本）。"""
-        document = self._result_preview.document()
-        document.clear()
-        cursor = QTextCursor(document)
-        pattern = re.compile(r"(\[ICON_[^\]]+\])")
-        for part in pattern.split(str(text)):
-            if not part:
-                continue
-            match = re.fullmatch(r"\[ICON_([^\]]+)\]", part)
-            if match:
-                name = str(match.group(1) or "").strip()
-                if name:
-                    try:
-                        registry = _get_font_icon_registry()
-                        sheet, idx = registry.resolve(name)
-                        if sheet is not None and idx is not None:
-                            atlas = _get_font_icon_atlas(sheet.filename)
-                            pix = atlas.pixmap_for_index(
-                                icon_size=sheet.icon_size, cols=sheet.cols, index=idx, scale=1
-                            )
-                            if pix is not None:
-                                url = QUrl(f"civ6icon:{name}")
-                                document.addResource(QTextDocument.ResourceType.ImageResource, url, pix.toImage())
-                                fmt = QTextImageFormat()
-                                fmt.setName(url.toString())
-                                fmt.setWidth(float(sheet.icon_size))
-                                fmt.setHeight(float(sheet.icon_size))
-                                fmt.setVerticalAlignment(QTextCharFormat.VerticalAlignment.AlignMiddle)
-                                cursor.insertImage(fmt)
-                                continue
-                    except Exception:
-                        pass
-                cursor.insertText(part)
-                continue
-            cursor.insertText(part)
+    def _relayout_cards(self) -> None:
+        """视口宽度变化 → 重排卡片宽度与高度。"""
+        width = self._result_list.viewport().width() - 4
+        if width <= 0:
+            return
+        for i in range(self._result_list.count()):
+            item = self._result_list.item(i)
+            card = self._result_list.itemWidget(item)
+            if card is not None:
+                card.set_width(width)
+                item.setSizeHint(card.sizeHint())
 
     def _show_result_preview(self) -> None:
-        """选中结果行 → 底部预览完整描述（含图标渲染）。"""
-        row_index = self._result_table.currentRow()
-        if row_index < 0:
-            return
-        item = self._result_table.item(row_index, 0)
+        """选中卡片 → 底部预览完整描述（含图标渲染）。"""
+        item = self._result_list.currentItem()
         if item is None:
             return
-        data = item.data(Qt.ItemDataRole.UserRole)
-        if not isinstance(data, tuple) or len(data) != 2:
+        result = item.data(Qt.ItemDataRole.UserRole)
+        if not isinstance(result, dict):
             return
-        label = self._result_table.item(row_index, 0).text() if self._result_table.item(row_index, 0) else ""
-        name = self._result_table.item(row_index, 1).text() if self._result_table.item(row_index, 1) else ""
-        hit = self._result_table.item(row_index, 3).text() if self._result_table.item(row_index, 3) else ""
-        description = self._result_table.item(row_index, 4).text() if self._result_table.item(row_index, 4) else ""
-        summary = self._result_table.item(row_index, 5).text() if self._result_table.item(row_index, 5) else ""
-        lines = [f"【{label}】{name}  （{data[1]}）  命中：{hit}"]
+        label = str(result.get("label") or "")
+        name = str(result.get("name") or "")
+        hit = str(result.get("hit") or "")
+        description = str(result.get("description") or "")
+        summary = str(result.get("summary") or "")
+        lines = [f"【{label}】{name}  （{result.get('type', '')}）  命中：{hit}"]
         if description:
             lines.append(description)
         if summary and summary != name:
             lines.append(f"命中详情：{summary}")
-        self._render_preview_text("\n".join(lines))
+        document = self._result_preview.document()
+        document.clear()
+        render_icons_into_document(document, "\n".join(lines))
 
-    def _on_result_activated(self, item: QTableWidgetItem) -> None:
-        data = item.data(Qt.ItemDataRole.UserRole)
-        if isinstance(data, tuple) and len(data) == 2 and data[0] and data[1]:
-            self._open_detail(str(data[0]), str(data[1]))
+    def _on_card_activated(self, item: QListWidgetItem) -> None:
+        result = item.data(Qt.ItemDataRole.UserRole)
+        if isinstance(result, dict) and result.get("category") and result.get("type"):
+            self._open_detail(str(result["category"]), str(result["type"]))
 
-    def _show_result_menu(self, pos) -> None:
-        item = self._result_table.itemAt(pos)
+    def _show_card_menu(self, pos) -> None:
+        item = self._result_list.itemAt(pos)
         if item is None:
             return
-        data = item.data(Qt.ItemDataRole.UserRole)
+        result = item.data(Qt.ItemDataRole.UserRole)
+        if not isinstance(result, dict):
+            return
         menu = QMenu(self)
         open_act = menu.addAction("打开详情")
         copy_act = menu.addAction("复制 Type")
-        chosen = menu.exec(self._result_table.viewport().mapToGlobal(pos))
-        if not isinstance(data, tuple) or len(data) != 2:
-            return
-        if chosen == open_act and data[0] and data[1]:
-            self._open_detail(str(data[0]), str(data[1]))
+        chosen = menu.exec(self._result_list.viewport().mapToGlobal(pos))
+        if chosen == open_act and result.get("category") and result.get("type"):
+            self._open_detail(str(result["category"]), str(result["type"]))
         elif chosen == copy_act:
-            QApplication.clipboard().setText(str(data[1]))
+            QApplication.clipboard().setText(str(result.get("type") or ""))
 
     # ── 详情与导航 ──
     def _open_detail(self, category: str, type_value: str) -> None:

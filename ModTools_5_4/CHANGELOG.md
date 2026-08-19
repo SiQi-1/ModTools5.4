@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-16 - 优化：[COLOR] 预设改用官方 Civ6_ColorAtlas.xml 定义
+
+### 变更
+- `data/text_color_presets.json` 扩充为 **116 个预设**：
+  - **96 个官方预设**提取自游戏 `Base/Assets/UI/Civ6_ColorAtlas.xml`（`<Color Name Color="r,g,b[,a]"/>`，全部为数字 RGB，无引用链）；
+  - 21 个 Flash UI 层预设补充（ChatMessage_Help/ConnectionStatus_*/Res*LabelCS 等，无明文源文件，按官方界面配色近似）；
+- 修正此前近似值（如 `Red` 255,92,92 → 官方 191,55,60；`Civ6Yellow` → 255,255,96；`COLOR_FLOAT_FOOD` → 85,155,6）；
+- 提取脚本存于 `modgen_work/`（不入 git），游戏更新后可重新提取。
+
 ## 2026-08-16 - 优化：游戏文本标记完整渲染（图标大小写 / [NEWLINE] / [COLOR]）
 
 ### 变更

@@ -98,12 +98,27 @@ def build_application(config: AppConfig | None = None) -> ModToolsApplication:
     return app
 
 
+def find_initial_project_path() -> Path | None:
+    """从命令行参数中找 .CIV 工程路径（文件关联双击打开用）。"""
+    for raw in sys.argv[1:]:
+        text = str(raw or "").strip().strip('"')
+        if not text:
+            continue
+        candidate = Path(text)
+        if candidate.suffix.upper() == ".CIV" and candidate.exists():
+            return candidate
+    return None
+
+
 def launch(config: AppConfig | None = None) -> int:
     """Launch the ModTools 5.4 GUI."""
     try:
         app = build_application(config)
         window = MainWindow(app.config)
         window.show()
+        initial_project = find_initial_project_path()
+        if initial_project is not None:
+            window.open_project_file(initial_project)
         return app.exec()
     except SystemExit:
         raise

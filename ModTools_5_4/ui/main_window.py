@@ -150,15 +150,19 @@ class MainWindow(QMainWindow):
         )
         if not selected_file:
             return
+        self.open_project_file(Path(selected_file))
 
+    def open_project_file(self, file_path: Path) -> None:
+        """打开指定 .CIV 工程（文件关联双击启动时调用）。"""
+        if self._workspace_page is None:
+            return
         try:
-            self._workspace_page.load_project(Path(selected_file))
+            self._workspace_page.load_project(file_path)
         except Exception as exc:
             QMessageBox.critical(self, "打开失败", str(exc))
             return
-
         self.show_page("workspace")
-        self.statusBar().showMessage(f"已打开工程: {Path(selected_file).name}", 3000)
+        self.statusBar().showMessage(f"已打开工程: {file_path.name}", 3000)
 
     def _handle_save_project(self) -> None:
         if self._workspace_page is None:

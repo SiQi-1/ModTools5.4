@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-08-16 - 新增：双击 .CIV 文件直接打开（文件关联）
+
+### 功能
+- 程序支持启动参数传工程路径：`ModTools5.4.exe "xx.CIV"`（或 `python ModTools5.4.py "xx.CIV"`）→ 启动后自动打开该工程并切到工作区页；
+- 新增 `tools/register_file_association.py`：注册/解除 `.CIV` 文件关联（写 `HKCU\Software\Classes`，当前用户级免管理员；源码运行时关联 `python + ModTools5.4.py`，打包 exe 时关联 exe 自身）；本机已注册；
+- README 新增「双击 .CIV 文件直接打开」章节（脚本方式 + 手动 .reg 方式）。
+
+### 验证
+- `find_initial_project_path` 参数解析 3 例（找到 .CIV / 忽略非 CIV / 忽略不存在文件）；`MainWindow.open_project_file` 冒烟：打开 52.CIV → 自动切到工作区页；全量 164 项测试通过。
+
+## 2026-08-16 - 新增：信仰官方固定图标（非万神殿）
+
+### 背景
+- 依据游戏文件 `Base/Assets/UI/Icons/Icons_Beliefs.xml` + `Base/Assets/Gameplay/Data/Beliefs.xml` 实测：所有信仰图标均在官方图集 `ICON_ATLAS_BELIEFS_PATHEON`（32/50/64/256），万神殿各有专属 Index；**非万神殿按类别共用一个 Index**（WORSHIP=22、FOLLOWER=23、FOUNDER=24、ENHANCER=25）。
+
+### 变更
+- **信仰编辑器**（`BeliefCompositeEditor`）新增复选框「使用官方固定图标」，状态存条目顶层键 `use_official_icon`（bool，不污染游戏字段）：
+  - 万神殿（BELIEF_CLASS_PANTHEON）自动**禁用并取消勾选**（必须自定义图标）；
+  - 已导入自定义图片时**以自定义图片为准**（开关不生效）；
+  - 老工程无该字段默认不勾选（保持原行为）。
+- **Icons.xml**（`art_workspace.py`）：启用官方图标的信仰直接输出 `<Row Name="ICON_{type}" Atlas="ICON_ATLAS_BELIEFS_PATHEON" Index="{类别Index}"/>`（政策卡同款机制），**不再生成自定义图集与 IMG/DDS 纹理**；未启用/万神殿/已导入图片维持原自定义图集逻辑。
+- **美术页**：启用官方图标的信仰条目**不再出现在「未导入图片实体（可选别名）」表**（与开关功能重合的部分移除）。
+- **工作区**：新建信仰条目默认 `use_official_icon: true`。
+
+### 验证
+- 新增 `tests/test_belief_official_icon.py`（8 例：Index 映射、生效规则、Icons.xml 三态、别名表隐藏）；全量 169 项测试通过；编辑器离屏冒烟验证通过。
+
 ## 2026-08-16 - 调整：自定义颜色仅支持十进制 RGB（十六进制游戏不认，已移除）
 
 - `[COLOR:r,g,b]` 十进制（含 4 分量/带空格）是游戏引擎唯一认可的直写格式；

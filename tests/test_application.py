@@ -5,6 +5,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -69,6 +70,31 @@ class ApplicationBootstrapTestCase(unittest.TestCase):
                 application.sys.exit = original_exit
                 application._CRASH_BOX_SHOWN = original_flag
                 QMessageBox.critical = original_critical
+
+
+class InitialProjectArgTestCase(unittest.TestCase):
+    """文件关联双击启动：命令行参数中的 .CIV 路径应被识别。"""
+
+    def _set_argv(self, args: list[str]) -> None:
+        patcher = mock.patch.object(application.sys, "argv", ["ModTools5.4.py"] + args)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_finds_civ_argument(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            civ = Path(tmp) / "test.CIV"
+            civ.write_text("{}", encoding="utf-8")
+            self._set_argv([f'"{civ}"', "--extra"])
+            self.assertEqual(application.find_initial_project_path(), civ)
+
+    def test_ignores_non_civ_args(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            self._set_argv([str(Path(tmp) / "note.txt"), "--debug"])
+            self.assertIsNone(application.find_initial_project_path())
+
+    def test_ignores_missing_file(self) -> None:
+        self._set_argv(["D:/not_exists_xyz.CIV"])
+        self.assertIsNone(application.find_initial_project_path())
 
 
 if __name__ == "__main__":

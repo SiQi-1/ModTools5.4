@@ -32,6 +32,40 @@
 
 ---
 
+## 双击 .CIV 文件直接打开
+
+程序支持启动参数传工程路径（`ModTools5.4.exe "xx.CIV"` 或 `python ModTools5.4.py "xx.CIV"`），
+因此可以注册 Windows 文件关联，实现**双击 .CIV 直接打开工程**：
+
+**方式一：运行注册脚本（推荐）**
+
+```powershell
+python tools/register_file_association.py        # 注册
+python tools/register_file_association.py --unregister  # 解除
+python tools/register_file_association.py --status      # 查看状态
+```
+
+只写当前用户注册表（`HKCU\Software\Classes`），无需管理员权限。源码运行时关联到
+`python + ModTools5.4.py`；打包 exe 运行时自动关联到 exe 自身。
+
+**方式二：手动注册（.reg）**
+
+把下面内容存为 `civ_assoc.reg`（把 `C:\路径\ModTools5.4.exe` 换成你的实际路径，引号不可省），双击导入：
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Classes\.CIV]
+@="ModTools5.4.CIV"
+
+[HKEY_CURRENT_USER\Software\Classes\ModTools5.4.CIV\shell\open\command]
+@="\"C:\\路径\\ModTools5.4.exe\" \"%1\""
+```
+
+> 注册后若资源管理器未立即生效，重启 explorer 或注销重登即可。
+
+---
+
 ## 设置页（首次使用）
 
 | 步骤 | 操作 |

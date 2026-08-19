@@ -4853,6 +4853,14 @@ class BeliefCompositeEditor(QWidget):
         self._duplicate_button = QPushButton("复制该信仰")
         self._duplicate_button.clicked.connect(self._request_duplicate)
 
+        self._use_official_icon_check = QCheckBox("使用官方固定图标")
+        self._use_official_icon_check.setToolTip(
+            "非万神殿信仰使用官方图集 ICON_ATLAS_BELIEFS_PATHEON 中对应类别的固定图标，无需导入图片。\n"
+            "万神殿信仰必须导入自定义图标（该选项自动禁用）。\n"
+            "已导入自定义图片时，以自定义图片为准（官方图标开关不生效）。"
+        )
+        self._use_official_icon_check.stateChanged.connect(self._handle_official_icon_toggled)
+
         self._main_editor.dataChanged.connect(self._emit_data_changed)
 
         layout = QVBoxLayout(self)
@@ -4861,6 +4869,7 @@ class BeliefCompositeEditor(QWidget):
         layout.addWidget(self._main_editor)
 
         actions = QHBoxLayout()
+        actions.addWidget(self._use_official_icon_check)
         actions.addWidget(self._duplicate_button)
         actions.addStretch(1)
         layout.addLayout(actions)
@@ -4868,18 +4877,43 @@ class BeliefCompositeEditor(QWidget):
     def set_entry(self, entry: dict[str, object], fallback_name: str) -> None:
         self._loading = True
         self._main_editor.set_entry(entry, fallback_name)
+        raw = entry.get("use_official_icon")
+        if isinstance(raw, bool):
+            checked = raw
+        else:
+            checked = str(raw or "").strip().lower() in {"1", "true", "yes", "on"}
+        self._use_official_icon_check.setChecked(checked)
+        self._refresh_official_icon_state()
         self._loading = False
 
     def export_entry(self) -> dict[str, object]:
-        return self._main_editor.export_entry()
+        payload = self._main_editor.export_entry()
+        payload["use_official_icon"] = self._use_official_icon_check.isChecked()
+        return payload
 
     def _request_duplicate(self) -> None:
         payload = self.export_entry()
         self.duplicateRequested.emit(payload)
 
+    def _refresh_official_icon_state(self) -> None:
+        """万神殿信仰必须自定义图标：禁用开关并取消勾选。"""
+        payload = self._main_editor.export_entry()
+        table_data = payload.get("table_data") if isinstance(payload.get("table_data"), dict) else {}
+        class_type = str(table_data.get("BeliefClassType") or "").strip().upper()
+        is_pantheon = class_type == "BELIEF_CLASS_PANTHEON"
+        self._use_official_icon_check.setEnabled(not is_pantheon)
+        if is_pantheon and self._use_official_icon_check.isChecked():
+            self._use_official_icon_check.setChecked(False)
+
+    def _handle_official_icon_toggled(self) -> None:
+        if self._loading:
+            return
+        self.dataChanged.emit()
+
     def _emit_data_changed(self) -> None:
         if self._loading:
             return
+        self._refresh_official_icon_state()
         self.dataChanged.emit()
 
 

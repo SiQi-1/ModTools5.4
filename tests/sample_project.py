@@ -359,6 +359,7 @@ def build_sample_project() -> object:
         "Description": "示例信仰描述。",
         "icon_image_name": "ICON_BELIEF_SIQI_DEMO",
         "images": {},
+        "use_official_icon": True,
         "belief_bonuses": [],
         "subtables": {},
     })

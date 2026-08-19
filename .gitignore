@@ -39,11 +39,9 @@ _work/
 
 # Old ad-hoc patterns (kept for legacy)
 ai_*
-tools/
 
-# AI 临时脚本（绝不提交）
+# AI 涓存椂鑴氭湰锛堢粷涓嶆彁浜わ級
 _gen_*.py
 _tmp_*.py
 ModTools_5_4/data/local_text_New.sqlite
-/_*.py
 /_*

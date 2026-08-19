@@ -6056,6 +6056,7 @@ class WorkspacePage(BasePage):
                     "table_name": "Beliefs",
                     "table_data": {},
                     "images": {},
+                    "use_official_icon": True,
                 }
             )
         elif section == "议程":

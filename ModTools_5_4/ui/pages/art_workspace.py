@@ -351,6 +351,51 @@ def _safe_text(value: object | None) -> str:
     return "" if value is None else str(value).strip()
 
 
+# ---- 信仰官方固定图标 ----
+# 依据游戏文件 Base/Assets/UI/Icons/Icons_Beliefs.xml 与
+# Base/Assets/Gameplay/Data/Beliefs.xml 实测映射：
+# 所有信仰图标均位于官方图集 ICON_ATLAS_BELIEFS_PATHEON（32/50/64/256 四尺寸），
+# 万神殿各有专属 Index；非万神殿按类别共用一个 Index。
+BELIEF_OFFICIAL_ICON_ATLAS = "ICON_ATLAS_BELIEFS_PATHEON"
+BELIEF_CLASS_ICON_INDEXES: dict[str, int] = {
+    "BELIEF_CLASS_WORSHIP": 22,   # 崇拜建筑（教堂/清真寺等）
+    "BELIEF_CLASS_FOLLOWER": 23,  # 信徒信条（通用）
+    "BELIEF_CLASS_FOUNDER": 24,   # 创始信条（通用）
+    "BELIEF_CLASS_ENHANCER": 25,  # 强化信条（通用）
+}
+
+
+def _as_bool(value: object | None) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _belief_class_type(entry: dict[str, object]) -> str:
+    table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
+    return str(table_data.get("BeliefClassType") or "").strip().upper()
+
+
+def belief_official_icon_index(class_type: str) -> int | None:
+    """非万神殿信仰类别 -> 官方图集 Index；万神殿/未知类别返回 None。"""
+    return BELIEF_CLASS_ICON_INDEXES.get(str(class_type or "").strip().upper())
+
+
+def belief_uses_official_icon(entry: dict[str, object]) -> bool:
+    """信仰是否使用官方固定图标：启用开关 + 非万神殿 + 未导入自定义图片。
+
+    已导入自定义图片时优先自定义图标（开关不生效），与美术页
+    “有图则不生成别名行”的既有规则保持一致。
+    """
+    if not _as_bool(entry.get("use_official_icon")):
+        return False
+    if belief_official_icon_index(_belief_class_type(entry)) is None:
+        return False
+    images = entry.get("images") if isinstance(entry.get("images"), dict) else {}
+    icon_payload = images.get("icon") if isinstance(images.get("icon"), dict) else {}
+    return not _safe_text(icon_payload.get("path"))
+
+
 def _active_game_db_path() -> Path:
     settings = load_settings()
     configured = _safe_text(getattr(settings, "game_db_path", ""))
@@ -1743,6 +1788,9 @@ class ArtWorkspacePanel(QWidget):
 
         for type_name, cn, entry in self._collect_new_items("信仰", name_key="Name"):
             if self._image_path(entry, "icon"):
+                continue
+            if belief_uses_official_icon(entry):
+                # 已启用官方固定图标：美术页无需再选别名（避免与开关功能重合）。
                 continue
             rows.append(_AliasRow("belief", type_name, cn, f"ICON_{type_name}", "icon"))
 
@@ -3340,6 +3388,14 @@ class ArtWorkspacePanel(QWidget):
 
         for type_name, _cn, entry in beliefs:
             icon_name = f"ICON_{type_name}"
+            if belief_uses_official_icon(entry):
+                # 官方固定图标：直接引用官方图集 + 类别 Index，不生成自定义图集
+                # （政策卡同款机制；官方图集游戏内已加载，无需 IMG/DDS 纹理）。
+                idx = belief_official_icon_index(_belief_class_type(entry))
+                def_rows.append(
+                    f'    <Row Name="{icon_name}" Atlas="{BELIEF_OFFICIAL_ICON_ATLAS}" Index="{idx}"/>'
+                )
+                continue
             _apply_entity("belief", type_name, entry, icon_name=icon_name, atlas_name=f"ATLAS_{icon_name}", sizes=self.SIZE_BELIEF)
 
         for type_name, _cn, entry in units:

@@ -50,6 +50,20 @@ if (Test-Path $modgenSrc) {
     Get-ChildItem $modgenDst -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 }
 
+# 源码发行（agent 可操作/修改/调试的完整源码 + 初始化/工具脚本 + 文档）
+Copy-Item (Join-Path $root "ModTools5.4.py") $releaseDir -Force
+Copy-Item (Join-Path $root "requirements.txt") $releaseDir -Force
+Copy-Item (Join-Path $root "LICENSE") $releaseDir -Force
+Copy-Item (Join-Path $root "README.md") $releaseDir -Force
+Copy-Item (Join-Path $root "AGENT_SETUP.md") $releaseDir -Force
+Copy-Item (Join-Path $pkg) (Join-Path $releaseDir "ModTools_5_4") -Recurse -Force
+Get-ChildItem (Join-Path $releaseDir "ModTools_5_4") -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $releaseDir "ModTools_5_4\logs") -Recurse -Force -ErrorAction SilentlyContinue
+$toolsDst = Join-Path $releaseDir "tools"
+New-Item -ItemType Directory -Path $toolsDst | Out-Null
+Copy-Item (Join-Path $root "tools\setup_env.py") $toolsDst -Force
+Copy-Item (Join-Path $root "tools\register_file_association.py") $toolsDst -Force
+
 $zipPath = Join-Path $root "$AppName.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path (Join-Path $releaseDir "*") -DestinationPath $zipPath -Force

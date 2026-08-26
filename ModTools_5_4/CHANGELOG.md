@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-16 - 发布改为源码+exe 双轨 + 新设备一键初始化
+
+### 新增
+- **`tools/setup_env.py` 一键初始化**：检测 Python（≥3.10）→ 创建 .venv → 安装 requirements → 探测游戏库/文本库并生成便携 settings.json → 导入+modgen 冒烟验证 → 就绪报告；`--check` 仅检测；
+- **`AGENT_SETUP.md`**：给 AI agent 的初始化任务书（全流程/手动配置/验证/排障/目录速览）；
+- **README 重写**：移除截图（维护成本高、实用性低），改为完整文字教程——双轨运行方式、初始化、能力搜索、AI 生成 .CIV（modgen + search + 开局提示词 + 范围/边界）、全部工作区说明、FAQ 补充源码版排障。
+
+### 打包（备用，待下次构建）
+- `build_release.ps1`：release/zip 双轨——exe + 完整源码（ModTools_5_4/、ModTools5.4.py、requirements.txt、LICENSE、README、AGENT_SETUP.md）+ modgen/ + tools/（setup_env、register_file_association）+ 数据文件。
+
 ## 2026-08-16 - modgen 内置知识查询：search 命令（方法论工具化）
 
 ### 新增 `python -m modgen.cli search`

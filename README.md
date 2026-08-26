@@ -1,44 +1,38 @@
-# ModTools 5.4 使用教程
+# ModTools 5.4
 
-基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。
-
-> **下载发布版**：GitHub Releases 页面提供打包好的 `ModTools5.4.zip`（含 `ModTools5.4.exe`，无需安装 Python，双击即用）。发布版由 GitHub Actions 自动构建，保证与源码一致。
->
-> **zip 内容**：`ModTools5.4.exe` + `local_text_New.sqlite`（内置中文文本库）+ `data/`（可覆盖的配置与颜色预设）+ `modgen/`（AI 生成 .CIV 的 CLI 工具与指南）。AI 生成 .CIV 的知识查询由工具内置的**能力实现搜索**提供，无需外部知识库。
+基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。**同时提供 AI 生成 .CIV 的工具链（modgen）**，并内置"能力实现搜索"作为知识获取途径——新设备无需外部知识库。
 
 ---
 
-## 界面预览
+## 两种运行方式（zip 内两者都有）
 
-| | |
-|---|---|
-| ![主页](ModTools_5_4/docs/screenshots/01_home.png) | ![工程总览](ModTools_5_4/docs/screenshots/02_workspace_overview.png) |
-| ![文明编辑器](ModTools_5_4/docs/screenshots/03_civilization_editor.png) | ![领袖编辑器](ModTools_5_4/docs/screenshots/04_leader_editor.png) |
-| ![单位晋升树](ModTools_5_4/docs/screenshots/05_promotion_tree_editor.png) | ![议程编辑器](ModTools_5_4/docs/screenshots/06_agenda_editor.png) |
-| ![伟人编辑器](ModTools_5_4/docs/screenshots/07_great_people_editor.png) | ![基础信息](ModTools_5_4/docs/screenshots/08_basic_info.png) |
-| ![美术工作区](ModTools_5_4/docs/screenshots/09_art_workspace.png) | ![修改器工作区](ModTools_5_4/docs/screenshots/10_modifier_workspace.png) |
-| ![文本工作区](ModTools_5_4/docs/screenshots/11_text_workspace.png) | ![小工具（能力实现搜索）](ModTools_5_4/docs/screenshots/12_search.png) |
-| ![设置页](ModTools_5_4/docs/screenshots/13_settings.png) | |
+| | `ModTools5.4.exe` | 源码版（`.py`） |
+|---|---|---|
+| 适用 | 只想点击即用 | 需要 agent 操作/修改/调试、二次开发 |
+| 需要 Python | 否 | 是（3.10+，推荐 3.13） |
+| 首次配置 | 无 | 运行一次 `python tools/setup_env.py` 自动完成 |
+| AI 工作流 | 仅 GUI | ✅ 源码可读可改 + modgen + 测试全可用 |
 
-> 截图由 `tools/make_screenshots.py` 自动生成（加载内置示例工程后逐页渲染，示例数据与测试共用 `tests/sample_project.py`）。
+> 新设备初始化（推荐让 AI agent 代做）：解压 → `python tools/setup_env.py` → 就绪。
+> 详见 `AGENT_SETUP.md`（给 agent 的初始化任务书）。
 
 ---
 
 ## 快速上手（5 步）
 
-1. **设置 → 配置文本/游戏数据库**：文本库选发布包自带的 `local_text_New.sqlite`（中文显示必需）；游戏库选 `DebugGameplay.sqlite`（导入原版对象、能力搜索必需）
+1. **设置 → 配置文本/游戏数据库**：文本库选 `local_text_New.sqlite`（中文显示必需）；游戏库选 `DebugGameplay.sqlite`（导入原版对象、能力搜索必需）。源码版可运行 `python tools/setup_env.py` 自动配置
 2. **文件 → 新建工程** → 输入工程名 → 保存为 `.CIV`
 3. **基础信息 → 选择 .civ6proj**：指向你的 ModBuddy 工程文件，设置前缀/中缀
 4. **左侧树选择分类 → 新增/导入对象** → 编辑（必填字段标红 `*`）
 5. **工程根节点 → 生成所有文件**：一键输出 SQL/XML/图标/ArtDef 等到 `.civ6proj` 目录
 
-> 也可以直接**双击 .CIV 文件**打开工程，见下文「双击 .CIV 打开」。
+> 也可以直接**双击 .CIV 文件**打开工程（见下文「双击 .CIV 打开」）。
 
 ---
 
 ## 界面导览
 
-主窗口 3 页（主页 / 工作区 / 设置），**小工具是独立窗口**（窗口菜单或主页按钮打开，可与主窗口并排使用）：
+主窗口 3 页（主页 / 工作区 / 设置），**小工具是独立窗口**（窗口菜单或主页按钮打开，可与主窗口并排）：
 
 - **主页**：入口导航
 - **工作区**：工程树 + 分类编辑（文明/领袖/区域/建筑/单位/晋升/改良/总督/伟人/政策/项目/信仰/议程）+ 基础信息 + 美术 + 修改器 + 文本
@@ -54,7 +48,7 @@
 - **中文搜名字/描述/效果**：如输入"宣战"，自动按效果词映射（"宣战"→WAR）扩展搜索，命中所有相关能力
 - **英文搜 Type/能力/条件**：如 `WAR`、`YIELD_PRODUCTION`、`REQUIREMENT_IS_AT_WAR`
 - **14 类对象全覆盖**：文明/领袖/特质/区域/建筑/单位/改良/项目/政策卡/总督/伟人/单位能力/单位晋升
-- **核心用途（做 Mod 时）**：想实现"某个效果"却不知道怎么下手 → 搜效果词 → 找到游戏里现成的对象 → 打开看它的 Modifier 实现（效果类型/参数/条件）→ **照抄**。例如搜"农场"→ 高棉「大人工湖」→ `EFFECT_ADJUST_PLOT_YIELD`（Amount=2, YIELD_FOOD）——"相邻农场+食物"的现成解法，无需 Lua，无需自己发明
+- **核心用途（做 Mod 时）**：想实现"某个效果"却不知道怎么下手 → 搜效果词 → 找到游戏里现成的对象 → 打开看它的 Modifier 实现（效果类型/参数/条件）→ **照抄**。例如搜"农场"→ 高棉「大人工湖」→ `EFFECT_ADJUST_PLOT_YIELD`（Amount=2, YIELD_FOOD）——"相邻农场+食物"的现成解法，无需 Lua
 
 打开对象后，右侧详情分两区：
 
@@ -65,15 +59,15 @@
 
 ---
 
-## AI 生成 .CIV（modgen 工具）
+## AI 生成 .CIV（modgen）
 
-发布包随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出，AI 不需要记忆游戏知识（"某个效果怎么实现"用上面的**能力实现搜索**现查现抄）。
+发布包随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出。**知识查询（"某个效果怎么实现"）由 `modgen search` 与能力实现搜索提供，AI 不需要记忆游戏知识。**
 
 ### 开局提示词（把这段给 AI）
 
 ```markdown
-你是 ModTools 5.4 的 Mod 制作助手。工作目录里有 ModTools5.4.exe（可视化编辑器）和
-modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
+你是 ModTools 5.4 的 Mod 制作助手。工作目录里有 ModTools5.4.py（源码，可用 .venv 运行）
+和 modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
 
 1. 工程文件是 .CIV（JSON），你只通过 modgen 生成/校验/合并条目，绝不手写 JSON 结构。
    必读 modgen/AGENTS.md（硬规则：ModifierType 优先用游戏库已有类型、JSON 禁止 ""、不写 Lua）。
@@ -81,15 +75,15 @@ modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
    --prefix <前缀> --infix <编号>；修改器用 generate-modifier / generate-requirement /
    generate-reqset / generate-ability（效果类型由工具校验，错了会拒绝）。
 3. 不知道"某个效果怎么实现"（如被宣战+100%产能、相邻农场+食物）：先运行
-   `python -m modgen.cli search <效果词>` 查游戏里现成的实现，例如
-   `search --object 农场` → 高棉「大人工湖」→ `EFFECT_ADJUST_PLOT_YIELD` + 两个
-   `REQUIREMENT_*`（相邻+农场判定），直接照抄；也可以让用户在 ModTools 小工具的
-   "能力实现搜索"里搜效果词并把结果发给我。**不要凭记忆断言某个效果没有现成实现**——
-   绝大多数效果都能在游戏里找到对应 modifier，搜不到再讨论其他方案。
+   python -m modgen.cli search <效果词> 查游戏里现成的实现（如 search --object 农场 →
+   高棉大人工湖 → EFFECT_ADJUST_PLOT_YIELD + REQUIREMENT_*，直接照抄）；
+   也可以让用户在 ModTools 小工具的"能力实现搜索"里搜效果词并把结果发给我。
+   **不要凭记忆断言某个效果没有现成实现**——绝大多数效果都能在游戏里找到对应
+   modifier，搜不到再讨论其他方案。
 4. 生成后必须 validate（ERROR 必须修、WARNING 需确认），再 merge 进工程；
    临时文件一律放 modgen_work/。
 5. 我的能力边界：不写 Lua、不直接写 SQL/XML、不生成图片资源、不做 UI 界面/
-   模型/动画/事件脚本；没有现成效果器的效果（如自定义 Lua 逻辑）请明确告知做不了。
+   模型/动画/事件脚本。
 ```
 
 ### 可用范围
@@ -99,8 +93,8 @@ modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
 | 13 个内容分类 | 文明/领袖/区域/建筑/单位/单位晋升/改良设施/总督/伟人/政策卡/项目/信仰/议程 |
 | 修改器四类 | Modifier / Requirement / RequirementSet / UnitAbility（效果类型存在性 + 参数骨架自动校验） |
 | 文本 | 中文文本直接写入条目，LOC tag 由导出自动注册 |
+| 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现 |
 | 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures |
-| 知识查询 | 能力实现搜索（现查原版实现）+ 游戏库 + modgen schemas（789 效果类型） |
 
 ### 实现不了的能力（务必向用户强调）
 
@@ -113,9 +107,7 @@ modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
 | ❌ **模型/动画/特效** | 3D 模型、骨骼动画、粒子特效 |
 | ❌ **事件脚本** | 监听游戏事件、自定义交互逻辑（需 Lua，同上） |
 
-> **重要方法论——"做不到"之前先搜索**：绝大多数 Mod 效果（包括相邻加成、城市产出调整等）游戏里**都有现成实现**，只是需要找到它。判断"有没有效果器"的唯一正确方法是用**能力实现搜索**查原版（如搜"农场"→ 高棉「大人工湖」→ `EFFECT_ADJUST_PLOT_YIELD` 实现相邻农场+食物），**而不是凭记忆断言**。确需 Lua 的情况极少（如自定义界面/事件逻辑），此时才如实告知。
-
-> modgen 是源码 CLI，新设备使用需 Python 3 环境（exe 本身不需要）。
+> **重要方法论——"做不到"之前先搜索**：绝大多数 Mod 效果（包括相邻加成、城市产出调整等）游戏里**都有现成实现**，判断"有没有效果器"的唯一正确方法是用 `modgen search` / 能力实现搜索查原版，**而不是凭记忆断言**。确需 Lua 的情况极少（如自定义界面/事件逻辑），此时才如实告知。
 
 ---
 
@@ -260,6 +252,9 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 **Q: 能力实现搜索搜不到结果**
 → 设置页没配游戏数据库（`DebugGameplay.sqlite`）；中文搜不到时可试试英文关键词（如"宣战"→`WAR`）。
 
+**Q: 源码版启动报错 / 依赖问题**
+→ 确认用 `.venv\Scripts\python` 运行，并已执行 `python tools/setup_env.py`；换镜像重装：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`。
+
 **Q: 颜色配置里颜色全被当成自定义重新定义了**
 → 标准色匹配依赖 `standard_colors.json`，确保文件未被删除。
 
@@ -275,7 +270,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 - Windows 10/11
 - 文明6（需要至少运行过一次，以生成 Cache 中的游戏数据库）
-- 不需要 Python 环境（打包版自带）
+- 源码版需要 Python 3.10+（打包版不需要）
 - 不需要 ModBuddy（但最后一步 Build 和部署到游戏需要）
 
 ---

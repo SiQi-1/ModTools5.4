@@ -56,6 +56,7 @@ Copy-Item (Join-Path $root "requirements.txt") $releaseDir -Force
 Copy-Item (Join-Path $root "LICENSE") $releaseDir -Force
 Copy-Item (Join-Path $root "README.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENT_SETUP.md") $releaseDir -Force
+Copy-Item (Join-Path $root "docs\CIV6_MOD_TUTORIAL.md") $releaseDir -Force
 Copy-Item (Join-Path $pkg) (Join-Path $releaseDir "ModTools_5_4") -Recurse -Force
 Get-ChildItem (Join-Path $releaseDir "ModTools_5_4") -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item (Join-Path $releaseDir "ModTools_5_4\logs") -Recurse -Force -ErrorAction SilentlyContinue

@@ -91,17 +91,19 @@ python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中
 - 注意：`generate-modifier` 产物是"自定义 ModifierType"（modifier_type = modifier_id），
   若要用游戏内置 ModifierType，需另行指定。
 
-## 外部知识库（生成前建议查阅字段语义）
+## 知识查询：优先使用工具内置能力（新设备无需外部知识库）
 
-`AI制作Mod/` 目录（本仓库外部）包含完整的文明6 Mod 制作知识：
-- `skills/01-core-tables/*.md`：各分类字段语义与坑（生成必读）
-- `skills/06-naming.md`：命名规范（与工具规则一致）
-- `skills/district-adjacency.md`：相邻加成语义（DistrictType 是归属方，不参与来源描述）
-- `skills/07-techniques/`：修改器技巧
-- `reference/csv-export/`：EffectType/RequirementType 权威参数表
-- `memory/`：历史错误反馈（易错点）
+生成 .CIV 所需的知识（"某个效果/能力是怎么实现的"）**由工具本身提供**，不要依赖外部资料：
 
-生成时：字段语义不确定 → 查 `01-core-tables`；Modifier 参数不确定 → 查 `reference/csv-export`。
+1. **能力实现搜索（ModTools 小工具 → 能力实现搜索）**：
+   - 中文搜效果/描述（如"宣战"、"产能"），或英文搜 Type/参数（如 `WAR`、`YIELD_PRODUCTION`）；
+   - 打开对象后右侧展示该能力的**完整实现**：ModifierType/EffectType、参数、条件集→条件→条件参数，ATTACH/GRANT_ABILITY 嵌套自动展开；
+   - **用途**：确定"用户意图 → 用哪个 EffectType/RequirementType/参数值"——照抄原版实现即可。
+2. **游戏库（DebugGameplay.sqlite）**：本机已配置时，`modgen validate` 会校验 EffectType/RequirementType/参数名归属；不确定的表结构/字段名直接查库。
+3. **modgen schemas**：`modgen/schemas/modifier_schemas.json`（789 效果类型参数集）与 `entry_schemas.json` 是工具内置的权威数据。
+
+> 注意：外部目录（如 `AI制作Mod/`）只在开发机上存在，**发布包不含外部知识库**——一律用上述工具内能力查询。
+> 硬规则不变：ModifierType 优先引用游戏库已有类型（确需新建时补 DynamicModifiers 行）；JSON 禁止 `""`；不写 Lua。
 
 ## 重新生成 schema
 

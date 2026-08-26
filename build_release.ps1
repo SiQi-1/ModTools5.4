@@ -42,6 +42,14 @@ Copy-Item (Join-Path $pkg "data\settings.json") (Join-Path $releaseDir "settings
 Copy-Item (Join-Path $pkg "data") (Join-Path $releaseDir "data") -Recurse -Force
 Remove-Item (Join-Path $releaseDir "data\settings.json") -ErrorAction SilentlyContinue
 
+# AI 生成 .CIV 工具（modgen，纯标准库 CLI + schemas + AGENTS.md 指南）
+$modgenSrc = Join-Path $root "modgen"
+$modgenDst = Join-Path $releaseDir "modgen"
+if (Test-Path $modgenSrc) {
+    Copy-Item $modgenSrc $modgenDst -Recurse -Force
+    Get-ChildItem $modgenDst -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 $zipPath = Join-Path $root "$AppName.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path (Join-Path $releaseDir "*") -DestinationPath $zipPath -Force

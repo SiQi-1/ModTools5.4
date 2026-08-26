@@ -62,6 +62,15 @@
 - Icons.xml 对启用官方图标的信仰直接输出官方图集引用行（政策卡同款），不再生成自定义图集与 IMG/DDS；美术页别名表同步隐藏该类条目；新建信仰默认启用。
 - 新增 `tests/test_belief_official_icon.py`（8 例）；全量 169 项测试通过。
 
+### 12) 2026-08-16 修复：统一 Text.sql 文本重复输出
+- 根因：`ordered_rows` 去重结果未用于实际输出（只算 total_rows）；分组按 `entity_type in tag` 子串匹配，type 前缀重叠或同 type 条目时同一行进入多个组。
+- 修复：Text 组装阶段跨组按行去重（行只归首个匹配组、total_rows 与输出行数一致）；`_build_belief_sql_pair` 按信仰 type 去重条目（消除 Beliefs 表同主键隐患）。
+- 新增 3 例回归测试；全量 175 项测试通过。
+
+### 13) 2026-08-16 修复：全分区 SQL 生成器按 type 去重重复条目
+- 12 个分区生成器统一在条目循环按 type 去重（同 type 只取第一条），消除主表同主键两行与文本重复；伟人两层去重（class + individual/greatwork）。
+- 新增 `tests/test_duplicate_type_entries.py`（12 例）；全量 187 项测试通过。
+
 ## 二、当前缺口（TODO）
 
 ### P2：响应式布局继续推广

@@ -191,6 +191,73 @@ class SqlPreviewsTestCase(unittest.TestCase):
         self.assertIn("RequiresPlacement", sql)
 
 
+def _make_belief(type_name: str, name: str, desc: str) -> dict[str, object]:
+    return {
+        "name": name,
+        "abbr": type_name.split("_")[-1],
+        "type": type_name,
+        "table_name": "Beliefs",
+        "table_data": {
+            "Name": name,
+            "Description": desc,
+            "BeliefClassType": "BELIEF_CLASS_FOLLOWER",
+        },
+        "Name": name,
+        "Description": desc,
+        "icon_image_name": f"ICON_{type_name}",
+        "images": {},
+        "use_official_icon": True,
+    }
+
+
+class BeliefTextDuplicationTestCase(unittest.TestCase):
+    """信仰文本重复输出回归：type 前缀重叠 / 同 type 条目不得导致 Text 两遍。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        config = load_config()
+        configure_logging(config.log_dir, config.debug)
+        cls.app = QApplication.instance() or QApplication([])
+        cls.page = WorkspacePage()
+
+    def test_prefix_overlap_types_not_duplicated_in_text(self) -> None:
+        # BELIEF_DEMO 是 BELIEF_DEMO_X 的前缀：分组子串匹配会把后者的行分进两个组，
+        # 输出组装必须跨组去重（行只出现一次，归入第一个匹配组）。
+        project = build_sample_project()
+        project.sections["信仰"] = [
+            _make_belief("BELIEF_DEMO", "信仰甲", "甲描述。"),
+            _make_belief("BELIEF_DEMO_X", "信仰乙", "乙描述。"),
+        ]
+        self.page._project = project
+        text_sql = self.page._build_text_workspace_preview("sql")
+        self.assertEqual(text_sql.count("LOC_BELIEF_DEMO_X_NAME"), 1)
+        self.assertEqual(text_sql.count("LOC_BELIEF_DEMO_X_DESCRIPTION"), 1)
+        self.assertEqual(text_sql.count("LOC_BELIEF_DEMO_NAME"), 1)
+
+    def test_same_type_entries_not_duplicated_in_data_and_text(self) -> None:
+        # 同 type 两条目：Beliefs 表会生成同主键两行（游戏报错），文本同 tag 两行
+        # 字符串不同无法按行去重——必须按 type 只取第一条。
+        project = build_sample_project()
+        project.sections["信仰"] = [
+            _make_belief("BELIEF_TITHE", "什一税", "第一份描述。"),
+            _make_belief("BELIEF_TITHE", "什一税改", "第二份描述。"),
+        ]
+        self.page._project = project
+        data_sql, _text_sql = self.page._build_belief_sql_pair()
+        self.assertEqual(data_sql.count("('BELIEF_TITHE', 'KIND_BELIEF')"), 1, "Types 不应重复")
+        self.assertEqual(data_sql.count("LOC_BELIEF_TITHE_NAME"), 1, "Beliefs 表不应出现同主键两行")
+        text_sql = self.page._build_text_workspace_preview("sql")
+        self.assertEqual(text_sql.count("LOC_BELIEF_TITHE_NAME"), 1)
+        self.assertEqual(text_sql.count("LOC_BELIEF_TITHE_DESCRIPTION"), 1)
+
+    def test_normal_text_unified_sql_ends_with_semicolon(self) -> None:
+        # 去重计数与实际输出行数必须一致，SQL 以单分号结尾。
+        self.page._project = build_sample_project()
+        text_sql = self.page._build_text_workspace_preview("sql")
+        self.assertTrue(text_sql.rstrip().endswith(";"))
+        self.assertEqual(text_sql.count(";"), 1, "LocalizedText VALUES 块只允许一个分号结尾")
+
+
 class EmptyParamHandlingTestCase(unittest.TestCase):
     """AI 写入 \"\"/null 的参数必须被跳过或输出 NULL，绝不输出 '' 字面量。"""
 

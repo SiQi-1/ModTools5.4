@@ -1112,16 +1112,31 @@ class WorkspacePage(BasePage):
             ("领袖外交文本", leader_diplomacy_groups),
         ]
 
-        ordered_rows: list[str] = []
-        for _title, groups in sections:
-            for _name, rows in groups:
-                ordered_rows.extend(rows)
-        ordered_rows = self._deduplicate_rows(ordered_rows)
+        # 组装时跨组去重：同一行（tag+文本）只输出一次，归入第一个出现的组。
+        # 此前 `ordered_rows` 的去重结果只用于 total_rows 计数，实际输出仍遍历
+        # 原始分组行，去重形同虚设；而分组按 `entity_type in tag` 子串匹配，
+        # type 前缀重叠（如 BELIEF_DEMO / BELIEF_DEMO_X）或同 type 条目时，
+        # 同一行会被分进多个组导致文本重复输出。
+        final_sections: list[tuple[str, list[tuple[str, list[str]]]]] = []
+        final_rows: list[str] = []
+        seen_rows: set[str] = set()
+        for title, groups in sections:
+            pending_groups: list[tuple[str, list[str]]] = []
+            for name, rows in groups:
+                pending = [row for row in rows if row not in seen_rows]
+                if not pending:
+                    continue
+                seen_rows.update(pending)
+                pending_groups.append((name, pending))
+            if pending_groups:
+                final_sections.append((title, pending_groups))
+                for _name, pending in pending_groups:
+                    final_rows.extend(pending)
 
-        if not ordered_rows:
+        if not final_rows:
             text_sql = "-- Text.sql\n-- 暂无文本数据"
         else:
-            total_rows = len(ordered_rows)
+            total_rows = len(final_rows)
             current = 0
             lines = [
                 "-- Text.sql",
@@ -1129,19 +1144,17 @@ class WorkspacePage(BasePage):
                 "-- LocalizedText 表",
                 "INSERT INTO LocalizedText (Language, Tag, Text) VALUES",
             ]
-            non_empty_sections = [(title, groups) for title, groups in sections if any(rows for _name, rows in groups)]
-            for sec_idx, (title, groups) in enumerate(non_empty_sections):
+            for sec_idx, (title, groups) in enumerate(final_sections):
                 lines.append(f"-- {title}")
-                non_empty_groups = [(name, rows) for name, rows in groups if rows]
-                for group_idx, (name, rows) in enumerate(non_empty_groups):
+                for group_idx, (name, rows) in enumerate(groups):
                     lines.append(f"-- {name}")
                     for row in rows:
                         current += 1
                         suffix = "," if current < total_rows else ";"
                         lines.append(f"{row}{suffix}")
-                    if group_idx < len(non_empty_groups) - 1:
+                    if group_idx < len(groups) - 1:
                         lines.append("")
-                if sec_idx < len(non_empty_sections) - 1:
+                if sec_idx < len(final_sections) - 1:
                     lines.extend(["", ""])  # 三换行分隔不同文本类别
             text_sql = "\n".join(lines).rstrip()
 
@@ -1162,7 +1175,7 @@ class WorkspacePage(BasePage):
             sum(len(rows) for _name, rows in civ_city_groups),
             sum(len(rows) for _name, rows in civ_citizen_groups),
             sum(len(rows) for _name, rows in leader_diplomacy_groups),
-            len(ordered_rows),
+            len(final_rows),
         )
 
         if fmt == "xml":
@@ -1521,10 +1534,15 @@ class WorkspacePage(BasePage):
         mapped_great_person_bindings = 0
         fallback_great_person_bindings = 0
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(civ_entries, start=1):
             civ_type = str(entry.get("type") or "").strip()
             if not civ_type:
                 civ_type = f"CIVILIZATION_CUSTOM_{index}"
+            if civ_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(civ_type)
 
             trait_type = f"TRAIT_{civ_type}"
             loc_core = civ_type[13:] if civ_type.startswith("CIVILIZATION_") else civ_type
@@ -1756,10 +1774,15 @@ class WorkspacePage(BasePage):
         image_comments: list[str] = []
         text_rows: list[str] = []
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(leader_entries, start=1):
             leader_type = str(entry.get("type") or "").strip()
             if not leader_type:
                 leader_type = f"LEADER_CUSTOM_{index}"
+            if leader_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(leader_type)
 
             short_type = leader_type[7:] if leader_type.startswith("LEADER_") else leader_type
             trait_type = f"TRAIT_LEADER_{short_type}" if short_type else f"TRAIT_LEADER_CUSTOM_{index}"
@@ -2151,10 +2174,15 @@ class WorkspacePage(BasePage):
             used_node_abbrs.add(candidate)
             return candidate
 
+        seen_types: set[str] = set()
         for entry in tree_entries:
             class_type = str(entry.get("type") or "").strip()
             if not class_type:
                 continue
+            if class_type in seen_types:
+                # 同 type 重复晋升树：只取第一条，避免 PromotionClasses 同主键两行。
+                continue
+            seen_types.add(class_type)
             class_name = str(entry.get("name") or "").strip()
 
             types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
@@ -2294,10 +2322,15 @@ class WorkspacePage(BasePage):
 
         # 省略规则：仅当字段存在数据库 SQL 默认值且当前值等于它时才省略；
         # 无 SQL 默认值的字段（NOT NULL 无默认）必须始终输出，否则数据库 NOT NULL 约束失败。
+        seen_types: set[str] = set()
         for index, entry in enumerate(district_entries, start=1):
             district_type = str(entry.get("type") or "").strip()
             if not district_type:
                 district_type = f"DISTRICT_CUSTOM_{index}"
+            if district_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(district_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
 
@@ -2727,10 +2760,15 @@ class WorkspacePage(BasePage):
                 return "NULL"
             return f"'{self._sql_escape(text)}'"
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(building_entries, start=1):
             building_type = str(entry.get("type") or "").strip()
             if not building_type:
                 building_type = f"BUILDING_CUSTOM_{index}"
+            if building_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(building_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             name_zh = str(_value_or_default(table_data, "Name") or "")
@@ -3316,10 +3354,15 @@ class WorkspacePage(BasePage):
                 return "NULL"
             return f"'{self._sql_escape(text)}'"
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(unit_entries, start=1):
             unit_type = str(entry.get("type") or "").strip()
             if not unit_type:
                 unit_type = f"UNIT_CUSTOM_{index}"
+            if unit_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(unit_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             name_zh = str(_value_or_default(table_data, "Name") or "")
@@ -3774,10 +3817,15 @@ class WorkspacePage(BasePage):
             row = "(" + ", ".join(_sql_literal(item) for item in values) + ")"
             groups.setdefault(key, []).append(row)
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(imp_entries, start=1):
             improvement_type = str(entry.get("type") or "").strip()
             if not improvement_type:
                 improvement_type = f"IMPROVEMENT_CUSTOM_{index}"
+            if improvement_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(improvement_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             name_zh = str(_value_or_default(table_data, "Name") or "")
@@ -4237,10 +4285,15 @@ class WorkspacePage(BasePage):
                 return "NULL"
             return f"'{self._sql_escape(text)}'"
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(policy_entries, start=1):
             policy_type = str(entry.get("type") or "").strip()
             if not policy_type:
                 policy_type = f"POLICY_CUSTOM_{index}"
+            if policy_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(policy_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             policy_name = str(_value_or_default(table_data, "Name") or "")
@@ -4450,10 +4503,15 @@ class WorkspacePage(BasePage):
         def _count_grouped_rows(grouped: dict[tuple[str, ...], list[str]]) -> int:
             return sum(len(rows) for rows in grouped.values())
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(project_entries, start=1):
             project_type = str(entry.get("type") or "").strip()
             if not project_type:
                 project_type = f"PROJECT_CUSTOM_{index}"
+            if project_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(project_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             project_name = str(_value_or_default(table_data, "Name") or "")
@@ -4751,10 +4809,16 @@ class WorkspacePage(BasePage):
                 return field_defaults.get(key)
             return value
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(belief_entries, start=1):
             belief_type = str(entry.get("type") or "").strip()
             if not belief_type:
                 belief_type = f"BELIEF_CUSTOM_{index}"
+            if belief_type in seen_types:
+                # 同 type 重复条目（复制/手动编辑 .CIV 常见）：只取第一条，
+                # 避免 Types/Beliefs/Text 重复输出与 Beliefs 主键冲突。
+                continue
+            seen_types.add(belief_type)
 
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             belief_name = str(_value_or_default(table_data, "Name") or "")
@@ -4828,10 +4892,15 @@ class WorkspacePage(BasePage):
                 return field_defaults.get(key)
             return value
 
+        seen_types: set[str] = set()
         for index, entry in enumerate(agenda_entries, start=1):
             agenda_type = str(entry.get("type") or "").strip()
             if not agenda_type:
                 agenda_type = f"AGENDA_CUSTOM_{index}"
+            if agenda_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(agenda_type)
             # 由 historical_agendas 填充；无历史议程时 AiLists 行必须自带 LeaderType，
             # 否则下方 `al.get("LeaderType") or leader_type` 会访问未定义变量崩溃
             leader_type = ""
@@ -5071,10 +5140,15 @@ class WorkspacePage(BasePage):
                 return [(level - 1, 0), (level - 1, 1), (level - 1, 2)]
             return [(level - 1, 2), (level - 1, 1)]
 
+        seen_types: set[str] = set()
         for entry in governor_entries:
             governor_type = str(entry.get("GovernorType") or "").strip()
             if not governor_type:
                 continue
+            if governor_type in seen_types:
+                # 同 type 重复条目：只取第一条，避免主表同主键两行与文本重复。
+                continue
+            seen_types.add(governor_type)
 
             name_text = str(entry.get("Name") or "").strip()
             desc_text = str(entry.get("Description") or "").strip()
@@ -5345,6 +5419,9 @@ class WorkspacePage(BasePage):
                 return "NULL"
             return f"'{self._sql_escape(text)}'"
 
+        seen_class_types: set[str] = set()
+        seen_individual_types: set[str] = set()
+        seen_greatwork_types: set[str] = set()
         for entry in great_entries:
             class_data = entry.get("class_data") if isinstance(entry.get("class_data"), dict) else {}
             unit_data = entry.get("unit_data") if isinstance(entry.get("unit_data"), dict) else {}
@@ -5356,6 +5433,8 @@ class WorkspacePage(BasePage):
             unit_type = str(class_data.get("UnitType") or unit_data.get("UnitType") or "").strip()
             if not unit_type and not is_import_locked:
                 continue
+            is_first_class = class_type not in seen_class_types
+            seen_class_types.add(class_type)
 
             class_name = str(class_data.get("Name") or "").strip()
             district_type = str(class_data.get("DistrictType") or "").strip()
@@ -5366,7 +5445,7 @@ class WorkspacePage(BasePage):
             timeline = 1 if bool(class_data.get("AvailableInTimeline", True)) else 0
             duplicate = 1 if bool(class_data.get("GenerateDuplicateIndividuals", False)) else 0
 
-            if not is_import_locked:
+            if is_first_class and not is_import_locked:
                 gp_types_rows.append(f"('{class_type}', 'KIND_GREAT_PERSON_CLASS')")
 
                 classes_rows.append(
@@ -5395,6 +5474,10 @@ class WorkspacePage(BasePage):
                 individual_type = str(individual.get("GreatPersonIndividualType") or "").strip()
                 if not individual_type:
                     continue
+                if individual_type in seen_individual_types:
+                    # 同个体 type 重复：只取第一条，避免个体表同主键两行。
+                    continue
+                seen_individual_types.add(individual_type)
                 gp_types_rows.append(f"('{self._sql_escape(individual_type)}', 'KIND_GREAT_PERSON_INDIVIDUAL')")
                 mode = str(individual.get("mode") or "activation").strip().lower()
                 row = {
@@ -5466,6 +5549,10 @@ class WorkspacePage(BasePage):
                         greatwork_type = str(greatwork.get("GreatWorkType") or "").strip()
                         if not greatwork_type:
                             continue
+                        if greatwork_type in seen_greatwork_types:
+                            # 同巨作 type 重复：只取第一条，避免巨作表同主键两行。
+                            continue
+                        seen_greatwork_types.add(greatwork_type)
                         greatwork_types_rows.append(f"('{self._sql_escape(greatwork_type)}', 'KIND_GREATWORK')")
 
                         greatwork_object_type = str(greatwork.get("GreatWorkObjectType") or "").strip()

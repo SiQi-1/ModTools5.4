@@ -1,6 +1,9 @@
 # AGENT.md — ModTools AI 协作规范与知识库
 
 > **强制阅读**：任何 AI/agent 在本仓库（ModTools 5.4）内工作、特别是**编写 .CIV 工程文件**或回答文明6 mod 制作问题时，必须先完整阅读本文件。规则优先于任何"合理想象"。
+>
+> **薄指针**：本文件只含工具专属规则。文明6 **游戏深度知识**（Modifier/Requirement/文本/图标/DB 验证，137+ 技能文件）在 `D:\文明6mod用文件夹\AI制作Mod\skills\`（入口 `AGENTS.md`，.CIV 工作流见 `skills/05-modtools-civ/INDEX.md`）。写 .CIV 时缺知识先查那边，别在本仓库重新积累（单一知识源，防漂移）。
+> **单会话交付**：.CIV + 特殊 SQL/Lua 补丁一体化流水线见 `AI制作Mod/skills/05-modtools-civ/pipeline.md`；无头导出用 `AI制作Mod/export_modtools.py`（本仓库 `.venv` 的 python 运行）。
 
 ---
 

@@ -2,7 +2,9 @@
 
 基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。
 
-> **下载发布版**：GitHub Releases 页面提供打包好的 `ModTools5.4.exe`（无需安装 Python，双击即用）。发布版由 GitHub Actions 自动构建，保证与源码一致。
+> **下载发布版**：GitHub Releases 页面提供打包好的 `ModTools5.4.zip`（含 `ModTools5.4.exe`，无需安装 Python，双击即用）。发布版由 GitHub Actions 自动构建，保证与源码一致。
+>
+> **zip 内容**：`ModTools5.4.exe` + `local_text_New.sqlite`（内置中文文本库）+ `data/`（可覆盖的配置与颜色预设）+ `modgen/`（AI 生成 .CIV 的 CLI 工具与指南）。AI 生成 .CIV 的知识查询由工具内置的**能力实现搜索**提供，无需外部知识库。
 
 ---
 

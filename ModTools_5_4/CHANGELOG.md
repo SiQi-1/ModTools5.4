@@ -1,5 +1,44 @@
 # Changelog
 
+## 2026-08-16 - 发布包支持新设备 AI 生成 CIV（随包内置 modgen）
+
+### 变更
+- `build_release.ps1`：release/zip 新增 **modgen/** 目录（AI 生成/校验 .CIV 的 CLI 工具 + schemas + AGENTS.md 指南，纯标准库可直接运行，剔除 __pycache__）；
+- `modgen/AGENTS.md`：知识来源从"外部知识库 AI制作Mod/"改为**工具内置能力**——能力实现搜索（现查原版实现）+ 游戏库 + schemas；明确发布包不含外部知识库；
+- README 发布说明更新 zip 内容清单；
+- 清理根目录遗留临时文件（_gi_*）。
+
+### 说明
+- AI 在新设备生成 .CIV 不需要搬运知识库：格式由 modgen 封装（Type 生成/校验/参数骨架），"意图→效果"知识用工具内能力实现搜索现查现抄。
+
+## 2026-08-16 - 修复：全分区 SQL 生成器按 type 去重重复条目
+
+### 问题
+- 各分区 SQL 生成器只做**行字符串级**去重：同一 type 的重复条目（复制/手写 .CIV 常见）若文本不同，行字符串不同 → 去重无效 → **主表同主键两行**（游戏加载报错）+ 文本重复。
+
+### 修复（`workspace_page.py`，12 个分区生成器统一加 type 级去重）
+- 文明 / 领袖 / 区域 / 建筑 / 单位 / 改良设施 / 政策卡 / 项目 / 信仰 / 议程 / 总督 / 单位晋升：条目循环按 type 去重，同 type 只取第一条（Types/主表/文本全部跳过）；
+- **伟人**：两层去重——`GreatPersonClassType` 只生成一次 class 行（避免 GreatPersonClasses 同主键），`GreatPersonIndividualType` 与 `GreatWorkType` 各自去重（个体/巨作不因 class 重复而翻倍）；同职业多条目时后置条目的 individuals 仍正常处理；
+- 通用 Text 组装跨组去重（上一修复）已兜底文本层；`_build_configs_sql_preview` 用 dict 天然去重，无需改动；修改器工作区有独立的编辑期 `_deduplicate_modifier_id` 机制。
+
+### 验证
+- 新增 `tests/test_duplicate_type_entries.py`（12 例，覆盖全部 12 个分区：同 type 两条目 → Types/主表/文本计数唯一）；全量 187 项测试通过。
+
+## 2026-08-16 - 修复：信仰文本生成两遍（统一 Text.sql 重复行）
+
+### 问题
+- 信仰文本在统一 Text.sql 中重复输出（同 type 条目可达 4 遍），且重复行可能破坏 VALUES 分号结尾。
+- 两个根因叠加：
+  1. **去重形同虚设**：`_build_text_workspace_preview` 中 `ordered_rows` 的去重结果只用于 `total_rows` 计数，实际输出仍遍历分组原始行（`workspace_page.py`）；
+  2. **分组子串匹配**：`_groups_by_section` 用 `entity_type in tag` 过滤，type 前缀重叠（如 `BELIEF_DEMO` / `BELIEF_DEMO_X`）时同一行被分进多个组；**同 type 两条目**时每组重复整组行。
+
+### 修复
+- `_build_text_workspace_preview`：组装阶段重构为**跨组按行去重**（同一行只输出一次、归入第一个匹配组，组空则注释头不输出），`total_rows` 与实际输出行数严格一致（SQL 单分号结尾）；
+- `_build_belief_sql_pair`：**按信仰 type 去重条目**（同 type 只取第一条）——同时消除 Types/Beliefs/Text 重复输出与 **Beliefs 表同主键两行**（游戏加载会报错）的隐患。
+
+### 验证
+- 新增 `tests/test_sql_previews.py` 3 例（前缀重叠不重复、同 type 不重复、统一 Text.sql 单分号结尾）；全量 175 项测试通过。
+
 ## 2026-08-16 - 新增：双击 .CIV 文件直接打开（文件关联）
 
 ### 功能

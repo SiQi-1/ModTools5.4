@@ -1,14 +1,16 @@
-"""modgen CLI：generate / validate / merge。
+"""modgen CLI：generate / validate / merge / search。
 
 用法：
     python -m modgen.cli generate <分类> --name 中文名 --abbr 简称 [--prefix 前缀] [--infix 编号] [--desc 描述]
     python -m modgen.cli validate <工程.CIV> [--prefix 前缀] [--infix 编号]
     python -m modgen.cli merge <工程.CIV> <分类> --entry entry.json [--no-validate]
+    python -m modgen.cli search <关键词> [--object] [--detail] [--game-db 路径] [--text-db 路径]
 """
 from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
@@ -28,7 +30,13 @@ from .modifier_generator import (
     generate_requirement,
     generate_requirement_set,
 )
+from .search import object_modifier_summary, resolve_db_paths, search_keyword
 from .validator import check_entry, validate_project
+
+SEARCH_HINT = (
+    "提示：不确定效果怎么做时，先用 `python -m modgen.cli search <效果词>` 查游戏里现成的实现，"
+    "再照抄（不要凭记忆断言某效果不存在）。"
+)
 
 
 def _parse_json_list(raw: str | None) -> list[dict[str, Any]]:
@@ -115,6 +123,56 @@ def _cmd_merge(args: argparse.Namespace) -> int:
     save_civ(Path(args.civ), payload)
     print(f"已合并到 {args.civ}（自动备份 .bak）")
     return 0
+
+
+def _cmd_search(args: argparse.Namespace) -> int:
+    """search：搜效果/对象 → 找到游戏里现成的实现（AI 知识获取的内置途径）。"""
+    keyword = args.keyword
+    game_db, text_db = resolve_db_paths(args.game_db, args.text_db)
+    if game_db is None:
+        print("ERROR: 未找到游戏数据库。可指定 --game-db 路径，或确认本机已运行过文明6。", file=sys.stderr)
+        return 1
+    conn = sqlite3.connect(str(game_db))
+    loc_conn = None
+    if text_db is not None:
+        try:
+            loc_conn = sqlite3.connect(str(text_db))
+        except sqlite3.Error:
+            loc_conn = None
+    try:
+        if args.object:
+            # 对象视角：列出该对象绑定的全部 Modifier 实现
+            results = search_keyword(conn, loc_conn, keyword, limit=5)
+            if not results:
+                print(f"未找到与「{keyword}」相关的对象。")
+                return 1
+            for item in results:
+                print(f"[{item['label']}] {item['name']} ({item['type']}) — 命中: {item['hit']}")
+                mods = object_modifier_summary(conn, loc_conn, item["category"], item["type"])
+                if not mods:
+                    print("    （该对象无直接绑定 Modifier，能力可能来自建筑/特质/相邻加成）")
+                for mod in mods:
+                    line = f"    {mod['modifier_id']} [{mod['effect_type'] or mod['modifier_type']}]"
+                    if mod["args"]:
+                        line += f"  参数: {', '.join(mod['args'][:6])}"
+                    print(line)
+                    for rs in mod["reqsets"]:
+                        print(f"        {rs}")
+            return 0
+
+        results = search_keyword(conn, loc_conn, keyword)
+        if not results:
+            print(f"未找到与「{keyword}」相关的内容。")
+            print("提示：中文可试效果词（宣战→WAR、产能→PRODUCTION…）；也可直接搜英文 Type/参数。")
+            return 1
+        print(f"命中 {len(results)} 个对象（--object 查看具体实现）：")
+        for item in results:
+            print(f"  [{item['label']}] {item['name']} ({item['type']}) — {item['hit']} | {item['summary'][:60]}")
+        return 0
+    finally:
+        conn.close()
+        if loc_conn is not None:
+            loc_conn.close()
 
 
 def _parse_params(raw: str | None) -> list[dict[str, Any]]:
@@ -223,6 +281,13 @@ def build_parser() -> argparse.ArgumentParser:
     merge.add_argument("--no-validate", action="store_true", help="跳过校验")
     merge.set_defaults(func=_cmd_merge)
 
+    search = sub.add_parser("search", help="搜索效果/对象，查看游戏里现成的 Modifier 实现（知识查询）")
+    search.add_argument("keyword", help="关键词：中文效果词（宣战/产能/农场…）或英文 Type/参数（WAR/YIELD_PRODUCTION…）")
+    search.add_argument("--object", action="store_true", help="列出命中对象的全部 Modifier 实现（照抄用）")
+    search.add_argument("--game-db", default="", help="游戏库路径（默认读 settings.json 或游戏 Cache）")
+    search.add_argument("--text-db", default="", help="文本库路径（中文检索用；默认读 settings.json）")
+    search.set_defaults(func=_cmd_search)
+
     # 修改器四类（共享 prefix/infix）
     def _add_shared(parser_: argparse.ArgumentParser) -> None:
         parser_.add_argument("--prefix", default="", help="工程前缀（如 SIQI）")
@@ -279,6 +344,10 @@ def main(argv: list[str] | None = None) -> int:
         return int(args.func(args))
     except Exception as exc:  # noqa: BLE001
         print(f"ERROR: {exc}", file=sys.stderr)
+        # 未知效果/条件类型等知识性错误：内置"先搜索再断言"的方法论引导
+        message = str(exc)
+        if any(marker in message for marker in ("EffectType", "RequirementType", "CollectionType")):
+            print(SEARCH_HINT, file=sys.stderr)
         return 1
 
 

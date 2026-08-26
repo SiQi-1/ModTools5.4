@@ -317,5 +317,80 @@ class ModifierTestCase(unittest.TestCase):
         self.assertTrue(any("EffectType" in e for e in errors), errors)
 
 
+def _has_game_db() -> bool:
+    from modgen.search import default_game_db_path, resolve_db_paths
+
+    gdb, _tdb = resolve_db_paths(None, None)
+    return gdb is not None and gdb.exists()
+
+
+@unittest.skipUnless(_has_game_db(), "无游戏数据库，跳过 search 测试")
+class SearchTestCase(unittest.TestCase):
+    """modgen search：效果/对象查询（知识获取的内置途径）。"""
+
+    def setUp(self) -> None:
+        import sqlite3
+
+        from modgen.search import resolve_db_paths
+
+        self.gdb, self.tdb = resolve_db_paths(None, None)
+        self.conn = sqlite3.connect(str(self.gdb))
+        self.loc = sqlite3.connect(str(self.tdb)) if self.tdb else None
+
+    def tearDown(self) -> None:
+        self.conn.close()
+        if self.loc is not None:
+            self.loc.close()
+
+    def test_english_keyword_finds_war_abilities(self) -> None:
+        from modgen.search import search_keyword
+
+        results = search_keyword(self.conn, self.loc, "WAR")
+        self.assertTrue(results, "WAR 应命中持有相关能力的对象")
+        self.assertTrue(any(item["hit"] == "能力" for item in results))
+
+    def test_chinese_effect_word_expands_to_english(self) -> None:
+        from modgen.search import search_keyword
+
+        results = search_keyword(self.conn, self.loc, "宣战")
+        self.assertTrue(results, "中文效果词'宣战'应经映射命中")
+        self.assertTrue(any(item["hit"] == "能力" for item in results))
+
+    def test_chinese_object_search_with_text_db(self) -> None:
+        from modgen.search import search_keyword
+
+        if self.loc is None:
+            self.skipTest("无文本库")
+        results = search_keyword(self.conn, self.loc, "农场")
+        types = {item["type"] for item in results}
+        self.assertIn("IMPROVEMENT_FARM", types, "中文'农场'应命中改良设施")
+        self.assertIn("TRAIT_CIVILIZATION_KHMER_BARAYS", types, "应命中相邻农场加成的高棉特质")
+
+    def test_object_modifier_summary_includes_farm_solution(self) -> None:
+        """相邻农场+食物 的现成实现（EFFECT_ADJUST_PLOT_YIELD）应能被查到手。"""
+        from modgen.search import object_modifier_summary
+
+        mods = object_modifier_summary(
+            self.conn, self.loc, "trait", "TRAIT_CIVILIZATION_KHMER_BARAYS"
+        )
+        farm_mod = next(
+            (m for m in mods if m["modifier_id"] == "TRAIT_FARM_AQUEDUCT_ADJECENCY_FOOD"), None
+        )
+        self.assertIsNotNone(farm_mod, "大人工湖的相邻农场食物 modifier 应存在")
+        self.assertEqual(farm_mod["effect_type"], "EFFECT_ADJUST_PLOT_YIELD")
+        self.assertIn("YieldType=YIELD_FOOD", farm_mod["args"])
+        self.assertTrue(
+            any("REQUIREMENT_PLOT_IMPROVEMENT_TYPE_MATCHES" in rs for rs in farm_mod["reqsets"]),
+            "条件应包含地块改良匹配（农场判定）",
+        )
+
+    def test_unknown_effect_error_hints_search(self) -> None:
+        """generate-modifier 未知 EffectType 报错应附 search 引导。"""
+        from modgen.cli import main
+
+        exit_code = main(["generate-modifier", "--effect", "EFFECT_NOT_REAL", "--desc", "X"])
+        self.assertNotEqual(exit_code, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

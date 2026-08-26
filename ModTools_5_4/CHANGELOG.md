@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-08-16 - modgen 内置知识查询：search 命令（方法论工具化）
+
+### 新增 `python -m modgen.cli search`
+- `search <关键词>`：三通道搜索（对象文本/能力层反查/中文效果词映射），命中对象列表（分类/名称/Type/命中/摘要）；
+- `search --object <关键词>`：列出命中对象的**全部 Modifier 实现**（ModifierId/EffectType/参数/条件集→条件→参数），AI 照抄用；
+- 路径自动解析：`--game-db/--text-db` > 当前目录 `settings.json` > `ModTools_5_4/data/settings.json` > 游戏默认 Cache；
+- 纯标准库、随发布包分发（zip 内 modgen/），不依赖 GUI。
+
+### 方法论内置（替代"提示词"）
+- **错误信息引导**：`generate-modifier`/`generate-requirement` 未知类型报错时，错误信息与通用提示均引导"用 `modgen search <效果词>` 查现成实现，不要凭记忆断言不存在"（原"可查 reference/csv-export"外部路径提示已移除）；
+- `modgen/AGENTS.md` 知识查询章节重写：`modgen search` 为命令行首选，能力实现搜索为 GUI 场景，附"农场→大人工湖"完整示例；
+- README 开局提示词第 3 条同步。
+
+### 验证
+- modgen 测试 34 项（新增 5 项 SearchTestCase：英文/中文效果词/对象反查/大人工湖实现可查/错误引导）；主仓库测试不受影响。
+
 ## 2026-08-16 - README 强化"知识获取途径"核心方法论
 
 - 修正错误示例："每相邻农场+1食物"实为 `EFFECT_ADJUST_PLOT_YIELD` 可实现（验证自高棉「大人工湖」 `TRAIT_FARM_AQUEDUCT_ADJECENCY_FOOD`），从"需 Lua"清单移除；

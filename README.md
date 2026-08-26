@@ -80,10 +80,12 @@ modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
 2. 生成条目：python -m modgen.cli generate <分类> --name 中文名 --abbr 英文简称
    --prefix <前缀> --infix <编号>；修改器用 generate-modifier / generate-requirement /
    generate-reqset / generate-ability（效果类型由工具校验，错了会拒绝）。
-3. 不知道"某个效果怎么实现"（如被宣战+100%产能、相邻农场+食物）：让用户在 ModTools 小工具的
-   "能力实现搜索"里搜效果词（如"宣战"、"农场"），把搜索结果（对象 + EffectType/RequirementType/
-   参数）发给我，我照抄原版实现。**不要凭记忆断言某个效果没有现成实现**——绝大多数效果
-   都能在游戏里找到对应 modifier，搜不到再讨论其他方案。
+3. 不知道"某个效果怎么实现"（如被宣战+100%产能、相邻农场+食物）：先运行
+   `python -m modgen.cli search <效果词>` 查游戏里现成的实现，例如
+   `search --object 农场` → 高棉「大人工湖」→ `EFFECT_ADJUST_PLOT_YIELD` + 两个
+   `REQUIREMENT_*`（相邻+农场判定），直接照抄；也可以让用户在 ModTools 小工具的
+   "能力实现搜索"里搜效果词并把结果发给我。**不要凭记忆断言某个效果没有现成实现**——
+   绝大多数效果都能在游戏里找到对应 modifier，搜不到再讨论其他方案。
 4. 生成后必须 validate（ERROR 必须修、WARNING 需确认），再 merge 进工程；
    临时文件一律放 modgen_work/。
 5. 我的能力边界：不写 Lua、不直接写 SQL/XML、不生成图片资源、不做 UI 界面/

@@ -17,13 +17,13 @@ from .schema_store import collection_type_exists, effect_type_params, requiremen
 def _require_valid_effect(effect_type: str) -> None:
     params = effect_type_params(effect_type)
     if params is None:
-        raise ValueError(f"未知 EffectType：{effect_type}（可查 reference/csv-export/Effects.csv）")
+        raise ValueError(f"未知 EffectType：{effect_type}（可用 python -m modgen.cli search <效果词> 查现成实现）")
 
 
 def _require_valid_requirement_type(requirement_type: str) -> None:
     params = requirement_type_params(requirement_type)
     if params is None:
-        raise ValueError(f"未知 RequirementType：{requirement_type}")
+        raise ValueError(f"未知 RequirementType：{requirement_type}（可用 python -m modgen.cli search <效果词> 查现成实现）")
 
 
 def _param_skeleton(param_names: list[str] | None) -> list[dict[str, Any]]:

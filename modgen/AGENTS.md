@@ -95,13 +95,20 @@ python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中
 
 生成 .CIV 所需的知识（"某个效果/能力是怎么实现的"）**由工具本身提供**，不要依赖外部资料：
 
-1. **能力实现搜索（ModTools 小工具 → 能力实现搜索）**：
-   - 中文搜效果/描述（如"宣战"、"产能"），或英文搜 Type/参数（如 `WAR`、`YIELD_PRODUCTION`）；
-   - 打开对象后右侧展示该能力的**完整实现**：ModifierType/EffectType、参数、条件集→条件→条件参数，ATTACH/GRANT_ABILITY 嵌套自动展开；
-   - **用途**：确定"用户意图 → 用哪个 EffectType/RequirementType/参数值"——照抄原版实现即可。
-2. **游戏库（DebugGameplay.sqlite）**：本机已配置时，`modgen validate` 会校验 EffectType/RequirementType/参数名归属；不确定的表结构/字段名直接查库。
-3. **modgen schemas**：`modgen/schemas/modifier_schemas.json`（789 效果类型参数集）与 `entry_schemas.json` 是工具内置的权威数据。
+1. **`modgen search`（命令行首选，AI 直接可用）**：
+   ```bash
+   python -m modgen.cli search <关键词>          # 搜效果/对象：中文效果词（宣战/产能/农场…）或英文 Type/参数（WAR/YIELD_PRODUCTION…）
+   python -m modgen.cli search --object <关键词>  # 列出命中对象的全部 Modifier 实现（EffectType/参数/条件集/条件，照抄用）
+   ```
+   - 路径自动解析：`--game-db/--text-db` 参数 > 当前目录 `settings.json` > 游戏默认 Cache；中文检索需要文本库（settings.json 的 `active_text_db_path`）；
+   - 例：`search --object 农场` → 高棉「大人工湖」→ `TRAIT_FARM_AQUEDUCT_ADJECENCY_FOOD [EFFECT_ADJUST_PLOT_YIELD]` + `REQUIREMENT_PLOT_IMPROVEMENT_TYPE_MATCHES(IMPROVEMENT_FARM)` ——"相邻农场+食物"的现成实现，直接照抄。
+2. **能力实现搜索（ModTools 小工具 → 能力实现搜索）**（GUI 场景）：
+   - 中文搜效果/描述，或英文搜 Type/参数；打开对象后右侧展示**完整实现**（含 ATTACH/GRANT_ABILITY 嵌套展开）；
+   - **用途**：与 `modgen search --object` 相同，只是 GUI 版。
+3. **游戏库（DebugGameplay.sqlite）**：`modgen validate` 会校验 EffectType/RequirementType/参数名归属；不确定的表结构/字段名直接查库。
+4. **modgen schemas**：`modgen/schemas/modifier_schemas.json`（789 效果类型参数集）与 `entry_schemas.json` 是工具内置的权威数据。
 
+> **方法论（硬性要求）**：判断"某个效果有没有现成实现"的唯一正确方法是 **search 查原版**，**不要凭记忆断言做不到**——绝大多数效果游戏里都有对应 Modifier（相邻加成、地块产出等）。确需 Lua 的只有自定义界面/事件逻辑等极少数场景，此时才告知用户。
 > 注意：外部目录（如 `AI制作Mod/`）只在开发机上存在，**发布包不含外部知识库**——一律用上述工具内能力查询。
 > 硬规则不变：ModifierType 优先引用游戏库已有类型（确需新建时补 DynamicModifiers 行）；JSON 禁止 `""`；不写 Lua。
 

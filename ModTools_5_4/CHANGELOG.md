@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-16 - ROADMAP 重写为当前状态（清理过时条目）
+
+- 移除过时内容：图片工具/PSD 条目（功能已删）、"测试 39 个用例"旧数字、README 截图脚本说明、已完成的全局搜索 TODO 与迭代顺序 A；
+- 补充最新状态：modgen（generate/validate/merge/search）、知识查询双入口、文本标记渲染、源码+exe 双轨发布、一键初始化、文件关联、187+ 测试、阶段 1/2 修复汇总；
+- `docs/TEX_FORMAT.md` 经核对与当前实现一致（R8G8B8A8_UNORM/Leader_Fallback/mip 3x3），保留。
+
 ## 2026-08-16 - 新增全流程教程 + 清理旧文档（教程移至仓库根）
 
 ### 新增

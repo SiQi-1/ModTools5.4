@@ -95,11 +95,10 @@ ModTools_5_4/
 │   └── images/                 # Embedded UI images (incl. citybanner_* city-state flag layers)
 ├── docs/
 │   ├── ROADMAP.md              # Current Done/TODO status (keep in sync)
-│   ├── TUTORIAL.md             # Full user tutorial (765 lines, from-zero mod making)
-│   ├── TEX_FORMAT.md           # Texture file format reference
-│   └── screenshots/            # Auto-generated README screenshots (tools/make_screenshots.py)
+│   └── TEX_FORMAT.md           # Texture file format reference
 └── logs/                       # modtools_5_4.log (git-tracked history; prefer not adding more)
 ```
+根目录文档：`README.md`（使用教程）、`CIV6_MOD_TUTORIAL.md`（从零全流程教程，随包分发）、`AGENT_SETUP.md`（新设备初始化，给 AI agent）、`modgen/AGENTS.md`（AI 生成 .CIV 必读）。
 
 ## Tests
 

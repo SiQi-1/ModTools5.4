@@ -1,9 +1,14 @@
 # Changelog
 
-## 2026-08-16 - 新增全流程教程 + 文档精简（能力搜索说明合并 / ModBuddy 表述修正）
+## 2026-08-16 - 新增全流程教程 + 清理旧文档（教程移至仓库根）
 
 ### 新增
-- **`docs/CIV6_MOD_TUTORIAL.md`**：文明6 Mod 制作全流程教程（独立文件，随包分发）——创建工程 → GUI/AI 双路径制作 → 部署进游戏（ModBuddy 构建 / 手写 .modinfo 模板）→ 纯 AI 工作流示例（被宣战+100%产能完整命令链）→ 知识查询方法论 → 常见效果速查表 → 排障速查。
+- **`CIV6_MOD_TUTORIAL.md`（仓库根，随包分发）**：文明6 Mod 制作全流程教程——创建工程 → GUI/AI 双路径制作 → 部署进游戏（ModBuddy 构建 / 手写 .modinfo 模板）→ 纯 AI 工作流示例（被宣战+100%产能完整命令链）→ 知识查询方法论 → 常见效果速查表 → 排障速查。
+
+### 清理（此前项目的文档不再进入 git/zip）
+- 删除 `docs/51_进度交接.md`、`docs/52_进度交接.md`（51/52.CIV 工程交接文档）；
+- 删除 `ModTools_5_4/docs/TUTORIAL.md`（旧教程，被新教程取代）与 `screenshots/` 13 张截图（README 去图后无引用）；
+- 保留 `docs/ROADMAP.md`（开发路线图）与 `docs/TEX_FORMAT.md`（格式参考）；CLAUDE.md 架构树同步。
 
 ### 修正与精简（README）
 - **ModBuddy 表述修正**（原"不需要 ModBuddy 但最后一步需要"矛盾）：明确——ModBuddy 非必需，工具只需 .civ6proj 定位输出目录（可手写模板）；部署需 .modinfo（ModBuddy 构建或手写放入游戏 Mods 目录）。

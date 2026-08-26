@@ -64,6 +64,56 @@
 
 ---
 
+## AI 生成 .CIV（modgen 工具）
+
+发布包随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出，AI 不需要记忆游戏知识（"某个效果怎么实现"用上面的**能力实现搜索**现查现抄）。
+
+### 开局提示词（把这段给 AI）
+
+```markdown
+你是 ModTools 5.4 的 Mod 制作助手。工作目录里有 ModTools5.4.exe（可视化编辑器）和
+modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
+
+1. 工程文件是 .CIV（JSON），你只通过 modgen 生成/校验/合并条目，绝不手写 JSON 结构。
+   必读 modgen/AGENTS.md（硬规则：ModifierType 优先用游戏库已有类型、JSON 禁止 ""、不写 Lua）。
+2. 生成条目：python -m modgen.cli generate <分类> --name 中文名 --abbr 英文简称
+   --prefix <前缀> --infix <编号>；修改器用 generate-modifier / generate-requirement /
+   generate-reqset / generate-ability（效果类型由工具校验，错了会拒绝）。
+3. 不知道"某个效果怎么实现"（如被宣战+100%产能）：让用户在 ModTools 小工具的
+   "能力实现搜索"里搜效果词（如"宣战"），把搜索结果（EffectType/RequirementType/参数）
+   发给我，我照抄原版实现。
+4. 生成后必须 validate（ERROR 必须修、WARNING 需确认），再 merge 进工程；
+   临时文件一律放 modgen_work/。
+5. 我的能力边界：不写 Lua、不直接写 SQL/XML、不生成图片资源、不做 UI 界面/
+   模型/动画/事件脚本；没有现成效果器的效果（如自定义 Lua 逻辑）请明确告知做不了。
+```
+
+### 可用范围
+
+| 能力 | 说明 |
+|------|------|
+| 13 个内容分类 | 文明/领袖/区域/建筑/单位/单位晋升/改良设施/总督/伟人/政策卡/项目/信仰/议程 |
+| 修改器四类 | Modifier / Requirement / RequirementSet / UnitAbility（效果类型存在性 + 参数骨架自动校验） |
+| 文本 | 中文文本直接写入条目，LOC tag 由导出自动注册 |
+| 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures |
+| 知识查询 | 能力实现搜索（现查原版实现）+ 游戏库 + modgen schemas（789 效果类型） |
+
+### 实现不了的能力（务必向用户强调）
+
+| 能力 | 说明 |
+|------|------|
+| ❌ **Lua 脚本** | 不生成、不编写、不支持 GamePlay/UI 脚本（工具硬边界，不是知识缺口） |
+| ❌ **UI 界面** | 自定义 UI.xml/面板/界面元素 |
+| ❌ **直接写 SQL/XML** | 所有输出由工具从 .CIV 生成，AI 不直接产出 |
+| ❌ **图片资源** | 图标/头像/立绘需用户提供，AI 不生成图片 |
+| ❌ **模型/动画/特效** | 3D 模型、骨骼动画、粒子特效 |
+| ❌ **事件脚本** | 监听游戏事件、自定义交互逻辑（需 Lua，同上） |
+| ⚠️ **无现成效果器的效果** | 某些效果游戏没有对应 Modifier（如 53.CIV 中"每相邻农场+1食物"暂搁置），需 Lua 才能实现——如实告知 |
+
+> modgen 是源码 CLI，新设备使用需 Python 3 环境（exe 本身不需要）。
+
+---
+
 ## 双击 .CIV 文件直接打开
 
 程序支持启动参数传工程路径（`ModTools5.4.exe "xx.CIV"` 或 `python ModTools5.4.py "xx.CIV"`），注册 Windows 文件关联后即可双击打开：

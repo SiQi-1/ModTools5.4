@@ -1,0 +1,84 @@
+{
+ "基础信息": {
+  "format": "MODTOOLS54_BASIC_INFO_WORKSPACE",
+  "schema_version": "1.0.0",
+  "data": {
+   "global_settings": {
+    "prefix": "",
+    "infix": 0,
+    "language": "简体中文"
+   },
+   "shared_workspace_params": {
+    "prefix": "",
+    "infix": 0,
+    "file_name": ""
+   },
+   "project_info": {
+    "civ6proj_path": "",
+    "mod_name": "",
+    "teaser": "",
+    "description": "",
+    "thanks": "",
+    "authors": "",
+    "guid": "",
+    "file_name": "",
+    "affects_saved_games": false,
+    "supports_single_player": false,
+    "supports_multiplayer": false,
+    "supports_hotseat": false,
+    "name_raw": "",
+    "teaser_raw": "",
+    "description_raw": "",
+    "localized_text_data": ""
+   },
+   "file_info": {
+    "front_end_actions": [],
+    "in_game_actions": [],
+    "delete_requests": []
+   }
+  }
+ },
+ "美术": {
+  "format": "MODTOOLS54_ART_WORKSPACE",
+  "schema_version": "1.0.0",
+  "data": {
+   "alias_map": {},
+   "source_map": {},
+   "need_map": {},
+   "extra_xlp_flags": {},
+   "extra_artdef_flags": {},
+   "civs": {},
+   "moments_map": {},
+   "leader_xlp_flags": {},
+   "art_xml_workspace_config": {
+    "art_consumers": {},
+    "libraries": {},
+    "required_game_art_ids": [],
+    "consumer_details": {}
+   },
+   "art_xml_source_config": {
+    "art_consumers": {},
+    "libraries": {},
+    "required_game_art_ids": [],
+    "consumer_details": {}
+   },
+   "art_xml_source_path": ""
+  }
+ },
+ "修改器": {
+  "format": "MODTOOLS54_MODIFIER_WORKSPACE",
+  "schema_version": "1.0.0",
+  "data": {
+   "prefix1": "",
+   "prefix2": "",
+   "owners": [],
+   "unit_abilities": [],
+   "modifiers": [],
+   "requirement_sets": [],
+   "requirements": []
+  }
+ },
+ "文本": {
+  "preview_settings": {}
+ }
+}

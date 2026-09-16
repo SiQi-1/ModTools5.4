@@ -1,4 +1,237 @@
 # Changelog
+## 2026-09-16 - 阶段 2：应用服务边界
+
+- 新增 `ModTools_5_4/application/services.py`：提供 Qt-free `ProjectService` 和 `GenerationService`。
+- `WorkspacePage` 的工程创建、加载、保存统一经过 `ProjectService`；GUI 输出面板和 AI 生成动作通过公开生成适配入口进入 `GenerationService`。
+- 保留旧私有生成方法和 tuple 接口，确保现有 GUI 行为与外部 AI 协议兼容。
+- 新增服务层单元测试，验证项目往返和生成委托不依赖 Qt。
+## 2026-09-16 - 阶段 0/1：重构基线与纯逻辑边界
+
+- 建立 `docs/ARCHITECTURE_BASELINE.md`，记录当前提交、工作树状态、测试基线与重构边界。
+- 新增 `project/schema.py`，集中 `.CIV` 顶层 envelope、workspace 归一化和序列化规则；`CivProject` 保持原有 API。
+- 新增 `project/output_manifest.py`，提供 Qt-free 输出 manifest、AI 摘要和安全相对路径规则；GUI 与 AI `get_manifest` 已接入，旧 tuple 接口保留。
+- 新增 `ai/contracts.py`，让 `help` 返回动作版本和参数元数据，现有动作参数校验行为保持不变。
+- 重复配置日志时关闭旧 handler，修复测试与 `--ai-exec` 场景的文件句柄泄漏警告。
+- 新增 schema、manifest、AI contract 回归测试。
+
+## 2026-08-17 - 生成 × 自定义 SQL 协调：加载顺序显式化 + check-conflicts 冲突检测
+
+### 背景（"到 Build 为止"的审计结论）
+
+- .CIV 生成内容（INSERT）与自定义 SQL（SELECT/UPDATE/自定义表）可能冲突：同表同主键双写 →
+  游戏加载主键冲突；UPDATE 生成行 → 下次生成覆盖回退。此前无任何检测，且自定义 SQL 与生成数据
+  同为 load_order 9999、显式 `--action` 时甚至为 0（会跑到生成数据之前）。
+
+### 修复与新增
+
+- **加载顺序显式化**：`custom_files.DEFAULT_LOAD_ORDER` 统一各动作默认顺序——自定义
+  UpdateDatabase=**10000**（> 生成数据 9999，SELECT 继承/自定义表永远在生成 INSERT 之后执行）；
+  modgen 显式 `--action` 与 GUI/AI `register_file_action` 缺省 load_order 时按同表取值。
+- **`modgen check-conflicts 工程.CIV [--json]`**（`modgen/custom_conflicts.py`）：
+  - 解析生成 SQL 与自定义 SQL 的 `INSERT`（VALUES 首列 = 主键）与 `UPDATE/DELETE`；
+    `INSERT...SELECT`（继承/数据迁移）合法跳过；
+  - ERROR = 同表同主键双写（自定义内部重复 / 与生成 SQL 冲突）；WARNING = UPDATE/DELETE 生成表（反模式）；
+  - 生成/自定义判别经 preview 引擎新增的 `build_preview_manifest`（readonly_custom_paths）；
+  - **AI 控制接口新增 `check_conflicts` 动作**（13→18→19→20 动作；需先 save_project）。
+- **修复（回归）**：`modgen/custom_file._action_entries` 兜底分支永不触发——**扁平基础信息**
+  （GUI 老工程格式）下 custom-file 的动作注册会静默丢失；改为显式回写，并加回归测试。
+- **skill 内部协调**：`skills/05-modtools-civ/pipeline.md` 补丁模式改写为新通道 + 协调红线
+  （同表 PK 禁止双写 / UPDATE 反模式 / SELECT 合法场景清单 / 分工口诀），验证速查表改为
+  全内置命令；modgen/AGENTS.md 工作流新增第 9 步与"自定义 SQL 协调"硬规则。
+- 测试：CheckConflictsCommandTestCase 6 项（扁平格式持久化回归/主键冲突/UPDATE 警告/干净自定义表/
+  INSERT...SELECT 豁免/CLI 退出码）+ AI `check_conflicts` 动作 1 项；全量：主仓库 285 + modgen 78。
+
+## 2026-08-17 - 技能库内迁：skills 本地化 + modgen skill 全文检索（摆脱外部目录依赖）
+
+### 背景
+
+- 游戏深度知识（SQL 模板/Lua API/.CIV 工作流/效果技巧，260+ 技能文件）此前在外部目录
+  `AI制作Mod/skills`，AGENT.md 靠绝对路径引用——换设备即断、发布包不带、外部调用易出错。
+
+### 迁移
+
+- **`skills/` 内迁仓库根**（262 文件 / 3.2 MB，与 modgen/ 平级；外部目录保留不动，仓库内为唯一权威）；
+  新增入口 `skills/AGENTS.md`（分类速查 + 查询方式 + 单一知识源约定）；
+- **`modgen skill <关键词>` 全文检索**（`modgen/skills.py`，纯标准库）：文件名+内容词频评分
+  （文件名命中加权）、命中片段、`--file <相对路径>` 输出全文（防 `..` 穿越）、目录 mtime 缓存索引、
+  `--skills-dir` 覆盖；与 `search` 分工：**"怎么做/怎么写"→skill**，"现成实现"→search；
+- **发布包自带技能库**：`build_release.ps1` 把 skills/ 打进 zip（含 AGENT.md/AGENTS.md 根文档），
+  新设备开箱即用；modgen 经 `mt_bridge` 同布局解析（zip 内 skills/ 与 modgen/ 同级，路径自动成立）；
+- **文档同步**：AGENT.md 薄指针改指仓库内相对路径（`skills/05-modtools-civ/pipeline.md` 本地；
+  无头导出改指 `modgen preview` 内置），modgen/AGENTS.md 知识查询新增第 0 条 skill、README/
+  教程第 5 章、CLAUDE.md、ROADMAP 同步。
+- 测试：SkillCommandTestCase 8 项（中文子串/文件名加权/片段/全文/穿越拒绝/空目录/真实库冒烟）；
+  全量：主仓库 283 测试 + modgen 72 测试通过。
+- **同日补强（闭环审计）**：检索引擎上移 `ModTools_5_4/skills_search.py`（单一实现；modgen/skills.py
+  经 mt_bridge 委托）；**AI 控制接口新增 `skill` 动作**（13→18→19 动作：keyword 检索 / file 全文）；
+  AGENTS.md 路由表、README 知识查询表、AGENT_SETUP.md（验证清单/使用指引/目录树）同步；全流程
+  闭环冒烟 10 步全过（new-project→generate/merge→validate→preview→civ6proj→custom-file→skill→
+  --ai-exec generate_all→自定义文件原样落盘+civ6proj 引用）。
+
+## 2026-08-17 - 自定义文件通道：AI 可写自定义 SQL/XML/Lua（消除"必须中转"）
+
+### 背景与能力
+
+- AI 以前只能生成 .CIV 主内容，自定义 SQL/Lua 必须人工中转（放文件 + GUI 一键配置）。
+  现在**自定义文件成为工具管理的一等公民**：AI 经工具写入工程目录并自动注册文件动作，
+  一键生成**原样透传**（不重新生成、不改写），进 .civ6proj 与 ActionData。
+- **共享规则模块 `ModTools_5_4/project/custom_files.py`**（纯标准库）：路径净化
+  （拒绝绝对路径/`..` 穿越）+ 动作分类（Scripts/*.lua→AddGameplayScripts、
+  UI/*.xml+lua→AddUserInterfaces、Import/*.lua→ImportFiles、Data/*.sql|xml→UpdateDatabase、
+  Icons/→UpdateIcons、Text/→UpdateText）+ 动作合并/移除（与 GUI 一键配置同一实现）。
+  GUI `_classify_custom_import_paths` 重构为委托该模块——**GUI 与 modgen 单一实现，防漂移**。
+
+### modgen 新命令 `custom-file`
+
+- `write 工程.CIV --path <相对路径> [--content 文本 | --content-file 文件] [--action 类型] [--no-action]`
+  （自动备份 .bak）；`list`（磁盘文件 + 动作清单）；`remove [--keep-file]`；
+  路径穿越拒绝（exit 1）；未绑定 .civ6proj 时提示先 `civ6proj --update-civ`。
+
+### AI 控制接口新动作（13 → 18）
+
+- `project_file_write`（自动注册动作，action_type 可显式指定）/ `project_file_read` /
+  `project_file_list` / `project_file_delete`（可连动作引用一起移除）/ `add_file_action`（精确注册，
+  UpdateIcons/UpdateText/UpdateColors 同时注册 FrontEnd+InGame）；`get_state` 增强：
+  返回 file_info 动作清单 + custom_files 工程目录文件清单 + project_root——**AI 与 GUI 视角一致**。
+
+### 修复（自定义文件链路）
+
+- 动作声明的 Lua/XML 文件此前会被**默认模板覆盖**（manifest 在收集外部文件前填模板）：
+  `_existing_action_file_content` 让已存在的动作文件以磁盘内容为准；
+- `_write_output_file` 统一换行归一（LF），修复 Windows 通用换行翻译把 `\r\n` 二次转成
+  `\r\r\n`（自定义文件经"写→生成→读"内容漂移）。
+
+### 硬规则修订（AGENT.md / modgen/AGENTS.md / README / 教程 / CLAUDE.md 同源同步）
+
+- 从"本项目不写 Lua、AI 不直接写 SQL/XML"修订为：**主内容**（13 分类/修改器/文本）仍由
+  工具从 .CIV 生成、不写 Lua；**自定义文件通道**允许 Lua/自定义 SQL/XML，但必须经
+  `custom-file` / `project_file_write` 工具化写入（路径与动作显式声明、进 .CIV、有备份与校验）。
+
+### 测试
+
+- 新增 `tests/test_custom_files.py`（22 项：净化/分类表驱动/UI Context 判定/合并去重/移除）、
+  AI 控制 6 项（写入自动注册/显式动作/列表删除/穿越拒绝/端到端透传+civ6proj 引用）、
+  modgen CustomFileCommandTestCase 6 项。全量：主仓库 283 测试 + modgen 64 测试通过。
+
+## 2026-08-17 - 能力实现搜索范围新增：科技/市政效果
+
+### 全局搜索（能力实现搜索 / modgen search）检索范围 14 类 → 16 类
+
+- **新增对象类型 `technology`（科技）/ `civic`（市政）**：检索语料覆盖
+  `Technologies`/`Civics` 主表（名称/描述/Type），效果绑定表 `TechnologyModifiers` /
+  `CivicModifiers` 接入三条链路——BM25 语料聚合（`search_index.DIRECT_BINDINGS`）、
+  Modifier 关键词反查（`ability_search._BINDING_TABLES`）、modgen 对象详情
+  （`object_modifier_summary`，`--object` 照抄实现用）。
+- 能力树同源生效：GUI 打开科技/市政对象详情时，`TechnologyModifiers`/`CivicModifiers`
+  绑定的 Modifier 按来源分组展开（ATTACH/GRANT_ABILITY 嵌套照常）；副表自动发现
+  （TechnologyPrereqs/Boost 等）无需额外配置。
+- GUI 小工具「全局搜索」分类下拉自动出现 科技/市政（`OBJECT_CATEGORY_LABELS` 数据驱动）；
+  `modgen search` 与 AI 控制接口 `search` 动作的 `category` 参数同步支持。
+- 实测：`search MATHEMATICS_ADJUST_SEA_MOVEMENT` → [科技] 数学（TECH_MATHEMATICS）；
+  `search CODE_OF_LAWS` → [市政] 法典（CIVIC_CODE_OF_LAWS）。
+  （注：本体科技/市政的 Modifier 多为能力授予/移动调整类，无直接 YIELD 参数——效果查询
+  的价值正是照抄这些现成实现。）
+- 测试：`test_search_index` 新增 3 项（注册/反查/分类过滤/能力树）+ modgen
+  `SearchRegistryTestCase`（无库注册断言）与 `SearchTestCase.test_technology_civic_effects_searchable`
+  （真实库端到端）；无游戏库环境自动 skip。
+
+## 2026-08-17 - AI 控制接口 + 内置 .civ6proj 生成（ModTools 摆脱 ModBuddy 新建工程依赖）
+
+### 新增：内置 .civ6proj 工程生成（复刻 ModBuddy 新建工程向导产物）
+
+- **`ModTools_5_4/project/civ6proj_generator.py`**（纯标准库，无 PyQt）：按 SDK 官方模板格式生成
+  ModBuddy 兼容工程——`{文件名}.civ6proj`（MSBuild XML：Name/Guid/ProjectGuid/ModVersion/Teaser/
+  Description/Authors/SpecialThanks/AffectsSavedGames/Supports×3/CompatibleVersions + InGameActionData
+  CDATA + None/Content/Folder ItemGroup + `<Import Project="$(MSBuildLocalExtensionPath)Civ6.targets"/>`，
+  自动生成新 GUID）+ 空白 `{文件名}.Art.xml`（内置模板 `data/default_blank_art.xml`）；生成物
+  ModBuddy 仍可直接打开/构建。格式依据 SDK `ModBuddy\Extensions\Application\ProjectTemplates\
+  Civ6ModProject\1033\*.zip` 模板与 `Civ6.targets`（向导参数表由 `.vstemplate` 占位符完整暴露，
+  无需反编译 DLL）。**本期不做 .modinfo**（那是 Build 时 GenerateModInfo 任务的产物，按计划下期）。
+- **GUI**：基础信息页"选择 .civ6proj"旁新增 **「新建 .civ6proj」** 按钮——默认路径
+  `文档\Firaxis ModBuddy\Civilization VI\<文件名>\`，字段取当前基础信息（GUID 为空自动生成），
+  生成后自动解析应用；`set_civ6proj_path()`（interactive 参数）供选择/新建/AI 接口三处共用。
+- **modgen 新命令 `civ6proj <工程.CIV>`**：`--out`（默认 ModBuddy 文档目录）/`--file-name`/
+  `--mod-name`/`--desc`/`--authors`/`--no-art-xml`/`--update-civ`（回写 civ6proj_path 进 .CIV，
+  自动备份）；scaffold 未配置的支持模式按 ModBuddy 向导默认 true 输出，避免生成无法加载的 mod。
+
+### 新增：AI 控制接口（外部 AI 打开并驱动 GUI）
+
+- **`ModTools_5_4/ai/control_server.py`**：动作注册表（`ControlContext`）+ localhost HTTP 服务器
+  （`ControlServer`，仅 127.0.0.1，QTimer 队列桥接 Qt 主线程，可选 token）+ CLI 一次性执行
+  （`--ai-exec`）。**不是** 2026-06-30 移除的应用内置 agent——这是给外部 AI 的驱动接口。
+- **13 个动作**：ping/help/open_project/save_project/get_state（分区条目+必填缺失+civ6proj 状态）/
+  get_manifest（导出清单）/generate_all（覆盖策略 ask|all|none）/generate_file/civ6proj_create/
+  quick_config/import_from_db（区域/建筑/单位/改良设施/伟人/政策卡，replace 仅前三类）/
+  search（与 GUI 小工具、modgen search 同一 BM25 引擎）/screenshot（PNG 截图，AI 可"看见"GUI）。
+- **CLI**：`python ModTools5.4.py 工程.CIV --ai-port 8765 [--ai-token X]`（驻留服务）；
+  `--ai-exec '<json动作>'`（可重复或数组，顺序执行后退出，结果写 stdout +
+  `ModTools_5_4/logs/ai_exec_result.json`，退出码 0/1/2）；`--headless`（offscreen 无窗口）。
+- **非交互化重构（GUI 行为不变）**：`_generate_all_output_files(overwrite_policy=)` /
+  `_generate_single_output_file(overwrite=)` 支持无弹窗模式并返回结果字典；必填校验拆出
+  `_collect_missing_required_fields()`（弹窗与数据收集分离）；一键配置拆出
+  `run_quick_config(interactive=)`；`_project_root_manifest` 前置刷新保证 quick_config 外部文件缓存就绪。
+- 文档：**`docs/AI_CONTROL_API.md`**（协议/动作表/典型工作流/安全边界）。
+
+### 测试与文档
+
+- 新增 `tests/test_civ6proj_generator.py`（17 项：官方属性键集比对、转义、GUID、动作 CDATA、
+  UpdateIcons 归一化、Art.xml）与 `tests/test_ai_control.py`（20 项：动作注册表、非交互生成、
+  一键配置、截图、Qt 桥、HTTP 往返/token、--ai-exec 解析执行）；modgen 新增 Civ6ProjCommandTestCase
+  （4 项）。全量：主仓库 250 测试 + modgen 55 测试通过。
+- `modgen/AGENTS.md`/`README.md`、根 `README.md`、`CIV6_MOD_TUTORIAL.md`、`CLAUDE.md` 架构树同步。
+
+### ModID（GUID）稳定性（同日补强）
+
+- **规则**：游戏的 Mod 唯一标识 = `.civ6proj` `<Guid>`（Build 时进 `.modinfo` `<Mod id>`），不可重复；
+  同一 Mod 重建必须沿用同一 GUID（否则游戏当成另一个 Mod）。
+- `create_mod_project` 返回 `guid`/`project_guid`（缺省自动生成 UUID v4）；`modgen civ6proj --update-civ`
+  在 .CIV 无 guid 时**回写本次生成的 GUID**（修掉"重复运行会重新生成 GUID 导致 ModID 漂移"的漏洞）；
+  GUI/AI 入口经解析回填机制同样稳定；`civ6proj_create` 结果含 `guid`。
+- `ai_get_state` 读取前先同步基础信息编辑器 → 工程数据（与 `_project_root_manifest` 同约定）：
+  GUI 上刚点「新建 .civ6proj」/刚改的字段，AI 立即能查到（离屏点击验证：按钮生成→界面回填→
+  get_state 全部一致）。
+- 测试：生成器返回值与文件 Guid 一致性 + 原 guid 保留（重建不漂移）；modgen 重复运行 guid 不变。
+
+## 2026-08-16 - 小工具搜索重做：LOC 嵌套解析收敛 + BM25 检索（bigram + 领域词典）
+
+### 修复：LOC 嵌套引用解析（能力实现搜索曾拿不到文本）
+
+- **问题**：游戏文本大量使用引用链（`{LOC_X}`，被引用文本还可能再嵌一层）。仓库里有四份各自为政的解析实现，其中**能力实现搜索（`db/ability_search.resolve_loc`）与 `modgen/search.py` 只解析一层**——显示残留未解析标记，更严重的是**检索匹配的是带 `{LOC_...}` 的原文，中文永远匹配不到这些文本**。
+- **修复**：新增 **`ModTools_5_4/db/loc_text.py`（单一实现）**——迭代展开 + `visited` 防环 + 深度上限（12）+ `{1_Amount}` 等数值占位符原样保留；四处调用点全部收敛委托（`text_database.query_text_by_tag`、`db/interface.py`、`db/ability_search.resolve_loc`、`modgen/search.py`），另将 `modgen/dbquery.resolve_loc_tag` 一并收敛（第五处）；modgen 经 `modgen/mt_bridge.py` 复用同一实现（仓库布局被破坏时自动补 sys.path）。
+
+### 重做：搜索算法（整句子串 + 46 词字典 → BM25）
+
+- **问题（实测）**：查询「通往你城市的贸易路线加产出」——效果词字典只命中 `城市→CITY`/`贸易→TRADE`（"产出""加成""贸易路线"都不在词典），中文通道要求**整句作为连续子串**出现（自然语言长查询 0 命中），回退英文子串通道后返回 200 条不相关结果（前 8 条全是议程特质）；无相关性排序与字段权重；ModifierStrings 中文完全未参与检索。
+- **新算法（`ModTools_5_4/db/search_index.py`）**：中文 **bigram** 倒排（无需分词库）+ **领域词典**（150+ 条中文术语 → 英文 Type 片段，如 贸易路线→TRADE_ROUTE、产出→YIELD、加成→ADJUST）+ **BM25**（k1=1.2/b=0.75）× 字段权重（名称 3.0 / Type 2.5 / 效果文本 2.0 / 描述 1.5 / Id·参数 1.0）；对象级**饱和聚合**（best + 0.18×其余，避免"文档多=排名高"）+ **覆盖度加成**（文档级与对象级）；**精确匹配晋级**（查询等于 Type/名称时置顶）；效果词扩展以 0.35 降权参与打分；索引按数据库 mtime 缓存（21,127 文档 / 14,426 词项，首次构建 ~0.35 秒，查询 1–7ms）。
+- **语料**：对象名称/描述（14 类）、ModifierStrings 中文、Modifier Id/Type/参数、Requirement Id/Type/参数与文本（全部经 LOC 嵌套解析）。
+- **效果**：同一查询 top 命中为「拉贾·托达·马尔（通往您国内城市的贸易路线为目的地每个特色区域+金币）」「伊本·法德兰」「贸易银行（通往盟友城市的贸易路线双边+2食物+2生产力）」「橙色电台」等真实实现；`农场` → 农场/梯田农场/太阳能农场。
+- **入口**：GUI 能力实现搜索（`ability_search.search_all`）与 CLI `modgen search` 共用同一索引与排序；效果词词典与 BM25 领域词典**同源**（`EFFECT_KEYWORD_MAP = search_index.TERM_MAP`），消除两份词典漂移。
+
+### 测试与文档
+
+- 新增 `tests/test_loc_text.py`（14 项：多层嵌套、防环、自引用、占位符保留、深度上限、回退语义、fetcher 语言回退）与 `tests/test_search_index.py`（12 项：分词/术语/Type 拆分、语料无残留 LOC 引用、缓存复用、中文名检索、精确 Type 置顶、自然语言贸易路线查询、分数降序、分类过滤）。
+
+## 2026-08-16 - 根目录文档任务路由（双目的分流）
+
+- 新增根目录 **`AGENTS.md`（复数，跨工具 agent 入口）**：任务分流表——A 实际应用（做 Mod/写 .CIV/答 Mod 问题）→ 读 `AGENT.md` + `modgen/AGENTS.md`；B 工具优化（改 ModTools/modgen）→ 读 `CLAUDE.md` + `ROADMAP.md`/`CHANGELOG.md`；C 环境初始化 → `AGENT_SETUP.md`；附任务特征判断法与红线（ModifierType 优先引用/JSON 禁 `""`/不写 Lua）。
+- `CLAUDE.md` 头部标注"工具优化向"并路由应用向任务；`AGENT.md` 头部标注"实际应用向"并路由工具优化任务；`modgen/AGENTS.md` 增加与 `AGENT.md` 的**同源声明**（硬规则两处一致，任一处为准）——解决"AI 先读根目录 md 而非子目录"导致的目的错位与文档重复维护问题。
+- 说明：`AGENTS.md`/`AGENT.md`/`modgen/AGENTS.md` 会被各 agent 工具自动注入，路由文件置于根目录可确保任意入口先落到任务分流。
+
+## 2026-08-16 - modgen 外接工具扩展：工程脚手架 + 修改器 merge + 无头预览 + DB 查询
+
+### 新增命令（`python -m modgen.cli ...`，AI agent 生成 .CIV 闭环补全）
+
+- **`new-project`**：创建工程级 .CIV 骨架——基础信息/美术/修改器/文本 结构就位，替代"手工拷贝旧工程 + 手写 workspace 骨架"（`modgen_work/build_52.py` 模式）。骨架默认结构来自 `modgen/schemas/project_scaffold.json`（`modgen/tools/extract_scaffold.py` 从 GUI 编辑器默认导出提取，结构变化后重新提取并提交）；
+- **`merge <工程> 修改器 --entry X`**：`generate-modifier/requirement/reqset/ability` 产物可直接合并进"修改器"节（自动识别类型，同 id 去重，合并后整体 `check_modifier_data` 校验，不合格拒绝），不再手拼修改器 dict；
+- **`preview <工程.CIV>`**：无头运行 GUI 生成引擎（offscreen，与 `tests/test_sql_previews.py` 同机制），输出将导出的全部文件（SQL/XML/Icons/ArtDef/XLP/Text/civ6proj…）到 `modgen_work/preview_<工程名>/` 或 `--dry-run` 只列清单；`--section 分类 [--format sql|xml]` 单分类输出。已验证与 52.CIV 人工核对产物逐字节一致（Modifiers/文明/文本 等，单位 SQL 差异为阶段1 `''`→`NULL` 修复所致，属预期）；需 PyQt6 环境；
+- **`query "SQL"`**：游戏库（DebugGameplay.sqlite）只读查询——仅允许 SELECT/WITH/PRAGMA/EXPLAIN，只读模式打开，写语句/多语句拒绝，默认限行 50（`--limit` 最大 500），`--json` 输出；
+- **`loc <LOC_TAG>`**：LOC 标签 → 简体中文（含 `{LOC_...}` 引用链展开），数据源为文本库 LocalizedText（与 GUI `db/interface.py` 同约定）。
+
+### 测试与文档
+
+- 新增 `modgen/tests/test_cli_tools.py`：new-project 结构/参数/校验、query 只读安全、loc 引用解析、merge 修改器（含去重与整体校验）、preview（PyQt 不可用时跳过）；modgen 51 测试 + 全量 187 测试通过；
+- `modgen/AGENTS.md`：推荐工作流更新为 new-project → generate → validate → merge（含修改器）→ preview 闭环；知识查询小节补充 query/loc 用法；
+- `modgen/README.md`：命令清单与结构图更新（含 extract_scaffold）。
 
 ## 2026-08-16 - ROADMAP 重写为当前状态（清理过时条目）
 

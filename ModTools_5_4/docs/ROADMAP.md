@@ -3,6 +3,18 @@
 > 本文档用于同步"代码真实状态"和"下一步优先级"。
 > 详细历史请看 `CHANGELOG.md`。功能改动时需同步更新两份文档。
 
+
+### 2026-09 阶段 0/1（已完成）
+- 完成架构基线记录：`docs/ARCHITECTURE_BASELINE.md`。
+- `.CIV` schema 归一化已从 `civ_project.py` 提取到 `project/schema.py`，旧入口保持兼容。
+- 输出 manifest 和路径安全规则已提取到 `project/output_manifest.py`，AI `get_manifest` 已使用共享值对象。
+- AI 动作 contract 元数据已加入 `ai/contracts.py`，`help` 可返回参数说明。
+- 日志 handler 重复配置时主动关闭，减少 Windows 文件句柄泄漏。
+
+### 2026-09 阶段 2（已完成）
+- 建立 `application` 服务层：`ProjectService` 负责 `.CIV` 持久化，`GenerationService` 负责 manifest/生成动作委托。
+- WorkspacePage 的项目 I/O 已接入 ProjectService；GUI/AI 生成入口已改为公开适配方法。
+- 当前仍由旧生成器执行实际内容构建，后续阶段再逐步迁移 SQL/XML 和资源生成逻辑。
 ## 一、当前已完成（Done）
 
 ### 1) 工程与工作区框架
@@ -22,16 +34,39 @@
 
 ### 5) 文本与知识查询
 - 文本工作区统一承载 Text.sql / Text.xml 预览；描述框右键 `[ICON_XXX]` 插入。
-- **能力实现搜索**（知识查询核心）：三通道（对象文本/能力层反查/中文效果词映射），14 类对象；详情 = 能力树（绑定来源分组、ATTACH/GRANT_ABILITY 嵌套展开、非默认标志、Strings）+ 数据表（主表/副表动态发现、相邻加成自动描述对照）；GUI（小工具窗口）与命令行（`modgen search`）双入口。
+- **LOC 文本解析单一实现**（`db/loc_text.py`）：嵌套 `{LOC_...}` 引用迭代展开 + 防环 + 深度上限；原四份分散实现（text_database / interface / ability_search / modgen）已全部收敛（含 modgen/dbquery，共五处）。
+- **能力实现搜索**（知识查询核心）：**BM25 检索**（`db/search_index.py`：中文 bigram + 150+ 条领域词典 → 英文 Type 片段 + 字段权重 + 覆盖度 + 精确匹配晋级），语料 = 对象名称/描述 + ModifierStrings 中文 + Modifier/Requirement 的 Id·Type·参数；16 类对象（2026-08-17 新增**科技/市政**，效果经 TechnologyModifiers/CivicModifiers 反查）；详情 = 能力树（绑定来源分组、ATTACH/GRANT_ABILITY 嵌套展开、非默认标志、Strings）+ 数据表（主表/副表动态发现、相邻加成自动描述对照）；GUI（小工具窗口）与命令行（`modgen search`）**同一实现与排序**。
 - 文本标记渲染：`[ICON_XXX]`（6 产出大小写不敏感）、`[NEWLINE]`、`[COLOR:XXX]`（官方 Civ6_ColorAtlas 116 预设 + 直接 RGB）。
 
 ### 6) 数据库导入能力（游戏库）
 - 区域、建筑、单位、单位晋升、改良设施、伟人导入已开放；政策卡逻辑已实现（按钮未开放）。
 
 ### 7) AI 生成 .CIV（modgen）
-- 纯标准库 CLI：generate（13 分类 + 修改器四类，Type 自动生成、EffectType 存在性校验、参数骨架）、validate（ERROR/WARNING）、merge、**search**（知识查询，`--object` 输出 Modifier 完整实现）。
+- 纯标准库 CLI：generate（13 分类 + 修改器四类，Type 自动生成、EffectType 存在性校验、参数骨架）、validate（ERROR/WARNING）、merge（内容分类 + **修改器**，自动备份）、**search**（知识查询，`--object` 输出 Modifier 完整实现）。
+- **new-project**：工程级 .CIV 骨架（基础信息/美术/修改器/文本 结构来自 GUI 默认导出提取的 project_scaffold.json），替代拷贝旧工程。
+- **civ6proj**：从 .CIV 基础信息直接生成 ModBuddy 兼容 .civ6proj + 空白 Art.xml（`--update-civ` 回写路径），无需 ModBuddy 新建工程。
+- **preview**：无头运行 GUI 生成引擎预览将导出的全部文件（SQL/XML/Icons/ArtDef/XLP/Text…，需 PyQt；`--section` 单分类输出）。
+- **query**（游戏库只读查询，仅 SELECT/WITH/PRAGMA/EXPLAIN）、**loc**（LOC → 简体中文）。
+- **skill**（2026-08-17）：本地技能库全文检索——仓库根 `skills/`（260+ 技能文件内迁自外部工作区，
+  随发布包分发，入口 `skills/AGENTS.md`），文件名+内容词频评分 + `--file` 全文；与 search 分工：
+  "怎么做/怎么写"→skill，"现成实现"→search。
 - 方法论内置：错误提示引导 search、"先搜索再断言"写入 AGENTS.md/README/教程。
-- 新设备无需外部知识库：知识查询 = `modgen search` / 能力实现搜索。
+- 新设备无需外部知识库：知识查询 = `modgen search` / `skill` / `query` / `loc` / 能力实现搜索。
+
+### 7b) AI 控制接口（外部 AI 驱动 GUI，2026-08）
+- GUI 内置 localhost HTTP 控制服务（`ai/control_server.py`，`--ai-port [--ai-token]`，QTimer 桥接主线程）
+  与 CLI 一次性执行（`--ai-exec [--headless]`）：18 动作（open_project/get_state/get_manifest/
+  generate_all/civ6proj_create/quick_config/import_from_db/search/screenshot + **自定义文件通道**
+  project_file_write/read/list/delete/add_file_action），协议见 `docs/AI_CONTROL_API.md`。
+- 生成/一键配置/必填校验非交互化（GUI 交互行为不变）；内置 .civ6proj 生成器（`project/civ6proj_generator.py`
+  + 基础信息页「新建 .civ6proj」按钮），生成物 ModBuddy 可打开/构建；.modinfo 下期再做（Build 时产物）。
+- **自定义文件通道**（2026-08-17）：`project/custom_files.py`（GUI 一键配置与 modgen `custom-file`
+  命令单一实现）——AI 可写自定义 SQL/XML/Lua（路径净化 + 动作自动分类注册 + 一键生成原样透传），
+  硬规则修订为"主内容不写 Lua/不手写 SQL；自定义文件经工具通道写入"；get_state 返回文件动作与自定义文件清单。
+- **生成 × 自定义 SQL 协调**（2026-08-17）：加载顺序显式化（自定义 UpdateDatabase=10000 > 生成数据 9999）；
+  `modgen check-conflicts [--json]` + AI 动作 `check_conflicts`（主键双写=ERROR / UPDATE 生成表=WARNING /
+  INSERT...SELECT 豁免）；preview 引擎新增 `build_preview_manifest`（readonly 判别）；skill 协调文档
+  pipeline.md 改写为新通道。
 
 ### 8) 发布与工程规范化（2026-08）
 - `build_release.ps1`：**源码 + exe 双轨**发行（zip 含 exe + 完整源码 + modgen + tools + 文档 + 数据文件）；PyInstaller onefile。
@@ -45,6 +80,11 @@
 - 明确设计意图不改：改良设施相邻加成 Description 用 "Placeholder"。
 
 ## 二、当前缺口（TODO）
+
+### P1：.modinfo 生成（ModBuddy 完全脱钩的最后一步）
+- 复刻 `Civ6.targets` 里 GenerateModInfo 任务的输出（civ6proj 属性 + 文件清单 → .modinfo），
+  文本/SQL 类 Mod 即可不经 ModBuddy 直接部署进游戏 Mods 目录；含美术资源的 Mod 仍依赖 Cooker。
+- 入口：`civ6proj_generator.generate_modinfo()` + GUI 按钮 + modgen `civ6proj --modinfo` + AI 动作。
 
 ### P1：导入按钮补齐
 - 政策卡导入逻辑已实现但按钮未开放（`group_workspace.py` 显隐名单）；文明、领袖、总督、项目、信仰、议程未实现导入。

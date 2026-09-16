@@ -49,6 +49,12 @@ def configure_logging(log_dir: Path, debug: bool = False) -> None:
     root = logging.getLogger()
     for old in list(root.handlers):
         root.removeHandler(old)
+        # Repeated bootstrap in tests, --ai-exec and GUI sessions must close
+        # old FileHandlers instead of leaking descriptors on Windows.
+        try:
+            old.flush()
+        finally:
+            old.close()
     root.setLevel(level)
     for h in handlers:
         root.addHandler(h)

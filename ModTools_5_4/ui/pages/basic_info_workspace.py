@@ -6,6 +6,12 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 
+from ...project.civ6proj_generator import (
+    create_mod_project,
+    default_modbuddy_project_dir,
+    sanitize_file_name,
+)
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QButtonGroup,
@@ -805,6 +811,9 @@ class BasicInfoWorkspacePanel(QWidget):
         self._civ6proj_path_edit.setReadOnly(True)
         self._select_civ6proj_button = QPushButton("选择 .civ6proj")
         self._select_civ6proj_button.clicked.connect(self._handle_choose_civ6proj)
+        self._create_civ6proj_button = QPushButton("新建 .civ6proj")
+        self._create_civ6proj_button.setToolTip("由 ModTools 直接生成 .civ6proj 工程文件与空白 Art.xml（无需 ModBuddy 新建工程）")
+        self._create_civ6proj_button.clicked.connect(self._handle_create_civ6proj)
         self._refresh_config_button = QPushButton("刷新配置")
         self._refresh_config_button.clicked.connect(self._handle_refresh_project_config)
 
@@ -920,6 +929,7 @@ class BasicInfoWorkspacePanel(QWidget):
         proj_path_row.setSpacing(8)
         proj_path_row.addWidget(self._civ6proj_path_edit, 1)
         proj_path_row.addWidget(self._select_civ6proj_button)
+        proj_path_row.addWidget(self._create_civ6proj_button)
 
         base_form = QFormLayout()
         base_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1031,13 +1041,70 @@ class BasicInfoWorkspacePanel(QWidget):
         )
         if not selected_file:
             return
+        self.set_civ6proj_path(Path(selected_file))
 
-        file_path = Path(selected_file)
+    def _default_new_project_file_name(self) -> str:
+        for source in (self._file_name_edit.text(), self._mod_name_edit.text()):
+            name = sanitize_file_name(_safe_text(source))
+            if name and name != "MyMod":
+                return name
+        return "MyMod"
+
+    def _handle_create_civ6proj(self) -> None:
+        """由 ModTools 直接新建 .civ6proj + 空白 Art.xml（复刻 ModBuddy 向导产物）。"""
+        file_name = self._default_new_project_file_name()
+        default_dir = default_modbuddy_project_dir(file_name)
+        selected_file, _ = QFileDialog.getSaveFileName(
+            self,
+            "新建 .civ6proj 工程文件",
+            str(default_dir / f"{file_name}.civ6proj"),
+            "Civ6 Project (*.civ6proj)",
+        )
+        if not selected_file:
+            return
+
+        target = Path(selected_file)
+        if target.suffix.lower() != ".civ6proj":
+            target = target.with_suffix(".civ6proj")
+        try:
+            created = create_mod_project(
+                directory=target.parent,
+                file_name=target.stem,
+                mod_name=_safe_text(self._mod_name_edit.text()) or target.stem,
+                guid=_safe_text(self._guid_edit.text()) or None,
+                teaser=_safe_text(self._description_edit.toPlainText()),
+                description=_safe_text(self._description_edit.toPlainText()),
+                authors=_safe_text(self._authors_edit.text()),
+                special_thanks=_safe_text(self._thanks_edit.text()),
+                affects_saved_games=self._affects_saved_games.isChecked(),
+                supports_single_player=self._supports_single_player.isChecked(),
+                supports_multiplayer=self._supports_multiplayer.isChecked(),
+                supports_hotseat=self._supports_hotseat.isChecked(),
+            )
+        except OSError as exc:
+            QMessageBox.critical(self, "新建失败", f"写入工程文件失败：{exc}")
+            return
+
+        self.set_civ6proj_path(Path(str(created["civ6proj"])))
+        QMessageBox.information(
+            self,
+            "新建完成",
+            f"已生成 ModBuddy 兼容工程：\n{created['civ6proj']}\n{created.get('art_xml')}\n\n"
+            "后续「一键生成」会把 SQL/XML/图标等输出到该目录。",
+        )
+
+    def set_civ6proj_path(self, file_path: Path, *, interactive: bool = True) -> None:
+        """解析并应用指定 .civ6proj（供选择/新建/AI 接口共用）。
+
+        interactive=False（AI 控制接口）时不弹窗，解析失败直接抛 ValueError。
+        """
         try:
             parsed = self._parse_civ6proj_file(file_path)
         except Exception as exc:
-            QMessageBox.critical(self, "解析失败", f"读取工程文件失败：{exc}")
-            return
+            if interactive:
+                QMessageBox.critical(self, "解析失败", f"读取工程文件失败：{exc}")
+                return
+            raise ValueError(f"解析 .civ6proj 失败：{exc}") from exc
 
         self._apply_parsed_civ6proj(parsed)
         self._civ6proj_path_edit.setText(str(file_path))
@@ -1540,6 +1607,9 @@ class BasicInfoWorkspacePanel(QWidget):
         return _local_name(root.tag).lower() == "context"
 
     def _classify_custom_import_paths(self) -> dict[str, list[str]]:
+        """自定义文件 → 动作分类桶（委托共享模块 `project/custom_files.py`，与 modgen 单一实现）。"""
+        from ...project.custom_files import classify_custom_path
+
         result = {
             "db": [],
             "icons": [],
@@ -1551,39 +1621,28 @@ class BasicInfoWorkspacePanel(QWidget):
         custom_paths = self._custom_project_paths()
         custom_set = {path.lower() for path in custom_paths}
 
+        def _peer_exists(rel: str) -> bool:
+            return rel.lower() in custom_set
+
+        def _read_text(rel: str) -> str:
+            return self._read_project_file_text(rel)
+
+        bucket_by_action = {
+            "UpdateDatabase": "db",
+            "UpdateIcons": "icons",
+            "UpdateText": "text",
+            "AddGameplayScripts": "gameplay_lua",
+            "AddUserInterfaces": "ui_files",
+            "ImportFiles": "import_lua",
+        }
         for rel in custom_paths:
             rel_norm = self._normalize_rel_path(rel)
-            lower = rel_norm.lower()
-            if "." not in lower:
-                continue
-            ext = lower.rsplit(".", 1)[-1]
-            parts = [part for part in lower.split("/") if part]
-            top = parts[0] if parts else ""
-
-            if ext in {"sql", "xml"}:
-                if top == "icons":
-                    result["icons"].append(rel_norm)
-                elif top == "text":
-                    result["text"].append(rel_norm)
-                elif top == "ui" and ext == "xml":
-                    lua_peer = rel_norm[:-4] + ".lua"
-                    if lua_peer.lower() in custom_set and self._looks_like_ui_context_xml(self._read_project_file_text(rel_norm)):
-                        result["ui_files"].append(rel_norm)
-                else:
-                    result["db"].append(rel_norm)
-                continue
-
-            if ext != "lua":
-                continue
-
-            if top == "scripts":
-                result["gameplay_lua"].append(rel_norm)
-            elif top == "ui":
-                xml_peer = rel_norm[:-4] + ".xml"
-                if xml_peer.lower() in custom_set and self._looks_like_ui_context_xml(self._read_project_file_text(xml_peer)):
-                    result["ui_files"].append(rel_norm)
-            elif top == "import":
-                result["import_lua"].append(rel_norm)
+            for _scope, action_type, _action_id, _load_order in classify_custom_path(
+                rel_norm, peer_exists=_peer_exists, read_text=_read_text
+            ):
+                bucket = bucket_by_action.get(action_type)
+                if bucket:
+                    result[bucket].append(rel_norm)
 
         for key, values in result.items():
             result[key] = sorted(set(values), key=lambda item: item.lower())
@@ -1753,10 +1812,16 @@ class BasicInfoWorkspacePanel(QWidget):
         self._front_end_editor.set_entries(_sync_entries(self._front_end_editor.entries()))
         self._in_game_editor.set_entries(_sync_entries(self._in_game_editor.entries()))
 
-    def _handle_quick_config(self) -> None:
+    def run_quick_config(self, *, interactive: bool = True) -> int | None:
+        """一键配置核心逻辑：扫描 .civ6proj 目录，追加文件动作配置（自动去重）。
+
+        interactive=True（GUI 按钮）：未选 .civ6proj 弹警告，完成后弹结果框；
+        interactive=False（AI 接口）：返回新增导入文件数，未选 .civ6proj 返回 None。
+        """
         if not _safe_text(self._file_name_edit.text()):
-            QMessageBox.warning(self, "一键配置", "请先选择 .civ6proj 文件。")
-            return
+            if interactive:
+                QMessageBox.warning(self, "一键配置", "请先选择 .civ6proj 文件。")
+            return None
 
         front_entries = self._front_end_editor.entries()
         in_game_entries = self._in_game_editor.entries()
@@ -1863,7 +1928,68 @@ class BasicInfoWorkspacePanel(QWidget):
 
         self._front_end_editor.set_entries(front_entries)
         self._in_game_editor.set_entries(in_game_entries)
-        QMessageBox.information(self, "一键配置", f"已追加文件动作配置（自动去重，不覆盖现有配置）。\n本次新增导入文件：{added_count} 个")
+        if interactive:
+            QMessageBox.information(self, "一键配置", f"已追加文件动作配置（自动去重，不覆盖现有配置）。\n本次新增导入文件：{added_count} 个")
+        return added_count
+
+    def _handle_quick_config(self) -> None:
+        self.run_quick_config(interactive=True)
+
+    # ── 自定义文件通道（AI 控制接口 / modgen 同语义，共享 project/custom_files.py）────
+
+    def register_file_action(
+        self,
+        *,
+        action_type: str,
+        action_id: str = "",
+        files: list[str],
+        load_order: int | None = None,
+    ) -> int:
+        """精确注册文件动作（无弹窗）。UpdateIcons/UpdateText/UpdateColors 同时注册
+        front + in_game；其余动作注册 in_game。返回新增文件数。
+
+        load_order=None 时按动作默认顺序（UpdateDatabase=10000 在生成数据 9999 之后）。
+        """
+        from ...project.custom_files import (
+            DEFAULT_LOAD_ORDER,
+            FRONT_AND_IN_GAME_ACTIONS,
+            IN_GAME_ONLY_ACTIONS,
+            merge_action_entry,
+        )
+
+        action = _safe_text(action_type)
+        if action not in FRONT_AND_IN_GAME_ACTIONS and action not in IN_GAME_ONLY_ACTIONS:
+            raise ValueError(f"未知动作类型：{action}")
+        action_id_value = _safe_text(action_id) or action
+        if load_order is None:
+            load_order = DEFAULT_LOAD_ORDER.get(action, 0)
+        file_list = [_safe_text(str(item)).replace("\\", "/") for item in files if _safe_text(str(item))]
+        added = 0
+        front = self._front_end_editor.entries()
+        in_game = self._in_game_editor.entries()
+        if action in FRONT_AND_IN_GAME_ACTIONS:
+            added += merge_action_entry(
+                front, action_type=action, action_id=action_id_value,
+                files=file_list, load_order=load_order, origin="custom",
+            )
+        added += merge_action_entry(
+            in_game, action_type=action, action_id=action_id_value,
+            files=file_list, load_order=load_order, origin="custom",
+        )
+        self._front_end_editor.set_entries(front)
+        self._in_game_editor.set_entries(in_game)
+        return added
+
+    def remove_action_files(self, rel_path: str) -> int:
+        """从全部文件动作移除指定文件（无弹窗）；返回移除引用数。"""
+        from ...project.custom_files import remove_action_files as _remove
+
+        front = self._front_end_editor.entries()
+        in_game = self._in_game_editor.entries()
+        removed = _remove(front, rel_path) + _remove(in_game, rel_path)
+        self._front_end_editor.set_entries(front)
+        self._in_game_editor.set_entries(in_game)
+        return removed
 
     def _handle_quick_clear(self) -> None:
         target_front_signatures = {

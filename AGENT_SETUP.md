@@ -56,7 +56,11 @@ python -m venv .venv
 ```bash
 .venv\Scripts\python -c "import PyQt6, PIL; print('OK')"
 .venv\Scripts\python -m modgen.cli search 农场     # 应输出命中对象（能力搜索验证）
+.venv\Scripts\python -m modgen.cli skill 相邻加成   # 本地技能库检索（zip 自带 skills/）
 .venv\Scripts\python -m modgen.cli generate 区域 --name 测试 --abbr T --prefix X --infix 1
+.venv\Scripts\python -m modgen.cli new-project _smoke.CIV --prefix X --infix 1   # 工程骨架（验证后删除 _smoke.CIV）
+.venv\Scripts\python -m modgen.cli civ6proj _smoke.CIV --update-civ             # .civ6proj 生成（删除 _smoke.CIV 与工程目录）
+.venv\Scripts\python -m modgen.cli custom-file write _smoke.CIV --path Scripts/T.lua --content "x"  # 自定义文件通道
 ```
 
 ## 3. 注册 .CIV 双击打开（可选，推荐）
@@ -69,8 +73,9 @@ python tools/register_file_association.py --status
 ## 4. 使用指引（给用户/AI 的一句话总结）
 
 - **启动编辑器**：`<zip根>\.venv\Scripts\python ModTools5.4.py`（或双击 `ModTools5.4.exe`，exe 无需 Python）
-- **AI 生成 .CIV**：必读 `modgen/AGENTS.md`；工具链 = `modgen generate/validate/merge` + `modgen search`（知识查询）
-- **知识查询**：`python -m modgen.cli search <效果词>` 或 GUI 小工具「能力实现搜索」
+- **AI 生成 .CIV**：必读 `modgen/AGENTS.md`；工具链 = `modgen new-project`（工程骨架）→ `generate/validate/merge`（含修改器 merge）→ `preview`（无头验证导出）→ `civ6proj --update-civ`（绑定输出目录）→ `custom-file`（自定义 SQL/Lua）→ `search/skill`（知识查询）
+- **知识查询**：`modgen search <效果词>`（游戏库实现）/ `skill <关键词>`（本地技能库）/ `query "SELECT ..."`（游戏库只读）/ `loc <LOC_TAG>`，或 GUI 小工具「能力实现搜索」
+- **AI 驱动 GUI**：`python ModTools5.4.py 工程.CIV --ai-port 8765`（协议见 `ModTools_5_4/docs/AI_CONTROL_API.md`）；一次性执行 `--ai-exec '<json动作>'`
 - **方法论**：判断"某效果有没有现成实现" = `search` 查原版，不要凭记忆断言
 
 ## 5. 排障速查
@@ -89,8 +94,9 @@ python tools/register_file_association.py --status
 ```
 <zip根>/
 ├─ ModTools5.4.py / ModTools5.4.exe   入口（源码版 / 打包版）
-├─ ModTools_5_4/                      完整源码（agent 可读可改）
+├─ ModTools_5_4/                      完整源码（agent 可读可改；docs/AI_CONTROL_API.md 在 ModTools_5_4/docs/）
 ├─ modgen/                            AI 生成 .CIV 工具 + AGENTS.md
+├─ skills/                            本地技能库（260+ 技能文件，modgen skill 检索）
 ├─ tools/setup_env.py                 一键初始化（本文件配套）
 ├─ tools/register_file_association.py .CIV 文件关联
 ├─ local_text_New.sqlite              内置中文文本库

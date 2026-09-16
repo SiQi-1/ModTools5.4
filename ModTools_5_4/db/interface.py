@@ -11,12 +11,16 @@ from __future__ import annotations
 
 from pathlib import Path
 import sqlite3
-import re
 
 from ..app.settings_store import load_settings, SETTINGS_FILE
+from . import loc_text
 
 
-_LOC_TOKEN_PATTERN = re.compile(r"\{\s*(LOC_[^}\s]+)\s*\}", re.IGNORECASE)
+# 嵌套引用展开的最大层数（统一实现见 db.loc_text）
+_MAX_REF_DEPTH = 12
+
+# 兼容旧引用：本模块历史上自带一份 token 正则，现统一取自 db.loc_text（单一实现）
+_LOC_TOKEN_PATTERN = loc_text.LOC_REF_PATTERN
 
 # ── 缓存（阶段2）：settings.json 与活动文本库路径按文件 mtime 自动失效，
 #    不再每次 LOC 查询都重读磁盘；tag 结果缓存随文本库 mtime 失效。
@@ -100,83 +104,68 @@ def _resolve_value_or_unknown(
     value: str,
     *,
     unknown_text: str,
-    visited: set[str],
-    depth: int,
-    max_depth: int,
+    depth: int = 0,
+    max_depth: int = _MAX_REF_DEPTH,
 ) -> str:
+    """解析可能含嵌套引用/纯文本的值（嵌套展开统一委托 db.loc_text）；失败返回 unknown_text。"""
     text = str(value or "").strip()
-    if not text:
-        return unknown_text
-    if depth > max_depth:
+    if not text or depth > max_depth:
         return unknown_text
 
-    upper = text.upper()
-    if upper.startswith("LOC_"):
+    if text.upper().startswith("LOC_"):
         return _resolve_tag_or_unknown(
-            text,
-            unknown_text=unknown_text,
-            visited=visited,
-            depth=depth + 1,
-            max_depth=max_depth,
+            text, unknown_text=unknown_text, depth=depth + 1, max_depth=max_depth
         )
 
-    if _LOC_TOKEN_PATTERN.search(text):
-        def repl(match: re.Match[str]) -> str:
-            ref_tag = str(match.group(1) or "").strip()
-            if not ref_tag:
-                return unknown_text
-            return _resolve_tag_or_unknown(
-                ref_tag,
-                unknown_text=unknown_text,
-                visited=visited,
-                depth=depth + 1,
-                max_depth=max_depth,
-            )
+    if not loc_text.contains_ref(text):
+        return text
 
-        replaced = _LOC_TOKEN_PATTERN.sub(repl, text).strip()
-        if not replaced:
-            return unknown_text
-        if replaced.upper().startswith("LOC_") or _LOC_TOKEN_PATTERN.search(replaced):
-            return _resolve_value_or_unknown(
-                replaced,
-                unknown_text=unknown_text,
-                visited=visited,
-                depth=depth + 1,
-                max_depth=max_depth,
-            )
-        return replaced
-
-    return text
+    replaced = loc_text.resolve_text(get_chinese_text_for_tag, text, max_depth=max_depth).strip()
+    if not replaced:
+        return unknown_text
+    return _finalize_resolved_text(
+        replaced, unknown_text=unknown_text, depth=depth + 1, max_depth=max_depth
+    )
 
 
 def _resolve_tag_or_unknown(
     tag: str,
     *,
     unknown_text: str,
-    visited: set[str],
+    depth: int = 0,
+    max_depth: int = _MAX_REF_DEPTH,
+) -> str:
+    normalized = str(tag or "").strip()
+    if not normalized or depth > max_depth:
+        return unknown_text
+
+    resolved = loc_text.resolve_tag(get_chinese_text_for_tag, normalized, max_depth=max_depth)
+    if not resolved:
+        return unknown_text
+    return _finalize_resolved_text(
+        resolved, unknown_text=unknown_text, depth=depth + 1, max_depth=max_depth
+    )
+
+
+def _finalize_resolved_text(
+    text: str,
+    *,
+    unknown_text: str,
     depth: int,
     max_depth: int,
 ) -> str:
-    normalized = str(tag or "").strip()
-    if not normalized:
-        return unknown_text
-    key = normalized.upper()
-    if key in visited:
-        return unknown_text
+    """收尾：残留未解析引用 → unknown_text；结果仍是引用形式 → 继续解析（防环）。"""
     if depth > max_depth:
         return unknown_text
-
-    visited.add(key)
-    resolved = get_chinese_text_for_tag(normalized)
-    if not resolved:
-        return unknown_text
-    return _resolve_value_or_unknown(
-        resolved,
-        unknown_text=unknown_text,
-        visited=visited,
-        depth=depth + 1,
-        max_depth=max_depth,
-    )
+    if loc_text.contains_ref(text):
+        text = loc_text.LOC_REF_PATTERN.sub(unknown_text, text).strip()
+        if not text:
+            return unknown_text
+    if text.upper().startswith("LOC_"):
+        return _resolve_tag_or_unknown(
+            text, unknown_text=unknown_text, depth=depth + 1, max_depth=max_depth
+        )
+    return text or unknown_text
 
 
 def get_chinese_text_for_tag_or_unknown(tag: str, unknown_text: str = "未知") -> str:
@@ -184,9 +173,8 @@ def get_chinese_text_for_tag_or_unknown(tag: str, unknown_text: str = "未知") 
     return _resolve_tag_or_unknown(
         tag,
         unknown_text=unknown_text,
-        visited=set(),
         depth=0,
-        max_depth=12,
+        max_depth=_MAX_REF_DEPTH,
     )
 
 
@@ -195,7 +183,6 @@ def resolve_chinese_text_or_unknown(value: str, unknown_text: str = "未知") ->
     return _resolve_value_or_unknown(
         value,
         unknown_text=unknown_text,
-        visited=set(),
         depth=0,
-        max_depth=12,
+        max_depth=_MAX_REF_DEPTH,
     )

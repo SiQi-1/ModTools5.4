@@ -27,10 +27,14 @@
 | 文件 | 谁创建 | 作用 |
 |------|--------|------|
 | `.CIV` | ModTools | 编辑状态（JSON），**你操作的是它** |
-| `.civ6proj` | ModBuddy 或手写 | 定位输出目录；ModTools 把生成的文件写进它所在目录 |
+| `.civ6proj` | **ModTools 直接生成**（或 ModBuddy） | 定位输出目录；ModTools 把生成的文件写进它所在目录 |
 | `.modinfo` | 构建生成或手写 | **游戏加载 Mod 的依据**，放游戏 Mods 目录 |
 
-关系：`.CIV`（编辑）→ ModTools 生成 SQL/XML/图片 → `.civ6proj` 目录 → 构建成 `.modinfo` → 游戏 Mods 目录。
+关系：`.CIV`（编辑）→ ModTools 生成 SQL/XML/图片 + `.civ6proj` → 构建成 `.modinfo` → 游戏 Mods 目录。
+
+> **`.civ6proj` 不需要 ModBuddy 新建**：基础信息页「新建 .civ6proj」按钮或
+> `python -m modgen.cli civ6proj 工程.CIV --update-civ` 都能直接生成（与 ModBuddy
+> 向导产物同构，含空白 Art.xml；ModBuddy 之后仍可打开/构建）。
 
 ---
 
@@ -43,7 +47,7 @@
 新建后进入「基础信息」：
 - **前缀**（如 `SIQI`）：所有 Type 的前缀段
 - **中缀**（如 `1`）：Type 的编号段（生成 `CIVILIZATION_SIQI_C0001_XXX` 形式）
-- **.civ6proj 路径**：选择/创建输出目录定位文件（没有 ModBuddy 时见第 4 章模板）
+- **.civ6proj 路径**：点 **「新建 .civ6proj」** 直接生成（默认 `文档\Firaxis ModBuddy\Civilization VI\<文件名>\`），或选择已有的 ModBuddy 工程文件
 
 ---
 
@@ -159,6 +163,9 @@
 # 环境（一次性）
 python tools/setup_env.py
 
+# 创建工程骨架（基础信息/美术/修改器/文本 结构就位，替代拷贝旧工程）
+python -m modgen.cli new-project 示例.CIV --name 示例文明模组 --prefix SIQI --infix 1
+
 # 生成条目骨架（Type/LOC/子表结构自动就位）
 python -m modgen.cli generate 文明 --name 示例文明 --abbr DEMO --prefix SIQI --infix 1
 python -m modgen.cli generate 领袖 --name 示例领袖 --abbr LEADER1 --prefix SIQI --infix 1
@@ -169,18 +176,41 @@ python -m modgen.cli generate-requirement --type REQUIREMENT_PLAYER_IS_AT_WAR --
 python -m modgen.cli generate-reqset --desc 战争条件集 --logic ALL --requirements '["REQUIREMENT_..."]'
 python -m modgen.cli generate-ability --abbr AB1 --name 示例能力
 
-# 校验（ERROR 必修 / WARNING 确认）与合并
+# 校验（ERROR 必修 / WARNING 确认）与合并（内容分类与修改器均可 merge）
 python -m modgen.cli validate 示例.CIV
 python -m modgen.cli merge 示例.CIV 文明 --entry modgen_work/entry_文明.json
+python -m modgen.cli merge 示例.CIV 修改器 --entry modgen_work/mod.json
 
-# 知识查询（不知道效果怎么做 → 先搜再抄）
+# 生成→校验闭环：无头预览将导出的全部文件（不开 GUI 也能验证）
+python -m modgen.cli preview 示例.CIV --dry-run
+python -m modgen.cli preview 示例.CIV --section 领袖 --format sql
+
+# 生成 .civ6proj 工程（无需 ModBuddy 新建；--update-civ 回写路径到 .CIV）
+python -m modgen.cli civ6proj 示例.CIV --update-civ
+
+# 自定义文件通道（确需 Lua / 自定义 SQL/XML 时；自动注册文件动作，一键生成原样透传）
+python -m modgen.cli custom-file write 示例.CIV --path Scripts/My.lua --content-file modgen_work/My.lua
+python -m modgen.cli custom-file write 示例.CIV --path Data/Extra.sql --content "INSERT INTO ..."
+python -m modgen.cli custom-file list 示例.CIV
+
+# 知识查询（不知道效果怎么做 → 先搜再抄；查表结构/查文本）
 python -m modgen.cli search 宣战
 python -m modgen.cli search --object 农场
+python -m modgen.cli query "SELECT ModifierType, CollectionType FROM DynamicModifiers LIMIT 10"
+python -m modgen.cli loc LOC_TRAIT_CIVILIZATION_XXX_NAME
+
+# AI 控制接口：驱动 GUI 的一键按钮（打开 GUI 后 HTTP 调用；或一次性执行）
+python ModTools5.4.py 示例.CIV --ai-port 8765
+python ModTools5.4.py 示例.CIV --headless --ai-exec '{"action":"generate_all","params":{"overwrite":"all"}}'
+# 动作表与协议：ModTools_5_4/docs/AI_CONTROL_API.md
 ```
 
 ### 4.2 完整示例：做一个"被宣战 +100% 产能"的领袖特质
 
 ```bash
+# 0. 建工程骨架（一次性）
+python -m modgen.cli new-project 示例.CIV --name 示例工程 --prefix SIQI --infix 1
+
 # 1. 查原版实现（方法论：先搜索，不要凭记忆）
 python -m modgen.cli search 宣战
 # → 找到柯廷战争机器等，记下效果类型与条件
@@ -194,9 +224,19 @@ python -m modgen.cli generate-modifier --effect EFFECT_ADD_DIPLOMATIC_YIELD_MODI
 python -m modgen.cli generate-requirement --type REQUIREMENT_PLAYER_IS_AT_WAR --desc 处于战争 > modgen_work/req.json
 python -m modgen.cli generate-reqset --desc 战争条件集 --logic ALL \
   --requirements '["<生成的REQUIREMENT_ID>"]' > modgen_work/reqset.json
-# ... merge 各条目进工程，validate 通过
+# ... merge 各条目进工程（含 `merge 示例.CIV 修改器 --entry modgen_work/mod.json`），validate 通过
 
-# 3. 用 GUI 打开工程 → 生成所有文件 → 部署（第 3 章）
+# 3. 预览将导出的文件，确认无字段/引用问题（不开 GUI）
+python -m modgen.cli preview 示例.CIV --dry-run
+python -m modgen.cli preview 示例.CIV --section 领袖
+
+# 4. 生成 .civ6proj（绑定输出目录）→ GUI 一键生成（或 --ai-exec 驱动）→ 部署（第 3 章）
+python -m modgen.cli civ6proj 示例.CIV --update-civ
+python ModTools5.4.py 示例.CIV --headless --ai-exec '{"action":"generate_all","params":{"overwrite":"all"}}'
+
+# 4b. 确需 Lua / 自定义 SQL/XML 时（自定义文件通道，自动注册动作、一键生成原样透传）
+python -m modgen.cli custom-file write 示例.CIV --path Scripts/My.lua --content-file modgen_work/My.lua
+python -m modgen.cli custom-file write 示例.CIV --path Data/Extra.sql --content "INSERT INTO ..."
 ```
 
 > 给 AI 的完整任务说明见 README「AI 生成 .CIV」章节的开局提示词；详细规则见 `modgen/AGENTS.md`。
@@ -210,13 +250,17 @@ python -m modgen.cli generate-reqset --desc 战争条件集 --logic ALL \
 ```bash
 python -m modgen.cli search <关键词>            # 中文效果词（宣战/产能/农场…）或英文（WAR/YIELD_*）
 python -m modgen.cli search --object <关键词>    # 列出对象的全部 Modifier 实现（照抄用）
+python -m modgen.cli skill <关键词>              # 本地技能库（仓库根 skills/）全文检索：写法/模板/工作流/Lua
+python -m modgen.cli skill <关键词> --file <相对路径>   # 输出命中技能文件全文
 ```
 
 示例：搜"农场"→ 高棉「大人工湖」→ `TRAIT_FARM_AQUEDUCT_ADJECENCY_FOOD [EFFECT_ADJUST_PLOT_YIELD] Amount=2, YIELD_FOOD` + 两个 `REQUIREMENT_*`（相邻水渠 + 地块是农场）——**"相邻农场+食物"的现成实现**。
 
 GUI 等效：小工具窗口 → 能力实现搜索（同一份数据，卡片 + 详情树）。
 
-**搜不到怎么办**：换英文关键词（效果词映射只覆盖常见词）→ 换相近词 → 才考虑"可能没有现成实现"（此时多半需要 Lua，工具不支持，如实告知）。
+**"怎么写"类知识**（SQL 模板、Lua API、.CIV 工作流）：`modgen skill <关键词>` 查仓库根 `skills/`（随发布包分发，`--file` 看全文）。
+
+**搜不到怎么办**：换英文关键词（效果词映射只覆盖常见词）→ 换相近词 → 才考虑"可能没有现成实现"（此时多半需要 Lua——走 `custom-file` 自定义文件通道，见第 4 章 4b）。
 
 ---
 
@@ -241,7 +285,7 @@ GUI 等效：小工具窗口 → 能力实现搜索（同一份数据，卡片 +
 | 现象 | 处理 |
 |------|------|
 | 中文显示"未知" | 文本库未配置：设置页选 `local_text_New.sqlite` |
-| 生成提示"请先导入 .civ6proj" | 基础信息未选 .civ6proj（无 ModBuddy 用第 3 章模板） |
+| 生成提示"请先导入 .civ6proj" | 基础信息未绑定 .civ6proj——点「新建 .civ6proj」由工具生成即可 |
 | search 中文无结果 | 文本库未配置；或换英文关键词 |
 | 游戏里 Mod 不生效 | 检查 Mods 目录结构（`Mods\<Mod名>\` 内含 .modinfo）；游戏内"额外内容"启用；XML 大小写 |
 | 修改器报错"未知 EffectType" | 效果类型不存在：`modgen search <效果词>` 查现成实现 |

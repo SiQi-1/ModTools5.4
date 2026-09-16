@@ -24,7 +24,7 @@
 
 1. **设置 → 配置文本/游戏数据库**：文本库选 `local_text_New.sqlite`（中文显示必需）；游戏库选 `DebugGameplay.sqlite`（导入原版对象、能力搜索必需）。源码版可运行 `python tools/setup_env.py` 自动配置
 2. **文件 → 新建工程** → 输入工程名 → 保存为 `.CIV`
-3. **基础信息 → 选择 .civ6proj**：指向你的 ModBuddy 工程文件，设置前缀/中缀
+3. **基础信息 → 选择 .civ6proj**：指向你的 ModBuddy 工程文件（或点 **「新建 .civ6proj」** 由工具直接生成，无需 ModBuddy），设置前缀/中缀
 4. **左侧树选择分类 → 新增/导入对象** → 编辑（必填字段标红 `*`）
 5. **工程根节点 → 生成所有文件**：一键输出 SQL/XML/图标/ArtDef 等到 `.civ6proj` 目录
 
@@ -50,6 +50,7 @@
 | 入口 | 适用 |
 |------|------|
 | `python -m modgen.cli search <效果词>` | **AI / 命令行首选**（`--object` 列出 Modifier 完整实现，照抄用） |
+| `python -m modgen.cli skill <关键词>` | **本地技能库全文检索**（仓库根 skills/，随发布包分发：SQL 模板/Lua API/.CIV 工作流/效果技巧；`--file` 看全文） |
 | 小工具窗口 → 能力实现搜索 | GUI 场景（卡片列表 + 详情树 + 图标/颜色渲染） |
 
 - 中文搜效果/描述（自动效果词映射："宣战"→WAR），英文搜 Type/参数（`WAR`、`YIELD_PRODUCTION`）
@@ -69,44 +70,71 @@
 和 modgen/（AI 生成 .CIV 的工具，纯标准库）。请遵守：
 
 1. 工程文件是 .CIV（JSON），你只通过 modgen 生成/校验/合并条目，绝不手写 JSON 结构。
-   必读 modgen/AGENTS.md（硬规则：ModifierType 优先用游戏库已有类型、JSON 禁止 ""、不写 Lua）。
+   必读 modgen/AGENTS.md（硬规则：ModifierType 优先用游戏库已有类型、JSON 禁止 ""、
+   主内容不写 Lua，自定义 SQL/XML/Lua 仅走 custom-file 通道）。
 2. 生成条目：python -m modgen.cli generate <分类> --name 中文名 --abbr 英文简称
    --prefix <前缀> --infix <编号>；修改器用 generate-modifier / generate-requirement /
    generate-reqset / generate-ability（效果类型由工具校验，错了会拒绝）。
+   新工程先建骨架：python -m modgen.cli new-project 工程.CIV --name 中文名
+   --prefix <前缀> --infix <编号>（不要拷贝旧工程/手写骨架）。
 3. 不知道"某个效果怎么实现"（如被宣战+100%产能、相邻农场+食物）：先运行
    python -m modgen.cli search <效果词> 查游戏里现成的实现（如 search --object 农场 →
    高棉大人工湖 → EFFECT_ADJUST_PLOT_YIELD + REQUIREMENT_*，直接照抄）；
    也可以让用户在 ModTools 小工具的"能力实现搜索"里搜效果词并把结果发给我。
+   查表结构/字段用 python -m modgen.cli query "SELECT ..."（游戏库只读），
+   查文本用 python -m modgen.cli loc <LOC_TAG>。
    **不要凭记忆断言某个效果没有现成实现**——绝大多数效果都能在游戏里找到对应
    modifier，搜不到再讨论其他方案。
-4. 生成后必须 validate（ERROR 必须修、WARNING 需确认），再 merge 进工程；
-   临时文件一律放 modgen_work/。
-5. 我的能力边界：不写 Lua、不直接写 SQL/XML、不生成图片资源、不做 UI 界面/
-   模型/动画/事件脚本。
+4. 生成后必须 validate（ERROR 必须修、WARNING 需确认），再 merge 进工程
+   （修改器条目用 `merge 工程.CIV 修改器 --entry X`）；merge 前可用
+   python -m modgen.cli preview 工程.CIV --dry-run 预览将导出的全部文件、
+   preview --section <分类> 检查具体 SQL/XML 内容；临时文件一律放 modgen_work/。
+5. 主内容（13 分类/修改器/文本）不写 Lua、不手写 SQL/XML；确需 Lua/自定义 SQL/XML 时
+   走**自定义文件通道**：python -m modgen.cli custom-file write 工程.CIV --path Scripts/My.lua
+   --content-file modgen_work/My.lua（自动注册文件动作；AI 控制接口 project_file_write 同语义）。
+   不生成图片资源、不做 3D 模型/动画/特效。
 ```
 
 ### 可用范围
 
 | 能力 | 说明 |
 |------|------|
+| 工程骨架 | `new-project` 创建 .CIV（基础信息/美术/修改器/文本 结构就位） |
 | 13 个内容分类 | 文明/领袖/区域/建筑/单位/单位晋升/改良设施/总督/伟人/政策卡/项目/信仰/议程 |
-| 修改器四类 | Modifier / Requirement / RequirementSet / UnitAbility（效果类型存在性 + 参数骨架自动校验） |
-| 文本 | 中文文本直接写入条目，LOC tag 由导出自动注册 |
-| 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现 |
-| 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures |
+| 修改器四类 | Modifier / Requirement / RequirementSet / UnitAbility（效果类型存在性 + 参数骨架自动校验；`merge 工程.CIV 修改器` 直接合并） |
+| 文本 | 中文文本直接写入条目，LOC tag 由导出自动注册；`loc <LOC_TAG>` 查询文本 |
+| 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现；**`modgen skill <关键词>` 本地技能库全文检索**（仓库根 skills/，写法/模板/工作流/Lua 知识）；`query "SQL"` 查游戏库表结构/数据 |
+| 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures；`preview` 可无头预览将导出的全部文件（需 PyQt） |
+| .civ6proj 工程 | `modgen civ6proj 工程.CIV [--update-civ]` 直接生成 ModBuddy 兼容工程文件 + 空白 Art.xml，**无需 ModBuddy 新建工程** |
+| **自定义文件通道** | 自定义 SQL/XML/Lua：`modgen custom-file write/list/remove` 或 AI 控制接口 `project_file_write`——写入工程目录、自动注册文件动作、一键生成原样透传 |
+| GUI 一键按钮 | **AI 控制接口**：`python ModTools5.4.py 工程.CIV --ai-port 8765` 后经 HTTP 驱动一键生成/一键配置/导入/截图（协议见 `ModTools_5_4/docs/AI_CONTROL_API.md`）；一次性执行 `--ai-exec '<json动作>'` |
 
-### 实现不了的能力（务必向用户强调）
+### 边界（务必向用户强调）
 
 | 能力 | 说明 |
 |------|------|
-| ❌ **Lua 脚本** | 不生成、不编写、不支持 GamePlay/UI 脚本（工具硬边界，不是知识缺口） |
-| ❌ **UI 界面** | 自定义 UI.xml/面板/界面元素 |
-| ❌ **直接写 SQL/XML** | 所有输出由工具从 .CIV 生成，AI 不直接产出 |
+| ⚠️ **Lua / 自定义 SQL/XML** | 仅经**自定义文件通道**（`custom-file` / `project_file_write`）工具化写入；主内容（.CIV 条目）不包含 Lua |
 | ❌ **图片资源** | 图标/头像/立绘需用户提供，AI 不生成图片 |
 | ❌ **模型/动画/特效** | 3D 模型、骨骼动画、粒子特效 |
-| ❌ **事件脚本** | 监听游戏事件、自定义交互逻辑（需 Lua，同上） |
 
 > **重要方法论——"做不到"之前先搜索**：绝大多数 Mod 效果（包括相邻加成、城市产出调整等）游戏里**都有现成实现**，判断"有没有效果器"的唯一正确方法是用 `modgen search` / 能力实现搜索查原版，**而不是凭记忆断言**。确需 Lua 的情况极少（如自定义界面/事件逻辑），此时才如实告知。
+
+---
+
+## AI 控制接口（驱动 GUI 的一键按钮）
+
+GUI 的很多能力（一键生成、一键配置、导入原版数据、截图观察界面）只有点按钮才能触发。
+ModTools 内置 localhost 控制服务，让外部 AI **打开 GUI 并自己操作它**：
+
+```bash
+python ModTools5.4.py 工程.CIV --ai-port 8765        # 驻留服务（可选 --ai-token）
+python ModTools5.4.py 工程.CIV --headless --ai-exec '{"action":"generate_all","params":{"overwrite":"all"}}'  # 一次性执行
+```
+
+- 20 个动作：`get_state` / `get_manifest` / `generate_all` / `generate_file` / `civ6proj_create` /
+  `quick_config` / `import_from_db` / `search` / **`skill`（本地技能库）** / **`check_conflicts`（SQL 冲突检测）** / `screenshot` / `open_project` / `save_project` /
+  `project_file_write` / `project_file_read` / `project_file_list` / `project_file_delete` / `add_file_action` …
+- 协议与示例：`ModTools_5_4/docs/AI_CONTROL_API.md`（POST `http://127.0.0.1:8765/api`，JSON 进出）。
 
 ---
 
@@ -243,7 +271,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 → 设置页没配文本数据库，或没导入 DLC 文本。
 
 **Q: 点击生成提示"请先导入 .civ6proj"**
-→ 基础信息里没选择 ModBuddy 工程文件。
+→ 基础信息里没有绑定 ModBuddy 工程文件：点 **「新建 .civ6proj」** 由工具直接生成（或选择已有的）。
 
 **Q: 生成时提示文件已存在**
 → 会弹窗让你选择覆盖哪些文件，其余跳过。
@@ -271,7 +299,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 - 文明6（需要至少运行过一次，以生成 Cache 中的游戏数据库）
 - 源码版需要 Python 3.10+（打包版不需要）
 - **ModBuddy 非必需**：
-  - 工具只用一个 `.civ6proj` 文件来**定位输出目录**——没有 ModBuddy 时可用任意文本编辑器创建（或复制模板改名，见教程）；
+  - 工具可以**自己生成 `.civ6proj`**（基础信息「新建 .civ6proj」按钮 / `modgen civ6proj` 命令，生成物与 ModBuddy 向导产物同构，ModBuddy 仍可打开/构建）；
   - 最终部署到游戏需要 `.modinfo`：有 ModBuddy 用它构建生成；没有则**手写 .modinfo 放入游戏 Mods 目录**（教程有模板）。
 
 ---

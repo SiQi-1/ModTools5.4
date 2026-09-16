@@ -1,0 +1,2707 @@
+{
+  "EFFECT_ADD_RELIGIOUS_UNIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_RELIGION_ADD_RELIGIOUS_UNIT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitType": [
+        "UNIT_WARRIOR_MONK"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_ADJACENT_LEVIED_UNIT_COMBAT_BONUS": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_COMBAT_FOR_ADJACENT_LEVIED_UNITS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_ALL_UNITS_PURCHASE_COST": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNITS_PURCHASE_COST",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_ALL_UNITS_PURCHASE_COST",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-100",
+        "20",
+        "30"
+      ],
+      "IncludeCivilian": [
+        "0",
+        "1"
+      ],
+      "UnitDomain": [
+        "DOMAIN_ALL",
+        "DOMAIN_LAND"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_ALL_UNIT_PRODUCTION_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_UNIT_PRODUCTION_MODIFIER",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_PRODUCTION_MODIFIER",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-100",
+        "-30",
+        "15"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_CITY_ALL_MILITARY_UNITS_PRODUCTION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_MILITARY_UNITS_PRODUCTION",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_MILITARY_UNITS_PRODUCTION",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_ALLIANCE_CITIES_MILITARY_UNIT_PRODUCTION",
+        "COLLECTION_ALLIANCE_CITIES"
+      ],
+      [
+        "MODIFIER_GOVERNOR_ADJUST_CITY_MILITARY_UNIT_PRODUCTION",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_CORE_CITIES_ADJUST_MILITARY_UNITS_PRODUCTION",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15",
+        "20",
+        "200",
+        "25",
+        "5",
+        "50",
+        "60"
+      ],
+      "EndEra": [
+        "ERA_CLASSICAL"
+      ],
+      "StartEra": [
+        "ERA_ANCIENT"
+      ],
+      "PromotionClass": [
+        "PROMOTION_CLASS_NAVAL_RAIDER",
+        "PROMOTION_CLASS_NAVAL_RANGED"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_CITY_POPULATION_UNIT_CREATED": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_CHANGE_POPULATION_CREATE_UNIT",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-1"
+      ],
+      "UnitType": [
+        "UNIT_SULEIMAN_JANISSARY"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_CITY_PRODUCTION_UNIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CAPITAL_CITY_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_PLAYER_CAPITAL_CITY"
+      ],
+      [
+        "MODIFIER_PLAYER_DISTRICTS_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_PLAYER_DISTRICTS"
+      ],
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_PRODUCTION_CHANGE",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_PRODUCTION_CHANGE_ETHIOPIA",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_CITY_UNIT_MAX_LEVEL": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_MAX_LEVEL",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_CITY_UNIT_MAX_LEVEL",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_NUMBER_ALLIES_UNIT_COMBAT_BONUS": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_COMBAT_FOR_NUMBER_ALLIES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_NUM_UNITS_SUPPORTED": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_NUM_UNITS_SUPPORTED",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ],
+      "BuildingType": [
+        "BUILDING_MUSEUM_ARTIFACT"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_BAN_UNIT_PRODUCTION_YIELD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYERS_ADJUST_UNIT_BAN_PRODUCTION_YIELD",
+        "COLLECTION_MAJOR_PLAYERS"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_PLAYER_BLOCK_UNIT_ENTRY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_BLOCK_UNIT_ENTRY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitType": [
+        "UNIT_ROCK_BAND"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_BUFF_UNIT_PRODUCTION_YIELD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYERS_ADJUST_UNIT_BUFF_PRODUCTION_YIELD",
+        "COLLECTION_MAJOR_PLAYERS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-100",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_DISTRICT_AND_BUILDINGS_CREATE_UNIT_WITH_ABILITY_BY_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_DISTRICT_ADJUST_PLAYER_DISTRICT_AND_BUILDINGS_CREATE_UNIT_WITH_ABILITY_BY_CLASS_GREAT_NEGOTIATORS",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_DISTRICT_ADJUST_PLAYER_DISTRICT_AND_BUILDINGS_CREATE_UNIT_WITH_ABILITY_BY_CLASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "DistrictType": [
+        "DISTRICT_HIPPODROME",
+        "DISTRICT_INDUSTRIAL_ZONE"
+      ],
+      "UnitAbilityType": [
+        "ABILITY_FREE_RESOURCE_MAITENANCE_HIPPODROME",
+        "ABILITY_LINCOLN_MELEE_UNITS"
+      ],
+      "UnitPromotionClass": [
+        "PROMOTION_CLASS_HEAVY_CAVALRY",
+        "PROMOTION_CLASS_MELEE"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_UNIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_DISTRICT_CREATE_UNIT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "DistrictType": [
+        "DISTRICT_MBANZA",
+        "DISTRICT_THEATER"
+      ],
+      "UnitType": [
+        "UNIT_APOSTLE"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_EMBARKED_UNIT_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_EMBARKED_MOVEMENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_EMBARK_UNIT_PASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_EMBARK_UNIT_PASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitType": [
+        "UNIT_TRADER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_KILLED_BY_GDR": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_KILLED_BY_GDR",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_SEA_KILLED": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_NAVAL_UNIT_KILLED",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_UNIT_PROMOTION_EARNED": {
+    "pairs": [
+      [
+        "MODIFIER_ALL_PLAYERS_ADJUST_ERA_SCORE_PER_UNIT_PROMOTION_EARNED",
+        "COLLECTION_MAJOR_PLAYERS"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_PLAYER_LEVIED_UNIT_UPGRADE_DISCOUNT_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_LEVIED_UNIT_UPGRADE_DISCOUNT_PERCENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "75"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_ROCK_BAND_UNIT_ALBUM_SALES": {
+    "pairs": [
+      [
+        "MODIFIER_EMERGENCY_PLAYERS_ADJUST_ROCK_BAND_UNIT_ALBUM_SALES",
+        "COLLECTION_EMERGENCY_PLAYERS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "25",
+        "50",
+        "75"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_BUILD_DISABLED": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_BUILD_DISABLED",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitType": [
+        "UNIT_SETTLER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_DISTRICT_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_DISTRICT_PERCENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "20"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_PROJECT_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_PROJECT_PERCENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_DISCOUNT_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_UPGRADE_DISCOUNT_PERCENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_RESOURCE_COST_DISCOUNT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_UPGRADE_RESOURCE_COST_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_UNIT_WONDER_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_WONDER_PERCENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_PLAYER_VALID_UNIT_BUILD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_VALID_UNIT_BUILD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitType": [
+        "UNIT_LAHORE_NIHANG"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_RANDOM_EVENT_NO_UNIT_DAMAGE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_RANDOM_EVENT_NO_UNIT_DAMAGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "NoDamage": [
+        "1"
+      ],
+      "RandomEventType": [
+        "RANDOM_EVENT_BLIZZARD_CRIPPLING",
+        "RANDOM_EVENT_BLIZZARD_SIGNIFICANT",
+        "RANDOM_EVENT_DROUGHT_EXTREME",
+        "RANDOM_EVENT_DROUGHT_MAJOR",
+        "RANDOM_EVENT_DUST_STORM_GRADIENT",
+        "RANDOM_EVENT_DUST_STORM_HABOOB",
+        "RANDOM_EVENT_EYJAFJALLAJOKULL_CATASTROPHIC",
+        "RANDOM_EVENT_EYJAFJALLAJOKULL_MEGACOLOSSAL",
+        "RANDOM_EVENT_FLOOD_1000_YEAR",
+        "RANDOM_EVENT_FLOOD_MAJOR"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNITS_RELIGIOUS_STRENGTH_BY_RELIGION_TYPE": {
+    "pairs": [
+      [
+        "MODIFIER_MAJOR_PLAYERS_ADJUST_UNITS_RELIGIOUS_STRENGTH_BY_RELIGION_TYPE",
+        "COLLECTION_MAJOR_PLAYERS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "10"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ADVANCED_COASTAL_RAID": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ADVANCED_COASTAL_RAID",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UseAdvancedCoastalRaid": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ADVANCED_PILLAGING": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ADVANCED_PILLAGING",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UseAdvancedPillaging": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_AGAINST_DISTRICT_COMBAT_BONUS": {
+    "pairs": [
+      [
+        "MODIFIER_GOVERNOR_ADJUST_DISTRICT_COMBAT_BONUS",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "10"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ANTI_AIR_STRENGTH": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_ANTI_AIR_STRENGTH_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "40"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ATTACK_AND_MOVE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ATTACK_AND_MOVE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanMove": [
+        "1",
+        "True"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ATTACK_EXPERIENCE_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_UNIT_ATTACK_EXPERIENCE_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ATTACK_RANGE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_ATTACK_RANGE",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_UNIT_ADJUST_ATTACK_RANGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BARBARIAN_COMBAT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_BARBARIAN_COMBAT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15",
+        "5"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BOOST_ALL_SPIES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_BOOST_ALL_SPIES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ],
+      "Defense": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BUILD_CHARGES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_BUILDER_CHARGES",
+        "COLLECTION_CITY_TRAINED_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_TRAINED_UNITS_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_PLAYER_TRAINED_UNITS"
+      ],
+      [
+        "MODIFIER_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_CEOBE_PLAYER_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_CEORE_PLAYER_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_PLAYER_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_CORE_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_0032_UNIT_ADJUST_BUILDER_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI32_RESOURCE_PLANT_BUILDER_CHARGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-1",
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BYPASS_COMBAT_UNIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_BYPASS_COMBAT_UNIT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Bypass": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BYPASS_WALLS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_BYPASS_WALLS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Enable": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_BYPASS_WALLS_PROMOTION_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_BYPASS_WALLS_PROMOTION_CLASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "PromotionClass": [
+        "PROMOTION_CLASS_ANTI_CAVALRY",
+        "PROMOTION_CLASS_MELEE"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_CANNOT_ATTACK": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_CANNOT_ATTACK",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Disable": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_CLEAR_TERRAIN_START_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_CLEAR_TERRAIN_START_MOVEMENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_COMBAT_CAPTURE": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_COMBAT_CAPTURE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_COMBAT_STRENGTH": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_BASE_COMBAT_STRENGTH",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_COMBAT_UNIT_CAPTURE": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_COMBAT_UNIT_CAPTURE",
+        "COLLECTION_UNIT_COMBAT"
+      ]
+    ],
+    "args": {
+      "CanCapture": [
+        "1"
+      ],
+      "UnitType": [
+        "UNIT_BUILDER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_CONVERTS_BARBARIANS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_CONVERTS_BARBARIANS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Converts": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_DAMAGE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_DAMAGE",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_DAMAGE",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_WORLD_UNITS_ADJUST_DAMAGE",
+        "COLLECTION_ALL_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-100",
+        "30"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_DIPLO_VISIBILITY_COMBAT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_DIPLO_VISIBILITY_COMBAT_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_ALL_UNITS_ADJUST_DIPLO_VISIBILITY_COMBAT_MODIFIER",
+        "COLLECTION_ALL_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2",
+        "3"
+      ],
+      "DeltaWithOpponent": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_DISASTER_CHARGES": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_DISASTER_CHARGES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_DOMAIN_PRODUCTION": {
+    "pairs": [
+      [
+        "MODIFIER_CITY_ADJUST_UNIT_DOMAIN_PRODUCTION",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "25",
+        "50"
+      ],
+      "Domain": [
+        "DOMAIN_SEA"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ENABLE_WALL_ATTACK",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Enable": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_PROMOTION_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ENABLE_WALL_ATTACK_PROMOTION_CLASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "PromotionClass": [
+        "PROMOTION_CLASS_ANTI_CAVALRY",
+        "PROMOTION_CLASS_MELEE"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_PROMOTION_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_ENABLE_WALL_ATTACK_WHOLE_GAME_PROMOTION_CLASS",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "PromotionClass": [
+        "PROMOTION_CLASS_ANTI_CAVALRY",
+        "PROMOTION_CLASS_MELEE",
+        "PROMOTION_CLASS_RANGED"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION_PROMOTION_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_ENABLE_WALL_ATTACK_WHOLE_GAME_SAME_RELIGION_PROMOTION_CLASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "PromotionClass": [
+        "PROMOTION_CLASS_HEAVY_CAVALRY",
+        "PROMOTION_CLASS_LIGHT_CAVALRY"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENEMY_TERRITORY_START_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_ENEMY_TERRITORY_START_MOVEMENT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ENTER_FOREIGN_LANDS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ENTER_FOREIGN_LANDS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Enter": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ERA_STRENGTH_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ERA_STRENGTH_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_ESCAPE_BOOST": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ESCAPE_BOOST",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "4"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ESCORT_MOBILITY": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_ESCORT_MOBILITY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "EscortMobility": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_EVICT_PERCENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_EVICT_PERCENT",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_EVICT_PERCENT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "25",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_EXERT_ZOC": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_EXERT_ZOC",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Exert": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_EXPERIENCE_LEVEL": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_EXPERIENCE_LEVEL",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_EXPERIENCE_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_UNIT_EXPERIENCE_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_UNIT_EXPERIENCE_MODIFIER",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_CITY_TRAINED_UNITS_ADJUST_XP_BONUS",
+        "COLLECTION_CITY_TRAINED_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-100",
+        "0",
+        "100",
+        "200",
+        "25",
+        "50",
+        "75"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_EXTRACT_SEA_ARTIFACTS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_EXTRACT_SEA_ARTIFACTS",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Extract": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FAITH_ON_DISTRICT_PLUNDER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_FAITH_ON_DISTRICT_PILLAGE",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "30"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FAITH_ON_IMPROVEMENT_PLUNDER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_FAITH_ON_IMPROVEMENT_PILLAGE",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FIGHT_WHILE_EMBARKED": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_FIGHT_WHILE_EMBARKED",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanFight": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FLANKING_BONUS_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_FLANKING_BONUS_MODIFIER",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_FLANKING_BONUS_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Percent": [
+        "100",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FORCE_RETREAT": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_FORCE_RETREAT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "ForceRetreat": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FOREIGN_SPREAD_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_FOREIGN_SPREAD_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "200"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_COMBAT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_FRIENDLY_TERRITORY_COMBAT",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_FRIENDLY_TERRITORY_COMBAT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "15",
+        "35"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_FRIENDLY_TERRITORY_START_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_FRIENDLY_TERRITORY_START_MOVEMENT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_GRANT_EXPERIENCE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_GRANT_EXPERIENCE",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_GRANT_EXPERIENCE",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_UNITS_ADJUST_GRANT_EXPERIENCE",
+        "COLLECTION_ALL_UNITS"
+      ],
+      [
+        "MODIFIER_ALLIANCE_TRAINED_UNITS_FREE_UPGRADE",
+        "COLLECTION_ALLIANCE_TRAINED_UNITS"
+      ],
+      [
+        "MODIFIER_CITY_TRAINED_UNITS_ADJUST_GRANT_EXPERIENCE",
+        "COLLECTION_CITY_TRAINED_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-1",
+        "20"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_GREAT_PERSON_CHARGES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_GREAT_PERSON_CHARGES",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_HEAL": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_HEAL",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_HEALING_MODIFIERS": {
+    "pairs": [
+      [
+        "MODIFIER_ALL_UNITS_ADJUST_HEAL_PER_TURN",
+        "COLLECTION_ALL_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_HEAL_PER_TURN",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_HEAL_PER_TURN",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_EMERGENCY_UNITS_ADJUST_HEALING",
+        "COLLECTION_EMERGENCY_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "10",
+        "100",
+        "20",
+        "30",
+        "5",
+        "50"
+      ],
+      "Type": [
+        "ALL",
+        "ENEMY",
+        "FRIENDLY",
+        "NEUTRAL"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_HEALING_RELIGION_MODIFIERS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_HEAL_RELIGION_PER_TURN",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_ALL_UNITS_ADJUST_HEAL_RELIGION_PER_TURN",
+        "COLLECTION_ALL_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_HEAL_RELIGION_PER_TURN",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "10"
+      ],
+      "Type": [
+        "ALL"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_HIDDEN_VISIBILITY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_HIDDEN_VISIBILITY",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_ARK_6_ADJUST_UNITS_HIDDEN_VISIBILITY",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Hidden": [
+        "1",
+        "true"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_HOLY_CITIES_COMBAT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_COMBAT_FOR_NUMBER_HOLY_CITIES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_CLIFF_WALLS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_CLIFF_WALLS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_RANGED_VS_DISTRICT_PENALTY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_IGNORE_RANGED_VS_DISTRICT_PENALTY",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_IGNORE_RANGED_VS_DISTRICT_PENALTY",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_RESOURCE_MAINTENANCE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_RESOURCE_MAINTENANCE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_RIVERS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_RIVERS",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_IGNORE_RIVERS",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_SHORES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_SHORES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_IGNORE_SHORES",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_STRATEGIC_RESOURCE_LEVIED": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_LEVIED_UNIT_IGNORE_STRATEGIC_RESOURCE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_TERRAIN_COST": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_TERRAIN_COST",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ],
+      "Type": [
+        "ALL",
+        "HILLS"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_IGNORE_ZOC": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_IGNORE_ZOC",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Ignore": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_INITIATION_YIELD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_INITIATION_GOLD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100"
+      ],
+      "YieldType": [
+        "YIELD_GOLD"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_INITIATION_YIELD_POPULATION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_INITIATION_YIELD_POPULATION",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "20"
+      ],
+      "YieldType": [
+        "YIELD_SCIENCE"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_JUMP_ABILITY": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_JUMP_DISTANCE",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_P0032_ADJUST_JUMP_DISTANCE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Range": [
+        "4",
+        "5",
+        "6"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_LAND_VICTORY_SPREAD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_LAND_VICTORY_SPREAD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "LandVictorySpread": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_MAINTENANCE_DISCOUNT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_UNIT_MAINTENANCE_DISCOUNT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-2",
+        "1",
+        "2",
+        "5"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_MILITARY_FORMATION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_MILITARY_FORMATION",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "MilitaryFormationType": [
+        "ARMY_MILITARY_FORMATION",
+        "CORPS_MILITARY_FORMATION"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_MILITARY_POLICIES_COMBAT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_PER_MILITARY_POLICIES_COMBAT_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_MOVEMENT",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_MOVEMENT",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_EMERGENCY_UNITS_ADJUST_MOVEMENT",
+        "COLLECTION_EMERGENCY_UNITS"
+      ],
+      [
+        "MODIFIER_ALLIANCE_UNIT_MOVEMENT",
+        "COLLECTION_ALLIANCE_UNITS"
+      ],
+      [
+        "MODIFIER_SIQI32_PLAYER_BUILDERS_ADJUST_MOVEMENT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-1",
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_MOVE_AND_ATTACK": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_MOVE_AND_ATTACK",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanAttack": [
+        "0",
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NATURAL_WONDER_DEFERRED_CHARGES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_NATURAL_WONDER_DEFERRED_CHARGES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NEIGHBOR_COMBAT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_COMBAT_FOR_NUMBER_NEIGHBORS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NO_BARB_XP_LIMIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_UNIT_NO_BARB_XP_LIMIT",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "NoLimit": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NO_FOREIGN_SPREAD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_NO_FOREIGN_SPREAD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "NoSpread": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NO_REDUCTION_DAMAGE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_NO_REDUCTION_DAMAGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "NoReduction": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_NUM_ATTACKS": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_NUM_ATTACKS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_OWNER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_OWNER",
+        "COLLECTION_ALL_UNITS"
+      ]
+    ],
+    "args": {
+      "NewOwner": [
+        "Player"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PARADROP_ABILITY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_PARADROP_ABILITY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanDrop": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PER_LUXURY_ATTACK_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_PER_LUXURY_ATTACK_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_PER_LUXURY_ATTACK_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PER_UNUSED_MOVEMENT_COMBAT_BONUS": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_COMBAT_FOR_UNUSED_MOVEMENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PILLAGE_DISTRICT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_DISTRICT_PILLAGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PILLAGE_IMPROVEMENT_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_IMPROVEMENT_PILLAGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PLUNDER_YIELDS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_PLUNDER_YIELDS",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_PLUNDER_YIELDS",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100",
+        "40",
+        "50",
+        "60"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_POST_COMBAT_HEAL": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_HEAL_FROM_COMBAT",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_HEAL_FROM_COMBAT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "20",
+        "30"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_POST_COMBAT_YIELD": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_POST_COMBAT_YIELD",
+        "COLLECTION_PLAYER_COMBAT"
+      ],
+      [
+        "MODIFIER_UNIT_ADJUST_POST_COMBAT_YIELD",
+        "COLLECTION_UNIT_COMBAT"
+      ],
+      [
+        "MODIFIER_SIQI_P0032_ADJUST_POST_COMBAT_YIELD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "PercentDefeatedStrength": [
+        "100",
+        "150",
+        "50"
+      ],
+      "YieldType": [
+        "YIELD_CULTURE",
+        "YIELD_FAITH",
+        "YIELD_GOLD",
+        "YIELD_SCIENCE"
+      ],
+      "OnlyWhenDefeatedEarlierEraUnit": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_POST_TOURISM_BOMB_LOYALTY": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_POST_TOURISM_BOMB_LOYALTY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-40"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PRODUCTION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_PLAYER_CITY_ADJUST_UNIT_PRODUCTION",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100",
+        "200",
+        "30",
+        "50"
+      ],
+      "UnitType": [
+        "UNIT_BUILDER",
+        "UNIT_GIANT_DEATH_ROBOT",
+        "UNIT_MILITARY_ENGINEER",
+        "UNIT_NIGHTMARE_SHADOW",
+        "UNIT_SETTLER",
+        "UNIT_SPY",
+        "UNIT_TRADER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PROMOTE_NO_FINISH_MOVES": {
+    "pairs": [
+      [
+        "MODIFIER_SIQI_CEOBE_UNITS_PROMOTE_NO_FINISH_MOVES",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_PROMOTE_NO_FINISH_MOVES",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "NoFinishMoves": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PROPERTY": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_PROPERTY",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_SHAMARE_UNITS_ADJUST_PROPERTY",
+        "COLLECTION_ALL_UNITS"
+      ],
+      [
+        "MODIFIER_SIQI_KROOS_PLAYER_UNIT_ADJUST_PROPERTY",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_SIQI_CORE_UNITS_ADJUST_PROPERTY",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_SIQI0032_PLAYER_UNITS_ADJUST_PROPERTY",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_SIQI_FEATHER_PEN_UNITS_ADJUST_PROPERTY",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-5",
+        "1",
+        "2",
+        "20",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "Key": [
+        "PROPERTY_SIQIYI_CORE_CASTER",
+        "PROPERTY_SIQIYI_CORE_DEFENDER",
+        "PROPERTY_SIQIYI_CORE_GUARD",
+        "PROPERTY_SIQIYI_CORE_LOGISTICS",
+        "PROPERTY_SIQIYI_CORE_LOGISTICS_1",
+        "PROPERTY_SIQI_SHAMARE_UU_DECOMBAT",
+        "PROPERTY_SIQI_TECNO_UU_COMBAT",
+        "SIQI_BOLIVAR_REBELS_PROPERTY",
+        "SIQI_GREYTHROAT_LEAD_PROPERTY",
+        "SIQI_KROOS_PLAYER_PROMOTION_UNIT_PROPERTY",
+        "SIQI_L0032_1_2_Combat",
+        "SIQI_L0032_1_3_Combat",
+        "SIQI_P0032_TRAVELER_EraCombat",
+        "SIQI_RAFIA_SILVA_CIV_PROPERTY",
+        "Siqi_U0032_1_Combat"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_PURCHASE_COST": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_PURCHASE_COST",
+        "COLLECTION_PLAYER_CITIES"
+      ],
+      [
+        "MODIFIER_SINGLE_CITY_ADJUST_UNIT_PURCHASE_COST",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_EMERGENCY_CITIES_ADJUST_UNIT_PURCHASE_COST",
+        "COLLECTION_EMERGENCY_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "100",
+        "20",
+        "30",
+        "50"
+      ],
+      "UnitType": [
+        "UNIT_APOSTLE",
+        "UNIT_BUILDER",
+        "UNIT_GURU",
+        "UNIT_KHMER_DOMREY",
+        "UNIT_MACEDONIAN_HYPASPIST",
+        "UNIT_MISSIONARY",
+        "UNIT_NUBIAN_PITATI",
+        "UNIT_POLISH_HUSSAR",
+        "UNIT_ROCK_BAND",
+        "UNIT_SETTLER",
+        "UNIT_TRADER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_RAIDING": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_ADJUST_RAIDING",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Bonus": [
+        "50"
+      ],
+      "CanRaid": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_RELIC_UPON_DEATH": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_RELIC_UPON_DEATH",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "RelicSource": [
+        "RELIC_SOURCE_RELIGIOUS_UNIT"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_DISTRICT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ROCK_BAND_LEVEL_DISTRICT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ],
+      "DistrictType": [
+        "DISTRICT_ACROPOLIS",
+        "DISTRICT_CAMPUS",
+        "DISTRICT_ENTERTAINMENT_COMPLEX",
+        "DISTRICT_HIPPODROME",
+        "DISTRICT_SPACEPORT",
+        "DISTRICT_STREET_CARNIVAL",
+        "DISTRICT_THEATER",
+        "DISTRICT_WATER_ENTERTAINMENT_COMPLEX",
+        "DISTRICT_WATER_STREET_CARNIVAL",
+        "DISTRICT_WONDER"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_IMPROVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ROCK_BAND_LEVEL_IMPROVEMENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ],
+      "ImprovementType": [
+        "IMPROVEMENT_BEACH_RESORT"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATIONAL_PARK": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ROCK_BAND_LEVEL_NATIONAL_PARK",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATURAL_WONDER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_ROCK_BAND_LEVEL_NATURAL_WONDER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_ROCK_BAND_TOURISM_BOMB_VALUE_PEACE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_ROCK_BAND_TOURISM_BOMB_VALUE_PEACE",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "200",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SEA_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SEA_MOVEMENT",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_SEA_MOVEMENT",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_CITY_TRAINED_UNITS_ADJUST_MOVEMENT",
+        "COLLECTION_CITY_TRAINED_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SEE_HIDDEN": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SEE_HIDDEN",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "SeeHidden": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SEE_THROUGH_FEATURES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SEE_THROUGH_FEATURES",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanSee": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SEE_THROUGH_TERRAIN": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SEE_THROUGH_TERRAIN",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "CanSee": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SIGHT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SIGHT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-1",
+        "1",
+        "10",
+        "2",
+        "3"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPREAD_CHARGES": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SPREAD_CHARGES",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_SPREAD_CHARGES",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ADJACENT_LEVEL_BOOST": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_SPY_COUNTERSPY_ADJACENT_LEVEL_BOOST",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ENTIRE_CITY": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_UNIT_ADJUST_SPY_COUNTERSPY_ENTIRE_CITY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "EntireCity": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_ESTABLISH_TIME": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SPY_ESTABLISH_TIME",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_SPY_ESTABLISH_TIME",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "ReductionPercent": [
+        "100"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_OFFENSIVE_OPERATION_TIME": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_SPY_OFFENSIVE_OPERATION_TIME",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "ReductionPercent": [
+        "25"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_OPERATION_CHANCE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SPY_OPERATION_CHANCE",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_EMERGENCY_UNITS_ADJUST_SPYING_EFFICIENCY",
+        "COLLECTION_EMERGENCY_UNITS"
+      ],
+      [
+        "MODIFIER_ALL_UNITS_ADJUST_SPYING_EFFICIENCY",
+        "COLLECTION_ALL_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-10",
+        "2"
+      ],
+      "Offensive": [
+        "1"
+      ],
+      "OperationType": [
+        "UNITOPERATION_SPY_FOMENT_UNREST",
+        "UNITOPERATION_SPY_GREAT_WORK_HEIST",
+        "UNITOPERATION_SPY_NEUTRALIZE_GOVERNOR",
+        "UNITOPERATION_SPY_RECRUIT_PARTISANS",
+        "UNITOPERATION_SPY_SABOTAGE_PRODUCTION",
+        "UNITOPERATION_SPY_SIPHON_FUNDS"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SPY_OPERATION_TIME": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SPY_OPERATION_TIME",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_SPY_OPERATION_TIME",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "OperationType": [
+        "UNITOPERATION_SPY_DISRUPT_ROCKETRY",
+        "UNITOPERATION_SPY_GAIN_SOURCES",
+        "UNITOPERATION_SPY_GREAT_WORK_HEIST",
+        "UNITOPERATION_SPY_RECRUIT_PARTISANS",
+        "UNITOPERATION_SPY_SABOTAGE_PRODUCTION",
+        "UNITOPERATION_SPY_SIPHON_FUNDS",
+        "UNITOPERATION_SPY_STEAL_TECH_BOOST"
+      ],
+      "ReductionPercent": [
+        "25"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_STRENGTH_FROM_CITY_CULTURAL_IDENTITY": {
+    "pairs": [
+      [
+        "MODIFIER_UNIT_STRENGTH_FROM_CITY_CULTURAL_IDENTITY",
+        "COLLECTION_PLAYER_COMBAT"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_STRENGTH_REDUCTION_FOR_DAMAGE_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_STRENGTH_REDUCTION_FOR_DAMAGE_MODIFIER",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_SUPPORT_BONUS_MODIFIER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_SUPPORT_BONUS_MODIFIER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Percent": [
+        "100",
+        "50"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TAG_ERA_PRODUCTION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_CITIES_ADJUST_UNIT_TAG_ERA_PRODUCTION",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "50"
+      ],
+      "EraType": [
+        "ERA_ANCIENT",
+        "ERA_CLASSICAL",
+        "ERA_INDUSTRIAL"
+      ],
+      "UnitPromotionClass": [
+        "PROMOTION_CLASS_ANTI_CAVALRY",
+        "PROMOTION_CLASS_MELEE",
+        "PROMOTION_CLASS_RANGED"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_CONVERT_CITY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_CONVERT_CITY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Convert": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_DISTRICT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_DISTRICT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "500"
+      ],
+      "DistrictType": [
+        "DISTRICT_CAMPUS",
+        "DISTRICT_COTHON",
+        "DISTRICT_HARBOR",
+        "DISTRICT_OBSERVATORY",
+        "DISTRICT_ROYAL_NAVY_DOCKYARD",
+        "DISTRICT_SEOWON",
+        "DISTRICT_SPACEPORT"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_IMPROVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_IMPROVEMENT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "500"
+      ],
+      "ImprovementType": [
+        "IMPROVEMENT_BEACH_RESORT"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATIONAL_PARK": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_NATIONAL_PARK",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1000"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATURAL_WONDER": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_NATURAL_WONDER",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1000"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TOURISM_BOMB_RANGE": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_RANGE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Modifier": [
+        "-50"
+      ],
+      "Range": [
+        "10"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_TRADE_ROUTE_PLUNDER_IMMUNITY": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TRADE_ROUTE_PLUNDER_IMMUNITY",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "DomainType": [
+        "DOMAIN_LAND",
+        "DOMAIN_SEA"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_UPGRADE_GOODY_HUT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_UPGRADE_GOODY_HUT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_VALID_TERRAIN": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_ADJUST_VALID_TERRAIN",
+        "COLLECTION_PLAYER_UNITS"
+      ],
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_VALID_TERRAIN",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "TerrainType": [
+        "TERRAIN_OCEAN"
+      ],
+      "Valid": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_WATER_DAMAGE_PROTECTION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_WATER_DAMAGE_RESISTANCE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_ADJUST_UNIT_WMD_PROTECTION": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_WMD_RESISTANCE",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Blast": [
+        "50"
+      ],
+      "Fallout": [
+        "100"
+      ]
+    }
+  },
+  "EFFECT_ADJUST_UNIT_YIELD_PER_TOURISM_BOMB": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNIT_ADJUST_TOURISM_BOMB_ADDITIONAL_YIELD",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "-75"
+      ],
+      "YieldType": [
+        "YIELD_GOLD"
+      ]
+    }
+  },
+  "EFFECT_CHANGE_UNIT_OPERATION_AVAILABILITY": {
+    "pairs": [
+      [
+        "MODIFIER_ALL_UNITS_DISABLE_OPERATION",
+        "COLLECTION_ALL_UNITS"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_DISTRICT_ADD_NAVAL_UNIT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_DISTRICT_ADD_NAVAL_UNIT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "DistrictType": [
+        "DISTRICT_ROYAL_NAVY_DOCKYARD"
+      ]
+    }
+  },
+  "EFFECT_ENABLE_UNIT_FAITH_PURCHASE": {
+    "pairs": [
+      [
+        "MODIFIER_CITY_ENABLE_UNIT_FAITH_PURCHASE",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_CITIES_ENABLE_UNIT_FAITH_PURCHASE",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "Tag": [
+        "CLASS_AIR_FIGHTER",
+        "CLASS_ANTI_CAVALRY",
+        "CLASS_GIANT_DEATH_ROBOT",
+        "CLASS_HEAVY_CAVALRY",
+        "CLASS_HEAVY_CHARIOT",
+        "CLASS_LANDCIVILIAN",
+        "CLASS_LIGHT_CAVALRY",
+        "CLASS_LIGHT_CHARIOT",
+        "CLASS_MELEE",
+        "CLASS_NAVAL_CARRIER",
+        "CLASS_RANGED",
+        "CLASS_RANGED_CAVALRY",
+        "CLASS_RECON",
+        "CLASS_SIEGE"
+      ]
+    }
+  },
+  "EFFECT_GRANT_CITY_YIELD_PERCENT_UNIT_CREATED_COST": {
+    "pairs": [
+      [
+        "MODIFIER_SINGLE_CITY_GRANT_YIELD_PER_UNIT_COST",
+        "COLLECTION_OWNER"
+      ],
+      [
+        "MODIFIER_PLAYER_CITIES_GRANT_YIELD_PER_UNIT_COST",
+        "COLLECTION_PLAYER_CITIES"
+      ]
+    ],
+    "args": {
+      "UnitProductionPercent": [
+        "20",
+        "25"
+      ],
+      "YieldType": [
+        "YIELD_CULTURE",
+        "YIELD_SCIENCE"
+      ]
+    }
+  },
+  "EFFECT_GRANT_FREE_RESOURCE_FROM_UNIT_PLOT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_GRANT_FREE_RESOURCE_FROM_UNIT_PLOT",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "1"
+      ]
+    }
+  },
+  "EFFECT_GRANT_PLAYER_YIELD_PERCENT_UNIT_COST": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_GRANT_YIELD_PERCENT_UNIT_COST",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitCostPercent": [
+        "50"
+      ],
+      "YieldType": [
+        "YIELD_GOLD"
+      ]
+    }
+  },
+  "EFFECT_GRANT_STRENGTH_PER_ADJACENT_UNIT_TYPE": {
+    "pairs": [
+      [
+        "GRANT_STRENGTH_PER_ADJACENT_UNIT_TYPE",
+        "COLLECTION_UNIT_COMBAT"
+      ]
+    ],
+    "args": {
+      "Amount": [
+        "2"
+      ],
+      "UnitType": [
+        "UNIT_COLOMBIAN_LLANERO"
+      ]
+    }
+  },
+  "EFFECT_RESTORE_UNIT_MOVEMENT": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_UNITS_RESET_MOVES",
+        "COLLECTION_PLAYER_UNITS"
+      ]
+    ],
+    "args": {}
+  },
+  "EFFECT_SETTLED_FOREIGN_CONTINENT_UNIT_CLASS": {
+    "pairs": [
+      [
+        "MODIFIER_PLAYER_ADJUST_SETTLE_FOREIGN_CONTINENT_UNIT_CLASS",
+        "COLLECTION_OWNER"
+      ]
+    ],
+    "args": {
+      "UnitPromotionClassType": [
+        "PROMOTION_CLASS_MELEE"
+      ]
+    }
+  }
+}

@@ -324,6 +324,22 @@ def _has_game_db() -> bool:
     return gdb is not None and gdb.exists()
 
 
+class SearchRegistryTestCase(unittest.TestCase):
+    """检索注册表（无需游戏库）：科技/市政效果必须已在检索范围内。"""
+
+    def test_technology_and_civic_registered(self) -> None:
+        from modgen.search import BINDING_TABLES, OBJECT_TYPES
+
+        self.assertIn("technology", OBJECT_TYPES)
+        self.assertIn("civic", OBJECT_TYPES)
+        self.assertEqual(OBJECT_TYPES["technology"]["table"], "Technologies")
+        self.assertEqual(OBJECT_TYPES["technology"]["type_col"], "TechnologyType")
+        self.assertEqual(OBJECT_TYPES["civic"]["table"], "Civics")
+        self.assertEqual(OBJECT_TYPES["civic"]["type_col"], "CivicType")
+        self.assertIn(("TechnologyModifiers", "TechnologyType", "ModifierId", "technology"), BINDING_TABLES)
+        self.assertIn(("CivicModifiers", "CivicType", "ModifierId", "civic"), BINDING_TABLES)
+
+
 @unittest.skipUnless(_has_game_db(), "无游戏数据库，跳过 search 测试")
 class SearchTestCase(unittest.TestCase):
     """modgen search：效果/对象查询（知识获取的内置途径）。"""
@@ -390,6 +406,35 @@ class SearchTestCase(unittest.TestCase):
 
         exit_code = main(["generate-modifier", "--effect", "EFFECT_NOT_REAL", "--desc", "X"])
         self.assertNotEqual(exit_code, 0)
+
+    def test_technology_civic_effects_searchable(self) -> None:
+        """科技/市政的效果：绑定的 Modifier 能反查到对象，详情能列出实现。"""
+        from modgen.search import object_modifier_summary, search_keyword
+
+        for table, obj_col, category in (
+            ("TechnologyModifiers", "TechnologyType", "technology"),
+            ("CivicModifiers", "CivicType", "civic"),
+        ):
+            with self.subTest(table=table):
+                row = self.conn.execute(
+                    f"SELECT {obj_col}, ModifierId FROM {table} LIMIT 1"
+                ).fetchone()
+                if row is None:
+                    self.skipTest(f"游戏库无 {table} 数据")
+                obj_type, modifier_id = str(row[0] or ""), str(row[1] or "")
+                results = search_keyword(self.conn, self.loc, modifier_id)
+                self.assertTrue(
+                    any(
+                        item.get("category") == category and item.get("type") == obj_type
+                        for item in results
+                    ),
+                    f"{modifier_id} 应反查到 {category} 对象 {obj_type}",
+                )
+                mods = object_modifier_summary(self.conn, self.loc, category, obj_type)
+                self.assertTrue(
+                    any(m["modifier_id"] == modifier_id for m in mods),
+                    f"{category} 详情应列出其绑定的 Modifier {modifier_id}",
+                )
 
 
 if __name__ == "__main__":

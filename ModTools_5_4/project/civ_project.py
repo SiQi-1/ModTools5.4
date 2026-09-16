@@ -5,31 +5,15 @@ from dataclasses import dataclass
 from pathlib import Path
 import json
 
-CIV_FILE_EXTENSION = ".CIV"
-CIV_SCHEMA_VERSION = "0.1.0"
-
-CIV_SECTION_ORDER = [
-    "基础信息",
-    "文明",
-    "领袖",
-    "区域",
-    "建筑",
-    "单位",
-    "单位晋升",
-    "改良设施",
-    "总督",
-    "伟人",
-    "政策卡",
-    "项目",
-    "信仰",
-    "议程",
-    "美术",
-    "文本",
-    "修改器",
-]
-
-CIV_DIRECT_WORKSPACE_SECTIONS = {"基础信息", "美术", "文本", "修改器"}
-CIV_GROUP_SECTIONS = [name for name in CIV_SECTION_ORDER if name not in CIV_DIRECT_WORKSPACE_SECTIONS]
+from .schema import (
+    CIV_DIRECT_WORKSPACE_SECTIONS,
+    CIV_FILE_EXTENSION,
+    CIV_GROUP_SECTIONS,
+    CIV_SCHEMA_VERSION,
+    CIV_SECTION_ORDER,
+    parse_project_payload,
+    project_envelope,
+)
 
 
 @dataclass(slots=True)
@@ -40,36 +24,14 @@ class CivProject:
     sections: dict[str, object]
 
     def to_dict(self) -> dict[str, object]:
-        return {
-            "meta": {
-                "format": "CIV_PROJECT",
-                "schema_version": CIV_SCHEMA_VERSION,
-                "project_name": self.project_name,
-            },
-            "workspace": self.sections,
-        }
+        return project_envelope(self.project_name, self.sections)
 
     @classmethod
     def from_dict(cls, payload: dict[str, object]) -> "CivProject":
-        meta = payload.get("meta") if isinstance(payload, dict) else None
-        workspace = payload.get("workspace") if isinstance(payload, dict) else None
-
-        if not isinstance(meta, dict):
+        # Preserve the legacy direct-call error for non-object payloads.
+        if not isinstance(payload, dict):
             raise ValueError("工程文件缺少 meta 节点")
-        if not isinstance(workspace, dict):
-            raise ValueError("工程文件缺少 workspace 节点")
-
-        project_name = str(meta.get("project_name") or "未命名工程").strip() or "未命名工程"
-
-        normalized: dict[str, object] = {}
-        for section in CIV_SECTION_ORDER:
-            if section in CIV_DIRECT_WORKSPACE_SECTIONS:
-                value = workspace.get(section, {})
-                normalized[section] = value if isinstance(value, dict) else {}
-            else:
-                value = workspace.get(section, [])
-                normalized[section] = value if isinstance(value, list) else []
-
+        project_name, normalized = parse_project_payload(payload)
         return cls(project_name=project_name, sections=normalized)
 
 
@@ -89,7 +51,6 @@ def load_civ_project(file_path: Path) -> CivProject:
     """Load and parse a .CIV file from disk (JSON payload)."""
     if file_path.suffix.upper() != CIV_FILE_EXTENSION:
         raise ValueError("请选择 .CIV 工程文件")
-
     raw_text = file_path.read_text(encoding="utf-8")
     payload = json.loads(raw_text)
     if not isinstance(payload, dict):
@@ -98,12 +59,10 @@ def load_civ_project(file_path: Path) -> CivProject:
 
 
 def save_civ_project(file_path: Path, project: CivProject) -> None:
-    """Serialize the project to a .CIV file in JSON format."""
+    """Serialize the project to a .CIV file from the shared schema envelope."""
     if file_path.suffix.upper() != CIV_FILE_EXTENSION:
         raise ValueError("工程文件后缀必须是 .CIV")
-
-    payload = project.to_dict()
     file_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
+        json.dumps(project.to_dict(), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )

@@ -18,10 +18,18 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from dataclasses import dataclass, field
 from typing import Any, Iterator, Optional
 import re
 import sqlite3
+
+from .loc_text import (
+    contains_ref,
+    looks_like_tag,
+    make_sqlite_fetcher,
+    resolve_tag_or_original,
+    resolve_text,
+)
+from . import search_index
 
 # ── 产出图标/中文名 ────────────────────────────────────────────
 YIELD_ICON_MAP: dict[str, str] = {
@@ -74,22 +82,9 @@ ADJACENCY_BOOLEAN_CN: dict[str, str] = {
 }
 
 # ── 中文效果词 → 英文概念（通道③）─────────────────────────────
-EFFECT_KEYWORD_MAP: dict[str, str] = {
-    "宣战": "WAR", "战争": "WAR", "和平": "WAR",
-    "产能": "PRODUCTION", "生产力": "PRODUCTION",
-    "信仰": "FAITH", "科技": "SCIENCE", "科技值": "SCIENCE",
-    "文化": "CULTURE", "文化值": "CULTURE", "金币": "GOLD", "金钱": "GOLD",
-    "食物": "FOOD", "宜居": "AMENITY", "住房": "HOUSING",
-    "移动": "MOVEMENT", "移动力": "MOVEMENT", "战斗力": "STRENGTH",
-    "旅游": "TOURISM", "伟人": "GREAT_PERSON", "人口": "POPULATION",
-    "区域": "DISTRICT", "建筑": "BUILDING", "单位": "UNIT",
-    "改良": "IMPROVEMENT", "项目": "PROJECT", "政策": "POLICY",
-    "相邻": "ADJACEN", "城市": "CITY", "蛮族": "BARBARIAN",
-    "宗教": "RELIGION", "遗物": "RELIC", "贸易": "TRADE",
-    "时代": "ERA", "黄金时代": "GOLDEN_AGE", "黑暗时代": "DARK_AGE",
-    "总督": "GOVERNOR", "间谍": "SPY", "使徒": "APOSTLE",
-    "海军": "NAVAL", "陆军": "LAND", "空袭": "AIR",
-}
+# 与 BM25 检索层的领域词典**同源**（search_index.TERM_MAP，单一维护点）：
+# 既用于"已按效果词扩展"提示，也用于英文 Type 片段的降权加分。
+EFFECT_KEYWORD_MAP: dict[str, str] = search_index.TERM_MAP
 
 
 @contextmanager
@@ -113,19 +108,18 @@ def open_dbs(game_db_path: str, text_db_path: str) -> Iterator[tuple[sqlite3.Con
 
 
 def resolve_loc(loc_conn: Optional[sqlite3.Connection], tag: object, lang: str = "zh_Hans_CN") -> str:
-    """LOC tag → 中文；失败返回原 tag。"""
+    """LOC tag → 中文；失败返回原 tag。
+
+    嵌套 `{LOC_...}` 引用由 `db.loc_text` 统一展开（单一实现）。
+    """
     text = str(tag or "").strip()
     if not text or loc_conn is None:
         return text
-    try:
-        row = loc_conn.execute(
-            "SELECT Text FROM LocalizedText WHERE Tag = ? AND lower(Language) = ? LIMIT 1",
-            (text, lang.lower()),
-        ).fetchone()
-    except sqlite3.Error:
-        return text
-    if row and str(row[0] or "").strip():
-        return str(row[0]).strip()
+    fetch = make_sqlite_fetcher(loc_conn, language=lang)
+    if looks_like_tag(text):
+        return resolve_tag_or_original(fetch, text)
+    if contains_ref(text):
+        return resolve_text(fetch, text)
     return text
 
 
@@ -239,6 +233,28 @@ OBJECT_TYPES: dict[str, dict[str, Any]] = {
              "table": "PolicyModifiers", "obj_col": "PolicyType", "mod_col": "ModifierId"},
         ],
     },
+    "technology": {
+        "label": "科技",
+        "table": "Technologies",
+        "type_col": "TechnologyType",
+        "name_col": "Name",
+        "desc_col": "Description",
+        "binding_sources": [
+            {"label": "TechnologyModifiers", "kind": "direct",
+             "table": "TechnologyModifiers", "obj_col": "TechnologyType", "mod_col": "ModifierId"},
+        ],
+    },
+    "civic": {
+        "label": "市政",
+        "table": "Civics",
+        "type_col": "CivicType",
+        "name_col": "Name",
+        "desc_col": "Description",
+        "binding_sources": [
+            {"label": "CivicModifiers", "kind": "direct",
+             "table": "CivicModifiers", "obj_col": "CivicType", "mod_col": "ModifierId"},
+        ],
+    },
     "governor": {
         "label": "总督",
         "table": "Governors",
@@ -299,7 +315,8 @@ OBJECT_TYPES: dict[str, dict[str, Any]] = {
 
 OBJECT_TYPE_ORDER: list[str] = [
     "civilization", "leader", "trait", "district", "building", "unit",
-    "improvement", "project", "policy", "governor", "governor_promotion",
+    "improvement", "project", "policy", "technology", "civic",
+    "governor", "governor_promotion",
     "great_person", "unit_ability", "unit_promotion",
 ]
 
@@ -438,6 +455,8 @@ _BINDING_TABLES: list[tuple[str, str, str]] = [
     ("ImprovementModifiers", "ImprovementType", "improvement"),
     ("ProjectCompletionModifiers", "ProjectType", "project"),
     ("PolicyModifiers", "PolicyType", "policy"),
+    ("TechnologyModifiers", "TechnologyType", "technology"),
+    ("CivicModifiers", "CivicType", "civic"),
     ("GovernorModifiers", "GovernorType", "governor"),
     ("GovernorPromotionModifiers", "GovernorPromotionType", "governor_promotion"),
     ("UnitAbilityModifiers", "UnitAbilityType", "unit_ability"),
@@ -560,6 +579,10 @@ def search_by_modifier_keyword(
 
 
 # ── 通道③：效果词映射 ─────────────────────────────────────────
+# 效果词扩展 → 英文精确通道的补充条数上限（BM25 已是主排序，补充只做兜底，避免刷屏）
+_SUPPLEMENT_LIMIT = 30
+
+
 def effect_keyword_expansion(keyword: str) -> tuple[list[str], str]:
     """中文效果词 → 附加英文关键词列表 + 提示文本。"""
     kw = str(keyword or "").strip()
@@ -567,11 +590,11 @@ def effect_keyword_expansion(keyword: str) -> tuple[list[str], str]:
         return [], ""
     extra: list[str] = []
     for cn, en in EFFECT_KEYWORD_MAP.items():
-        if cn in kw:
+        if cn in kw and en not in extra:
             extra.append(en)
     if not extra:
         return [], ""
-    hint = "已按效果词扩展搜索：" + "、".join(f"“{kw}”→{e}" for e in extra)
+    hint = "已按效果词扩展搜索：" + "、".join(f"“{cn}”→{en}" for cn, en in EFFECT_KEYWORD_MAP.items() if cn in kw and en in extra)
     return extra, hint
 
 
@@ -582,27 +605,35 @@ def search_all(
     category: str | None = None,
     limit: int = 200,
 ) -> dict[str, Any]:
-    """三通道合并。返回 {"results": [...], "hint": 提示, "expansions": [英文词]}。"""
-    results = search_objects(game_conn, loc_conn, keyword, category=category, limit=limit)
-    extra, hint = effect_keyword_expansion(keyword)
-    extra_hits: list[dict[str, Any]] = []
-    if extra:
-        for en in extra:
-            extra_hits.extend(
-                search_by_modifier_keyword(game_conn, loc_conn, en, category=category, limit=limit)
-            )
-    else:
-        extra_hits = search_by_modifier_keyword(game_conn, loc_conn, keyword, category=category, limit=limit)
+    """BM25 检索（对象名/描述 + 效果实现 + 条件实现），按相关性排序。
 
-    seen: set[tuple[str, str]] = set()
-    merged: list[dict[str, Any]] = []
-    for item in results + extra_hits:
-        key = (item["category"], item["type"])
-        if key in seen:
-            continue
-        seen.add(key)
-        merged.append(item)
-    return {"results": merged[:limit], "hint": hint, "expansions": extra}
+    - 查询与效果词扩展（如 贸易路线→TRADE_ROUTE、产出→YIELD）一起进入检索，
+      因此中文自然语言查询能命中英文 Type/参数里的游戏实现；
+    - 覆盖度加权：命中查询词越多的对象越靠前；
+    - 返回 {"results", "hint", "expansions"}（与历史接口一致）。
+
+    历史三通道（对象子串 / 修饰器子串 / 效果词映射）中，前两者被 BM25 取代
+    （子串匹配对自然语言几乎必然 0 命中），效果词映射仍用于提示与英文扩展。
+    """
+    kw = str(keyword or "").strip()
+    if not kw:
+        return {"results": [], "hint": "", "expansions": []}
+
+    extra, hint = effect_keyword_expansion(kw)
+
+    try:
+        index = search_index.get_index(game_conn, loc_conn, OBJECT_TYPES)
+        results = index.search(
+            kw,
+            category=category,
+            limit=limit,
+            boost_query=" ".join(extra),
+            boost_weight=search_index.EXPANSION_BOOST_WEIGHT,
+        )
+    except Exception:  # noqa: BLE001 - 索引异常时退回旧子串通道，保证搜索可用
+        results = search_objects(game_conn, loc_conn, kw, category=category, limit=limit)
+
+    return {"results": results[:limit], "hint": hint, "expansions": extra}
 
 
 # ── 对象详情 ───────────────────────────────────────────────────

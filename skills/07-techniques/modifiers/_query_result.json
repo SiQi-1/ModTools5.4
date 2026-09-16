@@ -1,0 +1,1625 @@
+[
+  {
+    "effect": "EFFECT_ADD_RELIGIOUS_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_RELIGION_ADD_RELIGIOUS_BUILDING",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 9,
+    "arguments": [
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_CATHEDRAL, BUILDING_GURDWARA, BUILDING_MEETING_HOUSE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADD_RELIGIOUS_BUILDING_MULTIPLIER",
+    "modifierType": "MODIFIER_PLAYER_ADD_RELIGIOUS_BUILDING_MULTIPLIER",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Founder",
+        "example_values": "1"
+      },
+      {
+        "name": "Multiplier",
+        "example_values": "10"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FAITH, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ACTIVE_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_SINGLE_CITY_ADJUST_ACTIVE_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_ADJACENT_CITY_RIVER_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_ADJACENT_RIVER_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ADJACENT_CITY_RIVER_DISTRICT_PRODUCTION",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_ADJACENT_RIVER_DISTRICT_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ALL_BUILDING_PRODUCTION_MODIFIER",
+    "modifierType": "MODIFIER_SINGLE_CITY_ADJUST_BUILDING_PRODUCTION_MODIFIER",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "15"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ALL_BUILDING_PRODUCTION_MODIFIER",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_PRODUCTION_MODIFIER",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "-30, 15, 25"
+      },
+      {
+        "name": "IsWonder",
+        "example_values": "0"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ALL_DISTRICT_PRODUCTION_MODIFIER",
+    "modifierType": "MODIFIER_SINGLE_CITY_ADJUST_DISTRICT_PRODUCTION_MODIFIER",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100, 15, 25"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_ALL_DISTRICT_PRODUCTION_MODIFIER",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_DISTRICT_PRODUCTION_MODIFIER",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "15, 25, 50"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_FEATURE_YIELD_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_FEATURE_YIELD_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      },
+      {
+        "name": "FeatureType",
+        "example_values": "FEATURE_FOREST, FEATURE_JUNGLE, FEATURE_MARSH"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_PRODUCTION, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_HOUSING",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_HOUSING",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 10, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_HOUSING",
+    "modifierType": "MODIFIER_SINGLE_CITY_ADJUST_BUILDING_HOUSING",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 6,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_HOUSING",
+    "modifierType": "MODIFIER_CITY_OWNER_ADJUST_BUILDING_HOUSING",
+    "collectionType": "COLLECTION_OWNER_CITY",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_HOUSING",
+    "modifierType": "MODIFIER_PLAYER_CAPITAL_CITY_ADJUST_BUILDING_HOUSING",
+    "collectionType": "COLLECTION_PLAYER_CAPITAL_CITY",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_ALL_CITIES_ADJUST_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_ALL_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_SINGLE_CITY_ADJUST_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_JADECHAMBER"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 19,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100, 200, 30"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_CASTLE, BUILDING_WALLS, BUILDING_WALLS,BUILDING_CASTLE,BUILDING_STAR_FORT"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_ENCAMPMENT, DISTRICT_HARBOR, DISTRICT_INDUSTRIAL_ZONE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_PURCHASE_COST",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_PURCHASE_COST",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_CASTLE, BUILDING_STAR_FORT, BUILDING_WALLS"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES",
+    "modifierType": "MODIFIER_SINGLE_CITY_RELIGIOUS_SPREADS",
+    "collectionType": "COLLECTION_CITY_TRAINED_UNITS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES",
+    "modifierType": "MODIFIER_PLAYER_UNITS_RELIGIOUS_SPREADS",
+    "collectionType": "COLLECTION_PLAYER_UNITS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES",
+    "modifierType": "MODIFIER_SINGLE_UNIT_RELIGIOUS_SPREADS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_SPREAD_CHARGES",
+    "modifierType": "MODIFIER_PLAYER_TRAINED_UNITS_ADJUST_RELIGIOUS_CHARGES",
+    "collectionType": "COLLECTION_PLAYER_TRAINED_UNITS",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_YIELD_CHANGE",
+    "modifierType": "MODIFIER_BUILDING_YIELD_CHANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 12,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2, 3, 4"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_ELECTRONICS_FACTORY, BUILDING_SHRINE, BUILDING_TEMPLE"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FAITH, YIELD_FOOD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_YIELD_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_YIELD_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 79,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_FACTORY, BUILDING_LIBRARY, BUILDING_WORKSHOP"
+      },
+      {
+        "name": "CityStatesOnly",
+        "example_values": "1"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_PRODUCTION, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_YIELD_MODIFIER",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_YIELD_MODIFIER",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_MONUMENT, BUILDING_SHRINE, BUILDING_TEMPLE"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 8,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_COMMERCIAL_HUB, DISTRICT_THEATER"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT",
+    "modifierType": "MODIFIER_SIQI_CORE_CITY_ADJUST_BUILDING_YIELD_MODIFIERS_FOR_DISTRICT",
+    "collectionType": "COLLECTION_OWNER_CITY",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_SIQIYI_ENGINEERING_DEPARTMENT"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_PRODUCTION"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_HOUSING_PER_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_HOUSING_PER_DISTRICT",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_CAPITAL_CITY_ADJUST_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CAPITAL_CITY",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_PRODUCTION_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_BUILDING_PRODUCTION_CHANGE_ETHIOPIA",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CAPITAL_CITY_ADJUST_DISTRICT_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CAPITAL_CITY",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_DISTRICT_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_DISTRICT_PRODUCTION_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_PRODUCTION_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_DISTRICT_PRODUCTION_CHANGE_ETHIOPIA",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_STATE_TRADE_ROUTE_DISTRICT_YIELD",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_CITY_STATE_TRADE_ROUTE_DISTRICT_YIELD",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_YIELD_FROM_POWERED_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_YIELD_FROM_POWERED_BUILDINGS",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "4"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_PRODUCTION"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_YIELD_PER_DISTRICT",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_PER_DISTRICT",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_CITY_YIELD_PER_DISTRICT",
+    "modifierType": "MODIFIER_CITY_ADJUST_CITY_YIELD_PER_DISTRICT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_ADJACENT_NATURAL_WONDER_PRODUCTION",
+    "modifierType": "MODIFIER_ALL_CITIES_ADJUST_DISTRICT_ADJACENT_NATURAL_WONDER_PRODUCTION",
+    "collectionType": "COLLECTION_ALL_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "50"
+      },
+      {
+        "name": "FeatureType",
+        "example_values": "FEATURE_IKKIL"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_AMENITY",
+    "modifierType": "MODIFIER_CITY_DISTRICTS_ADJUST_DISTRICT_AMENITY",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_AMENITY",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_DISTRICT_AMENITY",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_AMENITY",
+    "modifierType": "MODIFIER_SIQIMUJICA_ALL_DISTRICTS_ADJUST_DISTRICT_AMENITY",
+    "collectionType": "COLLECTION_ALL_DISTRICTS",
+    "modifierIdCount": 16,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 128, 16"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_AMENITY",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_DISTRICT_AMENITY",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2, 3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_AMENITY",
+    "modifierType": "MODIFIER_ADJUST_AMENITIES_IN_DISTRICT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_ATTACK_RANGE",
+    "modifierType": "MODIFIER_DISTRICT_ADJUST_CITY_ATTACK_RANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_BASE_YIELD_CHANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 15,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 4"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FOOD, YIELD_GOLD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE",
+    "modifierType": "MODIFIER_SIQI_CEOBE_PLAYER_DISTRICTS_ADJUST_BASE_YIELD_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE",
+    "modifierType": "MODIFIER_SIQI_CORE_ALL_DISTRICTS_ADJUST_BASE_YIELD_CHANGE",
+    "collectionType": "COLLECTION_ALL_DISTRICTS",
+    "modifierIdCount": 108,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 1024, 128"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FAITH, YIELD_FOOD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE",
+    "modifierType": "MODIFIER_SIQI_CORE_PLAYER_DISTRICTS_ADJUST_BASE_YIELD_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FAITH, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_BUILDING_PRODUCTION",
+    "modifierType": "MODIFIER_ALL_CITIES_ADJUST_DISTRICT_BUILDING_PRODUCTION",
+    "collectionType": "COLLECTION_ALL_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_EXTRA_ENTERTAINMENT",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_EXTRA_ENTERTAINMENT",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 12,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 4"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_ENTERTAINMENT",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_EXTRA_REGIONAL_ENTERTAINMENT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_RANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_EXTRA_REGIONAL_RANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_RANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_EXTRA_REGIONAL_RANGE",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_EXTRA_REGIONAL_YIELD",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_EXTRA_REGIONAL_YIELD",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_PRODUCTION"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_GREAT_PERSON_POINTS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_GREAT_PERSON_POINTS",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      },
+      {
+        "name": "GreatPersonClassType",
+        "example_values": "GREAT_PERSON_CLASS_MERCHANT, GREAT_PERSON_CLASS_PROPHET, GREAT_PERSON_CLASS_SCIENTIST"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS",
+    "modifierType": "MODIFIER_SINGLE_CITY_DISTRICTS_ADJUST_GREAT_PERSON_POINTS",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 8,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      },
+      {
+        "name": "GreatPersonClassType",
+        "example_values": "GREAT_PERSON_CLASS_ADMIRAL, GREAT_PERSON_CLASS_GENERAL, GREAT_PERSON_CLASS_PROPHET"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_GREAT_PERSON_POINTS",
+    "modifierType": "MODIFIER_ALLIANCE_DISTRICTS_ADJUST_GREAT_POINTS",
+    "collectionType": "COLLECTION_ALLIANCE_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_HOUSING",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_HOUSING",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2, 3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_HOUSING",
+    "modifierType": "MODIFIER_CITY_DISTRICTS_ADJUST_DISTRICT_HOUSING",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_HOUSING",
+    "modifierType": "MODIFIER_ADJUST_HOUSING_IN_DISTRICT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_PREREQ",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_DISTRICT_UNLOCK",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CANAL"
+      },
+      {
+        "name": "TechType",
+        "example_values": "TECH_MASONRY"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_PRODUCTION",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_DISTRICT_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 17,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100, 30, 500"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_ENCAMPMENT, DISTRICT_HOLY_SITE, DISTRICT_THEATER"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "modifierType": "MODIFIER_CITY_DISTRICTS_ADJUST_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100, 50"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_TOURISM_ADJACENCY_YIELD_MOFIFIER",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_TOURISM_CHANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2, 4, 5"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_TOURISM_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 15,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+    "modifierType": "MODIFIER_CITY_DISTRICTS_ADJUST_TOURISM_CHANGE",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+    "modifierType": "MODIFIER_EMERGENCY_DISTRICTS_ADJUST_TOURISM_CHANGE",
+    "collectionType": "COLLECTION_EMERGENCY_DISTRICTS",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_TOURISM_CHANGE",
+    "modifierType": "MODIFIER_SIQI_TECNO_CITY_DISTRICTS_ADJUST_TOURISM_CHANGE",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "4"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_WITHIN_ONE_HEX_ESPIONAGE_DEFENSE_BONUS",
+    "modifierType": "MODIFIER_DISTRICT_ADJUST_WITHIN_ONE_HEX_ESPIONAGE_DEFENSE_BONUS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "modifierType": "MODIFIER_ALL_DISTRICTS_ADJUST_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "collectionType": "COLLECTION_ALL_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "YieldTypeToGrant",
+        "example_values": "YIELD_PRODUCTION"
+      },
+      {
+        "name": "YieldTypeToMirror",
+        "example_values": "YIELD_FAITH"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_SIQI_UNCHARTED_STAR_MAP"
+      },
+      {
+        "name": "YieldTypeToGrant",
+        "example_values": "YIELD_FAITH, YIELD_PRODUCTION, YIELD_SCIENCE"
+      },
+      {
+        "name": "YieldTypeToMirror",
+        "example_values": "YIELD_FAITH, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 20,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_COMMERCIAL_HUB, DISTRICT_STONE_CRAB_CAFE"
+      },
+      {
+        "name": "YieldTypeToGrant",
+        "example_values": "YIELD_FOOD, YIELD_PRODUCTION, YIELD_SCIENCE"
+      },
+      {
+        "name": "YieldTypeToMirror",
+        "example_values": "YIELD_FAITH, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_YIELD_BASED_ON_ADJACENCY_BONUS_BUILDER",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "YieldTypeToGrant",
+        "example_values": "YIELD_CULTURE"
+      },
+      {
+        "name": "YieldTypeToMirror",
+        "example_values": "YIELD_FAITH"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "modifierType": "MODIFIER_SIQI_UBIKA_DISTRICTS_ADJUST_YIELD_BASED_ON_ADJACENCY_BONUS",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS"
+      },
+      {
+        "name": "YieldTypeToGrant",
+        "example_values": "YIELD_PRODUCTION"
+      },
+      {
+        "name": "YieldTypeToMirror",
+        "example_values": "YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_BASED_ON_APPEAL",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_YIELD_BASED_ON_APPEAL",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 12,
+    "arguments": [
+      {
+        "name": "Description",
+        "example_values": "LOC_DISTRICT_APPEAL_FAITH, LOC_DISTRICT_APPEAL_GOLD, LOC_DISTRICT_APPEAL_SCIENCE"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_COMMERCIAL_HUB, DISTRICT_HOLY_SITE"
+      },
+      {
+        "name": "RequiredAppeal",
+        "example_values": "2, 4, 6"
+      },
+      {
+        "name": "YieldChange",
+        "example_values": "1, 2, 4"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_YIELD_CHANGE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_CHANGE",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_YIELD_CHANGE",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 33,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2, 4"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_CHANGE",
+    "modifierType": "MODIFIER_SIQI0032_CITY_DISTRICTS_ADJUST_YIELD_CHANGE",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "2"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH, YIELD_PRODUCTION"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER",
+    "modifierType": "MODIFIER_PLAYER_DISTRICTS_ADJUST_YIELD_MODIFIER",
+    "collectionType": "COLLECTION_PLAYER_DISTRICTS",
+    "modifierIdCount": 26,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100, 50"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_PRODUCTION"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER",
+    "modifierType": "MODIFIER_CITY_DISTRICTS_ADJUST_YIELD_MODIFIER",
+    "collectionType": "COLLECTION_CITY_DISTRICTS",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_GOLD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER",
+    "modifierType": "MODIFIER_SIQI_CORE_ALL_DISTRICTS_ADJUST_YIELD_MODIFIER",
+    "collectionType": "COLLECTION_ALL_DISTRICTS",
+    "modifierIdCount": 108,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 1024, 128"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_FAITH, YIELD_FOOD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_AUTO_THEMED_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_AUTO_THEMED_BUILDING",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_MUSEUM_ARTIFACT"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_BUILDING_FAVOR",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_BUILDING_FAVOR",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_BROADCAST_CENTER"
+      },
+      {
+        "name": "Favor",
+        "example_values": "3"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_DISTRICT_AIR_SLOTS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_GRANT_AIR_SLOTS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 3,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_DISTRICT_CREATE_YIELD",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_CREATE_YIELD",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "100"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_NEIGHBORHOOD"
+      },
+      {
+        "name": "ImprovementType",
+        "example_values": "IMPROVEMENT_FARM"
+      },
+      {
+        "name": "MustReplaceImprovement",
+        "example_values": "1"
+      },
+      {
+        "name": "YieldBasedOnAppeal",
+        "example_values": "1"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_GOLD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_AERODROME_BUILDING_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_AERODROME_BUILDING_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_CULTURE_BUILDING_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_CULTURE_BUILDING_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_DISTRICT_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_DISTRICT_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_INDUSTRIAL_BUILDING_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_INDUSTRIAL_BUILDING_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_SCIENCE_BUILDING_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_PLAYER_ERA_SCORE_PER_SCIENCE_BUILDING_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED_EXCEPT",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_FREE_BUILDING_WHEN_SPECIALTY_DISTRICT_CONSTRUCTED_EXCEPT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_GOVERNMENT"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_SPECIALTY_DISTRICT_CANNOT_BE_BUILT_ADJACENT_TO_CITY",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_SPECIALTY_DISTRICT_CANNOT_BE_BUILT_ADJACENT_TO_CITY",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_SPECIFIC_DISTRICT_GRANT_ENVOYS",
+    "modifierType": "MODIFIER_PLAYER_DISTRICT_ADJUST_SPECIFIC_DISTRICT_GRANT_ENVOYS",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_GOVERNMENT"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_PLAYER_VALID_BUILDING",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_VALID_BUILDING",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_ADJUST_RELIGION_BUILDING_DISCOUNT",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_RELIGION_BUILDING_DISCOUNT",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Discount",
+        "example_values": "90"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_RIVER_DISTRICT_PRODUCTION",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ADJUST_RIVER_DISTRICT_PRODUCTION",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "15"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_DOMESTIC",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_DOMESTIC",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 5,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "0.5, 1, 2"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_INTERNATIONAL",
+    "modifierType": "MODIFIER_PLAYER_ADJUST_TRADE_ROUTE_YIELD_PER_SPECIALTY_DISTRICT_FOR_INTERNATIONAL",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "3"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_GOLD"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_DISTRICT_ADJACENCY",
+    "modifierType": "MODIFIER_PLAYER_CITIES_DISTRICT_ADJACENCY",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 8,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1, 2"
+      },
+      {
+        "name": "Description",
+        "example_values": "LOC_DISTRICT_DISTRICT_1_FAITH, LOC_DISTRICT_DISTRICT_1_GOLD, LOC_DISTRICT_DISTRICT_1_SCIENCE"
+      },
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_HARBOR, DISTRICT_HOLY_SITE"
+      },
+      {
+        "name": "TilesRequired",
+        "example_values": "1"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ENABLE_BUILDING_FAITH_PURCHASE",
+    "modifierType": "MODIFIER_CITY_ENABLE_BUILDING_FAITH_PURCHASE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CAMPUS, DISTRICT_THEATER"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ENABLE_BUILDING_FAITH_PURCHASE",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ENABLE_BUILDING_FAITH_PURCHASE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 4,
+    "arguments": [
+      {
+        "name": "DistrictType",
+        "example_values": "DISTRICT_CITY_CENTER, DISTRICT_ENCAMPMENT, DISTRICT_TIME_IS_MONEY"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_ENABLE_SPECIFIC_BUILDING_FAITH_PURCHASE",
+    "modifierType": "MODIFIER_PLAYER_CITIES_ENABLE_SPECIFIC_BUILDING_FAITH_PURCHASE",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_MUSEUM_ARTIFACT"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_GRANT_BUILDING_IN_CITY",
+    "modifierType": "MODIFIER_SINGLE_CITY_GRANT_BUILDING_IN_CITY",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_GRANT_BUILDING_IN_CITY_IGNORE",
+    "modifierType": "MODIFIER_SINGLE_CITY_GRANT_BUILDING_IN_CITY_IGNORE",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 10,
+    "arguments": [
+      {
+        "name": "BuildingType",
+        "example_values": "BUILDING_CASTLE, BUILDING_WALLS, BUILDING_WORKSHOP"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_GRANT_CHEAPEST_BUILDING_IN_CITY",
+    "modifierType": "MODIFIER_PLAYER_CITIES_GRANT_CHEAPEST_BUILDING_IN_CITY",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 2,
+    "arguments": [
+      {
+        "name": "Amount",
+        "example_values": "1"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST",
+    "modifierType": "MODIFIER_SINGLE_CITY_GRANT_YIELD_PER_BUILDING_COST",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "BuildingProductionPercent",
+        "example_values": "25"
+      },
+      {
+        "name": "IncludeWonder",
+        "example_values": "0"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_FAITH"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST",
+    "modifierType": "MODIFIER_PLAYER_CITIES_GRANT_YIELD_PER_BUILDING_COST_SAHARA",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST",
+    "modifierType": "MODIFIER_SINGLE_CITY_GRANT_YIELD_PER_BUILDING_COST_GRANCOLOMBIA_MAYA",
+    "collectionType": "COLLECTION_OWNER",
+    "modifierIdCount": 0,
+    "arguments": []
+  },
+  {
+    "effect": "EFFECT_GRANT_CITY_YIELD_PERCENT_BUILDING_CREATED_COST",
+    "modifierType": "MODIFIER_PLAYER_CITIES_GRANT_YIELD_PER_BUILDING_COST",
+    "collectionType": "COLLECTION_PLAYER_CITIES",
+    "modifierIdCount": 9,
+    "arguments": [
+      {
+        "name": "BuildingProductionPercent",
+        "example_values": "-15, 10, 30"
+      },
+      {
+        "name": "IncludeWonder",
+        "example_values": "0, 1"
+      },
+      {
+        "name": "YieldType",
+        "example_values": "YIELD_CULTURE, YIELD_GOLD, YIELD_SCIENCE"
+      }
+    ]
+  },
+  {
+    "effect": "EFFECT_PLAYER_DIPLOMACY_AGENDA_DISTRICT_SPREAD",
+    "modifierType": "MODIFIER_PLAYER_DIPLOMACY_AGENDA_HAMMURABI_DISTRICTS",
+    "collectionType": "COLLECTION_MAJOR_PLAYERS",
+    "modifierIdCount": 1,
+    "arguments": [
+      {
+        "name": "SimpleModifierDescription",
+        "example_values": "LOC_TOOLTIP_SAMPLE_DIPLOMACY_HAMMURABI_DISTRICT"
+      },
+      {
+        "name": "StatementKey",
+        "example_values": "AGENDA_HAMMURABI_DISTRICTS"
+      }
+    ]
+  }
+]

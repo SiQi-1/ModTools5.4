@@ -110,6 +110,10 @@ class MainWindow(QMainWindow):
         self._pages[page.page_id] = page
         self._stack.addWidget(page)
 
+    def workspace_page(self) -> WorkspacePage | None:
+        """工作区页面引用（AI 控制接口用）。"""
+        return self._workspace_page
+
     def show_page(self, page_id: str) -> None:
         page = self._pages.get(page_id)
         if page is None:

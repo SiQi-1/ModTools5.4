@@ -50,12 +50,21 @@ if (Test-Path $modgenSrc) {
     Get-ChildItem $modgenDst -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 }
 
+# 本地技能库（skills，知识库随发布包分发；modgen skill 检索入口）
+$skillsSrc = Join-Path $root "skills"
+if (Test-Path $skillsSrc) {
+    Copy-Item $skillsSrc (Join-Path $releaseDir "skills") -Recurse -Force
+    Get-ChildItem (Join-Path $releaseDir "skills") -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 # 源码发行（agent 可操作/修改/调试的完整源码 + 初始化/工具脚本 + 文档）
 Copy-Item (Join-Path $root "ModTools5.4.py") $releaseDir -Force
 Copy-Item (Join-Path $root "requirements.txt") $releaseDir -Force
 Copy-Item (Join-Path $root "LICENSE") $releaseDir -Force
 Copy-Item (Join-Path $root "README.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENT_SETUP.md") $releaseDir -Force
+Copy-Item (Join-Path $root "AGENT.md") $releaseDir -Force
+Copy-Item (Join-Path $root "AGENTS.md") $releaseDir -Force
 Copy-Item (Join-Path $root "CIV6_MOD_TUTORIAL.md") $releaseDir -Force
 Copy-Item $pkg (Join-Path $releaseDir "ModTools_5_4") -Recurse -Force
 Get-ChildItem (Join-Path $releaseDir "ModTools_5_4") -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue

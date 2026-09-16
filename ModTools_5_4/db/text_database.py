@@ -8,10 +8,14 @@ import re
 import sqlite3
 import xml.etree.ElementTree as ET
 
+from .loc_text import LOC_REF_PATTERN as _LOC_REF_PATTERN
+from .loc_text import make_sqlite_fetcher, resolve_text
+
 
 SIMPLIFIED_LANGUAGE = "zh_Hans_CN"
 SIMPLIFIED_LANGUAGE_NORMALIZED = SIMPLIFIED_LANGUAGE.lower()
-LOC_REF_PATTERN = re.compile(r"\{(LOC_[A-Z0-9_]+)\}")
+# 兼容旧引用：本模块历史上自带一份正则，现统一取自 db.loc_text（单一实现）
+LOC_REF_PATTERN = _LOC_REF_PATTERN
 
 
 @dataclass(slots=True)
@@ -259,7 +263,10 @@ def load_conflicts_against_db(text_db_path: Path, records: list[ImportRecord]) -
 
 
 def query_text_by_tag(text_db_path: Path, tag: str, resolve_nested: bool = True) -> str:
-    """Query text by tag, and optionally resolve nested {LOC_XXX} references."""
+    """Query text by tag, and optionally resolve nested {LOC_XXX} references.
+
+    嵌套展开委托 `db.loc_text`（单一实现：迭代 + 防环 + 深度上限）。
+    """
     normalized_tag = tag.strip()
     if not normalized_tag:
         return ""
@@ -269,19 +276,11 @@ def query_text_by_tag(text_db_path: Path, tag: str, resolve_nested: bool = True)
     try:
         _ensure_text_schema(conn)
 
-        def fetch_one(one_tag: str) -> str | None:
-            row = conn.execute(
-                "SELECT Text FROM LocalizedText WHERE Tag = ? AND lower(Language) = ? LIMIT 1",
-                (one_tag, SIMPLIFIED_LANGUAGE_NORMALIZED),
-            ).fetchone()
-            if row is None:
-                row = conn.execute(
-                    "SELECT Text FROM LocalizedText WHERE Tag = ? LIMIT 1",
-                    (one_tag,),
-                ).fetchone()
-                if row is None:
-                    return None
-            return str(row[0])
+        fetch_one = make_sqlite_fetcher(
+            conn,
+            language=SIMPLIFIED_LANGUAGE_NORMALIZED,
+            fallback_any_language=True,
+        )
 
         value = fetch_one(normalized_tag)
         if value is None:
@@ -290,37 +289,15 @@ def query_text_by_tag(text_db_path: Path, tag: str, resolve_nested: bool = True)
         if not resolve_nested:
             return value
 
-        return _resolve_nested_loc_refs(value, fetch_one)
+        # 旧版行为：被引用文本里的换行会被去掉（文本预览单行显示）
+        return resolve_text(fetch_one, value, strip_reference_newlines=True)
     finally:
         conn.close()
 
 
 def _resolve_nested_loc_refs(text: str, getter) -> str:
-    result = text
-    visited: set[str] = set()
-
-    for _ in range(10):
-        matches = LOC_REF_PATTERN.findall(result)
-        if not matches:
-            return result
-
-        changed = False
-        for loc_tag in matches:
-            if loc_tag in visited:
-                continue
-            visited.add(loc_tag)
-            mapped = getter(loc_tag)
-            replacement = mapped if mapped is not None else loc_tag
-            if "\n" in replacement:
-                replacement = replacement.replace("\n", "")
-            previous = result
-            result = result.replace("{" + loc_tag + "}", replacement)
-            changed = changed or (previous != result)
-
-        if not changed:
-            return result
-
-    return result
+    """已废弃：嵌套解析统一由 `db.loc_text` 提供（保留薄包装，兼容旧调用点）。"""
+    return resolve_text(getter, text, strip_reference_newlines=True)
 
 
 def _ensure_text_schema(conn: sqlite3.Connection) -> None:

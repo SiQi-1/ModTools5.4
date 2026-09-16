@@ -55,6 +55,7 @@ from ..ui_widget_kit import _BuildingSearchByDistrictDialog, _DistrictSearchDial
 from ..ui_widget_kit import set_workspace_sections_provider
 from ..ui_widget_kit import _build_building_entries, _build_district_hierarchy, _build_improvement_entries, _build_unit_entries
 from ...app.settings_store import load_settings
+from ...application import ProjectService
 from ...db.paths import DEFAULT_GAME_DB
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...project import (
@@ -63,9 +64,13 @@ from ...project import (
     CIV_SECTION_ORDER,
     CivProject,
     create_empty_project,
-    load_civ_project,
-    save_civ_project,
 )
+from ...project.civ6proj_generator import (
+    create_mod_project,
+    default_modbuddy_project_dir,
+    sanitize_file_name,
+)
+from ...project.output_manifest import OutputManifest, make_output_manifest, safe_relative_path
 
 
 MODIFIER_SECTION_FORMAT = "MODTOOLS54_MODIFIER_WORKSPACE"
@@ -440,7 +445,8 @@ class WorkspacePage(BasePage):
         self.setObjectName("workspacePage")
         self._loading_project = False
         self._workspace_editors_loaded = False
-        self._project: CivProject = create_empty_project()
+        self._project_service = ProjectService()
+        self._project: CivProject = self._project_service.create()
         self._project_file_path: Path | None = None
         self._sessions: list[ProjectSession] = []
         self._active_session_index: int = -1
@@ -473,8 +479,8 @@ class WorkspacePage(BasePage):
         self._workspace_path.setWordWrap(True)
 
         self._project_root_workspace = ProjectRootWorkspacePanel(
-            on_generate_single=self._generate_single_output_file,
-            on_generate_all=self._generate_all_output_files,
+            on_generate_single=self.generate_single_output_file,
+            on_generate_all=self.generate_all_output_files,
         )
 
         self._basic_info_workspace = BasicInfoWorkspacePanel(
@@ -583,15 +589,15 @@ class WorkspacePage(BasePage):
         layout.addWidget(splitter, 1)
         self.setLayout(layout)
 
-        self._add_session(create_empty_project(), None)
+        self._add_session(self._project_service.create(), None)
 
     def create_new_project(self, project_name: str = "未命名工程") -> None:
         self._sync_workspace_sections_from_editors()
-        self._add_session(create_empty_project(project_name), None)
+        self._add_session(self._project_service.create(project_name), None)
 
     def load_project(self, file_path: Path) -> None:
         self._sync_workspace_sections_from_editors()
-        loaded = load_civ_project(file_path)
+        loaded = self._project_service.load(file_path)
         self._add_session(loaded, file_path)
         self._refresh_all_workspaces_after_project_open()
 
@@ -602,7 +608,7 @@ class WorkspacePage(BasePage):
             raise ValueError("尚未指定工程保存路径")
         if target_path.suffix.upper() != CIV_FILE_EXTENSION:
             target_path = target_path.with_suffix(CIV_FILE_EXTENSION)
-        save_civ_project(target_path, self._project)
+        self._project_service.save(target_path, self._project)
         self._project_file_path = target_path
         if 0 <= self._active_session_index < len(self._sessions):
             self._sessions[self._active_session_index].file_path = target_path
@@ -9913,6 +9919,11 @@ class WorkspacePage(BasePage):
                 skipped += 1
         return written, skipped, cancelled
 
+    def output_manifest(self) -> OutputManifest:
+        """Return the current output plan through the shared Qt-free value object."""
+        files, folders, can_generate, civ6proj_path = self._project_root_manifest()
+        return make_output_manifest(files, folders, civ6proj_path)
+
     def _project_root_manifest(self) -> tuple[dict[str, str], set[str], bool, Path | None]:
         self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
         self._save_art_payload_to_project(self._art_workspace.export_project_payload())
@@ -10153,6 +10164,22 @@ class WorkspacePage(BasePage):
                         break
                     parent = parent.rsplit("/", 1)[0]
 
+            def _existing_action_file_content(rel_path: str) -> str:
+                """动作声明的文件若已存在于工程目录，以磁盘内容为准（自定义文件不被模板覆盖）。"""
+                if not (isinstance(civ6proj_path, Path) and civ6proj_path.exists()):
+                    return ""
+                disk = civ6proj_path.parent / Path(rel_path.replace("/", "\\"))
+                try:
+                    raw = disk.read_bytes()
+                except OSError:
+                    return ""
+                if not raw or b"\x00" in raw[:4096]:
+                    return ""
+                try:
+                    return raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    return raw.decode("utf-8", errors="ignore")
+
             for action in action_sources:
                 if not isinstance(action, dict):
                     continue
@@ -10175,32 +10202,32 @@ class WorkspacePage(BasePage):
                         continue
                     rel_path = f"{target_root}/{rel}" if not rel.startswith(f"{target_root}/") else rel
                     if action_type == "AddGameplayScripts" and rel_path.lower().endswith(".lua"):
-                        existing = str(files.get(rel_path, ""))
+                        existing = str(files.get(rel_path, "")) or _existing_action_file_content(rel_path)
                         files[rel_path] = existing if existing.strip() else gameplay_lua_template
                         managed_action_paths.add(rel_path.replace("\\", "/").strip().lower())
                         _ensure_parent_folders(rel_path)
                         continue
 
                     if action_type == "AddUserInterfaces" and rel_path.lower().endswith(".xml"):
-                        existing = str(files.get(rel_path, ""))
+                        existing = str(files.get(rel_path, "")) or _existing_action_file_content(rel_path)
                         files[rel_path] = existing if existing.strip() else ui_xml_template
                         managed_action_paths.add(rel_path.replace("\\", "/").strip().lower())
                         _ensure_parent_folders(rel_path)
 
                         lua_pair = rel_path[:-4] + ".lua"
-                        lua_existing = str(files.get(lua_pair, ""))
+                        lua_existing = str(files.get(lua_pair, "")) or _existing_action_file_content(lua_pair)
                         files[lua_pair] = lua_existing if lua_existing.strip() else gameplay_lua_template
                         managed_action_paths.add(lua_pair.replace("\\", "/").strip().lower())
                         _ensure_parent_folders(lua_pair)
                         continue
 
                     if action_type == "ImportFiles" and rel_path.lower().endswith(".lua"):
-                        files.setdefault(rel_path, "")
+                        files.setdefault(rel_path, _existing_action_file_content(rel_path))
                         managed_action_paths.add(rel_path.replace("\\", "/").strip().lower())
                         _ensure_parent_folders(rel_path)
                         continue
 
-                    files.setdefault(rel_path, "")
+                    files.setdefault(rel_path, _existing_action_file_content(rel_path))
                     managed_action_paths.add(rel_path.replace("\\", "/").strip().lower())
                     _ensure_parent_folders(rel_path)
 
@@ -10322,7 +10349,10 @@ class WorkspacePage(BasePage):
     def _write_output_file(self, root_dir: Path, relative_path: str, content: str) -> None:
         target = root_dir / Path(relative_path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        # 统一换行：内容可能来自磁盘（CRLF）或生成器（LF），先归一为 LF 再经
+        # write_text 输出，避免 Windows 通用换行翻译把 \n 二次转成 \r\n
+        normalized = str(content or "").replace("\n", "\n").replace("\r", "\n")
+        target.write_text(normalized, encoding="utf-8")
 
     @staticmethod
     def _output_needs_units_required_check(relative_path: str) -> bool:
@@ -10338,7 +10368,10 @@ class WorkspacePage(BasePage):
         rel = str(relative_path or "").replace("\\", "/").lower()
         return rel.startswith("data/") and "_districts." in rel
 
-    def _validate_required_main_table_fields(self, *, validate_units: bool, validate_districts: bool) -> bool:
+    def _collect_missing_required_fields(
+        self, *, validate_units: bool, validate_districts: bool
+    ) -> list[tuple[str, str, str]]:
+        """收集必填字段缺失项（不弹窗，供 GUI 校验与 AI 接口共用）。"""
         table_to_section = {
             "Districts": "区域",
             "Units": "单位",
@@ -10385,38 +10418,72 @@ class WorkspacePage(BasePage):
                         # 有默认值视为满足（生成器会按相同默认值输出），但不写回工程数据
                         continue
                     missing_required.append((section, obj_type, field_key))
+        return missing_required
 
+    def _show_missing_required_fields_dialog(self, missing_required: list[tuple[str, str, str]]) -> None:
+        lines = [f"{sec} / {obj_type} / {field_key}" for sec, obj_type, field_key in missing_required[:30]]
+        more = "\n..." if len(missing_required) > 30 else ""
+        QMessageBox.warning(
+            self,
+            "必填参数未填写",
+            "存在必填参数未填写，已阻止生成。\n"
+            "请先在对应分类的【主表】中补全必填字段后再生成。\n\n"
+            f"缺失列表（最多显示 30 条）：\n" + "\n".join(lines) + more,
+        )
+
+    def _validate_required_main_table_fields(self, *, validate_units: bool, validate_districts: bool) -> bool:
+        missing_required = self._collect_missing_required_fields(
+            validate_units=validate_units,
+            validate_districts=validate_districts,
+        )
         if missing_required:
-            lines = [f"{sec} / {obj_type} / {field_key}" for sec, obj_type, field_key in missing_required[:30]]
-            more = "\n..." if len(missing_required) > 30 else ""
-            QMessageBox.warning(
-                self,
-                "必填参数未填写",
-                "存在必填参数未填写，已阻止生成。\n"
-                "请先在对应分类的【主表】中补全必填字段后再生成。\n\n"
-                f"缺失列表（最多显示 30 条）：\n" + "\n".join(lines) + more,
-            )
+            self._show_missing_required_fields_dialog(missing_required)
             return False
         return True
 
-    def _generate_single_output_file(self, relative_path: str) -> None:
-        if relative_path in self._readonly_custom_paths:
-            QMessageBox.information(self, "只读文件", f"该文件为外部自定义只读文件，不参与生成：\n{relative_path}")
-            return
+    def generate_single_output_file(
+        self, relative_path: str, *, overwrite: bool | None = None
+    ) -> dict[str, object] | None:
+        """Public generation adapter used by application services."""
+        return self._generate_single_output_file(relative_path, overwrite=overwrite)
 
-        if not self._validate_required_main_table_fields(
+    def _generate_single_output_file(
+        self, relative_path: str, *, overwrite: bool | None = None
+    ) -> dict[str, object] | None:
+        """生成单个输出文件。
+
+        overwrite=None（默认）→ 交互模式：沿用原 GUI 行为（确认/进度/结果弹窗），返回 None；
+        传 bool → AI 接口模式：无弹窗，返回结果字典（{"ok": bool, ...}）。
+        """
+        interactive = overwrite is None
+        if relative_path in self._readonly_custom_paths:
+            message = f"该文件为外部自定义只读文件，不参与生成：\n{relative_path}"
+            if interactive:
+                QMessageBox.information(self, "只读文件", message)
+                return None
+            return {"ok": False, "error": "readonly_custom_file", "message": message}
+
+        missing = self._collect_missing_required_fields(
             validate_units=self._output_needs_units_required_check(relative_path),
             validate_districts=self._output_needs_districts_required_check(relative_path),
-        ):
-            return
+        )
+        if missing:
+            if interactive:
+                self._show_missing_required_fields_dialog(missing)
+                return None
+            return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
         if not can_generate or civ6proj_path is None:
-            QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
-            return
+            if interactive:
+                QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
+                return None
+            return {"ok": False, "error": "no_civ6proj", "message": "请先在基础信息中导入 .civ6proj 文件后再生成。"}
         if relative_path not in files:
-            QMessageBox.warning(self, "无法生成", "未找到所选文件内容。")
-            return
+            if interactive:
+                QMessageBox.warning(self, "无法生成", "未找到所选文件内容。")
+                return None
+            return {"ok": False, "error": "unknown_file", "message": "未找到所选文件内容。"}
 
         root_dir = civ6proj_path.parent
         root_dir.mkdir(parents=True, exist_ok=True)
@@ -10425,15 +10492,18 @@ class WorkspacePage(BasePage):
 
         target = root_dir / Path(relative_path)
         if target.exists():
-            result = QMessageBox.question(
-                self,
-                "文件已存在",
-                f"文件已存在：{target}\n是否覆盖？",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
-                QMessageBox.StandardButton.Cancel,
-            )
-            if result != QMessageBox.StandardButton.Yes:
-                return
+            if interactive:
+                result = QMessageBox.question(
+                    self,
+                    "文件已存在",
+                    f"文件已存在：{target}\n是否覆盖？",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
+                    QMessageBox.StandardButton.Cancel,
+                )
+                if result != QMessageBox.StandardButton.Yes:
+                    return None
+            elif overwrite is False:
+                return {"ok": True, "skipped": True, "reason": "exists_not_overwritten", "path": relative_path}
 
         is_img_target = relative_path == self._img_plan_relative_path()
         is_textures_target = relative_path == self._textures_plan_relative_path()
@@ -10450,22 +10520,25 @@ class WorkspacePage(BasePage):
             textures_plans = self._build_textures_output_plan() if is_textures_target else []
 
             total_steps = max(1, len(img_plans) + len(textures_plans))
-            progress = QProgressDialog("正在生成资源...", "取消", 0, total_steps, self)
-            progress.setWindowTitle("生成进度")
-            progress.setWindowModality(Qt.WindowModality.WindowModal)
-            progress.setMinimumDuration(0)
-            progress.setAutoClose(False)
-            progress.setAutoReset(False)
+            progress = None
+            if interactive:
+                progress = QProgressDialog("正在生成资源...", "取消", 0, total_steps, self)
+                progress.setWindowTitle("生成进度")
+                progress.setWindowModality(Qt.WindowModality.WindowModal)
+                progress.setMinimumDuration(0)
+                progress.setAutoClose(False)
+                progress.setAutoReset(False)
             progress_value = 0
 
             def _is_cancelled() -> bool:
-                return progress.wasCanceled()
+                return bool(progress is not None and progress.wasCanceled())
 
             def _step(label: str) -> None:
                 nonlocal progress_value
                 progress_value = min(total_steps, progress_value + 1)
-                progress.setLabelText(label)
-                progress.setValue(progress_value)
+                if progress is not None:
+                    progress.setLabelText(label)
+                    progress.setValue(progress_value)
                 QApplication.processEvents()
 
             cancelled = False
@@ -10489,8 +10562,9 @@ class WorkspacePage(BasePage):
                 )
                 cancelled = cancelled or tex_cancelled
 
-            progress.setValue(total_steps)
-            progress.close()
+            if progress is not None:
+                progress.setValue(total_steps)
+                progress.close()
 
             if cancelled:
                 target_message = (
@@ -10498,49 +10572,78 @@ class WorkspacePage(BasePage):
                     if is_textures_target
                     else f"已生成文件：{target}"
                 )
-                QMessageBox.information(
-                    self,
-                    "已取消",
+                summary = (
                     f"{target_message}\n"
                     f"图片输出：写入 {image_written}，跳过 {image_skipped}。\n"
-                    f"纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
+                    f"纹理输出：写入 {texture_written}，跳过 {texture_skipped}。"
                 )
-                return
+                if interactive:
+                    QMessageBox.information(self, "已取消", summary)
+                    return None
+                return {
+                    "ok": False,
+                    "cancelled": True,
+                    "path": relative_path,
+                    "image_written": image_written,
+                    "image_skipped": image_skipped,
+                    "texture_written": texture_written,
+                    "texture_skipped": texture_skipped,
+                }
 
         target_message = (
             "纹理输出（未写入纹理清单txt）"
             if is_textures_target
             else f"已生成文件：{target}"
         )
-
-        QMessageBox.information(
-            self,
-            "生成完成",
-            f"{target_message}\n图片输出：写入 {image_written}，跳过 {image_skipped}。\n纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
-        )
+        if interactive:
+            QMessageBox.information(
+                self,
+                "生成完成",
+                f"{target_message}\n图片输出：写入 {image_written}，跳过 {image_skipped}。\n纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
+            )
+            return None
+        return {
+            "ok": True,
+            "path": relative_path,
+            "image_written": image_written,
+            "image_skipped": image_skipped,
+            "texture_written": texture_written,
+            "texture_skipped": texture_skipped,
+        }
 
     @staticmethod
     def _safe_delete_relative_path(rel: object) -> str | None:
-        """规范化删除计划的相对路径；拒绝绝对路径/盘符/`..` 穿越，非法返回 None。"""
-        text = str(rel or "").replace("\\", "/").strip()
-        if not text or text.startswith("/") or re.match(r"^[A-Za-z]:", text):
-            return None
-        parts = [part for part in text.split("/") if part not in ("", ".")]
-        if any(part == ".." for part in parts):
-            return None
-        return "/".join(parts)
+        """兼容旧入口，实际规则集中在 project.output_manifest。"""
+        return safe_relative_path(rel)
+    def generate_all_output_files(self, *, overwrite_policy: str = "ask") -> dict[str, object] | None:
+        """Public generation adapter used by application services."""
+        return self._generate_all_output_files(overwrite_policy=overwrite_policy)
 
-    def _generate_all_output_files(self) -> None:
-        if not self._validate_required_main_table_fields(
+    def _generate_all_output_files(self, *, overwrite_policy: str = "ask") -> dict[str, object] | None:
+        """批量生成全部输出文件（一键生成）。
+
+        overwrite_policy：
+        - "ask"（默认）→ 交互模式：沿用原 GUI 行为（覆盖选择/进度/结果弹窗），返回 None；
+        - "all" / "none" → AI 接口模式：无弹窗；"all" 覆盖全部已存在文件并执行删除计划，
+          "none" 跳过全部已存在文件与删除计划。返回结果字典。
+        """
+        interactive = overwrite_policy == "ask"
+        missing = self._collect_missing_required_fields(
             validate_units=self._section_has_entries("单位"),
             validate_districts=self._section_has_entries("区域"),
-        ):
-            return
+        )
+        if missing:
+            if interactive:
+                self._show_missing_required_fields_dialog(missing)
+                return None
+            return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
         if not can_generate or civ6proj_path is None:
-            QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
-            return
+            if interactive:
+                QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
+                return None
+            return {"ok": False, "error": "no_civ6proj", "message": "请先在基础信息中导入 .civ6proj 文件后再生成。"}
 
         root_dir = civ6proj_path.parent
         root_dir.mkdir(parents=True, exist_ok=True)
@@ -10571,32 +10674,39 @@ class WorkspacePage(BasePage):
 
         overwrite_set: set[str] = set()
         delete_set: set[str] = set()
-        if existing or delete_candidates:
-            dlg = _OverwriteSelectionDialog(existing, self, delete_paths=delete_candidates)
-            if dlg.exec() != QDialog.DialogCode.Accepted:
-                return
-            overwrite_set = dlg.selected_paths()
-            delete_set = dlg.selected_delete_paths()
+        if interactive:
+            if existing or delete_candidates:
+                dlg = _OverwriteSelectionDialog(existing, self, delete_paths=delete_candidates)
+                if dlg.exec() != QDialog.DialogCode.Accepted:
+                    return None
+                overwrite_set = dlg.selected_paths()
+                delete_set = dlg.selected_delete_paths()
+        elif overwrite_policy == "all":
+            overwrite_set = set(existing)
+            delete_set = set(delete_candidates)
 
         img_plans = self._build_img_output_plan()
         textures_plans = self._build_textures_output_plan()
         total_steps = max(1, len(delete_set) + len(batch_items) + len(img_plans) + len(textures_plans))
-        progress = QProgressDialog("正在生成文件...", "取消", 0, total_steps, self)
-        progress.setWindowTitle("批量生成")
-        progress.setWindowModality(Qt.WindowModality.WindowModal)
-        progress.setMinimumDuration(0)
-        progress.setAutoClose(False)
-        progress.setAutoReset(False)
+        progress = None
+        if interactive:
+            progress = QProgressDialog("正在生成文件...", "取消", 0, total_steps, self)
+            progress.setWindowTitle("批量生成")
+            progress.setWindowModality(Qt.WindowModality.WindowModal)
+            progress.setMinimumDuration(0)
+            progress.setAutoClose(False)
+            progress.setAutoReset(False)
         progress_value = 0
 
         def _is_cancelled() -> bool:
-            return progress.wasCanceled()
+            return bool(progress is not None and progress.wasCanceled())
 
         def _step(label: str) -> None:
             nonlocal progress_value
             progress_value = min(total_steps, progress_value + 1)
-            progress.setLabelText(label)
-            progress.setValue(progress_value)
+            if progress is not None:
+                progress.setLabelText(label)
+                progress.setValue(progress_value)
             QApplication.processEvents()
 
         written = 0
@@ -10664,24 +10774,423 @@ class WorkspacePage(BasePage):
             )
             cancelled = cancelled or tex_cancelled
 
-        progress.setValue(total_steps)
-        progress.close()
+        if progress is not None:
+            progress.setValue(total_steps)
+            progress.close()
 
-        if cancelled:
+        summary = {
+            "deleted": deleted,
+            "delete_skipped": delete_skipped,
+            "written": written,
+            "skipped": skipped,
+            "image_written": image_written,
+            "image_skipped": image_skipped,
+            "texture_written": texture_written,
+            "texture_skipped": texture_skipped,
+        }
+        if interactive:
+            if cancelled:
+                QMessageBox.information(
+                    self,
+                    "已取消",
+                    f"生成已取消（已完成部分写入）。\n已删除 {deleted} 个文件，跳过删除 {delete_skipped} 个。\n已写入 {written} 个文件，跳过 {skipped} 个文件。\n"
+                    f"图片输出：写入 {image_written}，跳过 {image_skipped}。\n"
+                    f"纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
+                )
+                return None
             QMessageBox.information(
                 self,
-                "已取消",
-                f"生成已取消（已完成部分写入）。\n已删除 {deleted} 个文件，跳过删除 {delete_skipped} 个。\n已写入 {written} 个文件，跳过 {skipped} 个文件。\n"
-                f"图片输出：写入 {image_written}，跳过 {image_skipped}。\n"
-                f"纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
+                "生成完成",
+                f"已删除 {deleted} 个文件，跳过删除 {delete_skipped} 个。\n已写入 {written} 个文件，跳过 {skipped} 个文件。\n图片输出：写入 {image_written}，跳过 {image_skipped}。\n纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
             )
-            return
+            return None
+        return {"ok": not cancelled, "cancelled": cancelled, **summary}
 
-        QMessageBox.information(
-            self,
-            "生成完成",
-            f"已删除 {deleted} 个文件，跳过删除 {delete_skipped} 个。\n已写入 {written} 个文件，跳过 {skipped} 个文件。\n图片输出：写入 {image_written}，跳过 {image_skipped}。\n纹理输出：写入 {texture_written}，跳过 {texture_skipped}。",
+    # ── AI 控制接口支持方法（供 ai/control_server.py 动作注册表调用）──────
+
+    @staticmethod
+    def _ai_summary_value(value: object) -> object:
+        """把工程数据值压成 JSON 友好的摘要（列表→计数，字典→键列表）。"""
+        if isinstance(value, dict):
+            return {
+                "kind": "dict",
+                "keys": sorted(str(key) for key in value),
+            }
+        if isinstance(value, list):
+            return {"kind": "list", "count": len(value)}
+        return value
+
+    def ai_get_state(self) -> dict[str, object]:
+        """工程状态快照（JSON 友好）：分区/条目/必填缺失/基础信息。
+
+        先同步基础信息编辑器 → 工程数据（与 _project_root_manifest 同约定），
+        保证 GUI 上刚改/刚新建的 civ6proj_path、guid 等立即反映在快照里。
+        """
+        if self.has_active_session():
+            self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
+        basic = self._load_basic_info_payload_from_project() or {}
+        project_info = basic.get("project_info") if isinstance(basic, dict) else {}
+        if not isinstance(project_info, dict):
+            project_info = {}
+        global_settings = basic.get("global_settings") if isinstance(basic, dict) else {}
+        if not isinstance(global_settings, dict):
+            global_settings = {}
+
+        sections: dict[str, object] = {}
+        for section in CIV_SECTION_ORDER:
+            value = self._project.sections.get(section)
+            if section in CIV_DIRECT_WORKSPACE_SECTIONS:
+                summary: dict[str, object] = {}
+                if isinstance(value, dict):
+                    data = value.get("data") if isinstance(value.get("data"), dict) else value
+                    if isinstance(data, dict):
+                        summary = {
+                            str(key): self._ai_summary_value(item)
+                            for key, item in data.items()
+                        }
+                sections[section] = {"kind": "direct", "summary": summary}
+                continue
+            entries = [e for e in value if isinstance(e, dict)] if isinstance(value, list) else []
+            sections[section] = {
+                "kind": "list",
+                "count": len(entries),
+                "entries": [
+                    {
+                        "index": index,
+                        "name": self._resolve_entry_name(entry, index),
+                        "type": str(entry.get("type") or "").strip(),
+                    }
+                    for index, entry in enumerate(entries)
+                ],
+            }
+
+        civ6proj_path = str(project_info.get("civ6proj_path") or "").strip()
+        missing = self._collect_missing_required_fields(
+            validate_units=self._section_has_entries("单位"),
+            validate_districts=self._section_has_entries("区域"),
         )
+
+        # 文件动作 + 工程目录自定义文件清单（AI 与 GUI 视角一致）
+        file_info_data = basic.get("file_info") if isinstance(basic, dict) else {}
+        if not isinstance(file_info_data, dict):
+            file_info_data = {}
+
+        def _compact_actions(key: str) -> list[dict[str, object]]:
+            raw = file_info_data.get(key)
+            if not isinstance(raw, list):
+                return []
+            return [
+                {
+                    "type": str(item.get("type") or ""),
+                    "id": str(item.get("id") or ""),
+                    "load_order": int(item.get("load_order") or 0),
+                    "files": [str(f) for f in item.get("files", [])],
+                }
+                for item in raw
+                if isinstance(item, dict)
+            ]
+
+        root = self._ai_project_root_dir()
+        custom_files_list: list[str] = []
+        if root is not None:
+            custom_files_list = sorted(
+                str(path.relative_to(root)).replace("\\", "/")
+                for path in root.rglob("*")
+                if path.is_file()
+            )
+
+        return {
+            "project_name": self.project_name(),
+            "file_path": str(self.project_file_path() or "") or None,
+            "has_active_session": self.has_active_session(),
+            "global": {
+                "prefix": str(global_settings.get("prefix") or ""),
+                "infix": global_settings.get("infix"),
+                "language": str(global_settings.get("language") or ""),
+            },
+            "project_info": {
+                "civ6proj_path": civ6proj_path or None,
+                "civ6proj_exists": bool(civ6proj_path) and Path(civ6proj_path).exists(),
+                "project_root": str(root) if root is not None else None,
+                "file_name": str(project_info.get("file_name") or "").strip() or None,
+                "mod_name": str(project_info.get("mod_name") or "").strip() or None,
+                "guid": str(project_info.get("guid") or "").strip() or None,
+                "description": str(project_info.get("description") or "").strip() or None,
+            },
+            "sections": sections,
+            "required_missing": [list(item) for item in missing],
+            "file_info": {
+                "front_end_actions": _compact_actions("front_end_actions"),
+                "in_game_actions": _compact_actions("in_game_actions"),
+            },
+            "custom_files": custom_files_list,
+        }
+
+    def ai_run_quick_config(self) -> dict[str, object]:
+        """一键配置（无弹窗）。先重建清单以刷新外部工程文件缓存，再执行配置。"""
+        self._project_root_manifest()
+        added = self._basic_info_workspace.run_quick_config(interactive=False)
+        if added is None:
+            return {"ok": False, "error": "no_civ6proj", "message": "请先选择或新建 .civ6proj 文件。"}
+        return {"ok": True, "added_files": added}
+
+    def ai_create_civ6proj(
+        self,
+        *,
+        directory: str | None = None,
+        file_name: str | None = None,
+        fields: dict[str, object] | None = None,
+        create_art_xml: bool = True,
+    ) -> dict[str, object]:
+        """按当前工程基础信息新建 .civ6proj（+ 空白 Art.xml）并应用到工程。
+
+        fields 可覆盖基础信息字段：file_name/mod_name/guid/teaser/description/
+        authors/thanks/affects_saved_games/supports_single_player/
+        supports_multiplayer/supports_hotseat。
+        """
+        basic = self._load_basic_info_payload_from_project() or {}
+        project_info = basic.get("project_info") if isinstance(basic, dict) else {}
+        if not isinstance(project_info, dict):
+            project_info = {}
+        override = fields if isinstance(fields, dict) else {}
+
+        def _pick(key: str, default: object = "") -> object:
+            if key in override:
+                return override[key]
+            value = project_info.get(key)
+            return value if value not in (None, "") else default
+
+        base_name = sanitize_file_name(
+            str(file_name or "").strip() or str(_pick("file_name") or "").strip() or self.project_name()
+        )
+        target_dir = Path(directory) if directory else default_modbuddy_project_dir(base_name)
+        description = str(_pick("description") or _pick("teaser") or base_name)
+        created = create_mod_project(
+            directory=target_dir,
+            file_name=base_name,
+            mod_name=str(_pick("mod_name") or base_name),
+            guid=str(_pick("guid") or "") or None,
+            teaser=str(_pick("teaser") or description),
+            description=description,
+            authors=str(_pick("authors") or ""),
+            special_thanks=str(_pick("thanks") or ""),
+            affects_saved_games=bool(_pick("affects_saved_games", True)),
+            supports_single_player=bool(_pick("supports_single_player", True)),
+            supports_multiplayer=bool(_pick("supports_multiplayer", True)),
+            supports_hotseat=bool(_pick("supports_hotseat", True)),
+            write_art_xml=create_art_xml,
+        )
+        proj_path = created["civ6proj"]
+        self._basic_info_workspace.set_civ6proj_path(proj_path, interactive=False)
+        # civ6proj_path 立即落入工程数据（manifest/生成读它）
+        self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
+        return {
+            "ok": True,
+            "civ6proj": str(proj_path),
+            "art_xml": str(created["art_xml"]) if created.get("art_xml") else None,
+            "directory": str(target_dir),
+            "guid": str(created.get("guid") or ""),
+        }
+
+    def ai_import_entry_from_db(self, section: str, obj_type: str, *, replace: bool = False) -> dict[str, object]:
+        """无弹窗从游戏库导入单条数据（区域/建筑/单位/改良设施/伟人/政策卡）。"""
+        specs: dict[str, tuple[str, str, object]] = {
+            "区域": ("district_replaces", "ReplacesDistrictType", self._import_district_payload_from_db),
+            "建筑": ("building_replaces", "ReplacesBuildingType", self._import_building_payload_from_db),
+            "单位": ("unit_replaces", "ReplacesUnitType", self._import_unit_payload_from_db),
+            "改良设施": ("", "", self._import_improvement_payload_from_db),
+            "伟人": ("", "", self._import_great_people_payload_from_db),
+        }
+        spec = specs.get(section)
+        if spec is None and section == "政策卡":
+            settings = load_settings()
+            db_path = Path(str(settings.game_db_path or "")).expanduser()
+            if not db_path.exists() and DEFAULT_GAME_DB.exists():
+                db_path = DEFAULT_GAME_DB
+            if not db_path.exists():
+                return {"ok": False, "error": "no_game_db", "message": "未找到可用游戏数据库。"}
+            payload = self._import_policy_payload_from_db(db_path, obj_type)
+            subtable_key, target_key = "", ""
+        elif spec is not None:
+            subtable_key, target_key, func = spec
+            payload = func(obj_type)  # type: ignore[operator]
+        else:
+            return {"ok": False, "error": "unsupported_section", "message": f"不支持导入的分类：{section}"}
+
+        if payload is None:
+            return {"ok": False, "error": "not_found", "message": f"未找到数据：{section}/{obj_type}"}
+        if replace and subtable_key and target_key:
+            _fill_replace_target(payload, subtable_key, target_key, obj_type)
+
+        entries = self._project.sections.setdefault(section, [])
+        if not isinstance(entries, list):
+            entries = []
+            self._project.sections[section] = entries
+        entries.append(payload)
+        new_index = len(entries) - 1
+        self._rebuild_tree()
+        return {
+            "ok": True,
+            "section": section,
+            "index": new_index,
+            "type": str(payload.get("type") or obj_type),
+            "name": str(payload.get("name") or ""),
+        }
+
+    # ── 自定义文件通道（AI 控制接口 / modgen custom-file 同语义）────────────
+
+    def _ai_project_root_dir(self) -> Path | None:
+        civ6proj = self._civ6proj_target_path()
+        if civ6proj is None or not civ6proj.exists() or not civ6proj.is_file():
+            return None
+        return civ6proj.parent
+
+    def _ai_sync_basic_info_to_project(self) -> None:
+        self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
+
+    def ai_project_file_write(
+        self,
+        relative_path: str,
+        content: str,
+        *,
+        register_action: bool = True,
+        action_type: str = "",
+    ) -> dict[str, object]:
+        """把自定义 SQL/XML/Lua 文件写进工程目录（一键生成原样透传），并注册文件动作。"""
+        from ...project.custom_files import sanitize_relative_path
+
+        rel = sanitize_relative_path(relative_path)
+        if not rel:
+            return {"ok": False, "error": "invalid_path", "message": f"非法相对路径：{relative_path}（禁止绝对路径与 .. 穿越）"}
+        root = self._ai_project_root_dir()
+        if root is None:
+            return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj（civ6proj_create 动作）。"}
+
+        target = root / Path(rel.replace("/", "\\"))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(str(content or ""), encoding="utf-8")
+
+        result: dict[str, object] = {"ok": True, "path": rel, "absolute": str(target)}
+        if register_action:
+            self._project_root_manifest()  # 刷新外部文件缓存（分类依据）
+            try:
+                if str(action_type or "").strip():
+                    added = self._basic_info_workspace.register_file_action(
+                        action_type=str(action_type).strip(), files=[rel]
+                    )
+                else:
+                    added = self._basic_info_workspace.run_quick_config(interactive=False)
+            except ValueError as exc:
+                return {"ok": False, "error": "bad_action_type", "message": str(exc)}
+            self._ai_sync_basic_info_to_project()
+            result["added_files"] = int(added or 0)
+        return result
+
+    def ai_project_file_read(self, relative_path: str) -> dict[str, object]:
+        from ...project.custom_files import sanitize_relative_path
+
+        rel = sanitize_relative_path(relative_path)
+        if not rel:
+            return {"ok": False, "error": "invalid_path", "message": f"非法相对路径：{relative_path}"}
+        root = self._ai_project_root_dir()
+        if root is None:
+            return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj。"}
+        target = root / Path(rel.replace("/", "\\"))
+        if not target.exists() or not target.is_file():
+            return {"ok": False, "error": "not_found", "message": f"文件不存在：{rel}"}
+        try:
+            raw = target.read_bytes()
+        except OSError as exc:
+            return {"ok": False, "error": "read_failed", "message": str(exc)}
+        if b"\x00" in raw[:4096]:
+            return {"ok": False, "error": "binary", "message": f"二进制文件不可读：{rel}"}
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            text = raw.decode("utf-8", errors="ignore")
+        return {"ok": True, "path": rel, "content": text, "size": len(raw)}
+
+    def ai_project_file_list(self) -> dict[str, object]:
+        root = self._ai_project_root_dir()
+        if root is None:
+            return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj。"}
+        files = [
+            {"path": str(path.relative_to(root)).replace("\\", "/"), "size": path.stat().st_size}
+            for path in sorted(root.rglob("*"))
+            if path.is_file()
+        ]
+        basic = self._load_basic_info_payload_from_project() or {}
+        file_info_data = basic.get("file_info") if isinstance(basic, dict) else {}
+        if not isinstance(file_info_data, dict):
+            file_info_data = {}
+
+        def _compact(key: str) -> list[dict[str, object]]:
+            raw = file_info_data.get(key)
+            if not isinstance(raw, list):
+                return []
+            return [
+                {
+                    "type": str(item.get("type") or ""),
+                    "id": str(item.get("id") or ""),
+                    "load_order": int(item.get("load_order") or 0),
+                    "files": [str(f) for f in item.get("files", [])],
+                }
+                for item in raw
+                if isinstance(item, dict)
+            ]
+
+        return {
+            "ok": True,
+            "root": str(root),
+            "files": files,
+            "front_end_actions": _compact("front_end_actions"),
+            "in_game_actions": _compact("in_game_actions"),
+        }
+
+    def ai_project_file_delete(self, relative_path: str, *, remove_action: bool = True) -> dict[str, object]:
+        from ...project.custom_files import sanitize_relative_path
+
+        rel = sanitize_relative_path(relative_path)
+        if not rel:
+            return {"ok": False, "error": "invalid_path", "message": f"非法相对路径：{relative_path}"}
+        root = self._ai_project_root_dir()
+        if root is None:
+            return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj。"}
+        target = root / Path(rel.replace("/", "\\"))
+        deleted = False
+        if target.exists() and target.is_file():
+            try:
+                target.unlink()
+                deleted = True
+            except OSError as exc:
+                return {"ok": False, "error": "delete_failed", "message": str(exc)}
+        removed = 0
+        if remove_action:
+            removed = self._basic_info_workspace.remove_action_files(rel)
+            self._ai_sync_basic_info_to_project()
+        return {"ok": True, "path": rel, "deleted_file": deleted, "removed_actions": removed}
+
+    def ai_add_file_action(
+        self,
+        *,
+        action_type: str,
+        action_id: str = "",
+        files: list[str],
+        load_order: int = 0,
+    ) -> dict[str, object]:
+        """精确注册文件动作（无弹窗）。"""
+        if not isinstance(files, list) or not files:
+            return {"ok": False, "error": "bad_params", "message": "files 需为非空数组"}
+        try:
+            added = self._basic_info_workspace.register_file_action(
+                action_type=action_type, action_id=action_id, files=files, load_order=load_order
+            )
+        except ValueError as exc:
+            return {"ok": False, "error": "bad_action_type", "message": str(exc)}
+        self._ai_sync_basic_info_to_project()
+        return {"ok": True, "added_files": added}
+
+    # ── AI 控制接口支持方法结束 ───────────────────────────────────────────
 
     @staticmethod
     def _resolve_entry_name(entry: object, index: int) -> str:

@@ -1,25 +1,31 @@
 # AGENT.md — ModTools AI 协作规范与知识库
 
+> **任务分流**：本文件是**实际应用向**（写 .CIV / 答文明6 Mod 制作问题）的规范与知识库。
+> **工具优化向**（改 ModTools/modgen 代码、测试、打包）请读根目录 `CLAUDE.md`，本文件大部分内容与任务无关；
+> 通用任务分流见根目录 `AGENTS.md`；modgen 工具用法见 `modgen/AGENTS.md`（硬规则与本文件同源，任一处为准）。
+
 > **强制阅读**：任何 AI/agent 在本仓库（ModTools 5.4）内工作、特别是**编写 .CIV 工程文件**或回答文明6 mod 制作问题时，必须先完整阅读本文件。规则优先于任何"合理想象"。
 >
-> **薄指针**：本文件只含工具专属规则。文明6 **游戏深度知识**（Modifier/Requirement/文本/图标/DB 验证，137+ 技能文件）在 `D:\文明6mod用文件夹\AI制作Mod\skills\`（入口 `AGENTS.md`，.CIV 工作流见 `skills/05-modtools-civ/INDEX.md`）。写 .CIV 时缺知识先查那边，别在本仓库重新积累（单一知识源，防漂移）。
-> **单会话交付**：.CIV + 特殊 SQL/Lua 补丁一体化流水线见 `AI制作Mod/skills/05-modtools-civ/pipeline.md`；无头导出用 `AI制作Mod/export_modtools.py`（本仓库 `.venv` 的 python 运行）。
+> **薄指针**：本文件只含工具专属规则。文明6 **游戏深度知识**（Modifier/Requirement/文本/图标/DB 验证、Lua API 等 260+ 技能文件）在**仓库根 `skills/`**（随发布包分发；入口 `skills/AGENTS.md`，检索用 `python -m modgen.cli skill <关键词>`）。写 .CIV 时缺知识先查那边，别在本仓库重新积累（单一知识源，防漂移）。
+> **单会话交付**：.CIV + 特殊 SQL/Lua 补丁一体化流水线见 `skills/05-modtools-civ/pipeline.md`（本地）；无头导出用 `modgen preview`（工具内置，需 PyQt）或 GUI/AI 接口 `generate_all`。
 
 ---
 
 ## 0. 本项目是什么、不是什么
 
-- ModTools 是**可视化编辑工具**：AI 的工作是**编写 `.CIV` 工程文件（JSON，schema 0.1.0）**，由工具生成 SQL/XML/图标/ArtDef/XLP 等所有输出。**AI 不直接写 SQL/XML 文件**（SQL 仅出现在向用户解释或检查生成的产物时）。
+- ModTools 是**可视化编辑工具**：AI 的工作是**编写 `.CIV` 工程文件（JSON，schema 0.1.0）**，由工具生成 SQL/XML/图标/ArtDef/XLP 等所有输出。**主内容（13 分类/修改器/文本）AI 不直接写 SQL/XML**；确需自定义 SQL/XML/Lua 时，**只能走"自定义文件通道"**（见下节）——工具仍是唯一写入者。
 - 输出模型：`workspace` 是 section 索引字典，顺序固定（`CIV_SECTION_ORDER`，17 节）。基础信息/美术/文本/修改器 4 节存 dict，其余各节存条目列表。
 - Type 命名由工具按 `{表前缀}_{前缀}_{中缀}{4位编号}_{简称}` 自动生成（前缀/中缀来自"基础信息"配置），AI 写入 `type` 字段时遵循同一格式即可。
 
-## ⚠️ 禁止 Lua —— 必须向用户强调
+## ⚠️ Lua 与自定义 SQL/XML —— 仅走"自定义文件通道"
 
-**本项目不生成、不编写、不支持 Lua**（GamePlay/UI 脚本均不支持）。这是工具能力边界，不是知识缺口：
-
-- 不得在 .CIV 内容、生成输出、或给用户的方案中包含任何 Lua 脚本/UI.xml 能力；
-- 用户需求涉及 Lua（如 UI 面板、事件脚本、自定义操作逻辑）时，**必须明确告知用户："本工具无法编写 Lua 能力"**，并引导其用 SQL/Modifier 系统可实现的替代方案；
-- 不要引用任何 Lua API、事件、模板——那是其他工作流的知识，与本工具无关。
+- **主内容禁止 Lua**：.CIV 条目与生成器输出**不包含、不生成 Lua**——遇到需要 Lua 的需求（UI 面板、事件脚本、自定义逻辑），引导用户走自定义文件通道，而不是塞进 .CIV。
+- **自定义文件通道（2026-08-17 起允许）**：确需 Lua / 自定义 SQL/XML 补丁时，AI 必须**经工具写入**（绝不手工散落文件）：
+  - 无头：`python -m modgen.cli custom-file write 工程.CIV --path Scripts/My.lua --content-file modgen_work/My.lua`（内容临时文件放 `modgen_work/`）；
+  - GUI 接管：AI 控制接口 `project_file_write`（`--ai-port` HTTP / `--ai-exec`，同语义）；
+  - 自动按路径注册文件动作并进 .CIV：`Scripts/*.lua`→AddGameplayScripts、`UI/*.xml+lua`→AddUserInterfaces、`Import/*.lua`→ImportFiles、`Data/*.sql|xml`→UpdateDatabase、`Icons/`→UpdateIcons、`Text/`→UpdateText（`--action` 可显式指定）。
+- 文件写入 `.civ6proj` 工程目录，**一键生成原样透传**（不重新生成、不改写）；路径穿越被拒绝；`custom-file remove` / `project_file_delete` 可删除。
+- 内容质量由 AI 负责（工具不校验 Lua 语法/游戏 API）；SQL 里引用的 ModifierType 等仍须遵守硬规则一；Lua 仅用于 Modifier/Requirement 体系无法覆盖的少数场景，能不用就不用。
 
 ## 1. 硬规则一：ModifierType / EffectType / RequirementType 优先引用已有类型
 
@@ -102,5 +108,5 @@
 - [ ] JSON 中无任何 `""` 值（自查搜索 `": \"\""`）
 - [ ] 所有 Type/外键引用在游戏库中存在
 - [ ] 必填字段齐全（UI 中带 `*` 的字段）
-- [ ] 命名遵循前缀约定；无任何 Lua 相关内容
+- [ ] 命名遵循前缀约定；主内容无任何 Lua；自定义 SQL/XML/Lua 一律经 `custom-file` / `project_file_write` 写入并已注册文件动作
 - [ ] 图片字段不虚构路径，无图写 `{}`

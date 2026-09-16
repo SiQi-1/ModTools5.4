@@ -95,6 +95,23 @@ class SqlPreviewsTestCase(unittest.TestCase):
         schema = build_policies_main_schema()
         self.assertEqual({field.key: field.default for field in schema.fields}, POLICY_FIELD_DEFAULTS)
 
+    def test_belief_adapter_matches_legacy_output(self) -> None:
+        fixture = Path(__file__).parent / "fixtures" / "belief_sql_legacy.json"
+        for case in json.loads(fixture.read_text(encoding="utf-8"))["cases"]:
+            with self.subTest(case=case["name"]):
+                self.page._project.sections["信仰"] = case["entries"]
+                self.assertEqual(
+                    self.page._build_belief_sql_pair(), (case["data_sql"], case["text_sql"])
+                )
+                self.assertEqual(self._preview("信仰", "sql"), case["data_sql"])
+
+    def test_belief_editor_defaults_match_domain(self) -> None:
+        from ModTools_5_4.project.entity_defaults import BELIEF_FIELD_DEFAULTS
+        from ModTools_5_4.ui.pages.entity_table_form import build_beliefs_main_schema
+
+        schema = build_beliefs_main_schema()
+        self.assertEqual({field.key: field.default for field in schema.fields}, BELIEF_FIELD_DEFAULTS)
+
     def test_leader_preview_includes_colors_pair(self) -> None:
         result = self._preview("领袖", "sql")
         self.assertIsInstance(result, dict)

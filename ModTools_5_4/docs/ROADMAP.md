@@ -20,7 +20,8 @@
 - 已修复自定义输出文件的 CRLF 重复换行问题。
 - 第二步已完成：政策卡完整 SQL 生成迁入 `project/sql_builders/policies.py`，直接接收条目列表；默认值由 `project/entity_defaults.py` 同时供编辑器和生成器使用。
 - 政策卡迁移以 `47ed84d` 的九组输出为兼容基线，包含 SQLite 执行、无第三方依赖、GUI 接入验证；公共转义、去重、INSERT 块逻辑已收敛。
-- 下一步沿用该边界迁移信仰等依赖较少的分类；完整 CLI 预览、XML 和其他分类仍依赖 GUI 引擎。每个切片测试通过后单独提交。
+- 第三步已完成：信仰完整 SQL 生成迁入 `project/sql_builders/beliefs.py`，编辑器与生成器共享 `BELIEF_FIELD_DEFAULTS`，七组旧输出逐字兼容。
+- 完整 CLI 预览、XML 和其他分类仍依赖 GUI 引擎；下一步继续选择依赖较少的分类，每个切片测试通过后单独提交。
 
 ## 一、当前已完成（Done）
 

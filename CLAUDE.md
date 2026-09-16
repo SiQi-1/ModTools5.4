@@ -64,6 +64,7 @@ ModTools_5_4/
 │   ├── sql_utils.py            # Qt-free SQL literals, escaping, row deduplication, INSERT blocks
 │   ├── sql_builders/
 │   │   └── policies.py         # Policy section data -> (data SQL, localized text SQL), no GUI/DB
+│   │       └── beliefs.py          # Belief section data -> (data SQL, localized text SQL), no GUI/DB
 │   └── civ6proj_generator.py   # ★ 纯标准库 .civ6proj 生成器（复刻 ModBuddy 向导产物 + 空白 Art.xml；GUI/modgen/AI 三处共用）
 ├── db/
 │   ├── interface.py            # Text DB tag resolution (LOC_xxx lookup)
@@ -131,7 +132,7 @@ ModTools_5_4/
 
 **Project files**: `.CIV` files are JSON with a `meta` (format marker + schema version 0.1.0) and `workspace` (section-indexed dict). Sections follow a fixed order (`CIV_SECTION_ORDER`, 17 sections). "Direct workspace" sections (基础信息, 美术, 文本, 修改器) store a dict; all other sections store a list of objects.
 
-**Output model**: Generation is driven by workspace state. Policy SQL now lives in the Qt-free `project/sql_builders/policies.py`; `WorkspacePage._build_policy_sql_pair()` delegates to it. Policy defaults are shared with the editor through `project/entity_defaults.py`. Other section builders, XML conversion and generation orchestration still live in `workspace_page.py` (e.g. `_build_civilization_sql_pair`, `_build_leader_sql_pair`, `_build_promotion_tree_sql_bundle`). Files are output to the linked `.civ6proj` directory. The output tree is built from `CIV_SECTION_ORDER` — each section contributes specific file types (SQL, XML, XLP, artdef, DDS/TEX, etc.). Empty categories produce no files; a delete plan (`file_info.delete_requests`) is honored on generation.
+**Output model**: Generation is driven by workspace state. Policy SQL now lives in the Qt-free `project/sql_builders/policies.py`; `WorkspacePage._build_policy_sql_pair()` delegates to it. Policy and belief defaults are shared with the editor through `project/entity_defaults.py`; both builders are Qt-free under `project/sql_builders/`. Other section builders, XML conversion and generation orchestration still live in `workspace_page.py` (e.g. `_build_civilization_sql_pair`, `_build_leader_sql_pair`, `_build_promotion_tree_sql_bundle`). Files are output to the linked `.civ6proj` directory. The output tree is built from `CIV_SECTION_ORDER` — each section contributes specific file types (SQL, XML, XLP, artdef, DDS/TEX, etc.). Empty categories produce no files; a delete plan (`file_info.delete_requests`) is honored on generation.
 
 **Standalone policy builder**: `from ModTools_5_4.project.sql_builders import build_policy_sql_pair`; call `build_policy_sql_pair(project.sections.get("政策卡"))` to get `(data_sql, text_sql)` without creating a QApplication or accessing a database. It preserves legacy output and does not mutate the entries. Full `modgen preview` still needs PyQt. When extracting another category, capture legacy outputs before editing and keep GUI entry points compatible.
 

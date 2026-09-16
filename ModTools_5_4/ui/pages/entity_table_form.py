@@ -58,6 +58,7 @@ from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
 from ...project.entity_defaults import POLICY_FIELD_DEFAULTS
+from ...project.entity_defaults import BELIEF_FIELD_DEFAULTS
 
 
 BASIC_WITH_ICON_ROWS_LIMIT = 8
@@ -1342,9 +1343,9 @@ def build_projects_main_schema() -> MainTableSchema:
 
 def build_beliefs_main_schema() -> MainTableSchema:
     fields: list[TableFieldSpec] = [
-        TableFieldSpec("Name", "信仰名字（中文）", "text", "basic", "", chinese_input=True),
-        TableFieldSpec("Description", "信仰描述（中文）", "text", "basic", "", chinese_input=True, tokenized_multiline=True),
-        TableFieldSpec("BeliefClassType", "信仰类别", "template", "basic", "", template_key=BELIEF_TEMPLATE_MAPPING["BeliefClassType"]),
+        TableFieldSpec("Name", "信仰名字（中文）", "text", "basic", BELIEF_FIELD_DEFAULTS["Name"], chinese_input=True),
+        TableFieldSpec("Description", "信仰描述（中文）", "text", "basic", BELIEF_FIELD_DEFAULTS["Description"], chinese_input=True, tokenized_multiline=True),
+        TableFieldSpec("BeliefClassType", "信仰类别", "template", "basic", BELIEF_FIELD_DEFAULTS["BeliefClassType"], template_key=BELIEF_TEMPLATE_MAPPING["BeliefClassType"]),
     ]
 
     return MainTableSchema(

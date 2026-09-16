@@ -1,0 +1,93 @@
+{
+  "source_commit": "5faacc1",
+  "cases": [
+    {
+      "name": "empty",
+      "entries": [],
+      "data_sql": "-- Beliefs.sql\n-- 暂无信仰数据",
+      "text_sql": "-- Text.sql\n-- 暂无信仰文本数据"
+    },
+    {
+      "name": "missing_section",
+      "entries": null,
+      "data_sql": "-- Beliefs.sql\n-- 暂无信仰数据",
+      "text_sql": "-- Text.sql\n-- 暂无信仰文本数据"
+    },
+    {
+      "name": "wrong_section_shape",
+      "entries": {
+        "type": "BELIEF_IGNORED"
+      },
+      "data_sql": "-- Beliefs.sql\n-- 暂无信仰数据",
+      "text_sql": "-- Text.sql\n-- 暂无信仰文本数据"
+    },
+    {
+      "name": "all_fields",
+      "entries": [
+        {
+          "type": "BELIEF_COMPLETE",
+          "table_data": {
+            "Name": "神谕者 O'Brien",
+            "Description": "信仰说明\n第二行",
+            "BeliefClassType": "BELIEF_CLASS_FOUNDER"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('BELIEF_COMPLETE', 'KIND_BELIEF');\n\n-- Beliefs\nINSERT INTO Beliefs (BeliefType, Name, Description, BeliefClassType) VALUES\n('BELIEF_COMPLETE', 'LOC_BELIEF_COMPLETE_NAME', 'LOC_BELIEF_COMPLETE_DESCRIPTION', 'BELIEF_CLASS_FOUNDER');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_BELIEF_COMPLETE_NAME','神谕者 O''Brien'),\n('zh_Hans_CN','LOC_BELIEF_COMPLETE_DESCRIPTION','信仰说明\n第二行');"
+    },
+    {
+      "name": "default_class",
+      "entries": [
+        {
+          "type": "BELIEF_DEFAULT",
+          "table_data": {
+            "Name": "默认信仰",
+            "Description": "默认说明"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('BELIEF_DEFAULT', 'KIND_BELIEF');\n\n-- Beliefs\nINSERT INTO Beliefs (BeliefType, Name, Description, BeliefClassType) VALUES\n('BELIEF_DEFAULT', 'LOC_BELIEF_DEFAULT_NAME', 'LOC_BELIEF_DEFAULT_DESCRIPTION', 'BELIEF_CLASS_PANTHEON');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_BELIEF_DEFAULT_NAME','默认信仰'),\n('zh_Hans_CN','LOC_BELIEF_DEFAULT_DESCRIPTION','默认说明');"
+    },
+    {
+      "name": "duplicate_types_keep_first",
+      "entries": [
+        {
+          "type": "BELIEF_DUP",
+          "table_data": {
+            "Name": "首条"
+          }
+        },
+        {
+          "type": " BELIEF_DUP ",
+          "table_data": {
+            "Name": "不可覆盖"
+          }
+        },
+        {
+          "table_data": {
+            "Name": "自动类型"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('BELIEF_DUP', 'KIND_BELIEF'),\n('BELIEF_CUSTOM_3', 'KIND_BELIEF');\n\n-- Beliefs\nINSERT INTO Beliefs (BeliefType, Name, Description, BeliefClassType) VALUES\n('BELIEF_DUP', 'LOC_BELIEF_DUP_NAME', 'LOC_BELIEF_DUP_DESCRIPTION', 'BELIEF_CLASS_PANTHEON'),\n('BELIEF_CUSTOM_3', 'LOC_BELIEF_CUSTOM_3_NAME', 'LOC_BELIEF_CUSTOM_3_DESCRIPTION', 'BELIEF_CLASS_PANTHEON');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_BELIEF_DUP_NAME','首条'),\n('zh_Hans_CN','LOC_BELIEF_DUP_DESCRIPTION',''),\n('zh_Hans_CN','LOC_BELIEF_CUSTOM_3_NAME','自动类型'),\n('zh_Hans_CN','LOC_BELIEF_CUSTOM_3_DESCRIPTION','');"
+    },
+    {
+      "name": "malformed_entries",
+      "entries": [
+        null,
+        42,
+        {},
+        {
+          "type": "BELIEF_BAD",
+          "table_data": [],
+          "name": "忽略"
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('BELIEF_CUSTOM_1', 'KIND_BELIEF'),\n('BELIEF_BAD', 'KIND_BELIEF');\n\n-- Beliefs\nINSERT INTO Beliefs (BeliefType, Name, Description, BeliefClassType) VALUES\n('BELIEF_CUSTOM_1', 'LOC_BELIEF_CUSTOM_1_NAME', 'LOC_BELIEF_CUSTOM_1_DESCRIPTION', 'BELIEF_CLASS_PANTHEON'),\n('BELIEF_BAD', 'LOC_BELIEF_BAD_NAME', 'LOC_BELIEF_BAD_DESCRIPTION', 'BELIEF_CLASS_PANTHEON');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_BELIEF_CUSTOM_1_NAME',''),\n('zh_Hans_CN','LOC_BELIEF_CUSTOM_1_DESCRIPTION',''),\n('zh_Hans_CN','LOC_BELIEF_BAD_NAME',''),\n('zh_Hans_CN','LOC_BELIEF_BAD_DESCRIPTION','');"
+    }
+  ]
+}

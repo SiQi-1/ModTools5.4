@@ -1,4 +1,11 @@
 # Changelog
+## 2026-09-17 - 阶段 3 第三步：信仰生成器脱离 GUI
+
+- 新增 `project/sql_builders/beliefs.py`：信仰条目直接生成数据 SQL 与文本 SQL，继续保持无 Qt、无数据库依赖。
+- `WorkspacePage._build_belief_sql_pair()` 改为兼容适配入口；信仰编辑器与 builder 共享 `BELIEF_FIELD_DEFAULTS`。
+- 保存 5faacc1 的七组信仰旧输出作为基线，验证重复 Type、缺省类别、异常条目、中文转义和空分类行为。
+- 新增 SQLite 可执行、输入不变、无第三方依赖和 GUI 适配回归测试。
+
 ## 2026-09-17 - 阶段 3 第二步：政策卡生成器脱离 GUI
 
 - 新增 `project/sql_builders/policies.py`：直接接收 .CIV 政策卡条目，返回数据 SQL 与文本 SQL，无 Qt、界面实例或游戏数据库依赖。

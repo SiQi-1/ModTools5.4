@@ -16,3 +16,10 @@ POLICY_FIELD_DEFAULTS = MappingProxyType({
     "RequiresGovernmentUnlock": 0,
     "ExplicitUnlock": 0,
 })
+
+
+BELIEF_FIELD_DEFAULTS = MappingProxyType({
+    "Name": "",
+    "Description": "",
+    "BeliefClassType": "",
+})

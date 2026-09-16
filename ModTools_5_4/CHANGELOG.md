@@ -1,4 +1,11 @@
 # Changelog
+## 2026-09-16 - 阶段 3：SQL 辅助逻辑边界
+
+- 新增 `project/sql_utils.py`，集中 SQL 字面量格式化规则，保持 `NULL`、布尔、数字和字符串转义行为一致。
+- `WorkspacePage` 七处分类生成器改为委托纯 Python 辅助函数，为后续拆分 `sql_builders/` 保留稳定 seam。
+- 修复输出文件写入时 CRLF 被重复转换为 LF 的问题，避免自定义 Lua/XML 文件出现多余空行。
+- 新增 SQL 辅助函数回归测试；主测试集 299 项通过（1 项跳过）。
+
 ## 2026-09-16 - 阶段 2：应用服务边界
 
 - 新增 `ModTools_5_4/application/services.py`：提供 Qt-free `ProjectService` 和 `GenerationService`。

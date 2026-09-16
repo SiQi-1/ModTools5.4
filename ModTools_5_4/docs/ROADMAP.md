@@ -15,6 +15,10 @@
 - 建立 `application` 服务层：`ProjectService` 负责 `.CIV` 持久化，`GenerationService` 负责 manifest/生成动作委托。
 - WorkspacePage 的项目 I/O 已接入 ProjectService；GUI/AI 生成入口已改为公开适配方法。
 - 当前仍由旧生成器执行实际内容构建，后续阶段再逐步迁移 SQL/XML 和资源生成逻辑。
+### 2026-09 阶段 3（进行中）
+- 已完成第一小步：SQL 字面量格式化提取到 `project/sql_utils.py`，WorkspacePage 的七处分类生成器统一委托。
+- 已修复自定义输出文件的 CRLF 重复换行问题；下一步继续按分类拆出无 Qt 的 `sql_builders/`，每次保持可回退和完整测试通过。
+
 ## 一、当前已完成（Done）
 
 ### 1) 工程与工作区框架

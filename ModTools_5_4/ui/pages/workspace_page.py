@@ -71,6 +71,7 @@ from ...project.civ6proj_generator import (
     sanitize_file_name,
 )
 from ...project.output_manifest import OutputManifest, make_output_manifest, safe_relative_path
+from ...project.sql_utils import sql_literal
 
 
 MODIFIER_SECTION_FORMAT = "MODTOOLS54_MODIFIER_WORKSPACE"
@@ -2306,20 +2307,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         def _append_grouped_row(groups: dict[tuple[str, ...], list[str]], columns: list[str], values: list[object]) -> None:
             key = tuple(columns)
@@ -2751,20 +2739,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         seen_types: set[str] = set()
         for index, entry in enumerate(building_entries, start=1):
@@ -3345,20 +3320,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         seen_types: set[str] = set()
         for index, entry in enumerate(unit_entries, start=1):
@@ -3803,20 +3765,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         def _append_grouped_row(groups: dict[tuple[str, ...], list[str]], columns: list[str], values: list[object]) -> None:
             key = tuple(columns)
@@ -4276,20 +4225,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         seen_types: set[str] = set()
         for index, entry in enumerate(policy_entries, start=1):
@@ -4444,20 +4380,7 @@ class WorkspacePage(BasePage):
             return str(value or "").strip()
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         def _is_default(value: object | None, default: object | None) -> bool:
             if value is None:
@@ -5410,20 +5333,7 @@ class WorkspacePage(BasePage):
         }
 
         def _sql_literal(value: object) -> str:
-            if value is None:
-                return "NULL"
-            if isinstance(value, bool):
-                return "1" if value else "0"
-            if isinstance(value, int):
-                return str(value)
-            if isinstance(value, float):
-                return format(value, ".15g")
-            text = str(value)
-            if not text.strip():
-                return "NULL"
-            if text.strip().lower() == "none":
-                return "NULL"
-            return f"'{self._sql_escape(text)}'"
+            return sql_literal(value, self._sql_escape)
 
         seen_class_types: set[str] = set()
         seen_individual_types: set[str] = set()
@@ -10351,7 +10261,7 @@ class WorkspacePage(BasePage):
         target.parent.mkdir(parents=True, exist_ok=True)
         # 统一换行：内容可能来自磁盘（CRLF）或生成器（LF），先归一为 LF 再经
         # write_text 输出，避免 Windows 通用换行翻译把 \n 二次转成 \r\n
-        normalized = str(content or "").replace("\n", "\n").replace("\r", "\n")
+        normalized = str(content or "").replace("\r\n", "\n").replace("\r", "\n")
         target.write_text(normalized, encoding="utf-8")
 
     @staticmethod

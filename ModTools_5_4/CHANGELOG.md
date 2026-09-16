@@ -1,4 +1,14 @@
 # Changelog
+## 2026-09-17 - 阶段 3 第二步：政策卡生成器脱离 GUI
+
+- 新增 `project/sql_builders/policies.py`：直接接收 .CIV 政策卡条目，返回数据 SQL 与文本 SQL，无 Qt、界面实例或游戏数据库依赖。
+- `WorkspacePage._build_policy_sql_pair()` 保留兼容入口并委托新生成器；GUI 预览、统一文本、AI/CLI 全量输出继续沿用原有调用链。
+- 政策卡字段默认值收敛到 `project/entity_defaults.py`，编辑器与生成器共享，避免独立默认值漂移。
+- 字符串转义、行去重和 INSERT 块格式化提取到 `project/sql_utils.py`，原 GUI 静态方法保留委托入口。
+- 保存提交 `47ed84d` 的九组旧输出，验证逐字等价、输入不变、SQLite 可执行，以及 `python -S` 无第三方包运行。新增 GUI 适配与默认值一致性检查。
+- 本次仅迁移政策卡 SQL；完整 CLI 预览、XML 转换与其他分类生成仍使用原 GUI 引擎。
+- 验证：主测试集 305 项（304 通过、1 跳过），modgen 78 项全部通过；九组旧输出逐字一致。
+
 ## 2026-09-16 - 阶段 3：SQL 辅助逻辑边界
 
 - 新增 `project/sql_utils.py`，集中 SQL 字面量格式化规则，保持 `NULL`、布尔、数字和字符串转义行为一致。

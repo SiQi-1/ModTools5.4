@@ -6,7 +6,9 @@ expected tables and types.
 """
 from __future__ import annotations
 
+import json
 import os
+from pathlib import Path
 import unittest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -75,6 +77,23 @@ class SqlPreviewsTestCase(unittest.TestCase):
             with self.subTest(section=section):
                 result = self._preview(section, "xml")
                 self.assertIn("<Row", str(result), section)
+
+    def test_policy_adapter_matches_legacy_output(self) -> None:
+        fixture = Path(__file__).parent / "fixtures" / "policy_sql_legacy.json"
+        for case in json.loads(fixture.read_text(encoding="utf-8"))["cases"]:
+            with self.subTest(case=case["name"]):
+                self.page._project.sections["政策卡"] = case["entries"]
+                self.assertEqual(
+                    self.page._build_policy_sql_pair(), (case["data_sql"], case["text_sql"])
+                )
+                self.assertEqual(self._preview("政策卡", "sql"), case["data_sql"])
+
+    def test_policy_editor_defaults_match_domain(self) -> None:
+        from ModTools_5_4.project.entity_defaults import POLICY_FIELD_DEFAULTS
+        from ModTools_5_4.ui.pages.entity_table_form import build_policies_main_schema
+
+        schema = build_policies_main_schema()
+        self.assertEqual({field.key: field.default for field in schema.fields}, POLICY_FIELD_DEFAULTS)
 
     def test_leader_preview_includes_colors_pair(self) -> None:
         result = self._preview("领袖", "sql")

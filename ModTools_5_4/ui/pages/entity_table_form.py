@@ -57,6 +57,7 @@ from ..responsive import ResponsiveGrid, ResponsiveSplit
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
+from ...project.entity_defaults import POLICY_FIELD_DEFAULTS
 
 
 BASIC_WITH_ICON_ROWS_LIMIT = 8
@@ -1268,13 +1269,13 @@ def build_improvements_main_schema() -> MainTableSchema:
 
 def build_policies_main_schema() -> MainTableSchema:
     fields: list[TableFieldSpec] = [
-        TableFieldSpec("Name", "政策卡名字（中文）", "text", "basic", "", chinese_input=True),
-        TableFieldSpec("Description", "政策卡描述（中文）", "text", "basic", "", chinese_input=True, tokenized_multiline=True),
-        TableFieldSpec("PrereqCivic", "前置市政", "template", "basic", "", template_key=POLICY_TEMPLATE_MAPPING["PrereqCivic"]),
-        TableFieldSpec("PrereqTech", "前置科技", "template", "basic", "", template_key=POLICY_TEMPLATE_MAPPING["PrereqTech"]),
-        TableFieldSpec("GovernmentSlotType", "政策槽位", "template", "basic", "SLOT_WILDCARD", template_key=POLICY_TEMPLATE_MAPPING["GovernmentSlotType"]),
-        TableFieldSpec("RequiresGovernmentUnlock", "需要政体解锁", "bool", "bool", 0),
-        TableFieldSpec("ExplicitUnlock", "显式解锁", "bool", "bool", 0),
+        TableFieldSpec("Name", "政策卡名字（中文）", "text", "basic", POLICY_FIELD_DEFAULTS["Name"], chinese_input=True),
+        TableFieldSpec("Description", "政策卡描述（中文）", "text", "basic", POLICY_FIELD_DEFAULTS["Description"], chinese_input=True, tokenized_multiline=True),
+        TableFieldSpec("PrereqCivic", "前置市政", "template", "basic", POLICY_FIELD_DEFAULTS["PrereqCivic"], template_key=POLICY_TEMPLATE_MAPPING["PrereqCivic"]),
+        TableFieldSpec("PrereqTech", "前置科技", "template", "basic", POLICY_FIELD_DEFAULTS["PrereqTech"], template_key=POLICY_TEMPLATE_MAPPING["PrereqTech"]),
+        TableFieldSpec("GovernmentSlotType", "政策槽位", "template", "basic", POLICY_FIELD_DEFAULTS["GovernmentSlotType"], template_key=POLICY_TEMPLATE_MAPPING["GovernmentSlotType"]),
+        TableFieldSpec("RequiresGovernmentUnlock", "需要政体解锁", "bool", "bool", POLICY_FIELD_DEFAULTS["RequiresGovernmentUnlock"]),
+        TableFieldSpec("ExplicitUnlock", "显式解锁", "bool", "bool", POLICY_FIELD_DEFAULTS["ExplicitUnlock"]),
     ]
 
     return MainTableSchema(

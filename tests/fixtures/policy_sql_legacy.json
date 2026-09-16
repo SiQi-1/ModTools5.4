@@ -1,0 +1,152 @@
+{
+  "source_commit": "47ed84d",
+  "cases": [
+    {
+      "name": "empty",
+      "entries": [],
+      "data_sql": "-- Policies.sql\n-- 暂无政策卡数据",
+      "text_sql": "-- Text.sql\n-- 暂无政策卡文本数据"
+    },
+    {
+      "name": "missing_section",
+      "entries": null,
+      "data_sql": "-- Policies.sql\n-- 暂无政策卡数据",
+      "text_sql": "-- Text.sql\n-- 暂无政策卡文本数据"
+    },
+    {
+      "name": "wrong_section_shape",
+      "entries": {
+        "type": "POLICY_IGNORED"
+      },
+      "data_sql": "-- Policies.sql\n-- 暂无政策卡数据",
+      "text_sql": "-- Text.sql\n-- 暂无政策卡文本数据"
+    },
+    {
+      "name": "defaults_and_malformed_entries",
+      "entries": [
+        null,
+        42,
+        {},
+        {
+          "type": "POLICY_DEFAULTS",
+          "table_data": []
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_CUSTOM_1', 'KIND_POLICY'),\n('POLICY_DEFAULTS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_CUSTOM_1', 'LOC_POLICY_CUSTOM_1_NAME', 'LOC_POLICY_CUSTOM_1_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0),\n('POLICY_DEFAULTS', 'LOC_POLICY_DEFAULTS_NAME', 'LOC_POLICY_DEFAULTS_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_CUSTOM_1_NAME',''),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_1_DESCRIPTION',''),\n('zh_Hans_CN','LOC_POLICY_DEFAULTS_NAME',''),\n('zh_Hans_CN','LOC_POLICY_DEFAULTS_DESCRIPTION','');"
+    },
+    {
+      "name": "all_fields",
+      "entries": [
+        {
+          "type": "POLICY_COMPLETE",
+          "table_data": {
+            "Name": "匠人的 O'Brien",
+            "Description": "中文第一行\n第二行; [ICON_Culture]",
+            "PrereqCivic": " CIVIC_CODE_OF_LAWS ",
+            "PrereqTech": " TECH_MINING ",
+            "GovernmentSlotType": "SLOT_ECONOMIC",
+            "RequiresGovernmentUnlock": "1",
+            "ExplicitUnlock": true
+          },
+          "subtables": {
+            "Policies_XP1": {
+              "MinimumGameEra": "ERA_CLASSICAL",
+              "MaximumGameEra": "ERA_MODERN",
+              "RequiresDarkAge": 1,
+              "RequiresGoldenAge": 0
+            },
+            "Policy_GovernmentExclusives_XP2": {
+              "GovernmentType": "GOVERNMENT_DEMOCRACY"
+            }
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_COMPLETE', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_COMPLETE', 'LOC_POLICY_COMPLETE_NAME', 'LOC_POLICY_COMPLETE_DESCRIPTION', 'CIVIC_CODE_OF_LAWS', 'TECH_MINING', 'SLOT_ECONOMIC', 1, 1);\n\n-- Policies_XP1\nINSERT INTO Policies_XP1 (PolicyType, MinimumGameEra, MaximumGameEra, RequiresDarkAge, RequiresGoldenAge) VALUES\n('POLICY_COMPLETE', 'ERA_CLASSICAL', 'ERA_MODERN', 1, 0);\n\n-- Policy_GovernmentExclusives_XP2\nINSERT INTO Policy_GovernmentExclusives_XP2 (PolicyType, GovernmentType) VALUES\n('POLICY_COMPLETE', 'GOVERNMENT_DEMOCRACY');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_COMPLETE_NAME','匠人的 O''Brien'),\n('zh_Hans_CN','LOC_POLICY_COMPLETE_DESCRIPTION','中文第一行\n第二行; [ICON_Culture]');"
+    },
+    {
+      "name": "legacy_subtables",
+      "entries": [
+        {
+          "type": "POLICY_LEGACY",
+          "table_data": {
+            "Name": "旧工程"
+          },
+          "policies_xp1": {
+            "MaximumGameEra": "ERA_RENAISSANCE",
+            "RequiresGoldenAge": "1"
+          },
+          "policy_government_exclusive": {
+            "GovernmentType": "GOVERNMENT_MONARCHY"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_LEGACY', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_LEGACY', 'LOC_POLICY_LEGACY_NAME', 'LOC_POLICY_LEGACY_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);\n\n-- Policies_XP1\nINSERT INTO Policies_XP1 (PolicyType, MinimumGameEra, MaximumGameEra, RequiresDarkAge, RequiresGoldenAge) VALUES\n('POLICY_LEGACY', NULL, 'ERA_RENAISSANCE', 0, 1);\n\n-- Policy_GovernmentExclusives_XP2\nINSERT INTO Policy_GovernmentExclusives_XP2 (PolicyType, GovernmentType) VALUES\n('POLICY_LEGACY', 'GOVERNMENT_MONARCHY');",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_LEGACY_NAME','旧工程'),\n('zh_Hans_CN','LOC_POLICY_LEGACY_DESCRIPTION','');"
+    },
+    {
+      "name": "modern_subtables_override_legacy",
+      "entries": [
+        {
+          "type": "POLICY_MODERN",
+          "subtables": {
+            "Policies_XP1": {},
+            "Policy_GovernmentExclusives_XP2": {}
+          },
+          "policies_xp1": {
+            "RequiresDarkAge": 1
+          },
+          "policy_government_exclusive": {
+            "GovernmentType": "GOVERNMENT_MONARCHY"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_MODERN', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_MODERN', 'LOC_POLICY_MODERN_NAME', 'LOC_POLICY_MODERN_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_MODERN_NAME',''),\n('zh_Hans_CN','LOC_POLICY_MODERN_DESCRIPTION','');"
+    },
+    {
+      "name": "duplicate_types_keep_first",
+      "entries": [
+        {
+          "type": "POLICY_DUP",
+          "table_data": {
+            "Name": "首条"
+          }
+        },
+        {
+          "type": " POLICY_DUP ",
+          "table_data": {
+            "Name": "不可覆盖首条"
+          }
+        },
+        {
+          "table_data": {
+            "Name": "自动 Type"
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_DUP', 'KIND_POLICY'),\n('POLICY_CUSTOM_3', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_DUP', 'LOC_POLICY_DUP_NAME', 'LOC_POLICY_DUP_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0),\n('POLICY_CUSTOM_3', 'LOC_POLICY_CUSTOM_3_NAME', 'LOC_POLICY_CUSTOM_3_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_DUP_NAME','首条'),\n('zh_Hans_CN','LOC_POLICY_DUP_DESCRIPTION',''),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_3_NAME','自动 Type'),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_3_DESCRIPTION','');"
+    },
+    {
+      "name": "null_blank_and_invalid_numbers",
+      "entries": [
+        {
+          "type": "POLICY_NULLS",
+          "table_data": {
+            "Name": null,
+            "Description": null,
+            "PrereqCivic": "None",
+            "PrereqTech": " ",
+            "GovernmentSlotType": " ",
+            "RequiresGovernmentUnlock": "bad",
+            "ExplicitUnlock": null
+          }
+        }
+      ],
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_NULLS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_NULLS', 'LOC_POLICY_NULLS_NAME', 'LOC_POLICY_NULLS_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_NULLS_NAME',''),\n('zh_Hans_CN','LOC_POLICY_NULLS_DESCRIPTION','');"
+    }
+  ]
+}

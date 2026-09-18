@@ -22,6 +22,11 @@
 - 政策卡迁移以 `47ed84d` 的九组输出为兼容基线，包含 SQLite 执行、无第三方依赖、GUI 接入验证；公共转义、去重、INSERT 块逻辑已收敛。
 - 第三步已完成：信仰完整 SQL 生成迁入 `project/sql_builders/beliefs.py`，编辑器与生成器共享 `BELIEF_FIELD_DEFAULTS`，七组旧输出逐字兼容。
 - 完整 CLI 预览、XML 和其他分类仍依赖 GUI 引擎；下一步继续选择依赖较少的分类，每个切片测试通过后单独提交。
+- 已完成：**自定义 ModifierType 注册判定改为原版快照驱动**（修复「本机装过旧 Mod 就不补 `Types`/`DynamicModifiers` 行 → 换机加载失败」）：
+  - 新增 `ModTools_5_4/data/vanilla_modifier_types.json`（989 条）+ 提取脚本 `modgen/tools/extract_vanilla_modifier_types.py`（从游戏自带 XML 提取，自动定位游戏目录）。
+  - `.CIV` 新增字段 `modifiers[].modifier_type_source`（`null` 自动 / `"new"` 强制新建 / `"vanilla"` 强制已有），GUI 三态下拉 + 实时判定提示。
+  - `modgen/modifier_validator.py` 新增两条 ERROR（强制新建却属原版 / 强制已有却不在快照）+ 一条 WARNING（自动判定为自定义）。
+  - 判据收敛为单一来源 `_custom_modifier_type_map()`，SQL 与 XML 两条生成路径共用。
 
 ## 一、当前已完成（Done）
 

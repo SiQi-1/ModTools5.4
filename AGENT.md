@@ -34,6 +34,11 @@
   - 命名遵循 `MODIFIER_{前缀}_{语义}`，不允许裸名；
   - 必须同时补 `DynamicModifiers` 行（ModifierType/CollectionType/EffectType），且 CollectionType 与 EffectType 必须是已存在类型。
 - 查询方式：`SELECT ModifierType, CollectionType, EffectType FROM DynamicModifiers`（工具内也有 ModifierType 搜索）。不确定就查，禁止凭记忆编造。
+  ⚠ **但"库里查得到"≠"这是原版类型"**：`DebugGameplay.sqlite` 是运行缓存，**玩家装过的每个 Mod 注册的类型都在里面**（实测本机 1024 条里 57 条非原版）。
+  - 判断是否原版，看随包分发的**原版快照** `ModTools_5_4/data/vanilla_modifier_types.json`（989 条，由 `python -m modgen.tools.extract_vanilla_modifier_types` 从游戏自带 XML 提取）；
+  - 生成器按快照决定是否补 `Types` + `DynamicModifiers` 行：**不在快照里 = 本工程新建，必须补**；
+  - 条目可用 `modifier_type_source` 覆盖自动判定（`null` 自动 / `"new"` 强制新建 / `"vanilla"` 强制视为游戏已有）；
+  - 引用了别人 Mod 的类型而不补行 → 在**没装那个 Mod 的机器上加载失败**；`modgen validate` 会对此报 ERROR。
 
 ## 2. 硬规则二：JSON 值禁止写 `""`（空字符串）
 
@@ -100,11 +105,16 @@
 - 建筑 TraitType 需独立 `TRAIT_BUILDING_xxx`（不共用文明特质）。
 - 事件类 Requirement（如 REQUIREMENT_PLAYER_TURN_STARTED）必须写 `Triggered=1`。
 - ModifierStrings 预览文本仅 `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 一种效果器支持（Context 固定 Preview）。
+  **该效果类型必须写 `preview_text`**（原版 226 个实例里 221 个都写了）：不写不会报错，但**战斗预览面板看不到这层加成的来源**（沉默失效）。
+  - 工具链路：`modifier_workspace` 生成 `INSERT INTO ModifierStrings(ModifierId,'Preview','LOC_{ModifierId}_PREVIEW')`，`workspace_page._modifier_strength_preview_text_rows()` 生成对应 LocalizedText 行；**两行都依赖 `preview_text` 非空**。
+  - 写法：数值型 `+{1_Amount} [ICON_Strength] 战斗力（来源）`；`Key`（属性）型 `+{Property} [ICON_Strength] 战斗力（来源）`。
+  - `modgen validate` 对"该效果类型 + preview_text 为空"给 WARNING。
 - 图标引用后必须带文字：`[ICON_xxx] 标签`。
 
 ## 8. 写完 .CIV 的自检清单
 
 - [ ] 所有 ModifierType/EffectType/RequirementType/CollectionType 都查过游戏库（新类型极少且已写 DynamicModifiers 行）
+- [ ] 自定义 ModifierType（不在 `data/vanilla_modifier_types.json` 快照中的）已确认会被注册：`modgen validate` 无「强制已有却不在快照」ERROR
 - [ ] JSON 中无任何 `""` 值（自查搜索 `": \"\""`）
 - [ ] 所有 Type/外键引用在游戏库中存在
 - [ ] 必填字段齐全（UI 中带 `*` 的字段）

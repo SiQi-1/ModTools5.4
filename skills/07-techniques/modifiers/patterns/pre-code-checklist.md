@@ -69,4 +69,7 @@ ModifierArguments: (ModifierId, Name, Value)
 - [ ] 每个 GrantAbility 的 AbilityType 参数指向一个存在的 AbilityType
 - [ ] 每个 Ability 在 UnitAbilityModifiers 中都有条目
 - [ ] 所有 RequirementSet 在 RequirementSetRequirements 中都有条目
+- [ ] **每个 `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 都有 `ModifierStrings`（Context=`Preview`），且 `LOC_{ModifierId}_PREVIEW` 在 Text SQL 里有中文**
+      ——漏写不报错，但战斗预览面板看不到加成来源（规则见 [modifier-techniques.md 技巧 3](../modifier-techniques.md)）
+- [ ] 预览文本占位符是 `{1_Amount}`（数值）/ `{Property}`（Key 属性），**不是 `{Amount}`**
 - [ ] LOC 文本 Key 与 Text SQL 中的 Tag 一一对应（如果有 ModifierStrings）

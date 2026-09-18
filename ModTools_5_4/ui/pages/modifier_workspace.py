@@ -13,6 +13,13 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence
 
 from .group_workspace import SMALL_BUTTON_QSS, _build_entity_type, _shared_params_from_basic_section
+from ...project.vanilla_modifier_types import (
+    SOURCE_NEW,
+    SOURCE_VANILLA,
+    describe_modifier_type,
+    load_vanilla_modifier_types,
+    resolve_needs_registration,
+)
 
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, QStringListModel, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence, QShortcut
@@ -837,6 +844,8 @@ class ModifierRecord:
     subject_stack_limit: int = 0
     effect_type: str | None = None
     collection_type: str | None = None
+    # 类型来源："" = 自动（按原版快照判定）/"new" = 强制新建 /"vanilla" = 强制视为游戏已有
+    modifier_type_source: str = ""
     preview_text: str = ""
     parameters: List[Dict[str, object]] = field(default_factory=list)
 
@@ -2590,6 +2599,9 @@ class HomePage(BasePage):
         self._current_modifier_index: int = -1
         self._modifier_editor_index: int = -1
         self._modifier_meta_index: Dict[str, ModifierTypeRecord] = {}
+        # 原版快照（随包分发）与本机实时库类型（仅用于回退判定 / 撞名提示）
+        self._vanilla_modifier_types: Dict[str, Dict[str, str]] = {}
+        self._live_modifier_types: set = set()
         self._effect_types: List[str] = []
         self._collection_types: List[str] = []
         self._effect_param_map: Dict[str, List[str]] = {}
@@ -2781,7 +2793,32 @@ class HomePage(BasePage):
 
     # -------------------- Data Loading --------------------
     def _load_reference_data(self) -> None:
-        self._modifier_meta_index = self._load_modifier_meta_from_db()
+        # 原版 ModifierType 快照（随包分发，与「本机装过哪些 Mod」解耦）；
+        # 缺失时回退到本机运行缓存库，仅用于 UI 候选与旧启发式，不再作为唯一判据。
+        self._vanilla_modifier_types = load_vanilla_modifier_types()
+        self._live_modifier_types = set()
+        live = self._load_modifier_meta_from_db()
+        self._live_modifier_types = set(live.keys())
+        if self._vanilla_modifier_types:
+            self._modifier_meta_index = {
+                name: ModifierTypeRecord(
+                    modifier_type=name,
+                    effect_type=meta.get("effect_type") or None,
+                    collection_type=meta.get("collection_type") or None,
+                )
+                for name, meta in self._vanilla_modifier_types.items()
+            }
+            LOGGER.info(
+                "[Modifiers] 原版 ModifierType 快照已加载：%d 条（本机实时库另有 %d 条非原版）",
+                len(self._modifier_meta_index),
+                len(self._live_modifier_types - set(self._vanilla_modifier_types)),
+            )
+        else:
+            self._modifier_meta_index = live
+            LOGGER.warning(
+                "[Modifiers] 未找到原版 ModifierType 快照，回退本机实时库判定；"
+                "请运行 python -m modgen.tools.extract_vanilla_modifier_types 生成快照"
+            )
         effect_types, collection_types, effect_param_map, requirement_types, requirement_param_map = self._load_effect_type_parameters()
         self._effect_types = effect_types
         self._collection_types = collection_types
@@ -2869,6 +2906,48 @@ class HomePage(BasePage):
                 collection_type=row["CollectionType"],
             )
         return result
+
+    # -------------------- 自定义 ModifierType 判定（单一来源） --------------------
+    def _needs_type_registration(self, record: "ModifierRecord") -> bool:
+        """该 ModifierType 是否需要在本工程补 Types + DynamicModifiers 行。
+
+        判据：条目 override > 原版快照 > （快照缺失时）旧启发式。
+        详见 ModTools_5_4/project/vanilla_modifier_types.py 的模块说明。
+        """
+        return resolve_needs_registration(
+            str(getattr(record, "modifier_type", "") or ""),
+            str(getattr(record, "modifier_type_source", "") or ""),
+            snapshot=self._vanilla_modifier_types,
+            legacy_known_types=self._live_modifier_types,
+            prefixes=self._project_prefixes(),
+        )
+
+    def _project_prefixes(self) -> tuple:
+        prefix1 = self._prefix_input.text().strip().upper() if getattr(self, "_prefix_input", None) else ""
+        prefix2 = self._prefix2_input.text().strip().upper() if getattr(self, "_prefix2_input", None) else ""
+        return tuple(p for p in (prefix1, prefix2) if p)
+
+    def _custom_modifier_type_map(self) -> Dict[str, Dict[str, str | None]]:
+        """收集需要注册的 ModifierType → {effect_type, collection_type}（SQL/XML 导出共用）。"""
+        collected: Dict[str, Dict[str, str | None]] = {}
+        for record in self._modifiers:
+            modifier_type = record.modifier_type.strip()
+            if not modifier_type:
+                continue
+            if not self._needs_type_registration(record):
+                continue
+            current = collected.get(modifier_type)
+            if current is None:
+                collected[modifier_type] = {
+                    "effect_type": record.effect_type,
+                    "collection_type": record.collection_type,
+                }
+                continue
+            if not current.get("effect_type") and record.effect_type:
+                current["effect_type"] = record.effect_type
+            if not current.get("collection_type") and record.collection_type:
+                current["collection_type"] = record.collection_type
+        return collected
 
     def _load_effect_type_parameters(
         self,
@@ -3716,6 +3795,25 @@ class HomePage(BasePage):
         self._modifier_type_combo.currentTextChanged.connect(lambda _t: self._on_modifier_editor_changed("modifier_type"))
         modtype_row.addWidget(self._modifier_type_combo, 1)
         layout.addLayout(modtype_row)
+
+        source_row = QHBoxLayout()
+        source_row.addWidget(QLabel("类型来源"))
+        self._modifier_type_source_combo = QComboBox()
+        self._modifier_type_source_combo.addItem("自动判定（按原版类型快照）", "")
+        self._modifier_type_source_combo.addItem("强制：本工程新建（补 Types + DynamicModifiers）", SOURCE_NEW)
+        self._modifier_type_source_combo.addItem("强制：游戏已有（不生成任何行）", SOURCE_VANILLA)
+        self._modifier_type_source_combo.setToolTip(
+            "决定该 ModifierType 是否需要在生成时补 Types + DynamicModifiers 行。\n"
+            "自动判定依据随包分发的『原版类型快照』（游戏自带 XML 提取），"
+            "与本机装过哪些 Mod 无关；遇到特殊情况可在此强制指定。"
+        )
+        self._modifier_type_source_combo.currentIndexChanged.connect(self._on_modifier_type_source_changed)
+        source_row.addWidget(self._modifier_type_source_combo, 1)
+        layout.addLayout(source_row)
+
+        self._modifier_type_source_hint = QLabel("")
+        self._modifier_type_source_hint.setWordWrap(True)
+        layout.addWidget(self._modifier_type_source_hint)
 
         effect_row = QHBoxLayout()
         effect_btn = compact_button("搜索", 44)
@@ -4991,6 +5089,10 @@ class HomePage(BasePage):
                 self._set_combo_text(self._effect_type_combo, record.effect_type or "")
             if self._collection_type_combo:
                 self._set_combo_text(self._collection_type_combo, record.collection_type or "")
+            if getattr(self, "_modifier_type_source_combo", None):
+                source = str(record.modifier_type_source or "")
+                index = self._modifier_type_source_combo.findData(source)
+                self._modifier_type_source_combo.setCurrentIndex(index if index >= 0 else 0)
             if self._owner_reqset_input:
                 self._owner_reqset_input.setText(record.owner_reqset or "")
             if self._subject_reqset_input:
@@ -5014,6 +5116,7 @@ class HomePage(BasePage):
             self._sync_modifier_preview_editor_visibility()
         finally:
             self._loading_modifier_editor = False
+        self._refresh_modifier_type_source_hint()
 
     def _clear_modifier_editor(self) -> None:
         self._modifier_editor_index = -1
@@ -5027,6 +5130,8 @@ class HomePage(BasePage):
             self._effect_type_combo.setCurrentText("")
         if self._collection_type_combo:
             self._collection_type_combo.setCurrentText("")
+        if getattr(self, "_modifier_type_source_combo", None):
+            self._modifier_type_source_combo.setCurrentIndex(0)
         if self._owner_reqset_input:
             self._owner_reqset_input.clear()
         if self._subject_reqset_input:
@@ -5091,6 +5196,8 @@ class HomePage(BasePage):
             record.effect_type = self._effect_type_combo.currentText().strip() or None
         if self._collection_type_combo:
             record.collection_type = self._collection_type_combo.currentText().strip() or None
+        if getattr(self, "_modifier_type_source_combo", None):
+            record.modifier_type_source = str(self._modifier_type_source_combo.currentData() or "")
         if self._owner_reqset_input:
             record.owner_reqset = self._owner_reqset_input.text().strip() or None
         if self._subject_reqset_input:
@@ -5647,6 +5754,7 @@ class HomePage(BasePage):
             "modifier_type": self._modifier_type_combo.currentText().strip() if self._modifier_type_combo else "",
             "effect_type": self._effect_type_combo.currentText().strip() if self._effect_type_combo else "",
             "collection_type": self._collection_type_combo.currentText().strip() if self._collection_type_combo else "",
+            "modifier_type_source": str(self._modifier_type_source_combo.currentData() or "") if getattr(self, "_modifier_type_source_combo", None) else "",
             "owner_reqset": owner_text.strip(),
             "subject_reqset": subject_text.strip(),
             "run_once": self._run_once_cb.isChecked() if self._run_once_cb else False,
@@ -5707,6 +5815,43 @@ class HomePage(BasePage):
                 self._effect_type_combo.setCurrentText(meta.effect_type)
             if meta.collection_type:
                 self._collection_type_combo.setCurrentText(meta.collection_type)
+        self._refresh_modifier_type_source_hint()
+
+    def _on_modifier_type_source_changed(self, _index: int = 0) -> None:
+        self._refresh_modifier_type_source_hint()
+        self._on_modifier_editor_changed("modifier_type_source")
+
+    def _refresh_modifier_type_source_hint(self) -> None:
+        """刷新「类型来源」判定提示（自动 / 强制新建 / 强制已有）。"""
+        label = getattr(self, "_modifier_type_source_hint", None)
+        combo = getattr(self, "_modifier_type_source_combo", None)
+        if label is None or combo is None:
+            return
+        source = str(combo.currentData() or "")
+        modifier_type = self._modifier_type_combo.currentText().strip() if self._modifier_type_combo else ""
+        verdict = describe_modifier_type(
+            modifier_type,
+            source,
+            snapshot=self._vanilla_modifier_types,
+            legacy_known_types=self._live_modifier_types,
+            prefixes=self._project_prefixes(),
+        )
+        presets = {
+            "vanilla": ("原版快照中已有该类型 → 不生成 Types / DynamicModifiers 行。", "#666666"),
+            "new": ("不在原版快照中 → 将生成 Types + DynamicModifiers 行。", "#1a7f37"),
+            "forced_new": ("已强制标记为新建 → 将生成行；若该类型其实是原版，会与游戏主键冲突。", "#b26a00"),
+            "forced_vanilla": ("已强制标记为游戏已有 → 不生成行；若原版其实没有该类型，加载会缺类型。", "#b26a00"),
+            "legacy": ("未找到原版类型快照，已回退本机库判定（建议先运行 modgen.tools.extract_vanilla_modifier_types）。", "#b26a00"),
+        }
+        if not modifier_type:
+            label.setText("")
+            return
+        text, color = presets.get(verdict, ("", "#666666"))
+        if verdict in {"new", "forced_new"} and modifier_type in self._live_modifier_types:
+            text += "（注意：本机运行库中已存在同名类型，可能与其他 Mod 撞名）"
+            color = "#b26a00"
+        label.setText(text)
+        label.setStyleSheet("color: %s;" % color)
 
     def _on_effect_type_changed(self, text: str) -> None:
         self._sync_modifier_preview_editor_visibility()
@@ -5870,6 +6015,7 @@ class HomePage(BasePage):
                 "subject_stack_limit": record.subject_stack_limit,
                 "effect_type": record.effect_type,
                 "collection_type": record.collection_type,
+                "modifier_type_source": record.modifier_type_source or None,
                 "preview_text": record.preview_text,
                 "parameters": list(record.parameters),
             }
@@ -6076,34 +6222,8 @@ class HomePage(BasePage):
             sections.append("\n".join(lines))
 
         # Custom ModifierType definitions (Types / DynamicModifiers)
-        prefix1 = self._prefix_input.text().strip().upper() if self._prefix_input else ""
-        prefix2 = self._prefix2_input.text().strip().upper() if self._prefix2_input else ""
-
-        def _is_project_custom(modifier_type: str) -> bool:
-            """Any ModifierType matching the project prefix is always treated as custom."""
-            for p in (prefix1, prefix2):
-                if p and modifier_type.upper().startswith(p) or f"_{p}_" in modifier_type.upper():
-                    return True
-            return False
-
-        custom_modifier_types: Dict[str, Dict[str, str | None]] = {}
-        for record in self._modifiers:
-            modifier_type = record.modifier_type.strip()
-            if not modifier_type:
-                continue
-            if modifier_type in self._modifier_meta_index and not _is_project_custom(modifier_type):
-                continue
-            current = custom_modifier_types.get(modifier_type)
-            if current is None:
-                custom_modifier_types[modifier_type] = {
-                    "effect_type": record.effect_type,
-                    "collection_type": record.collection_type,
-                }
-            else:
-                if not current.get("effect_type") and record.effect_type:
-                    current["effect_type"] = record.effect_type
-                if not current.get("collection_type") and record.collection_type:
-                    current["collection_type"] = record.collection_type
+        # 判据单一来源：_custom_modifier_type_map()（override > 原版快照 > 旧启发式回退）
+        custom_modifier_types = self._custom_modifier_type_map()
 
         if custom_modifier_types:
             type_lines = ["INSERT INTO Types (Type, Kind) VALUES"]
@@ -6449,25 +6569,8 @@ class HomePage(BasePage):
                 if table_name == OWNER_TABLE_WITH_ATTACHMENT_TARGET:
                     ElementTree.SubElement(row_el, "AttachmentTargetType").text = _text(attachment_target_type)
 
-        # Types / DynamicModifiers (custom)
-        custom_modifier_types: Dict[str, Dict[str, str | None]] = {}
-        for record in self._modifiers:
-            modifier_type = record.modifier_type.strip()
-            if not modifier_type:
-                continue
-            if modifier_type in self._modifier_meta_index:
-                continue
-            current = custom_modifier_types.get(modifier_type)
-            if current is None:
-                custom_modifier_types[modifier_type] = {
-                    "effect_type": record.effect_type,
-                    "collection_type": record.collection_type,
-                }
-            else:
-                if not current.get("effect_type") and record.effect_type:
-                    current["effect_type"] = record.effect_type
-                if not current.get("collection_type") and record.collection_type:
-                    current["collection_type"] = record.collection_type
+        # Types / DynamicModifiers (custom) —— 与 SQL 侧共用同一判据
+        custom_modifier_types = self._custom_modifier_type_map()
         if custom_modifier_types:
             types_el = ElementTree.SubElement(root, "Types")
             dyn_el = ElementTree.SubElement(root, "DynamicModifiers")
@@ -6729,6 +6832,7 @@ class HomePage(BasePage):
                     subject_stack_limit=int(entry.get("subject_stack_limit", 0) or 0),
                     effect_type=entry.get("effect_type") or None,
                     collection_type=entry.get("collection_type") or None,
+                    modifier_type_source=str(entry.get("modifier_type_source") or "").strip().lower(),
                     preview_text=str(entry.get("preview_text", "") or ""),
                     parameters=list(entry.get("parameters", []) or []),
                 )

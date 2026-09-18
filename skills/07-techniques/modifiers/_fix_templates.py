@@ -18,67 +18,67 @@ def get_tpl(et, desc):
 
     # Combat strength
     if "战斗力" in d:
-        if "防空" in d: return "+{Amount}% 防空战斗力"
-        if "蛮族" in d or "BARBARIAN" in e: return "+{Amount} [ICON_Strength] 对蛮族"
-        if "外交" in d or "DIPLO" in e: return "+{Amount} [ICON_Strength] 外交能见度"
-        if "圣城" in d or "HOLY" in e: return "+{Amount} [ICON_Strength] 每个圣城"
-        if "奢侈品" in d or "LUXURY" in e: return "+{Amount} [ICON_Strength] 每个奢侈品"
-        if "未使用" in d or "UNUSED" in e: return "+{Amount} [ICON_Strength] 每个未用移动力"
-        if "相邻" in d or "ADJACENT" in e or "NEIGHBOR" in e: return "+{Amount} [ICON_Strength] 相邻加成"
-        if "区域" in d or "AGAINST_DISTRICT" in e: return "+{Amount} [ICON_Strength] 对区域"
-        if "受伤" in d: return "-{Amount}% 受伤战斗惩罚"
+        if "防空" in d: return "+{1_Amount}% 防空战斗力"
+        if "蛮族" in d or "BARBARIAN" in e: return "+{1_Amount} [ICON_Strength] 对蛮族"
+        if "外交" in d or "DIPLO" in e: return "+{1_Amount} [ICON_Strength] 外交能见度"
+        if "圣城" in d or "HOLY" in e: return "+{1_Amount} [ICON_Strength] 每个圣城"
+        if "奢侈品" in d or "LUXURY" in e: return "+{1_Amount} [ICON_Strength] 每个奢侈品"
+        if "未使用" in d or "UNUSED" in e: return "+{1_Amount} [ICON_Strength] 每个未用移动力"
+        if "相邻" in d or "ADJACENT" in e or "NEIGHBOR" in e: return "+{1_Amount} [ICON_Strength] 相邻加成"
+        if "区域" in d or "AGAINST_DISTRICT" in e: return "+{1_Amount} [ICON_Strength] 对区域"
+        if "受伤" in d: return "-{1_Amount}% 受伤战斗惩罚"
         if "时代" in d: return "跨时代战斗力修正"
         if "支援" in d: return "+{Percent}% 支援加成"
         if "侧翼" in d or "FLANKING" in e: return "+{Percent}% 夹击加成"
-        if "友方" in d or "FRIENDLY" in e: return "+{Amount} [ICON_Strength] 友方领土"
-        return "+{Amount} [ICON_Strength] 战斗力"
+        if "友方" in d or "FRIENDLY" in e: return "+{1_Amount} [ICON_Strength] 友方领土"
+        return "+{1_Amount} [ICON_Strength] 战斗力"
 
     # Movement
     if "移动力" in d or "MOVEMENT" in e:
-        if "登船" in d or "EMBARK" in e: return "+{Amount} [ICON_Movement] 登船移动力"
-        if "海洋" in d or "SEA" in e: return "+{Amount} [ICON_Movement] 海洋移动力"
-        if "开阔" in d or "CLEAR" in e: return "+{Amount} [ICON_Movement] 开阔地形初始移动力"
-        if "敌方" in d or "ENEMY" in e: return "+{Amount} [ICON_Movement] 敌方领土初始移动力"
-        if "友方" in d or "FRIENDLY" in e: return "+{Amount} [ICON_Movement] 友方领土初始移动力"
+        if "登船" in d or "EMBARK" in e: return "+{1_Amount} [ICON_Movement] 登船移动力"
+        if "海洋" in d or "SEA" in e: return "+{1_Amount} [ICON_Movement] 海洋移动力"
+        if "开阔" in d or "CLEAR" in e: return "+{1_Amount} [ICON_Movement] 开阔地形初始移动力"
+        if "敌方" in d or "ENEMY" in e: return "+{1_Amount} [ICON_Movement] 敌方领土初始移动力"
+        if "友方" in d or "FRIENDLY" in e: return "+{1_Amount} [ICON_Movement] 友方领土初始移动力"
         if "恢复" in d or "RESTORE" in e: return "恢复全部移动力"
-        return "+{Amount} [ICON_Movement] 移动力"
+        return "+{1_Amount} [ICON_Movement] 移动力"
 
     # Experience
     if "经验" in d or "EXPERIENCE" in e:
-        if "攻击" in d and "经验" in d: return "+{Amount}% 攻击经验"
-        return "+{Amount} 经验值"
+        if "攻击" in d and "经验" in d: return "+{1_Amount}% 攻击经验"
+        return "+{1_Amount} 经验值"
 
-    if "等级" in d: return "+{Amount} 等级"
+    if "等级" in d: return "+{1_Amount} 等级"
 
     # Healing
     if "回复" in d or "治疗" in d or "HEAL" in e:
-        if "战斗后" in d or "POST_COMBAT" in e: return "+{Amount} 击杀后回复"
-        if "宗教" in d: return "+{Amount} 宗教领土回复"
-        if "直接" in d: return "+{Amount} 立即回复"
-        return "+{Amount} 每回合回复"
+        if "战斗后" in d or "POST_COMBAT" in e: return "+{1_Amount} 击杀后回复"
+        if "宗教" in d: return "+{1_Amount} 宗教领土回复"
+        if "直接" in d: return "+{1_Amount} 立即回复"
+        return "+{1_Amount} 每回合回复"
 
     if "伤害" in d or "DAMAGE" in e:
         if "环境" in d or "RANDOM" in e: return "免疫自然灾害"
         if "核" in d or "WMD" in e: return "免疫核武器伤害"
         if "水灾" in d: return "免疫水灾伤害"
-        return "{Amount} 伤害"
+        return "{1_Amount} 伤害"
 
     # Production
     if "生产力" in d or "PRODUCTION" in e:
-        return "+{Amount}% [ICON_Production] 生产力"
+        return "+{1_Amount}% [ICON_Production] 生产力"
 
     if "购买" in d or "PURCHASE" in e:
         if "信仰" in d or "FAITH" in e: return "可用信仰购买单位"
-        return "+{Amount}% [ICON_Gold] 购买费用"
+        return "+{1_Amount}% [ICON_Gold] 购买费用"
 
     if "费用" in d or "维护" in d or "MAINTENANCE" in e:
-        return "-{Amount} [ICON_Gold] 维护费"
+        return "-{1_Amount} [ICON_Gold] 维护费"
 
     if "升级费" in d:
-        return "-{Amount}% 升级费用"
+        return "-{1_Amount}% 升级费用"
 
     # Sight/Visibility
-    if "视野" in d or "SIGHT" in e: return "+{Amount} 视野范围"
+    if "视野" in d or "SIGHT" in e: return "+{1_Amount} 视野范围"
     if "隐身" in d or "HIDDEN" in e: return "对敌方隐身"
     if "探测" in d or "SEE_HIDDEN" in e: return "可探测隐身单位"
     if "看穿" in d or "SEE_THROUGH" in e:
@@ -88,58 +88,58 @@ def get_tpl(et, desc):
     # Spy
     if "间谍" in d or "SPY" in e:
         if "时间" in d or "TIME" in e: return "+{ReductionPercent}% 行动速度"
-        if "成功" in d or "CHANCE" in e: return "+{Amount} 行动成功率"
-        if "反间谍" in d or "COUNTERSPY" in e: return "+{Amount} 反间谍等级"
-        if "等级" in d: return "+{Amount} 间谍等级"
-        return "+{Amount} 间谍行动效率"
+        if "成功" in d or "CHANCE" in e: return "+{1_Amount} 行动成功率"
+        if "反间谍" in d or "COUNTERSPY" in e: return "+{1_Amount} 反间谍等级"
+        if "等级" in d: return "+{1_Amount} 间谍等级"
+        return "+{1_Amount} 间谍行动效率"
 
     # Religion
     if "宗教" in d or "传播" in d or "SPREAD" in e:
-        if "压力" in d or "EVICT" in e: return "+{Amount}% 宗教压力"
-        if "次数" in d or "CHARGES" in e: return "+{Amount} 传教次数"
-        if "外国" in d or "FOREIGN" in e: return "+{Amount}% 外国传播强度"
+        if "压力" in d or "EVICT" in e: return "+{1_Amount}% 宗教压力"
+        if "次数" in d or "CHARGES" in e: return "+{1_Amount} 传教次数"
+        if "外国" in d or "FOREIGN" in e: return "+{1_Amount}% 外国传播强度"
         if "击杀" in d or "LAND_VICTORY" in e: return "击杀时传播宗教"
         if "禁止" in d or "NO_FOREIGN" in e: return "不可在外国传教"
         if "解锁" in d or "ADD_RELIGIOUS" in e: return "解锁宗教单位"
         if "首次" in d or "INITIATION" in e:
-            if "人口" in d: return "+{Amount} [ICON_Science] 每人口产出"
-            return "+{Amount} [ICON_Gold] 首次传教产出"
+            if "人口" in d: return "+{1_Amount} [ICON_Science] 每人口产出"
+            return "+{1_Amount} [ICON_Gold] 首次传教产出"
         if "自然奇观" in d or "NATURAL_WONDER" in e: return "自然奇观传教不消耗次数"
-        return "+{Amount} 宗教传播强度"
+        return "+{1_Amount} 宗教传播强度"
 
     # Rock band / Tourism
     if "摇滚" in d or "旅游" in d or "TOURISM" in e:
-        if "忠诚" in d or "LOYALTY" in e: return "+{Amount} 忠诚度下降"
-        if "专辑" in d or "ALBUM" in e: return "+{Amount}% 专辑销售额"
-        if "等级" in d or "LEVEL" in e: return "+{Amount} 摇滚乐队等级"
-        if "和平" in d or "PEACE" in e: return "+{Amount}% 和平时期旅游爆发"
+        if "忠诚" in d or "LOYALTY" in e: return "+{1_Amount} 忠诚度下降"
+        if "专辑" in d or "ALBUM" in e: return "+{1_Amount}% 专辑销售额"
+        if "等级" in d or "LEVEL" in e: return "+{1_Amount} 摇滚乐队等级"
+        if "和平" in d or "PEACE" in e: return "+{1_Amount}% 和平时期旅游爆发"
         if "转化" in d or "CONVERT" in e: return "演出后转化城市宗教"
         if "范围" in d or "RANGE" in e: return "+{Range} 旅游爆发范围"
-        return "+{Amount} 旅游业绩"
+        return "+{1_Amount} 旅游业绩"
 
     # Pillage/Plunder
     if "掠夺" in d or "劫掠" in d or "PILLAGE" in e or "PLUNDER" in e:
-        if "区域" in d or "DISTRICT" in e: return "+{Amount}% 区域掠夺产出"
-        if "改良" in d or "IMPROVEMENT" in e: return "+{Amount}% 改良设施掠夺产出"
-        if "信仰" in d and "区域" in d: return "+{Amount} [ICON_Faith] 区域掠夺信仰"
-        if "信仰" in d: return "+{Amount} [ICON_Faith] 改良掠夺信仰"
-        return "+{Amount}% 掠夺产出"
+        if "区域" in d or "DISTRICT" in e: return "+{1_Amount}% 区域掠夺产出"
+        if "改良" in d or "IMPROVEMENT" in e: return "+{1_Amount}% 改良设施掠夺产出"
+        if "信仰" in d and "区域" in d: return "+{1_Amount} [ICON_Faith] 区域掠夺信仰"
+        if "信仰" in d: return "+{1_Amount} [ICON_Faith] 改良掠夺信仰"
+        return "+{1_Amount}% 掠夺产出"
 
     # Charges
     if "次数" in d or "CHARGES" in e:
-        if "伟人" in d: return "+{Amount} 伟人使用次数"
-        if "灾害" in d: return "+{Amount} 灾害应对次数"
-        return "+{Amount} 使用次数"
+        if "伟人" in d: return "+{1_Amount} 伟人使用次数"
+        if "灾害" in d: return "+{1_Amount} 灾害应对次数"
+        return "+{1_Amount} 使用次数"
 
     # Era score
     if "时代" in d or "ERA_SCORE" in e:
-        if "击杀" in d: return "+{Amount} 时代分数/击杀"
-        if "晋升" in d: return "+{Amount} 时代分数/晋升"
-        return "+{Amount} 时代分数"
+        if "击杀" in d: return "+{1_Amount} 时代分数/击杀"
+        if "晋升" in d: return "+{1_Amount} 时代分数/晋升"
+        return "+{1_Amount} 时代分数"
 
     # Specific abilities
-    if "攻击范围" in d or "射程" in d: return "+{Amount} 攻击范围"
-    if "攻击次数" in d or "NUM_ATTACKS" in e: return "+{Amount} 额外攻击次数"
+    if "攻击范围" in d or "射程" in d: return "+{1_Amount} 攻击范围"
+    if "攻击次数" in d or "NUM_ATTACKS" in e: return "+{1_Amount} 额外攻击次数"
     if "属性" in d or "PROPERTY" in e: return "单位属性修正"
     if "编队" in d or "FORMATION" in e: return "编入军团/军队"
     if "城墙" in d or "WALL" in e:
@@ -171,7 +171,7 @@ def get_tpl(et, desc):
     if "部落" in d or "GOODY_HUT" in e: return "可从部落村庄升级"
     if "所有权" in d or "OWNER" in e: return "转移单位所有权"
     if "地形" in d and "通行" in d: return "可通行指定地形"
-    if "免费" in d or "GRANT_FREE" in e: return "+{Amount} 免费资源"
+    if "免费" in d or "GRANT_FREE" in e: return "+{1_Amount} 免费资源"
     if "建造" in d and "特殊" in d: return "可建造特殊单位"
     if "禁止建造" in d: return "禁止建造此单位"
     if "禁止" in d and "产出" in d: return "禁止产出购买单位"
@@ -186,15 +186,15 @@ def get_tpl(et, desc):
     if "行动操作" in d or "OPERATION" in e: return "禁用特定行动"
     if "外贸" in d: return "允许商人登船"
     if "护航" in d or "ESCORT" in e: return "可护卫其他单位"
-    if "逃脱" in d or "ESCAPE" in e: return "+{Amount} 逃脱移动力"
+    if "逃脱" in d or "ESCAPE" in e: return "+{1_Amount} 逃脱移动力"
     if "国际" in d: return "可进入外国领土"
     if "忽略" in d and "单位" in d: return "忽略敌方单位阻挡"
     if "忽略战略" in d: return "忽略战略资源维护"
 
     # Additional fallbacks
-    if "区域" in d and "加速" in d: return "+{Amount}% 区域数单位生产力"
-    if "项目" in d and "加速" in d: return "+{Amount}% 项目数单位生产力"
-    if "奇观" in d and "加速" in d: return "+{Amount}% 奇观进度生产力"
+    if "区域" in d and "加速" in d: return "+{1_Amount}% 区域数单位生产力"
+    if "项目" in d and "加速" in d: return "+{1_Amount}% 项目数单位生产力"
+    if "奇观" in d and "加速" in d: return "+{1_Amount}% 奇观进度生产力"
     if "生成" in d and "携带" in d and "能力" in d: return "建造时生成特殊单位"
 
     # Fallbacks by EffectType name pattern
@@ -205,7 +205,7 @@ def get_tpl(et, desc):
     if "ENABLE_WALL_SAME_RELIGION_PROMOTION" in e: return "同宗教指定兵种可攻击城墙"
     if "IGNORE_RANGED" in e: return "忽略远程区域惩罚"
     if "IGNORE_STRATEGIC_RESOURCE_LEVIED" in e: return "征召单位忽略战略资源"
-    if "MILITARY_POLICIES" in e: return "+{Amount} [ICON_Strength] 每个军事政策"
+    if "MILITARY_POLICIES" in e: return "+{1_Amount} [ICON_Strength] 每个军事政策"
     if "NO_REDUCTION_DAMAGE" in e: return "受伤无战斗力惩罚"
     if "STRENGTH_FROM_CITY_CULTURAL" in e: return "文化身份战斗力加成"
     if "STRENGTH_REDUCTION_FOR_DAMAGE" in e: return "-{50}% 受伤战斗力惩罚"
@@ -220,7 +220,7 @@ def get_tpl(et, desc):
     if "MAX_LEVEL" in e: return "提升单位等级上限"
     if "NO_BARB_XP" in e: return "蛮族无经验上限"
     if "DISTRICT_ADD_NAVAL_UNIT" in e: return "完成区域获得海军单位"
-    if "NUM_UNITS_SUPPORTED" in e: return "+{Amount} 可支持单位数"
+    if "NUM_UNITS_SUPPORTED" in e: return "+{1_Amount} 可支持单位数"
     if "NOT_FOUND" in e: return "（文本参考）"
 
     return "（文本参考）"

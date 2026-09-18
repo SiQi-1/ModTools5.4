@@ -128,6 +128,8 @@ def generate_modifier(
         "subject_stack_limit": int(flags.get("subject_stack_limit") or 0),
         "effect_type": effect_type,
         "collection_type": collection_type,
+        # 类型来源：None=自动（按原版类型快照判定）/"new"=强制新建 /"vanilla"=强制视为游戏已有
+        "modifier_type_source": None,
         "preview_text": "",
         "parameters": parameters,
     }

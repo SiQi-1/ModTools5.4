@@ -242,6 +242,7 @@
 | `Amount` | **必写** | 战斗力加成值（整数）。原版示例值：`5` |
 
 > 需要 ModifierStrings（Preview 上下文，参考 `LOC_COMBAT_PREVIEW_CITY_FRIENDLY_COMBAT_BONUS`）。系统通过战斗预览显示此效果，不写 ModifierStrings 则 UI 不显示加成数值。
+> 完整规则（三种 Context、占位符 `{1_Amount}` / `{Property}`、工具生成链路）见 [modifier-techniques.md 技巧 3](../modifier-techniques.md)。
 
 ---
 

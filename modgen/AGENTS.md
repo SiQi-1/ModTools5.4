@@ -56,6 +56,9 @@ python -m modgen.cli query "SELECT ModifierType, CollectionType FROM DynamicModi
 python -m modgen.cli loc LOC_TRAIT_XXX_NAME                                                 # LOC → 简体中文
 python -m modgen.cli preview 工程.CIV [--dry-run | --out 目录]                               # 无头预览将导出的全部文件
 python -m modgen.cli preview 工程.CIV --section 分类 [--format sql|xml]                      # 单分类输出文本
+
+# 原版 ModifierType 快照（自定义类型注册判定用；随包分发，缺失时回退旧启发式）
+python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out 路径] [--json]
 ```
 
 `--prefix`/`--infix` 来自工程"基础信息"（前缀如 SIQI、中缀编号如 35）。
@@ -117,6 +120,11 @@ python -m modgen.cli preview 工程.CIV --section 分类 [--format sql|xml]     
 - **自定义 SQL 协调**：加载顺序 = UpdateDatabase 10000（生成数据 9999 之后）；同表同主键禁止与生成
   SQL 双写（`check-conflicts` 报 ERROR）；UPDATE/DELETE 生成表 = 反模式（WARNING）；SELECT 仅用于
   `INSERT...SELECT` 继承与自定义表填充。
+- **需要"更晚"的加载顺序时**：`custom-file write` 自动注册的动作 **id 就是类型名**（`UpdateDatabase`）、
+  load order 10000；注册按 **(type, id)** 合并，所以同 id 只会被并进原组、**拿不到自己的顺序**。
+  要独立顺序必须给**独立 id** + 显式 `load_order`（AI 接口 `add_file_action` 支持），例如遍历原版表
+  （`INSERT INTO BuildingModifiers … SELECT … FROM Buildings WHERE IsWonder = 1`）用 `LoadOrder 199999`，
+  确保资料片/其他 Mod 的数据已就位；同时确认该文件**没有**留在原组（否则执行两次 → 主键冲突）。
 
 ## 分类说明
 
@@ -147,6 +155,22 @@ python -m modgen.cli preview 工程.CIV --section 分类 [--format sql|xml]     
 - 生成的 Modifier 参数骨架 value 为 null，AI 需填入实际值（数值/Type/文本）。
 - 注意：`generate-modifier` 产物是"自定义 ModifierType"（modifier_type = modifier_id），
   若要用游戏内置 ModifierType，需另行指定。
+- **ModifierStrings 预览文本**：`effect_type = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的 modifier **必须填 `preview_text`**
+  （原版 226 个实例里 221 个都写了；不写不报错，但战斗预览面板不显示该加成来源）。
+  工具会生成两行：`ModifierStrings(ModifierId,'Preview','LOC_{ModifierId}_PREVIEW')` + 对应 `LocalizedText`
+  （前者在 `modifier_workspace`，后者在 `workspace_page._modifier_strength_preview_text_rows()`），**都要求 `preview_text` 非空**。
+  写法：数值型 `+{1_Amount} [ICON_Strength] 战斗力（来源）`；`Key`（属性）型 `+{Property} [ICON_Strength] 战斗力（来源）`。
+- **自定义 ModifierType 必须注册**：`.CIV` 里 `modifier_type` 不属于**原版快照**
+  （`ModTools_5_4/data/vanilla_modifier_types.json`，989 条，由
+  `python -m modgen.tools.extract_vanilla_modifier_types` 从游戏自带 XML 提取）时，
+  导出会补 `INSERT INTO Types(KIND_MODIFIER)` + `INSERT INTO DynamicModifiers` 行。
+  - 判定**不看本机运行缓存库** `DebugGameplay.sqlite`（它含玩家装过的所有 Mod 的类型，
+    "库里有"≠"原版有"）；沿用它会把别人的自定义类型误当原版、不补行，
+    结果 Mod 在没装那个旧 Mod 的机器上加载失败。
+  - 条目可用 `modifier_type_source` 覆盖：`null`=自动（按快照）/ `"new"`=强制新建 /
+    `"vanilla"`=强制视为游戏已有（用于快照漏收的极端情况）。
+  - `validate` 会对「强制新建却属原版」「强制已有却不在快照」报 **ERROR**；
+    自动判定为自定义时给 WARNING（提示将补注册行）。
 
 ## 知识查询：优先使用工具内置能力（新设备无需外部知识库）
 

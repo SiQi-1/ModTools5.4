@@ -202,49 +202,49 @@ while i < len(lines):
             et = current_et
             template = None
             if "战斗力" in desc:
-                template = "+{Amount} [ICON_Strength] 战斗力"
+                template = "+{1_Amount} [ICON_Strength] 战斗力"
             elif "移动力" in desc or "MOVEMENT" in et:
-                template = "+{Amount} [ICON_Movement] 移动力"
+                template = "+{1_Amount} [ICON_Movement] 移动力"
             elif "经验" in desc:
-                template = "+{Amount} 经验值"
+                template = "+{1_Amount} 经验值"
             elif "等级" in desc:
-                template = "+{Amount} 等级"
+                template = "+{1_Amount} 等级"
             elif "回复" in desc or "治疗" in desc or "HEAL" in et:
-                template = "+{Amount} 每回合回复"
+                template = "+{1_Amount} 每回合回复"
             elif "伤害" in desc or "DAMAGE" in et:
-                template = "{Amount} 伤害修正"
+                template = "{1_Amount} 伤害修正"
             elif "生产力" in desc or "PRODUCTION" in et:
-                template = "+{Amount}% [ICON_Production] 生产力"
+                template = "+{1_Amount}% [ICON_Production] 生产力"
             elif "购买" in desc or "PURCHASE" in et:
-                template = "+{Amount}% 购买费用"
+                template = "+{1_Amount}% 购买费用"
             elif "费用" in desc or "维护" in desc:
-                template = "-{Amount} [ICON_Gold] 维护费"
+                template = "-{1_Amount} [ICON_Gold] 维护费"
             elif "视野" in desc or "SIGHT" in et:
-                template = "+{Amount} 视野范围"
+                template = "+{1_Amount} 视野范围"
             elif "间谍" in desc or "SPY" in et:
-                template = "+{Amount} 间谍行动效率"
+                template = "+{1_Amount} 间谍行动效率"
             elif "宗教" in desc or "传播" in desc:
-                template = "+{Amount} 宗教传播强度"
+                template = "+{1_Amount} 宗教传播强度"
             elif "摇滚" in desc or "旅游" in desc:
-                template = "+{Amount} 旅游业绩"
+                template = "+{1_Amount} 旅游业绩"
             elif "掠夺" in desc or "劫掠" in desc:
-                template = "+{Amount}% 掠夺产出"
+                template = "+{1_Amount}% 掠夺产出"
             elif "次数" in desc or "CHARGES" in et:
-                template = "+{Amount} 使用次数"
+                template = "+{1_Amount} 使用次数"
             elif "时代" in desc:
-                template = "+{Amount} 时代分数"
+                template = "+{1_Amount} 时代分数"
             elif "编队" in desc or "FORMATION" in et:
                 template = "编入军团/军队"
             elif "城墙" in desc or "WALL" in et:
                 template = "可攻击城墙"
             elif "军" in desc or "夹击" in desc:
-                template = "+{Amount} [ICON_Strength] 战斗力"
+                template = "+{1_Amount} [ICON_Strength] 战斗力"
             elif "支援" in desc:
                 template = "+{Percent}% 支援加成"
             elif "夹击" in desc:
                 template = "+{Percent}% 夹击加成"
             elif "劫掠" in desc or "RAID" in et:
-                template = "+{Amount} 劫掠加成"
+                template = "+{1_Amount} 劫掠加成"
             elif "遗物" in desc:
                 template = "死亡时获得遗物"
             elif "俘" in desc:
@@ -260,7 +260,7 @@ while i < len(lines):
             elif "探测" in desc:
                 template = "可探测隐身单位"
             elif "攻击范围" in desc or "射程" in desc:
-                template = "+{Amount} 攻击范围"
+                template = "+{1_Amount} 攻击范围"
             elif "禁止" in desc and "攻击" in desc:
                 template = "无法攻击"
             elif "进入" in desc and "外国" in desc:
@@ -270,7 +270,7 @@ while i < len(lines):
             elif "移动" in desc and "攻击" in desc:
                 template = "移动后可攻击"
             elif "升级" in desc:
-                template = "+{Amount} 升级次数"
+                template = "+{1_Amount} 升级次数"
             elif "部落" in desc or "GOODY" in et:
                 template = "可从部落村庄升级"
             elif "所有权" in desc or "OWNER" in et:
@@ -278,7 +278,7 @@ while i < len(lines):
             elif "地形" in desc and "通行" in desc:
                 template = "可通行指定地形"
             elif "免费" in desc:
-                template = "+{Amount} 免费资源"
+                template = "+{1_Amount} 免费资源"
             elif "建造" in desc and "单位" in desc:
                 template = "可建造特殊单位"
             elif "特种" in desc:

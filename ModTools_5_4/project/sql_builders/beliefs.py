@@ -84,5 +84,3 @@ def build_belief_sql_pair(entries: object) -> tuple[str, str]:
         ]
     ).rstrip()
     return data_sql, text_sql
-
-\n

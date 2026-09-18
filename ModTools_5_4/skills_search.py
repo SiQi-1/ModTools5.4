@@ -55,6 +55,17 @@ def _index_key(root: Path) -> tuple[float, str]:
     return newest, str(root)
 
 
+def _is_dev_artifact(rel_path: str) -> bool:
+    """`_` 前缀的文件/目录 = 技能库的开发产物（生成脚本、中间数据），不参与检索。
+
+    例如 `07-techniques/modifiers/_fix_templates.py`、`_unit_combat_info.txt`、
+    `_modifier-city.md.effects.txt` 这类文件本质是"生成知识文档的脚本与中间产物"，
+    内容里密密麻麻提到同一个术语，会把真正该读的知识文档挤出检索前列。
+    约定：技能库内以 `_` 开头的路径段一律跳过（`__pycache__` 等同理）。
+    """
+    return any(part.startswith("_") for part in str(rel_path).replace("\\", "/").split("/"))
+
+
 def build_index(root: Path) -> list[dict[str, Any]]:
     """构建 [(rel_path, text), ...]（按目录 mtime 缓存）。"""
     key = _index_key(root)
@@ -65,13 +76,15 @@ def build_index(root: Path) -> list[dict[str, Any]]:
     for path in sorted(root.rglob("*")):
         if not path.is_file() or path.suffix.lower() not in SEARCH_EXTS:
             continue
-        text = _load_text(path)
-        if not text.strip():
-            continue
         try:
             rel = path.relative_to(root).as_posix()
         except ValueError:
             rel = path.name
+        if _is_dev_artifact(rel):
+            continue
+        text = _load_text(path)
+        if not text.strip():
+            continue
         docs.append({"rel": rel, "text": text})
     _index_cache[str(root)] = (key, docs)
     return docs

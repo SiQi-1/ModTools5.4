@@ -5,6 +5,8 @@
 - 参数名必须 ∈ 该类型的参数名集合（多余/拼错参数名报错，缺失参数提示）
 - requirement_set 引用存在（owner_reqset/subject_reqset/bound_requirements）
 - ModifierId / RequirementId 命名规范（MODIFIER_ / REQUIREMENT_ / REQSET_ 前缀）
+- **自定义 ModifierType 注册**：不在原版快照中的类型必须补 Types + DynamicModifiers 行
+  （否则该 Mod 在没装过同名 Mod 的机器上加载即缺类型；判定见 modgen/vanilla_types.py）
 """
 from __future__ import annotations
 
@@ -15,6 +17,7 @@ from .schema_store import (
     effect_type_params,
     requirement_type_params,
 )
+from .vanilla_types import load_vanilla_modifier_types, needs_registration, snapshot_available
 
 
 def _params_to_dict(parameters: Any) -> dict[str, Any]:
@@ -65,6 +68,38 @@ def check_modifier(
     collection_type = str(modifier.get("collection_type") or "").strip()
     if collection_type and not collection_type_exists(collection_type):
         errors.append(f"未知 CollectionType：{collection_type}")
+
+    # ---- ModifierStrings 预览文本（战斗预览面板显示加成来源）----
+    # 仅 EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER 支持 Preview；原版 226 个实例里 221 个都写了。
+    # 不写不会报错，但战斗预览面板看不到这层加成的来源 —— 属于典型的"沉默失效"。
+    if effect_type.upper() == "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER" and not str(
+        modifier.get("preview_text") or ""
+    ).strip():
+        warnings.append(
+            "缺少 ModifierStrings 预览文本（preview_text）：战斗预览面板不会显示该加成来源；"
+            "数值型填 +{1_Amount} [ICON_Strength] 战斗力（来源），Key/属性型填 +{Property} …（来源）"
+        )
+
+    # ---- 自定义 ModifierType 注册（Types + DynamicModifiers）----
+    modifier_type = str(modifier.get("modifier_type") or "").strip()
+    source = str(modifier.get("modifier_type_source") or "").strip().lower()
+    if modifier_type and snapshot_available():
+        snapshot = load_vanilla_modifier_types()
+        in_snapshot = modifier_type in snapshot
+        if source == "new" and in_snapshot:
+            errors.append(
+                f"modifier_type_source=new 但该类型已属原版（{modifier_type}）；"
+                "重复注册会与游戏 DynamicModifiers 主键冲突，请改为自动或 vanilla"
+            )
+        elif source == "vanilla" and not in_snapshot:
+            errors.append(
+                f"modifier_type_source=vanilla 但该类型不在原版快照中（{modifier_type}）；"
+                "不注册会让本 Mod 在未装同名 Mod 的机器上加载失败"
+            )
+        elif not source and not in_snapshot:
+            warnings.append(
+                f"自定义 ModifierType（{modifier_type}）将在生成时补 Types + DynamicModifiers 行"
+            )
 
     if requirement_set_ids is not None:
         for key in ("owner_reqset", "subject_reqset"):

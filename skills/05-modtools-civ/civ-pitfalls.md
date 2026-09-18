@@ -24,6 +24,9 @@
 | 10 | Modifier 链断在关联表 | `owners[].table_name` + `bound_modifier_ids` 必须形成完整挂载链；写完对照 AGENTS.md §5 陷阱 12 |
 | 11 | EffectType/RequirementType 凭记忆 | 必须查游戏 DB（`DynamicModifiers`/`Requirements`）或快照 `data/effect_type_parameters.json` |
 | 12 | 参数值 `"true"/"false"` 歧义 | 布尔参数工具会转 `1/0`（有意设计）；数值参数别写引号内 |
+| 13 | 战斗力类 Modifier 漏 `preview_text` | EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的条目**必须填 `preview_text`**（`.CIV` 的 `modifiers[].preview_text`）。不填不报错，但**战斗预览面板看不到加成来源**；`modgen validate` 会给 WARNING。占位符用 `{1_Amount}`（数值）/ `{Property}`（Key 属性），**别写 `{Amount}`**（详见 `07-techniques/modifier-techniques.md` 技巧 3） |
+| 14 | 世界奇观效果挂 `DISTRICT_WONDER` | 奇观**落位**即生成虚拟 `DISTRICT_WONDER` 区域 → **未建成就生效**。必须改挂 `BuildingModifiers`：`INSERT INTO BuildingModifiers (BuildingType, ModifierId) SELECT BuildingType, '<ModifierId>' FROM Buildings WHERE IsWonder = 1;`（走自定义文件通道，独立动作 id + `LoadOrder 199999`）。详见 `07-techniques/modifier-techniques.md` 技巧 4 |
+| 15 | 建筑挂载的城市级效果把需求写错侧（或把 subject 当"这个建筑"） | 建筑挂载 + **城市级**效果时 **subject 就是城市**：城市/地块级需求写 `subject_reqset`（地块按**城市地块=市中心格**求值），**玩家/领袖级需求（本文明、某领袖）写 `owner_reqset`**（0050 `REQSET_SIQI_0050_IS_LEADER` ×20 条建筑挂载先例；原版 `KILWA_*` 也有写 subject 侧的，本工程统一 owner 侧）。`PLOT_ADJACENT_TO_OWNER` 的 **owner = 挂载对象**（改良设施/伟人/奇观本体），不是玩家 → "该奇观与这座城市相邻 1 环" 用 `{MinDistance=1, MaxDistance=1}`；`PLOT_ADJACENT_DISTRICT_TYPE_MATCHES{DISTRICT_CITY_CENTER}` 是**自指恒假**。产出类型优先 cities 版 `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER`。详见 `07-techniques/modifier-techniques.md` 技巧 4 |
 
 ## 命名速记（详情 `skills/06-naming.md` + 工具 AGENT.md §3）
 
@@ -40,5 +43,7 @@
 - [ ] 全文 grep 无 `.lua` 引用（除说明文字）
 - [ ] 每个新 Type 在游戏 DB 可查（`DebugGameplay.sqlite`，AGENTS.md §2 优先级）
 - [ ] 事件类 Requirement `triggered=true`；Modifier 挂载链完整
+- [ ] 战斗力类 Modifier（EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER`）都填了 `preview_text`（否则战斗预览不显示来源）
+- [ ] 建筑挂载的城市级效果：城市/地块级需求在 **subject 侧**、玩家/领袖级在 **owner 侧**，且没有"城市相邻市中心"这类自指需求（陷阱 15）
 - [ ] 图标字段路径不虚构，无图时留 `{}`（模板字段 `images` 为空对象）
 - [ ] 文本 LOC 键与 `skills/02-config-files/text.md` 引用链一致

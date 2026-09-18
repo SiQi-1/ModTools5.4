@@ -34,7 +34,7 @@
 **效果**：调整相邻征召单位的近战战斗力（绝对值加成）
 > **溯源**：单位能力 — 匈牙利黑军（`ABILITY_BLACK_ARMY`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_NUMBER_ALLIES_UNIT_COMBAT_BONUS
@@ -50,7 +50,7 @@
 **效果**：根据相邻友军数量调整单位近战战斗力
 > **溯源**：单位能力 — 克鲁兹起义军（`ABILITY_HUSZAR`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_AGAINST_DISTRICT_COMBAT_BONUS
@@ -66,7 +66,7 @@
 **效果**：调整单位对区域攻击时的战斗力加成
 > **溯源**：总督晋升 — 塞拉斯克尔（`GOVERNOR_PROMOTION_SERASKER`） — 赋予总督晋升能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ANTI_AIR_STRENGTH
@@ -81,7 +81,7 @@
 
 **效果**：调整单位的防空战斗力
 > **溯源**：单位晋升 — 无人机防空（`PROMOTION_GDR_AA_DEFENSE`） — 赋予单位晋升效果（无人机防空）
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -102,7 +102,7 @@
 > **溯源**：单位晋升 — 副油箱（`PROMOTION_DROP_TANKS`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 远程（`PROMOTION_LONG_RANGE`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 测距一致（`PROMOTION_COINCIDENCE_RANGEFINDING`） — 赋予单位晋升效果
-> 需要 ModifierStrings（Preview：`+{Amount} 攻击范围`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 攻击范围`）
 
 ---
 
@@ -155,7 +155,7 @@
 > **溯源**：文明/领袖特性 — 我来，我见，我征服（`TRAIT_LEADER_CAESAR`） — 文明或领袖特性效果
 
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_BYPASS_COMBAT_UNIT
@@ -278,8 +278,8 @@ INSERT INTO ModifierArguments (ModifierId, Name, Value) VALUES
 
 | 写法 | 参数 | ModifierStrings | 说明 |
 |------|------|----------------|------|
-| **固定值** | `Amount='4'` | `+{Amount} [ICON_Strength] 战斗力` | `{Amount}` 解析为数字 |
-| **变化值** | `Key='PROP_KEY'` | **必须用 LOC 引用** | 战斗力取该 Property 当前值 |
+| **固定值** | `Amount='4'` | `+{1_Amount} [ICON_Strength] 战斗力` | `{1_Amount}` 解析为该 Modifier 的 Amount 值 |
+| **变化值** | `Key='PROP_KEY'` | `+{Property} [ICON_Strength] 战斗力（来源）` | 战斗力取该 Property 当前值 |
 
 Property 赋值方式（**二选一，不能混用**）：
 - `EFFECT_ADJUST_UNIT_PROPERTY`（`Key='PROP_KEY'`，Amount=数值）
@@ -366,7 +366,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：伟人能力 — 何塞·安东尼奥·派斯（`GREAT_PERSON_INDIVIDUAL_COMMANDANTE_ANTONIO_PAEZ`）
 > **溯源**：伟人能力 — 拉斐尔·乌达内塔（`GREAT_PERSON_INDIVIDUAL_COMMANDANTE_URDANETA`）
 > **溯源**：伟人能力 — 圣地亚哥·马里诺（`GREAT_PERSON_INDIVIDUAL_COMMANDANTE_MARINO`）
-> 需要 ModifierStrings（Preview：`+{Amount} 每回合回复`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 每回合回复`）
 
 ---
 
@@ -386,7 +386,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：文明/领袖特性 — 驿站（`TRAIT_CIVILIZATION_MONGOLIAN_ORTOO`） — 文明或领袖特性效果
 > **溯源**：文明/领袖特性 — TRAIT_LEADER_MAJOR_CIV（`TRAIT_LEADER_MAJOR_CIV`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ENABLE_WALL_ATTACK
@@ -478,7 +478,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：根据时代差异调整单位战斗力
 > **溯源**：该 EffectType 仅在 DynamicModifiers 中注册，官方数据库中无实际 Modifier 使用记录
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -497,7 +497,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 劝导者（`PROMOTION_PROSELYTIZER`） — 赋予单位晋升效果
 > **溯源**：文明/领袖特性 — 艾思科里亚（`TRAIT_LEADER_EL_ESCORIAL`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 宗教压力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 宗教压力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_EXERT_ZOC
@@ -583,7 +583,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整单位在友方领土中的战斗力
 > **溯源**：单位能力 — 友好领土优势（`ABILITY_FRIENDLY_TERRITORY_RELIGIOUS`） — 赋予单位特殊能力（在友方领土中时获得 [ICON_Strength] 战斗力加成。）
 > **溯源**：单位能力 — 宗教审讯（`ABILITY_INQUISITION_FRIENDLY_TERRITORY_BONUS`） — 赋予单位特殊能力
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -600,7 +600,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据圣城数量调整单位战斗力
 > **溯源**：单位能力 — 圣城之战（`ABILITY_BYZANTIUM_COMBAT_UNITS`） — 赋予单位特殊能力
 > **溯源**：单位能力 — 圣城宗教战斗力（`ABILITY_BYZANTIUM_RELIGIOUS_UNITS`） — 赋予单位特殊能力
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -634,7 +634,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：忽略远程单位对区域攻击的减伤惩罚
 > **溯源**：单位晋升 — 粒子束攻城巨炮（`PROMOTION_GDR_SIEGE_LASER`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 对区域`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 对区域`）
 ---
 
 ### EFFECT_ADJUST_UNIT_IGNORE_RESOURCE_MAINTENANCE
@@ -717,7 +717,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据已启用军事政策槽位数量提供战斗力加成
 > **溯源**：单位能力 — ABILITY_GORGO_POLICY_SLOT_COMBAT_BONUS（`ABILITY_GORGO_POLICY_SLOT_COMBAT_BONUS`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_NEIGHBOR_COMBAT_MODIFIER
@@ -733,7 +733,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据相邻己方单位数量调整战斗力
 > **溯源**：单位能力 — 安比奥里克斯（`ABILITY_AMBIORIX_NEIGHBOR_COMBAT_BONUS`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_NO_REDUCTION_DAMAGE
@@ -750,7 +750,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — 武士（`ABILITY_SAMURAI`） — 赋予单位特殊能力
 > **溯源**：单位晋升 — 锁子甲（`PROMOTION_NIHANG_NO_WOUNDED_PENALTY`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_NUM_ATTACKS
@@ -769,7 +769,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 神枪手（`PROMOTION_EXPERT_MARKSMAN`） — 赋予单位晋升效果（如果单位没有移动，每回合+1额外攻击。）
 > **溯源**：单位晋升 — 突破（`PROMOTION_BREAKTHROUGH`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 狼群战术（`PROMOTION_WOLFPACK`） — 赋予单位晋升效果
-> 需要 ModifierStrings（Preview：`+{Amount} 使用次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 使用次数`）
 
 ---
 
@@ -786,7 +786,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：根据拥有奢侈品数量提供战斗力加成
 > **溯源**：单位能力 — ABILITY_MONTEZUMA_COMBAT_BONUS_PER_LUXURY（`ABILITY_MONTEZUMA_COMBAT_BONUS_PER_LUXURY`） — 赋予单位特殊能力（奢侈品提供+{1_Amount} [ICON_Strength] 战斗力。（蒙特祖玛））
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -803,7 +803,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据未使用移动力提供战斗力加成
 > **溯源**：单位能力 — 向前冲（`ABILITY_CAROLEAN`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_POST_COMBAT_YIELD
@@ -843,7 +843,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整单位自定义属性值（Key参数决定具体属性）
 > **溯源**：单位能力 — ABILITY_SHAMARE_UU_GRANT（`ABILITY_SHAMARE_UU_GRANT`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} 单位属性`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 单位属性`）
 ---
 
 ### EFFECT_ADJUST_UNIT_RAIDING
@@ -862,7 +862,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — 雷霆海岸扫荡（`ABILITY_MELEE_COASTAL_RAID`） — 赋予单位特殊能力
 > **溯源**：单位晋升 — 掠夺（`PROMOTION_LOOT`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ### EFFECT_ADJUST_UNIT_RELIC_UPON_DEATH
@@ -893,7 +893,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：根据城市文化身份调整单位战斗力
 > **溯源**：该 EffectType 仅在 DynamicModifiers 中注册，官方数据库中无实际 Modifier 使用记录
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -910,7 +910,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整受伤单位的战斗力削减幅度
 > **溯源**：政策 — 国家认同（`POLICY_NATIONAL_IDENTITY`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SUPPORT_BONUS_MODIFIER
@@ -976,7 +976,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：根据宗教类型调整宗教单位的宗教战斗力
 > **溯源**：世界议会决议 — "世界宗教"（`WC_RES_WORLD_RELIGION`） — 世界议会议案效果
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -993,7 +993,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：根据相邻指定单位类型数量提供战斗力加成
 > **溯源**：单位能力 — ABILITY_LLANERO_ADJACENCY_STRENGTH（`ABILITY_LLANERO_ADJACENCY_STRENGTH`） — 赋予单位特殊能力（相邻的牛仔骑兵提供+{CalculatedAmount} [ICON_Strength] 战斗力。）
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Strength] 战斗力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Strength] 战斗力`）
 
 ---
 
@@ -1016,7 +1016,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：科技 — 内燃机（`TECH_COMBUSTION`）
 > **溯源**：纪念活动 — COMMEMORATION_EXPLORATION（`COMMEMORATION_EXPLORATION`）
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 海洋移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 海洋移动力`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_EMBARK_UNIT_PASS
@@ -1068,7 +1068,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：若回合开始时位于开阔地形，增加移动力
 > **溯源**：单位能力 — 重型战车（`ABILITY_HEAVY_CHARIOT`） — 赋予单位特殊能力（初始处于开阔地貌时+1 [ICON_Movement] 移动力。）
 > **溯源**：单位能力 — 轻战车（`ABILITY_LIGHT_CHARIOT`） — 赋予单位特殊能力（初始处于开阔地貌时+2 [ICON_Movement] 移动力。）
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 
 ---
 
@@ -1105,7 +1105,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：若回合开始时位于敌方领土，增加移动力
 > **溯源**：政策 — 综合攻击后勤保障（`POLICY_FUTURE_VICTORY_DOMINATION`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ESCAPE_BOOST
@@ -1121,7 +1121,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：增加间谍逃脱时的移动力
 > **溯源**：单位晋升 — 王牌驾驶员（`PROMOTION_SPY_ACE_DRIVER`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ESCORT_MOBILITY
@@ -1155,7 +1155,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：若回合开始时位于友方领土，增加移动力
 > **溯源**：政策 — 后勤（`POLICY_LOGISTICS`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_IGNORE_RIVERS
@@ -1194,7 +1194,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 水陆两栖（`PROMOTION_AMPHIBIOUS`） — 赋予单位晋升效果
 > **溯源**：单位能力 — 地中海殖民地（`ABILITY_MEDITERRANEAN_COLONIES`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 海洋移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 海洋移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_IGNORE_TERRAIN_COST
@@ -1214,7 +1214,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — 高原训练（`ABILITY_ALTITUDE_TRAINING`） — 赋予单位特殊能力
 > **溯源**：单位能力 — 森林斗士（`ABILITY_NAGAO`） — 赋予单位特殊能力
 > **溯源**：单位晋升 — 游骑兵（`PROMOTION_RANGER`） — 赋予单位晋升效果
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 
 ---
 
@@ -1254,7 +1254,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — ABILITY_GRANT_MOVEMENT_BONUS（`ABILITY_GRANT_MOVEMENT_BONUS`） — 赋予单位特殊能力
 > **溯源**：单位晋升 — "和谐"（`PROMOTION_SPECIAL_POPUKAR_R2`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_MOVE_AND_ATTACK
@@ -1326,7 +1326,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — ABILITY_ROYAL_NAVY_DOCKYARD_MOVEMENT_BONUS（`ABILITY_ROYAL_NAVY_DOCKYARD_MOVEMENT_BONUS`） — 赋予单位特殊能力
 > **溯源**：单位能力 — ABILITY_GREAT_LIGHTHOUSE_MOVEMENT（`ABILITY_GREAT_LIGHTHOUSE_MOVEMENT`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 海洋移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 海洋移动力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TRADE_ROUTE_PLUNDER_IMMUNITY
@@ -1359,7 +1359,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：恢复单位的全部移动力
 > **溯源**：伟人能力 — 拉斐尔·乌达内塔（`GREAT_PERSON_INDIVIDUAL_COMMANDANTE_URDANETA`）（2单元格内的所有陆地战斗单位重新获得全额 [ICON_Movement] 移动力和攻击力。）
-> 需要 ModifierStrings（Preview：`+{Amount} [ICON_Movement] 移动力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} [ICON_Movement] 移动力`）
 
 ---
 
@@ -1377,7 +1377,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：提升城市训练单位的最大等级上限
 > **溯源**：该 EffectType 仅在 DynamicModifiers 中注册，官方数据库中无实际 Modifier 使用记录
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 
 ---
 
@@ -1393,7 +1393,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整单位攻击获得的经验倍率
 > **溯源**：城邦 — 喀布尔（`MINOR_CIV_KABUL`） — 城邦宗主国加成
-> 需要 ModifierStrings（Preview：`+{Amount} 经验值`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 经验值`）
 
 ---
 
@@ -1410,7 +1410,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：直接提升单位的经验等级
 > **溯源**：单位能力 — ABILITY_UNIT_AUTO_VETERANCY（`ABILITY_UNIT_AUTO_VETERANCY`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} 经验值`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 经验值`）
 ---
 
 ### EFFECT_ADJUST_UNIT_EXPERIENCE_MODIFIER
@@ -1432,7 +1432,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — ABILITY_ARMORY_TRAINED_UNIT_XP（`ABILITY_ARMORY_TRAINED_UNIT_XP`） — 赋予单位特殊能力
 > **溯源**：单位能力 — ABILITY_MILITARY_ACADEMY_TRAINED_UNIT_XP（`ABILITY_MILITARY_ACADEMY_TRAINED_UNIT_XP`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} 经验值`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 经验值`）
 ---
 
 ### EFFECT_ADJUST_UNIT_GRANT_EXPERIENCE
@@ -1455,7 +1455,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：伟人能力 — 拉斯喀瑞尼亚·鲍勃里斯（`GREAT_PERSON_INDIVIDUAL_LASKARINA_BOUBOULINA`）
 > **溯源**：伟人能力 — 谢尔盖·戈尔什科夫（`GREAT_PERSON_INDIVIDUAL_SERGEY_GORSHKOV`）
 > **溯源**：伟人能力 — 克兰西·费尔南多（`GREAT_PERSON_INDIVIDUAL_CLANCY_FERNANDO`）
-> 需要 ModifierStrings（Preview：`+{Amount} 经验值`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 经验值`）
 
 ---
 
@@ -1472,7 +1472,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：移除单位从蛮族获得的经验上限
 > **溯源**：文明/领袖特性 — 我来，我见，我征服（`TRAIT_LEADER_CAESAR`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 经验值`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 经验值`）
 ---
 
 ### EFFECT_ADJUST_UNIT_UPGRADE_GOODY_HUT
@@ -1509,7 +1509,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：文明/领袖特性 — 神风（`TRAIT_LEADER_DIVINE_WIND`） — 文明或领袖特性效果
 > **溯源**：文明/领袖特性 — 平安祈愿（`TRAIT_LEADER_GU_NINGNING`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`{Amount} 伤害`）
+> 需要 ModifierStrings（Preview：`{1_Amount} 伤害`）
 ---
 
 ### EFFECT_ADJUST_UNIT_HEAL
@@ -1524,7 +1524,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：直接治疗单位指定血量
 > **溯源**：部落村庄 — 军事治疗（`GOODYHUT_HEAL`） — 部落村庄奖励效果
-> 需要 ModifierStrings（Preview：`+{Amount} 每回合回复`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 每回合回复`）
 
 ---
 
@@ -1548,7 +1548,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 船舰补给（`PROMOTION_SUPPLY_FLEET`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 超级航空母舰（`PROMOTION_SUPER_CARRIER`） — 赋予单位晋升效果
 > **溯源**：单位能力 — 桃大将军的鼓舞（`ABILITY_UNIT_PEACH_MYRTLE_COMBAT_AND_MOVE`） — 赋予单位特殊能力
-> 需要 ModifierStrings（Preview：`+{Amount} 每回合回复`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 每回合回复`）
 
 ---
 
@@ -1567,7 +1567,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整宗教单位在特定宗教领土中的回复量
 > **溯源**：万神/信条 — "圣水"（`BELIEF_HOLY_WATERS`） — 宗教单位在己方圣水领土中回血量增加
-> 需要 ModifierStrings（Preview：`+{Amount} 每回合回复`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 每回合回复`）
 
 ---
 
@@ -1586,7 +1586,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — ABILITY_TOMYRIS_HEAL_AFTER_DEFEATING_UNIT（`ABILITY_TOMYRIS_HEAL_AFTER_DEFEATING_UNIT`） — 赋予单位特殊能力
 > **溯源**：建筑 — 作战部（`BUILDING_GOV_MILITARY`）
 
-> 需要 ModifierStrings（Preview：`+{Amount} 每回合回复`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 每回合回复`）
 ---
 
 ## 生产/购买
@@ -1608,7 +1608,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：区域 — 曼丁哥市场（`DISTRICT_SUGUBA`）
 > **溯源**：政策 — 权力归花儿（`POLICY_FLOWER_POWER`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Gold] 购买费用`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Gold] 购买费用`）
 ---
 
 ### EFFECT_ADJUST_ALL_UNIT_PRODUCTION_MODIFIER
@@ -1627,7 +1627,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 权力归花儿（`POLICY_FLOWER_POWER`） — 通过政策卡提供加成
 > **溯源**：文明/领袖特性 — 杰利之歌（`TRAIT_CIVILIZATION_MALI_GOLD_DESERT`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 ---
 
 ### EFFECT_ADJUST_CITY_ALL_MILITARY_UNITS_PRODUCTION
@@ -1652,7 +1652,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：纪念活动 — COMMEMORATION_MILITARY（`COMMEMORATION_MILITARY`）
 > **溯源**：伟人能力 — 切斯特·尼米兹（`GREAT_PERSON_INDIVIDUAL_CHESTER_NIMITZ`）
 > **溯源**：伟人能力 — 特米斯托克力（`GREAT_PERSON_INDIVIDUAL_THEMISTOCLES`）
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 
 ---
 
@@ -1688,7 +1688,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整城市特定条件下的单位生产力基础产出
 > **溯源**：城邦 — 军事城邦（`MINOR_CIV_MILITARISTIC`） — 城邦宗主国加成（首都/兵营/军营/军事学院等军事建筑提供）
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 
 ---
 
@@ -1734,7 +1734,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整使用特定产出类型生产单位时的效率
 > **溯源**：世界议会决议 — "雇佣兵公司"（`WC_RES_MERCENARY_COMPANIES`） — 世界议会议案效果
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 
 ---
 
@@ -1783,7 +1783,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据已建区域数量加速单位建造
 > **溯源**：文明/领袖特性 — 五个太阳的传说（`TRAIT_CIVILIZATION_LEGEND_FIVE_SUNS`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 区域数单位生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 区域数单位生产力`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_UNIT_PROJECT_PERCENT
@@ -1799,7 +1799,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据已建项目数量加速单位建造
 > **溯源**：建筑 — 皇家学会（`BUILDING_GOV_SCIENCE`）
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 项目数单位生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 项目数单位生产力`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_UNIT_UPGRADE_DISCOUNT_PERCENT
@@ -1850,7 +1850,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：根据奇观建造进度加速单位建造
 > **溯源**：文明/领袖特性 — FIRST_EMPEROR_TRAIT（`FIRST_EMPEROR_TRAIT`）
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 奇观进度生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 奇观进度生产力`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_VALID_UNIT_BUILD
@@ -1884,7 +1884,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：区域 — U型港（`DISTRICT_COTHON`）
 > **溯源**：建筑 — 航海学校（`BUILDING_NAVIGATION_SCHOOL`）
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_MAINTENANCE_DISCOUNT
@@ -1904,7 +1904,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：文明/领袖特性 — 勤俭节约（`TRAIT_LEADER_SNOWSANT`） — 文明或领袖特性效果
 > **溯源**：文明/领袖特性 — 北欧卫队（`TRAIT_LEADER_HARALD_ALT`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`-{Amount} [ICON_Gold] 维护费`）
+> 需要 ModifierStrings（Preview：`-{1_Amount} [ICON_Gold] 维护费`）
 ---
 
 ### EFFECT_ADJUST_UNIT_PRODUCTION
@@ -1927,7 +1927,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 征收（`POLICY_EXPROPRIATION`） — 通过政策卡提供加成
 > **溯源**：政策 — 服役（`POLICY_ILKUM`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 ---
 
 ### EFFECT_ADJUST_UNIT_PURCHASE_COST
@@ -1950,7 +1950,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：文明/领袖特性 — 连击，甜品与猫猫！（`TRAIT_LEADER_MOUSSE`） — 文明或领袖特性效果
 
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Gold] 购买费用`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Gold] 购买费用`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TAG_ERA_PRODUCTION
@@ -1972,7 +1972,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 大军团（`POLICY_GRANDE_ARMEE`） — 通过政策卡提供加成
 > **溯源**：政策 — 先军政策（`POLICY_MILITARY_FIRST`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 ---
 
 ### EFFECT_ENABLE_UNIT_FAITH_PURCHASE
@@ -2009,7 +2009,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：建筑 — 皇家学堂（`BUILDING_BASILIKOI_PAIDES`）
 > **溯源**：文明/领袖特性 — 厄勃隆尼斯之王（`TRAIT_LEADER_AMBIORIX`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount}% [ICON_Production] 生产力`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% [ICON_Production] 生产力`）
 ---
 
 ### EFFECT_GRANT_PLAYER_YIELD_PERCENT_UNIT_COST
@@ -2046,7 +2046,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 军需官（`PROMOTION_SPY_QUARTERMASTER`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 测谎仪（`PROMOTION_SPY_POLYGRAPH`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ADJACENT_LEVEL_BOOST
@@ -2062,7 +2062,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：反间谍时提升相邻单元格友方间谍的等级
 > **溯源**：单位晋升 — 监视（`PROMOTION_SPY_SURVEILLANCE`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SPY_COUNTERSPY_ENTIRE_CITY
@@ -2078,7 +2078,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：反间谍时保护整个城市的所有区域
 > **溯源**：单位晋升 — 监视（`PROMOTION_SPY_SURVEILLANCE`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 间谍等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 间谍等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SPY_ESTABLISH_TIME
@@ -2137,7 +2137,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 骗子（`PROMOTION_SPY_CON_ARTIST`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 游击队领袖（`PROMOTION_SPY_GUERILLA_LEADER`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 行动成功率`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 行动成功率`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SPY_OPERATION_TIME
@@ -2189,7 +2189,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整宗教单位在外国领土的传播强度
 > **溯源**：单位晋升 — 翻译员（`PROMOTION_TRANSLATOR`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 宗教传播强度`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 宗教传播强度`）
 ---
 
 ### EFFECT_ADJUST_UNIT_LAND_VICTORY_SPREAD
@@ -2206,7 +2206,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 弟子（`PROMOTION_MONK_DISCIPLES`） — 赋予单位晋升效果
 > **溯源**：单位能力 — 圣城之战（`ABILITY_BYZANTIUM_COMBAT_UNITS`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} 宗教传播强度`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 宗教传播强度`）
 ---
 
 ### EFFECT_ADJUST_UNIT_NO_FOREIGN_SPREAD
@@ -2222,7 +2222,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：禁止宗教单位在外国领土传教
 > **溯源**：单位能力 — 国内传播（`ABILITY_NO_FOREIGN_SPREAD`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount} 宗教传播强度`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 宗教传播强度`）
 ---
 
 ### EFFECT_ADJUST_UNIT_SPREAD_CHARGES
@@ -2241,7 +2241,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：建筑 — 圣索菲亚大教堂（`BUILDING_HAGIA_SOPHIA`）
 > **溯源**：文明/领袖特性 — 艾思科里亚（`TRAIT_LEADER_EL_ESCORIAL`） — 文明或领袖特性效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 传教次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 传教次数`）
 ---
 
 ## 掠夺/劫掠
@@ -2259,7 +2259,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：掠夺区域时额外获得信仰
 > **溯源**：建筑 — 骑士团长礼拜堂（`BUILDING_GOV_FAITH`）
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ### EFFECT_ADJUST_UNIT_FAITH_ON_IMPROVEMENT_PLUNDER
@@ -2275,7 +2275,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：掠夺改良设施时额外获得信仰
 > **溯源**：建筑 — 骑士团长礼拜堂（`BUILDING_GOV_FAITH`）
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ### EFFECT_ADJUST_UNIT_PILLAGE_DISTRICT_MODIFIER
@@ -2292,7 +2292,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 扫荡（`POLICY_RAID`） — 通过政策卡提供加成
 > **溯源**：政策 — 全面战争（`POLICY_TOTAL_WAR`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ### EFFECT_ADJUST_UNIT_PILLAGE_IMPROVEMENT_MODIFIER
@@ -2309,7 +2309,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 扫荡（`POLICY_RAID`） — 通过政策卡提供加成
 > **溯源**：政策 — 全面战争（`POLICY_TOTAL_WAR`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ### EFFECT_ADJUST_UNIT_PLUNDER_YIELDS
@@ -2330,7 +2330,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位能力 — ABILITY_FRANCIS_DRAKE_PLUNDER_BONUS（`ABILITY_FRANCIS_DRAKE_PLUNDER_BONUS`） — 赋予单位特殊能力
 > **溯源**：单位能力 — ABILITY_CHING_SHIH_PLUNDER_BONUS（`ABILITY_CHING_SHIH_PLUNDER_BONUS`） — 赋予单位特殊能力
 
-> 需要 ModifierStrings（Preview：`+{Amount}% 掠夺产出`）
+> 需要 ModifierStrings（Preview：`+{1_Amount}% 掠夺产出`）
 ---
 
 ## 旅游/摇滚乐队
@@ -2347,7 +2347,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整摇滚乐队演出后的专辑销售旅游业绩
 > **溯源**：紧急情况 — 诺贝尔文学奖（`EMERGENCY_NOBEL_PRIZE_LITERATURE`） — 紧急情况奖励效果
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 
 ---
 
@@ -2364,7 +2364,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队演出后降低目标城市的忠诚度
 > **溯源**：单位晋升 — 独立摇滚（`PROMOTION_INDIE`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_DISTRICT
@@ -2385,7 +2385,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 华丽摇滚（`PROMOTION_GLAM_ROCK`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 雷鬼音乐（`PROMOTION_REGGAE_ROCK`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_IMPROVEMENT
@@ -2402,7 +2402,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在指定改良设施上演出时获得额外等级
 > **溯源**：单位晋升 — 冲浪摇滚（`PROMOTION_SURF_ROCK`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATIONAL_PARK
@@ -2418,7 +2418,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在国家公园演出时获得额外等级
 > **溯源**：单位晋升 — 音乐节（`PROMOTION_MUSIC_FESTIVAL`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ROCK_BAND_LEVEL_NATURAL_WONDER
@@ -2434,7 +2434,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在自然奇观演出时获得额外等级
 > **溯源**：单位晋升 — 音乐节（`PROMOTION_MUSIC_FESTIVAL`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 等级`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 等级`）
 ---
 
 ### EFFECT_ADJUST_UNIT_ROCK_BAND_TOURISM_BOMB_VALUE_PEACE
@@ -2450,7 +2450,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整和平时期摇滚乐队的旅游业绩爆发值
 > **溯源**：政策 — 权力归花儿（`POLICY_FLOWER_POWER`） — 通过政策卡提供加成
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TOURISM_BOMB_CONVERT_CITY
@@ -2484,7 +2484,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 太空摇滚（`PROMOTION_SPACE_ROCK`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 冲浪摇滚（`PROMOTION_SURF_ROCK`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TOURISM_BOMB_IMPROVEMENT
@@ -2501,7 +2501,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在指定改良设施上演出时额外获得旅游业绩
 > **溯源**：单位晋升 — 冲浪摇滚（`PROMOTION_SURF_ROCK`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATIONAL_PARK
@@ -2517,7 +2517,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在国家公园演出时额外获得旅游业绩
 > **溯源**：单位晋升 — 音乐节（`PROMOTION_MUSIC_FESTIVAL`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TOURISM_BOMB_NATURAL_WONDER
@@ -2533,7 +2533,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队在自然奇观演出时额外获得旅游业绩
 > **溯源**：单位晋升 — 音乐节（`PROMOTION_MUSIC_FESTIVAL`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_TOURISM_BOMB_RANGE
@@ -2550,7 +2550,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整摇滚乐队旅游业绩爆发的有效范围
 > **溯源**：单位晋升 — 音量爆表（`PROMOTION_GOES_TO`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ### EFFECT_ADJUST_UNIT_YIELD_PER_TOURISM_BOMB
@@ -2567,7 +2567,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：摇滚乐队旅游爆发时额外获得指定产出
 > **溯源**：单位晋升 — 流行巨星（`PROMOTION_POP`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 旅游业绩`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 旅游业绩`）
 ---
 
 ## 视野/可见性
@@ -2657,7 +2657,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：单位晋升 — 侦察飞机（`PROMOTION_SCOUT_PLANES`） — 赋予单位晋升效果
 > **溯源**：单位晋升 — 观察（`PROMOTION_OBSERVATION`） — 赋予单位晋升效果
 > **溯源**：单位能力 — 雷夫·埃里克森（`ABILITY_ERIKSON_NAVAL_SIGHT`） — 赋予单位特殊能力
-> 需要 ModifierStrings（Preview：`+{Amount} 视野范围`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 视野范围`）
 
 ---
 
@@ -2730,7 +2730,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：GDR击杀非蛮族单位时获得时代分数
 > **溯源**：纪念活动 — COMMEMORATION_AUTOMATON（`COMMEMORATION_AUTOMATON`）
 
-> 需要 ModifierStrings（Preview：`+{Amount} 时代分数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 时代分数`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_NON_BARBARIAN_UNIT_SEA_KILLED
@@ -2746,7 +2746,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：海军单位击杀非蛮族单位时获得时代分数
 > **溯源**：纪念活动 — COMMEMORATION_EXPLORATION（`COMMEMORATION_EXPLORATION`）
 
-> 需要 ModifierStrings（Preview：`+{Amount} 时代分数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 时代分数`）
 ---
 
 ### EFFECT_ADJUST_PLAYER_ERA_SCORE_PER_UNIT_PROMOTION_EARNED
@@ -2760,7 +2760,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：单位晋升时获得时代分数
 > **溯源**：该 EffectType 仅在 DynamicModifiers 中注册，官方数据库中无实际 Modifier 使用记录
-> 需要 ModifierStrings（Preview：`+{Amount} 时代分数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 时代分数`）
 
 ---
 
@@ -2783,7 +2783,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 > **溯源**：政策 — 农奴制（`POLICY_SERFDOM`） — 通过政策卡提供加成
 > **溯源**：奇观 — 金字塔（`BUILDING_PYRAMIDS`） — 奇观效果
 > **溯源**：文明/领袖特性 — 始皇帝（`FIRST_EMPEROR_TRAIT`） — 文明或领袖特性效果
-> 需要 ModifierStrings（Preview：`+{Amount} 使用次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 使用次数`）
 ---
 
 ### EFFECT_ADJUST_UNIT_DISASTER_CHARGES
@@ -2797,7 +2797,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：调整单位应对灾害的使用次数
 > **溯源**：该 EffectType 仅在 DynamicModifiers 中注册，官方数据库中无实际 Modifier 使用记录
-> 需要 ModifierStrings（Preview：`+{Amount} 使用次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 使用次数`）
 
 ---
 
@@ -2830,7 +2830,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：调整伟人的使用次数
 > **溯源**：建筑 — 摩索拉斯王陵墓（`BUILDING_HALICARNASSUS_MAUSOLEUM`）
 
-> 需要 ModifierStrings（Preview：`+{Amount} 使用次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 使用次数`）
 ---
 
 ### EFFECT_ADJUST_UNIT_INITIATION_YIELD
@@ -2863,7 +2863,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 
 **效果**：宗教单位按目标城市人口传教时获得指定产出
 > **溯源**：城邦 — 菲斯（`MINOR_CIV_FEZ`） — 城邦宗主国加成
-> 需要 ModifierStrings（Preview：`+{Amount} 宗教传播强度`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 宗教传播强度`）
 
 ---
 
@@ -2880,7 +2880,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：宗教单位在自然奇观旁传教不消耗次数
 > **溯源**：单位晋升 — 朝圣者（`PROMOTION_PILGRIM`） — 赋予单位晋升效果
 
-> 需要 ModifierStrings（Preview：`+{Amount} 传教次数`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 传教次数`）
 ---
 
 ### EFFECT_ADJUST_UNIT_OWNER
@@ -2964,7 +2964,7 @@ INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
 **效果**：赠予单位所在单元格的奢侈品资源
 > **溯源**：伟人能力 — 柯莱欧司（`GREAT_PERSON_INDIVIDUAL_COLAEUS`）（赠予{Amount}份该单元格上的奢侈品资源给您的 [ICON_Capital] 首都城市。）
 > **溯源**：伟人能力 — 斐迪南·麦哲伦（`GREAT_PERSON_INDIVIDUAL_FERDINAND_MAGELLAN`）
-> 需要 ModifierStrings（Preview：`+{Amount} 免费资源`）
+> 需要 ModifierStrings（Preview：`+{1_Amount} 免费资源`）
 
 ---
 

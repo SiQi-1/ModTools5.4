@@ -437,5 +437,117 @@ class SearchTestCase(unittest.TestCase):
                 )
 
 
+class CustomModifierTypeRegistrationTestCase(unittest.TestCase):
+    """自定义 ModifierType 注册判定（原版快照驱动，不依赖本机装过哪些 Mod）。"""
+
+    def _modifier(self, modifier_type: str, source: str = "") -> dict:
+        return {
+            "modifier_id": "MODIFIER_SIQI_0055_TEST",
+            "modifier_type": modifier_type,
+            "comment": "t",
+            "owner_reqset": None,
+            "subject_reqset": None,
+            "run_once": False,
+            "new_only": False,
+            "permanent": False,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_UNIT_PROPERTY",
+            "collection_type": "COLLECTION_PLAYER_UNITS",
+            "modifier_type_source": source or None,
+            "preview_text": None,
+            "parameters": [{"name": "Amount", "value": 1}, {"name": "Key", "value": "X"}],
+        }
+
+    def test_snapshot_available(self) -> None:
+        from modgen.vanilla_types import snapshot_available
+
+        self.assertTrue(snapshot_available(), "缺少原版快照，先跑 modgen.tools.extract_vanilla_modifier_types")
+
+    def test_vanilla_type_no_registration_warning(self) -> None:
+        data = {"modifiers": [self._modifier("MODIFIER_PLAYER_CITIES_EXTRA_DISTRICT")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, warnings = check_modifier_data(data)
+        self.assertEqual(errors, [])
+        self.assertFalse(any("Types + DynamicModifiers" in w for w in warnings),
+                         "原版类型不应提示需要注册")
+
+    def test_custom_type_warns_pending_registration(self) -> None:
+        data = {"modifiers": [self._modifier("MODIFIER_SIQI0055_PLAYER_UNITS_ADJUST_PROPERTY")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, warnings = check_modifier_data(data)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("Types + DynamicModifiers" in w for w in warnings),
+                        "自定义类型应提示将补注册行")
+
+    def test_force_new_on_vanilla_type_is_error(self) -> None:
+        data = {"modifiers": [self._modifier("MODIFIER_PLAYER_CITIES_EXTRA_DISTRICT", "new")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, _warnings = check_modifier_data(data)
+        self.assertTrue(any("主键冲突" in e for e in errors))
+
+    def test_force_vanilla_on_custom_type_is_error(self) -> None:
+        data = {"modifiers": [self._modifier("MODIFIER_SIQI0055_PLAYER_UNITS_ADJUST_PROPERTY", "vanilla")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, _warnings = check_modifier_data(data)
+        self.assertTrue(any("加载失败" in e for e in errors))
+
+    def test_generator_emits_source_field(self) -> None:
+        entry = generate_modifier(
+            prefix="SIQI",
+            infix=55,
+            effect_type="EFFECT_ADJUST_UNIT_PROPERTY",
+            collection_type="COLLECTION_PLAYER_UNITS",
+            desc="TEST",
+        )
+        self.assertIn("modifier_type_source", entry)
+        self.assertIsNone(entry["modifier_type_source"])
+
+
+class ModifierStringsPreviewTestCase(unittest.TestCase):
+    """战斗力类 modifier 必须给 ModifierStrings 预览文本（否则战斗面板不显示来源）。"""
+
+    def _strength_modifier(self, preview: str) -> dict:
+        return {
+            "modifier_id": "MODIFIER_SIQI_0055_MIL_STRENGTH_5",
+            "modifier_type": "MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH",
+            "comment": "军事单位+5战斗力",
+            "owner_reqset": None,
+            "subject_reqset": None,
+            "run_once": False,
+            "new_only": False,
+            "permanent": False,
+            "owner_stack_limit": 0,
+            "subject_stack_limit": 0,
+            "effect_type": "EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER",
+            "collection_type": "COLLECTION_UNIT_COMBAT",
+            "preview_text": preview,
+            "parameters": [{"name": "Amount", "value": 5}],
+        }
+
+    def test_missing_preview_warns(self) -> None:
+        data = {"modifiers": [self._strength_modifier("")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, warnings = check_modifier_data(data)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("ModifierStrings" in w for w in warnings))
+
+    def test_with_preview_no_warning(self) -> None:
+        data = {"modifiers": [self._strength_modifier("+{1_Amount} [ICON_Strength] 战斗力（恶魔的助威）")],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, warnings = check_modifier_data(data)
+        self.assertEqual(errors, [])
+        self.assertFalse(any("ModifierStrings" in w for w in warnings))
+
+    def test_non_supported_effect_not_warned(self) -> None:
+        modifier = self._strength_modifier("")
+        modifier["effect_type"] = "EFFECT_ADJUST_CITY_YIELD_CHANGE"
+        modifier["modifier_type"] = "MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_CHANGE"
+        data = {"modifiers": [modifier],
+                "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        _errors, warnings = check_modifier_data(data)
+        self.assertFalse(any("ModifierStrings" in w for w in warnings))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -26,3 +26,11 @@ python -m modgen.cli skill <关键词> --limit 20
   表结构/字段 → `modgen query`；LOC 文本 → `modgen loc`。
 - **单一知识源**：知识只存本目录（与 `AGENT.md`/`modgen/AGENTS.md` 同源分工）。禁止把知识复制进对话或临时文件，需要时用 `skill --file` 现查现读。
 - 文件内容里若出现历史遗留的外部绝对路径（如 `D:\文明6mod用文件夹\...`、`reference/...`），以本仓库相对路径与工具内置能力为准。
+
+## 维护约定
+
+- **跨 EffectType 的通用规则**写进 `07-techniques/modifier-techniques.md`（技巧 1/2/3…）；**每个 EffectType 的参数**才写进 `07-techniques/modifiers/modifier-<分类>.md`。
+  通用规则必须在三处留入口，否则等于没写：`07-techniques/modifiers.md`（SQL 步骤表）、`07-techniques/modifiers/patterns/pre-code-checklist.md`（写码自检）、`05-modtools-civ/civ-pitfalls.md`（.CIV 落地自检）。
+- **`_` 前缀 = 非知识文件**：生成脚本、查询脚本、中间产物（如 `_generate_final.py`、`_modifier-city.md.effects.txt`、`_trace_result*.txt`）一律用 `_` 开头 —— 检索引擎会跳过这些路径（`ModTools_5_4/skills_search.py::_is_dev_artifact`），避免它们把真正该读的文档挤出结果前列。新增此类文件请沿用 `_` 前缀。
+- **生成式文档**（如 `07-techniques/modifiers/modifier-unit-combat.md`）由同目录 `_*.py` 脚本产出：改内容要**改脚本模板并重新生成**，只改产物会被下次生成覆盖；模版占位符统一 `{1_Amount}`。
+

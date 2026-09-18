@@ -51,7 +51,15 @@
 - **何时用 SELECT**（合法模式，check-conflicts 不告警）：
   - `INSERT...SELECT` 显式继承：CityNames/CitizenNames（模板 `01-core-tables/civilization.md` §SELECT 复制官方）；
   - 自定义表建表 + `INSERT...SELECT` 数据迁移/填充（数据驱动模式见 `04-lua/lua-workshop-misc-custom-sql-tables.md`）；
-  - 跨表条件迁移（如 BeliefModifiers 遍历信条，`07-techniques/modifiers/cases/case-attach-chain.md`）。
+  - 跨表条件迁移（如 BeliefModifiers 遍历信条，`07-techniques/modifiers/cases/case-attach-chain.md`）；
+  - **批量挂载到原版对象**：如世界奇观效果
+    `INSERT INTO BuildingModifiers (BuildingType, ModifierId) SELECT BuildingType, '<ModifierId>' FROM Buildings WHERE IsWonder = 1;`
+    （**不要手抄奇观清单**，清单随资料片/DLC/其他 Mod 变化；奇观为什么必须挂建筑而不是 `DISTRICT_WONDER` 区域，
+    见 `07-techniques/modifier-techniques.md` 技巧 4）。
+- **需要更晚的加载顺序时**（如上面的遍历要求资料片/其他 Mod 数据就位）：给**独立动作 id + `LoadOrder 199999`**。
+  注意 `custom-file write` 自动注册的动作 id 就是类型名 `UpdateDatabase`（load_order 10000），而注册按
+  **(type, id)** 合并 —— 同 id 会被并进原组、拿不到自己的顺序；且要确认该文件没留在原组，否则执行两次（主键冲突）。
+  可用 AI 接口 `add_file_action`（带 `load_order`）注册。
 - **协调规则（红线，检测工具 `modgen check-conflicts`）**：
   1. **同表同主键禁止双写**：生成 SQL 已插入的行，自定义 SQL 不得再 INSERT（= ERROR，游戏加载主键冲突）。
      要改生成内容 → **回 .CIV 改对应条目**（工具是唯一写入者）；

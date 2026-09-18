@@ -64,3 +64,135 @@ INSERT INTO RequirementArguments (RequirementId, Name, Value) VALUES
 ```
 
 > **为什么 MinDist = MaxDist？** 范围条件（如 MinDist=1 MaxDist=5）会导致符合条件的多个 Modifier 同时生效、预览文本出现多条。精确匹配保证每次只有一个 Modifier 命中，预览干净。
+
+---
+
+## 技巧 3：ModifierStrings（效果预览文本）—— 战斗力类**必写**
+
+**结论**：整条链路上**只有 `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 一种效果器支持预览文本**（Context 固定 `Preview`）。
+凡是 EffectType 为它的 modifier（`MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH`、`MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_STRENGTH`、`MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_DIFFICULTY` 等），
+**必须写 `ModifierStrings`**：不写**不会报错、不会崩**，但**战斗预览面板看不到这层加成的来源**——典型的"沉默失效"，最容易整批漏掉。
+
+- 原版数据：`EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 共 226 个实例，**221 个都写了** Preview。
+- 作者既有工程 0043–0054 的每个战斗力 modifier（含 Property 读出口）也都写了。
+- `modgen validate` 会对「该效果类型 + `preview_text` 为空」给 **WARNING**。
+
+### 三种 Context（别混用）
+
+| Context | 作用 | 何时必须写 | 实例 |
+|---|---|---|---|
+| `Preview` | 战斗预览面板的加成行 | EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` | `LOC_ABILITY_STRONG_WHEN_ATTACKING_DESCRIPTION` = `进攻时+{1_Amount} [ICON_Strength] 战斗力` |
+| `Summary` | 伟人面板的效果摘要 | 伟人「诞生时」类 modifier（`GreatPersonIndividualBirthModifiers`） | `01-core-tables/greatperson.md` |
+| `Sample` | 外交面板的简短原因 | 议程 modifier | `01-core-tables/agenda.md` |
+
+### 写什么（占位符）
+
+| 参数形态 | 模板 | 例 |
+|---|---|---|
+| `Amount`（数值） | `+{1_Amount} [ICON_Strength] 战斗力（来源）` | `+{1_Amount} [ICON_Strength] 战斗力（恶魔的助威）` |
+| `Key`（Property 读出口） | `+{Property} [ICON_Strength] 战斗力（来源）` | `+{Property} [ICON_Strength] 战斗力（来自魔界电视台）` |
+| 百分比 | `+{1_Amount}% …（来源）` | `+{1_Amount}% 掠夺产出` |
+
+- 占位符**统一用 `{1_Amount}`**：工具模版（`_handle_gen_modifier_preview_text`）与绝大多数原版能力文本都是 `{1_Amount}`。
+  （`{Amount}` 也能被引擎解析——原版仅个别文本如 `LOC_COMBAT_DIFFICULTY_SCALING` 用它——但**同一工程里混用两种写法没有好处**，且老 skill 模板里的 `{Amount}` 已统一改为 `{1_Amount}`。）
+- 预览行要**短**：只讲"加多少 + 来源"。整段能力描述不要塞进来（会被战斗面板截断且难读）。
+
+### 在 .CIV / 生成器里的落地
+
+- `.CIV` 字段：`修改器.data.modifiers[].preview_text`（编辑器标签：`ModifierStrings.Text（Context 固定为 Preview）`；旁边「生成」按钮按参数自动填骨架 `+{1_Amount} 来自` / `+{Property} 来自`）。
+- 导出时**生成两行，缺一不可**：
+  1. `modifier_workspace` → `INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES ('MOD_X','Preview','LOC_MOD_X_PREVIEW');`
+  2. `workspace_page._modifier_strength_preview_text_rows()` → `('zh_Hans_CN','LOC_MOD_X_PREVIEW','<preview_text 原文>');`
+- **两行都以 `preview_text` 非空为前提**：留空则这一对**静默跳过**（既无 ModifierStrings 行，也无 LOC 文本）。
+
+### 自检
+
+- [ ] 每个 EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的 modifier 都有 `ModifierStrings` 行
+- [ ] 对应 `LOC_{ModifierId}_PREVIEW` 在 Text SQL 里有中文文本
+- [ ] 占位符是 `{1_Amount}` / `{Property}`，不是 `{Amount}`
+- [ ] 数值型与 `Key` 型用了对应的模板（不要给 Property 读出口写 `{1_Amount}`）
+
+---
+
+## 技巧 4：世界奇观的效果要挂 `BuildingModifiers`，**不要**挂 `DistrictModifiers(DISTRICT_WONDER)`
+
+**实机结论（0055 实测）**：奇观在**选区落位时**就会先生成一个虚拟的 `DISTRICT_WONDER` 区域，
+因此把 modifier 挂到 `DistrictModifiers` 的 `DISTRICT_WONDER` 上，**奇观还没造完就已经生效**（提前吃加成）。
+
+| 挂载点 | 触发时机 | 结论 |
+|---|---|---|
+| `DistrictModifiers` / `DISTRICT_WONDER` | 奇观**落位**（虚拟区域一存在即生效） | ❌ 提前生效 |
+| `BuildingModifiers` / 各奇观建筑（`IsWonder=1`） | 奇观**建成**（建筑进入城市） | ✅ 正确 |
+
+**遍历方式用 `INSERT...SELECT`，不要手抄清单**（奇观清单随资料片/DLC/其他 Mod 变化，硬编码必漏）：
+
+```sql
+-- 走自定义文件通道：Data/<工程名>_Wonders.sql（工具是唯一写入者）
+INSERT INTO BuildingModifiers (BuildingType, ModifierId)
+SELECT BuildingType, 'MODIFIER_SIQI_0055_WONDER_SCIENCE_100'
+FROM Buildings WHERE IsWonder = 1;
+```
+
+- Modifier 本体（`Modifiers` / `ModifierArguments` / RequirementSet）仍写在 `.CIV` 修改器段，由生成 SQL 在 9999 建立；
+  自定义 SQL 只补**挂载行**（`INSERT...SELECT` 是 `check-conflicts` 认可的合法模式，不告警）。
+- **两种"给城市的百分比产出"类型，原版都在用（挂建筑上都成立）**：
+
+  | ModifierType | 集合 | 原版建筑挂载实例 |
+  |---|---|---|
+  | `MODIFIER_SINGLE_CITY_ADJUST_CITY_YIELD_MODIFIER` | `COLLECTION_OWNER`（= 拥有该建筑的**那一座**城市） | 奇观：`BROADWAY_ADDCULTUREYIELD` / `OXFORD_ADDSCIENCEYIELD` / `RUHRVALLEY_ADDPRODUCTIONYIELD` / `KILWA_SINGLE_*` |
+  | `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER` | `COLLECTION_PLAYER_CITIES`（= 该玩家所有城市，靠 subject reqset 过滤） | `AMUNDSEN_SCOTT_*` / `KILWA_PLAYERCITIES_*` / `CASA_DE_CONTRATACION_*`（原版共 153 条） |
+
+  **本工程统一用 cities 版**（需求分工明确：玩家级挂 owner、城市级挂 subject；与 0050 的既有写法一致）。
+
+### ⚠ 需求上下文：`Subject` 是城市，`Owner` 是挂载对象 / 其拥有者玩家
+
+这是最容易写错的一步（0055 踩过两轮）：**`SubjectRequirementSetId` 不是"这个建筑"，而是"效果作用的对象"**。
+
+| 需求想说什么 | 写哪一侧 | 原版/工程先例 |
+|---|---|---|
+| 城市/地块自身条件（有驻军、有某区域、有某地形、相邻某物） | **subject**（= 城市；地块按**城市地块 = 市中心格**求值） | `AMUNDSEN_SNOW_ADDSCIENCEYIELD`（`REQUIREMENT_CITY_HAS_X_TERRAIN_TYPE`）、`CITY_HAS_HOLY_SITE`、`STATUELIBERTY_CITIES_ALWAYS_LOYAL` |
+| 玩家/领袖级条件（本文明限定、某领袖） | **owner**（= 挂载对象的拥有者玩家） | 0050 `REQSET_SIQI_0050_IS_LEADER`（`REQUIREMENT_PLAYER_LEADER_TYPE_MATCHES`）挂在 **owner** 侧 ×20 条建筑挂载；0055 遗物 modifier 同 |
+| 同上，但写在 subject 侧 | 也能跑（引擎按"城市的拥有者玩家"求值） | `KILWA_*` 的 `REQUIREMENT_PLAYER_IS_SUZERAIN_X_TYPE` 就在 subject 侧 reqset 里 —— 原版两种都有人用，**本工程统一走 owner 侧** |
+
+`REQUIREMENT_PLOT_ADJACENT_TO_OWNER` 里的 **owner = 挂载对象**（modifier 的来源实例），**不是玩家**：
+
+- `NAZCA_LINE_ADJACENCY_FAITH`（`ImprovementModifiers` + 玩家级集合 `COLLECTION_PLAYER_PLOTS`）用 `ADJACENT_TO_OWNER`（无参数，默认 1 环）
+  = "与该改良设施相邻的格"；`AOE_REQUIRES_OWNER_ADJACENCY{Min=0,Max=2}` 用于伟人光环 = "与该伟人 2 格内的单位"。
+- 挂在奇观建筑上时 owner 就是**那一座奇观**；每座奇观各有一条挂载行，所以"城市相邻的奇观数"能自然叠加。距离惯例：**恰好 N 环 = `Min=N, Max=N`**；**N 环内 = `Min=0, Max=N`**。
+
+**0055 天界天使学校实战定型**（每有一奇观与市中心相邻，有该校的城市 +100% 科文）：
+
+```
+modifier: modifier_type = MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER (COLLECTION_PLAYER_CITIES)
+          owner_reqset   = REQSET_SIQI_0055_IS_OUR_CIV              -- 玩家级 → owner 侧
+          subject_reqset = REQSET_SIQI_0055_CITY_ADJ_WONDER_SCHOOL  -- 城市级 → subject 侧（TEST_ALL）
+              ├ REQUIREMENT_PLOT_ADJACENT_TO_OWNER{MinDistance=1, MaxDistance=1}  -- 该城市与这座奇观相邻 1 环
+              └ REQUIREMENT_CITY_HAS_DISTRICT{DistrictType=DISTRICT_SIQI_D0055_2} -- 该城市有特色学院
+挂载：INSERT INTO BuildingModifiers SELECT BuildingType, '<ModifierId>' FROM Buildings WHERE IsWonder = 1;
+```
+
+| 想表达 | 正确写法 | 错误写法 |
+|---|---|---|
+| 该奇观与**这座**城市相邻 1 环 | `REQUIREMENT_PLOT_ADJACENT_TO_OWNER{MinDistance=1, MaxDistance=1}`（owner=挂载对象即该奇观，subject=城市） | — |
+| 城市相邻任意奇观 | `REQUIREMENT_PLOT_ADJACENT_TO_WONDER`（无参数，1 环；原版只用于改良设施，`CHATEAU_WONDERADJACENCY_CULTURE`） | — |
+| 城市 N 格内有某建筑 | `REQUIREMENT_PLOT_ADJACENT_BUILDING_TYPE_MATCHES{BuildingType=…, MinRange=0, MaxRange=N}`（原版 `REQUIRES_PLOT_HAS_LIBERTY_WITHIN_6` 等 3 例） | — |
+| 城市有某区域 | `REQUIREMENT_CITY_HAS_DISTRICT{DistrictType=…}` + `inverse=true` 表示"没有" | — |
+| ❌ "城市相邻市中心" | — | `PLOT_ADJACENT_DISTRICT_TYPE_MATCHES{DistrictType=DISTRICT_CITY_CENTER}` —— subject 是城市，等于问"城市是否相邻市中心"，**自指恒假** |
+
+- 想用 `PLOT_ADJACENT_BUILDING_TYPE_MATCHES` 表达"相邻**这一座**奇观"是做不到的（参数是**类型**）——
+  一个 ModifierId 挂到全部奇观时无法区分是哪一座，只能用 `PLOT_ADJACENT_TO_OWNER` + 逐奇观挂载。
+
+### 加载顺序：自定义文件要独立顺序，必须给独立动作 id
+
+- `modgen custom-file write` 自动注册的动作 id 就是类型名 `UpdateDatabase`（load order 10000）；
+- 注册按 **(type, id)** 合并 —— 同 id 会并进已有那一组，**拿不到自己的顺序**（实测：文件被塞进生成数据的 9999 组）；
+- 要独立顺序：新增一条动作并给**不同 id**（如 `UpdateDatabaseWonders`）+ `LoadOrder 199999`，
+  同时确认该文件**没有**同时留在原组里（否则会执行两次 → 主键冲突）。
+  奇观类 SQL 需要 199999：确保执行时 `Buildings` 表已被原版/资料片/其他 Mod 填满。
+
+```xml
+<UpdateDatabase id="UpdateDatabase"><Properties><LoadOrder>9999</LoadOrder></Properties>…生成数据…</UpdateDatabase>
+<UpdateDatabase id="UpdateDatabaseWonders"><Properties><LoadOrder>199999</LoadOrder></Properties>
+  <File>Data/Siqi_Leaders_0055_Wonders.sql</File>
+</UpdateDatabase>
+```

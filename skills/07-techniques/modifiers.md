@@ -162,7 +162,7 @@ INSERT INTO DynamicModifiers (ModifierType, CollectionType, EffectType) VALUES
 3. DynamicModifiers（仅自定义 ModifierType 时需要）
 4. Modifiers
 5. ModifierArguments
-6. ModifierStrings（按需）
+6. ModifierStrings（战斗力类必写，其余按需）
 7. RequirementSets（按需）
 8. RequirementSetRequirements（按需）
 9. Requirements（按需）
@@ -236,12 +236,28 @@ INSERT INTO ModifierArguments (ModifierId, Name, Value) VALUES
 
 一个 ModifierId 可能有多个参数行，子文件条目列出的参数全部要写。
 
-### 3.4 ModifierStrings（按需）
+### 3.4 ModifierStrings（战斗力类**必写**，其余按需）
+
+> **仅 `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 支持 Preview**。该效果类型（`MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH`、`MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_STRENGTH` 等）**必须写**，
+> 否则战斗预览面板看不到加成来源 —— **不报错、静默失效**，最容易整批漏掉。
+> 完整规则（三种 Context、占位符、生成器链路、自检清单）见 **[modifier-techniques.md 技巧 3](modifier-techniques.md)**。
 
 ```sql
+-- 数值型（Amount）
 INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
-('MODIFIER_SIQI_0042_GRANT_TECH_MINING', 'Preview', 'LOC_MODIFIER_SIQI_0042_GRANT_TECH_MINING_PREVIEW');
+('MODIFIER_SIQI_0055_MIL_STRENGTH_5', 'Preview', 'LOC_MODIFIER_SIQI_0055_MIL_STRENGTH_5_PREVIEW');
+-- 对应中文（写在 Text SQL 里）：
+-- ('zh_Hans_CN','LOC_MODIFIER_SIQI_0055_MIL_STRENGTH_5_PREVIEW','+{1_Amount} [ICON_Strength] 战斗力（恶魔的助威）')
+
+-- Property（Key）读出口
+INSERT INTO ModifierStrings (ModifierId, Context, Text) VALUES
+('MODIFIER_SIQI_0055_MAKAI_TV_STRENGTH_READER', 'Preview', 'LOC_MODIFIER_SIQI_0055_MAKAI_TV_STRENGTH_READER_PREVIEW');
+-- ('zh_Hans_CN','LOC_MODIFIER_SIQI_0055_MAKAI_TV_STRENGTH_READER_PREVIEW','+{Property} [ICON_Strength] 战斗力（来自魔界电视台）')
 ```
+
+- 占位符：数值型 `{1_Amount}`、Property 型 `{Property}` —— **不要写 `{Amount}`**。
+- LOC tag 约定：`LOC_{ModifierId}_PREVIEW`（写 .CIV 时由工具生成，不必手写）。
+- 其他 Context：伟人「诞生时」用 `Summary`，议程用 `Sample`。
 
 ### 3.5 RequirementSets → Requirements → RequirementArguments
 

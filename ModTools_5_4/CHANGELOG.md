@@ -1,4 +1,90 @@
 # Changelog
+## 2026-09-17 - 修正：建筑挂载 + 城市级效果的**需求上下文**（Subject 是城市，不是建筑）
+
+- **问题（0055「天界天使学校」奇观加成）**：原写法用 `SubjectRequirementSetId` + `REQUIREMENT_PLOT_ADJACENT_DISTRICT_TYPE_MATCHES{DistrictType=DISTRICT_CITY_CENTER}`
+  想表达"该奇观与这座城市相邻"，实际是**自指悖论**——建筑挂载 + 城市级效果时 subject 解析为**城市**，
+  该需求等于在问"城市是否与市中心相邻"（城市地块就是市中心格），恒为假，加成永不生效。
+- **结论（原版佐证）**：建筑挂载 + 城市级效果时 subject = **城市**；
+  `AMUNDSEN_*` 用 `REQUIREMENT_CITY_HAS_X_TERRAIN_TYPE`、`KILWA_*` 用 `REQUIREMENT_PLAYER_IS_SUZERAIN_X_TYPE`；
+  地块类需求在城市 subject 上按**城市地块（= 市中心格）**求值（`STATUELIBERTY_CITIES_ALWAYS_LOYAL`、
+  `COLOSSEUM_IDENTITY` 用 `PLOT_ADJACENT_BUILDING_TYPE_MATCHES{BuildingType=…, MinRange=0, MaxRange=6}` 表达"城市 N 格内有该建筑"）。
+- **正确写法**：`REQUIREMENT_PLOT_ADJACENT_TO_OWNER{MinDistance=1, MaxDistance=1}` —— owner = 挂载对象（该奇观），
+  subject = 城市，语义即"**该奇观恰好与这座城市相邻 1 环**"，逐奇观精确判定。
+  距离取值惯例：恰好 N 环 = `Min=N, Max=N`；N 环内 = `Min=0, Max=N`。
+- **第二轮（同日，按作者指示定型）**：`MODIFIER_SINGLE_CITY_*` 换成 cities 版
+  `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER`（`COLLECTION_PLAYER_CITIES`，原版 153 条建筑挂载用例：
+  `AMUNDSEN_*`/`KILWA_PLAYERCITIES_*`/`CASA_DE_CONTRATACION_*`）；需求分工改为**玩家级挂 owner、城市级挂 subject**：
+  `owner_reqset = REQSET_SIQI_0055_IS_OUR_CIV`（原版 `KILWA_*` 把玩家级需求写 subject 侧也能跑，本工程统一 owner 侧，
+  与 0050 的 `REQSET_SIQI_0050_IS_LEADER` ×20 条建筑挂载一致）；并补上"城市须有特色学院"条件。
+  证据链：`PLOT_ADJACENT_TO_OWNER` 的 owner = **挂载对象**而非玩家（`NAZCA_LINE_ADJACENCY_FAITH` 挂改良设施、
+  `AOE_REQUIRES_OWNER_ADJACENCY` 挂伟人光环皆然）。
+- **0055 工程最终状态**：`REQ_SIQI_0055_CITY_ADJ_WONDER` = `PLOT_ADJACENT_TO_OWNER{1,1}`；
+  新 reqset `REQSET_SIQI_0055_CITY_ADJ_WONDER_SCHOOL`（`TEST_ALL` = 上述相邻需求 + `REQ_SIQI_0055_CITY_HAS_UNIQUE_CAMPUS`
+  →`REQUIREMENT_CITY_HAS_DISTRICT{DISTRICT_SIQI_D0055_2}`，替换原 `…_OURS` 集）；
+  两条奇观 modifier = `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER` + owner `REQSET_SIQI_0055_IS_OUR_CIV` +
+  subject `REQSET_SIQI_0055_CITY_ADJ_WONDER_SCHOOL`（`Amount=100`，SCIENCE/CULTURE）。
+  重跑 `generate_all`（19 文件 / 61 图）核对产物：`Data/Siqi_Leaders_0055_Modifiers.sql` 第 53–54、128、142–143、150、163、170–171 行符合上述结构，
+  无残留 `…_OURS` 行、未新增 `DynamicModifiers` 行（cities 版属原版类型，快照 `vanilla_modifier_types.json` 内已含
+  `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER → [COLLECTION_PLAYER_CITIES, EFFECT_ADJUST_CITY_YIELD_MODIFIER]`）；
+  `modgen validate` 通过、`check-conflicts`（8 生成 + 1 自定义 SQL）无冲突。
+- **知识库落地**：`skills/07-techniques/modifier-techniques.md` 技巧 4 新增「⚠ 需求上下文：`Subject` 是城市，`Owner` 是挂载对象 / 其拥有者玩家」
+  小节（两种产出类型对照表 + owner/subject 分工表 + 原版佐证 + 0055 定型代码块 + 写法对照表 + 距离取值惯例 + "逐奇观挂载"的必要性）；
+  `skills/05-modtools-civ/civ-pitfalls.md` 陷阱表第 15 条与自检清单同步改写。
+- 说明：本轮为**游戏知识 + 工程内容**修正，未改工具代码。
+
+## 2026-09-17 - 知识库：奇观效果挂载点（实机修正）+ 自定义文件独立加载顺序
+
+- **实机结论（0055「天界天使学校」奇观加成）**：奇观**落位**时就会先生成一个虚拟的 `DISTRICT_WONDER` 区域，因此
+  `DistrictModifiers(DISTRICT_WONDER)` 挂载会在**奇观未建成时**就生效。正确挂载点是 `BuildingModifiers`（奇观建筑本体，建成才生效）。
+  遍历方式用 `INSERT ... SELECT ... FROM Buildings WHERE IsWonder = 1`，不手抄清单（清单随资料片/DLC/其他 Mod 变化）。
+- **自定义文件的独立加载顺序**：`custom-file write` 自动注册的动作 id 就是类型名 `UpdateDatabase`（load order 10000），
+  而注册按 **(type, id)** 合并 —— 实测给同一 id 追加文件会被并进生成数据的 9999 组，拿不到自己的顺序。
+  要独立顺序必须用**不同 id** + 显式 `load_order`（AI 接口 `add_file_action` 支持），并用 `--no-action` 或摘除原组成员避免重复执行。
+- **知识库落地**：
+  - `skills/07-techniques/modifier-techniques.md` 新增**技巧 4**（挂载点对照表 + `INSERT...SELECT` 模板 + 独立动作 id/加载顺序示例）。
+  - `skills/05-modtools-civ/civ-pitfalls.md` 陷阱表新增第 14 条；`skills/05-modtools-civ/pipeline.md` 自定义 SQL 段补充"批量挂载 + 加载顺序"。
+  - `modgen/AGENTS.md` 硬规则新增「需要更晚的加载顺序时」。
+- **0055 工程改动**：移除 `DistrictModifiers(DISTRICT_WONDER)` 挂载；新增自定义文件 `Data/Siqi_Leaders_0055_Wonders.sql`
+  （两条 `INSERT...SELECT`），注册为独立动作 `UpdateDatabaseWonders` / `LoadOrder 199999`。
+  验证：`check-conflicts` 识别 1 个自定义 SQL、无冲突；生成产物中已无 `DISTRICT_WONDER` 行；`.civ6proj` 中两个动作块并存且顺序正确。
+- 说明：本轮为**游戏知识 + 工程内容**修正，未改工具代码；`ModifierStrings` 相关工具改动见下一条。
+
+## 2026-09-17 - 技能库优化：ModifierStrings 规则升格为权威条目 + 检索剔除开发产物
+
+- **问题一（知识太软）**：`EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 必须写 `ModifierStrings` 这条规则原本只散落在 `07-techniques/modifiers.md` §3.4（两行、"按需"、例子还是个非 Preview 效果器）与每效果器子文件的长注释里，没有权威出处，也没有进任何自检清单 —— 结果整批漏写。
+- **问题二（占位符不一致）**：生成式文档模版写 `{Amount}`，而工具（`_handle_gen_modifier_preview_text`）与绝大多数原版能力文本用 `{1_Amount}`；AI 照抄子文件就会写出与工具约定不符的写法。已在 `modifier-unit-combat.md` / `-NEW.md`、`_fix_templates.py` / `_generate_final.py` / `_upgrade_templates.py` 统一为 `{1_Amount}`（原版引用文本如柯莱欧司的 `{Amount}` 保持原样）。
+- **问题三（检索被污染）**：技能库里混着 46 个 `_` 前缀的开发产物（生成脚本、`_query_*.py`、`_trace_result*.txt`、`_modifier-*.md.effects.txt`），它们反复提及同一术语，把真正该读的文档挤出结果前列。`skills_search.py` 新增 `_is_dev_artifact()`：路径任一段以 `_` 开头即不进索引（263 → 217 个文件）。
+- **改动**：
+  - 新增权威条目 `skills/07-techniques/modifier-techniques.md` **技巧 3：ModifierStrings（效果预览文本）—— 战斗力类必写**（三种 Context 对照表、`{1_Amount}`/`{Property}` 写法、`.CIV` 字段与两条生成链路、自检清单）。
+  - 三处入口同步：`07-techniques/modifiers.md`（步骤表 6 与 §3.4 改为"必写"并指回技巧 3）、`07-techniques/modifiers/patterns/pre-code-checklist.md` 第六步、`05-modtools-civ/civ-pitfalls.md`（陷阱表新增第 13 条 + 自检清单）。
+  - `modifier-city.md` 交叉链接；`skills/AGENTS.md` 新增「维护约定」（通用规则写哪、入口留三处、`_` 前缀约定、生成式文档要改脚本模板）。
+- **验证**：新增 `tests/test_skills_search.py`（7 项：`_` 前缀判定、索引不泄漏开发产物、保留知识文档、通用规则可被 `search_skills` 命中、占位符约定存在）；`modgen skill ModifierStrings` 现在能命中 `modifier-techniques.md`，`preview_text 预览文本` 查询它排第一。
+
+## 2026-09-17 - 新增：战斗力类 Modifier 缺 ModifierStrings 预览文本时给出校验 WARNING
+
+- **背景**：`EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 是唯一支持 `ModifierStrings`（Context=Preview）的效果器，原版 226 个实例里 221 个都写了预览文本；不写不会报错，但**战斗预览面板看不到这层加成的来源**（典型"沉默失效"）。工具此前既不提示也不阻塞，容易整批漏填。
+- **改动**：`modgen/modifier_validator.py` 对「`effect_type = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 且 `preview_text` 为空」新增 WARNING，并在提示里给出两种写法（数值型 `+{1_Amount} [ICON_Strength] 战斗力（来源）`；`Key`/属性型 `+{Property} …（来源）`）。
+- 生成链路本身无需改动：`modifier_workspace` 写 `ModifierStrings(ModifierId,'Preview','LOC_{ModifierId}_PREVIEW')`，`workspace_page._modifier_strength_preview_text_rows()` 写对应 `LocalizedText` 行，两者都以 `preview_text` 非空为前提。
+- **验证**：modgen 新增 `ModifierStringsPreviewTestCase`（3 项，含"非该效果类型不告警"）；`55.CIV` 补齐 3 条预览文本后重跑 `generate_all`，产物中 `ModifierStrings` 3 行 + 对应 LOC 3 行均已生成。
+- 文档同步：`AGENT.md` §7（改为"必须写"并给出写法与链路）、`modgen/AGENTS.md` 修改器规则。
+
+## 2026-09-17 - 修复：自定义 ModifierType 注册判定改为「原版快照」驱动（+ 三态人工覆盖 + 校验兜底）
+
+- **问题**：ModifierType 是否为「游戏已有类型」过去靠查询本机运行缓存 `DebugGameplay.sqlite` 的 `DynamicModifiers` 判断，而该缓存带有**玩家装过的所有 Mod 注册的类型**（实测本机 1024 条中 51 条是作者自己 Mod 留下的）。于是「库里已有」被当成「原版已有」，生成时**不补** `Types` / `DynamicModifiers` 行 —— 换一台没装那个 Mod 的机器加载即失败（"本机灵、换机炸"）。同时判据 `_is_project_custom` 只看名字前缀，认不出 `MODIFIER_SIQI0055_X` 这类既有命名，且有 `p and A or B` 运算符优先级歧义。
+- **A 原版快照（治本）**：新增 `ModTools_5_4/data/vanilla_modifier_types.json`（989 条），由新脚本 `python -m modgen.tools.extract_vanilla_modifier_types` 从**游戏自带 XML**（`Base/DLC/CTP/Debug/LaunchPad` 的 `<DynamicModifiers><Row>`）提取，自动定位游戏目录（`--game-dir` / `CIV6_GAME_DIR` / 注册表 SteamPath + `libraryfolders.vdf` / 常见路径）。生成判据改为「不在快照中 = 本工程新建，必须补行」，与「本机装过什么 Mod」解耦，导出结果可复现。
+- **B 三态人工覆盖**：修改器编辑器 ModifierType 下新增「类型来源」下拉（自动 / 强制本工程新建 / 强制游戏已有）+ 实时判定提示（含"本机库已有同名类型，可能与其他 Mod 撞名"提醒）；新增数据字段 `modifiers[].modifier_type_source = null | "new" | "vanilla"`。
+- **C 校验兜底**：`modgen/modifier_validator.py` 新增判定——`source=new` 但属原版 → **ERROR**（会与游戏主键冲突）；`source=vanilla` 但不在快照 → **ERROR**（会缺类型）；自动且不在快照 → WARNING（提示将补注册行）。快照缺失时全部静默降级，不阻塞老环境。
+- **D 判据收敛**：SQL 与 XML 两条生成路径改为共用 `_custom_modifier_type_map()`（单一来源）；`ModTools_5_4/project/vanilla_modifier_types.py` 的前缀匹配改为按 `_` 分段 + 允许「前缀+纯数字编号」，两种命名风格（`MODIFIER_SIQI_0055_X` / `MODIFIER_SIQI0055_X`）都能识别。
+- **验证**：主测试集 322 项通过（1 跳过），modgen 84 项通过；新增 `tests/test_vanilla_modifier_types.py`（12 项）与 modgen `CustomModifierTypeRegistrationTestCase`（6 项）；对 0055 工程重跑 `generate_all`，`Types`/`DynamicModifiers` 输出与修复前逐字一致。
+- 发布打包无需改动（`ModTools_5_4/data` 与 `modgen` 均整目录分发）。
+
+## 2026-09-17 - 修复：beliefs.py 末尾残留字面 `\n` 导致的语法错误
+
+- `project/sql_builders/beliefs.py` 末尾（第 88 行）残留一个字面 `\n`（反斜杠+n），使该模块语法错误。
+- 影响面：`project/sql_builders/__init__.py` 导入 `beliefs`，因此 `ModTools5.4.py`（GUI）与 `modgen preview` 均无法启动/运行（`SyntaxError: unexpected character after line continuation character`）。
+- 修复：删除该残留行；`compileall` 与 `from ModTools_5_4.project.sql_builders import ...` 均通过。
+- 该错误由 `31c2bf2 refactor: extract Qt-free belief SQL builder` 引入，非本次 Mod 制作流程新增。
+
 ## 2026-09-17 - 阶段 3 第三步：信仰生成器脱离 GUI
 
 - 新增 `project/sql_builders/beliefs.py`：信仰条目直接生成数据 SQL 与文本 SQL，继续保持无 Qt、无数据库依赖。

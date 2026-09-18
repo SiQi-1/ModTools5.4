@@ -203,49 +203,49 @@ def get_modstr_template(et, desc):
     et_upper = et
 
     if "战斗力" in desc_lower:
-        return "+{Amount} [ICON_Strength] 战斗力"
+        return "+{1_Amount} [ICON_Strength] 战斗力"
     if "移动力" in desc_lower or "MOVEMENT" in et_upper:
         if "登船" in desc_lower or "海洋" in desc_lower or "SEA" in et_upper:
-            return "+{Amount} [ICON_Movement] 海洋移动力"
-        return "+{Amount} [ICON_Movement] 移动力"
+            return "+{1_Amount} [ICON_Movement] 海洋移动力"
+        return "+{1_Amount} [ICON_Movement] 移动力"
     if "经验" in desc_lower or "EXPERIENCE" in et_upper:
-        return "+{Amount} 经验值"
+        return "+{1_Amount} 经验值"
     if "等级" in desc_lower:
-        return "+{Amount} 等级"
+        return "+{1_Amount} 等级"
     if "回复" in desc_lower or "治疗" in desc_lower or "HEAL" in et_upper:
-        return "+{Amount} 每回合回复"
+        return "+{1_Amount} 每回合回复"
     if "伤害" in desc_lower or "DAMAGE" in et_upper:
-        return "{Amount} 伤害"
+        return "{1_Amount} 伤害"
     if "生产力" in desc_lower or "PRODUCTION" in et_upper:
-        return "+{Amount}% [ICON_Production] 生产力"
+        return "+{1_Amount}% [ICON_Production] 生产力"
     if "购买" in desc_lower or "PURCHASE" in et_upper:
-        return "+{Amount}% [ICON_Gold] 购买费用"
+        return "+{1_Amount}% [ICON_Gold] 购买费用"
     if "费用" in desc_lower or "维护" in desc_lower or "MAINTENANCE" in et_upper or "DISCOUNT" in et_upper:
-        return "-{Amount} [ICON_Gold] 维护费"
+        return "-{1_Amount} [ICON_Gold] 维护费"
     if "视野" in desc_lower or "SIGHT" in et_upper:
-        return "+{Amount} 视野范围"
+        return "+{1_Amount} 视野范围"
     if "间谍" in desc_lower or "SPY" in et_upper:
         if "时间" in desc_lower or "TIME" in et_upper:
             return "+{ReductionPercent}% 行动速度"
         if "几率" in desc_lower or "CHANCE" in et_upper:
-            return "+{Amount} 行动成功率"
-        return "+{Amount} 间谍等级"
+            return "+{1_Amount} 行动成功率"
+        return "+{1_Amount} 间谍等级"
     if "宗教" in desc_lower or "传播" in desc_lower or "SPREAD" in et_upper:
         if "压力" in desc_lower:
-            return "+{Amount}% 宗教压力"
+            return "+{1_Amount}% 宗教压力"
         if "次数" in desc_lower or "CHARGES" in et_upper:
-            return "+{Amount} 传教次数"
-        return "+{Amount} 宗教传播强度"
+            return "+{1_Amount} 传教次数"
+        return "+{1_Amount} 宗教传播强度"
     if "摇滚" in desc_lower or "旅游" in desc_lower or "TOURISM" in et_upper:
-        return "+{Amount} 旅游业绩"
+        return "+{1_Amount} 旅游业绩"
     if "掠夺" in desc_lower or "劫掠" in desc_lower or "PILLAGE" in et_upper or "PLUNDER" in et_upper:
-        return "+{Amount}% 掠夺产出"
+        return "+{1_Amount}% 掠夺产出"
     if "次数" in desc_lower or "CHARGES" in et_upper:
-        return "+{Amount} 使用次数"
+        return "+{1_Amount} 使用次数"
     if "时代" in desc_lower or "ERA_SCORE" in et_upper:
-        return "+{Amount} 时代分数"
+        return "+{1_Amount} 时代分数"
     if "财产" in desc_lower or "PROPERTY" in et_upper:
-        return "+{Amount} 单位属性"
+        return "+{1_Amount} 单位属性"
     if "产出" in desc_lower or "YIELD" in et_upper:
         return "+{PercentDefeatedStrength}% 敌方战斗力 [ICON_Yield] 产出"
     if "战斗后" in desc_lower or "胜利" in desc_lower:
@@ -287,31 +287,31 @@ def get_modstr_template(et, desc):
     if "地形" in desc_lower or "TERRAIN_COST" in et_upper:
         return "忽略地形移动消耗"
     if "开阔" in desc_lower or "CLEAR_TERRAIN" in et_upper:
-        return "+{Amount} [ICON_Movement] 开阔地形移动力"
+        return "+{1_Amount} [ICON_Movement] 开阔地形移动力"
     if "敌方" in desc_lower or "ENEMY" in et_upper:
-        return "+{Amount} [ICON_Movement] 敌方领土移动力"
+        return "+{1_Amount} [ICON_Movement] 敌方领土移动力"
     if "友方" in desc_lower or "FRIENDLY" in et_upper:
-        return "+{Amount} [ICON_Movement] 友方领土移动力"
+        return "+{1_Amount} [ICON_Movement] 友方领土移动力"
     if "外交" in desc_lower or "DIPLO" in et_upper:
-        return "+{Amount} [ICON_Strength] 外交能见度战斗力"
+        return "+{1_Amount} [ICON_Strength] 外交能见度战斗力"
     if "奢侈品" in desc_lower or "LUXURY" in et_upper:
-        return "+{Amount} [ICON_Strength] 每个奢侈品"
+        return "+{1_Amount} [ICON_Strength] 每个奢侈品"
     if "未使用" in desc_lower or "UNUSED" in et_upper:
-        return "+{Amount} [ICON_Strength] 每个未用移动力"
+        return "+{1_Amount} [ICON_Strength] 每个未用移动力"
     if "圣城" in desc_lower or "HOLY" in et_upper:
-        return "+{Amount} [ICON_Strength] 每个圣城"
+        return "+{1_Amount} [ICON_Strength] 每个圣城"
     if "蛮族" in desc_lower or "BARBARIAN" in et_upper:
-        return "+{Amount} [ICON_Strength] 对蛮族"
+        return "+{1_Amount} [ICON_Strength] 对蛮族"
     if "区域攻击" in desc_lower or "AGAINST_DISTRICT" in et_upper:
-        return "+{Amount} [ICON_Strength] 对区域"
+        return "+{1_Amount} [ICON_Strength] 对区域"
     if "相邻" in desc_lower or "ADJACENT" in et_upper or "NEIGHBOR" in et_upper:
-        return "+{Amount} [ICON_Strength] 相邻加成"
+        return "+{1_Amount} [ICON_Strength] 相邻加成"
     if "防空" in desc_lower or "ANTI_AIR" in et_upper:
-        return "+{Amount}% 防空战斗力"
+        return "+{1_Amount}% 防空战斗力"
     if "攻击范围" in desc_lower or "RANGE" in et_upper:
-        return "+{Amount} 攻击范围"
+        return "+{1_Amount} 攻击范围"
     if "攻击次数" in desc_lower or "NUM_ATTACKS" in et_upper:
-        return "+{Amount} 额外攻击次数"
+        return "+{1_Amount} 额外攻击次数"
     if "隐身" in desc_lower or "HIDDEN" in et_upper:
         return "对敌方隐身"
     if "探测" in desc_lower or "SEE_HIDDEN" in et_upper:
@@ -331,7 +331,7 @@ def get_modstr_template(et, desc):
     if "晋升后" in desc_lower or "PROMOTE_NO_FINISH" in et_upper:
         return "晋升后可继续移动"
     if "伟人" in desc_lower and "次数" in desc_lower:
-        return "+{Amount} 伟人使用次数"
+        return "+{1_Amount} 伟人使用次数"
     if "外贸" in desc_lower:
         return "文明或领袖特性效果"
     if "文物" in desc_lower or "ARTIFACT" in et_upper:
@@ -351,19 +351,19 @@ def get_modstr_template(et, desc):
     if "解锁" in desc_lower or "ENABLE_UNIT_FAITH" in et_upper:
         return "可用信仰购买单位"
     if "返还" in desc_lower:
-        return "+{Amount}% 返还产出"
+        return "+{1_Amount}% 返还产出"
     if "按消耗" in desc_lower or "PERCENT_UNIT_COST" in et_upper:
         return "+{UnitCostPercent}% 返还金币"
     if "按生产" in desc_lower or "PERCENT_UNIT_CREATED" in et_upper:
         return "+{UnitProductionPercent}% 生产力转换为产出"
     if "资源" in desc_lower and "赠予" in desc_lower:
-        return "+{Amount} 免费奢侈品"
+        return "+{1_Amount} 免费奢侈品"
     if "资源" in desc_lower and "忽略" in desc_lower:
         return "忽略战略资源"
     if "征召" in desc_lower and "忽略" in desc_lower:
         return "征召单位忽略战略资源"
     if "征召" in desc_lower and "升级" in desc_lower:
-        return "-{Amount}% 征召单位升级费"
+        return "-{1_Amount}% 征召单位升级费"
     if "核" in desc_lower or "WMD" in et_upper:
         return "免疫核武器伤害"
     if "水灾" in desc_lower:
@@ -371,7 +371,7 @@ def get_modstr_template(et, desc):
     if "控制区" in desc_lower and "忽略" in desc_lower:
         return "忽略控制区"
     if "逃脱" in desc_lower or "ESCAPE" in et_upper:
-        return "+{Amount} 逃脱移动力"
+        return "+{1_Amount} 逃脱移动力"
     if "护卫" in desc_lower or "ESCORT" in et_upper:
         return "护卫队机动性"
     if "恢复" in desc_lower and "移动" in desc_lower:
@@ -393,7 +393,7 @@ def get_modstr_template(et, desc):
     if "护卫" in desc_lower:
         return "可护卫其他单位"
     if "圣城" in desc_lower:
-        return "+{Amount} [ICON_Strength]"
+        return "+{1_Amount} [ICON_Strength]"
     if "区域" in desc_lower and "忽略" in desc_lower:
         return "忽略区域防御"
     if "悬崖" in desc_lower:

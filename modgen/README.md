@@ -6,6 +6,10 @@
 
 ## 用途
 
+自定义 UI/Lua LOC 使用 `.CIV` 的 `文本.custom_entries`，由统一 Text SQL/XML 输出；字段及冲突规则见 [AI 契约](AGENTS.md#自定义-ui--lua-loc-文本)。
+
+独立纹理使用 `texture add/list/remove`；完整字段与生成约定见 [AI 契约](AGENTS.md#独立-ui-纹理背景--按钮--精灵表)。
+
 让 AI（或脚本）生成"编辑器能直接打开、正确导出"的 .CIV 工程与条目：
 - `new-project`：创建工程级 .CIV 骨架（基础信息/美术/修改器/文本 结构就位，无需拷贝旧工程）
 - `generate`：意图参数 → 合规条目（Type/LOC/默认值/子表骨架自动生成）
@@ -56,6 +60,7 @@ modgen/
 ├── modifier_merger.py        # 修改器条目合并进工程"修改器"节
 ├── project_scaffold.py       # new-project 工程骨架（运行时纯标准库）
 ├── custom_file.py            # custom-file 自定义 SQL/XML/Lua 文件通道（写工程目录 + 注册文件动作）
+├── texture.py                # texture 原尺寸 PNG 声明增删（校验复用 project/ui_textures.py）
 ├── skills.py                 # skill 本地技能库全文检索（仓库根 skills/，mtime 缓存索引）
 ├── dbquery.py                # query（游戏库只读查询）/ loc（LOC 文本查询）
 ├── mt_bridge.py              # 复用 ModTools 侧 db.loc_text / db.search_index / project.civ6proj_generator / project.custom_files（单一实现，防漂移）

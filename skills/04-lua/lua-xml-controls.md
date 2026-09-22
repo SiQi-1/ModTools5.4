@@ -22,15 +22,16 @@
 
 ## 精灵表坐标约定
 
-所有 `StateOffsetIncrement`、`TextureOffset`、`CheckTextureOffset` 等偏移的 **正 Y 方向 = 纹理文件中向上**。引擎默认从纹理底部帧开始读取。
+按本地官方 `Controls_Close.dds` 与 `Civ6_Styles.xml`（`StateOffsetIncrement="0,34"`）核对：PNG/DDS 像素行从上往下，前四帧依次是 Normal、Hover、Down、Disabled。`StateOffsetIncrement` 的正 Y 对应向下选取下一帧；不要把整张图倒置。部分官方纹理还含额外状态帧。
 
 ```
-纹理文件纵向堆叠（4 态按钮，StateOffsetIncrement="0,41"）：
-y=123  Disabled     ← 引擎从 y=0 开始，向上走 41/82/123 到各态
-y=82   Down
-y=41   Hover
-y=0    Normal       ← 默认帧
+PNG 顶部 y=0     Normal
+         y=34    Hover
+         y=68    Down
+         y=102   Disabled
 ```
+
+2026-09-23 修正：旧版“从底部向上读取”说明错误。检查转换结果时也应确认 DDS→PNG 脚本没有垂直翻转。
 
 ---
 
@@ -209,7 +210,7 @@ ScrollBar（见 §24）、UpButton/DownButton、内容容器（通常是 Stack�
 
 | 属性 | 格式 | 说明 |
 |------|------|------|
-| `StateOffsetIncrement` | `"0,N"` | 状态帧纵向步进（正 Y = 向上）。4 态：Normal→Hover→Down→Disabled |
+| `StateOffsetIncrement` | `"0,N"` | 状态帧纵向步进（PNG/DDS 像素行向下）。4 态：Normal→Hover→Down→Disabled |
 | `States` | 整数 | 状态帧数（默认 4） |
 | `DisabledMouseMoveCallbacks` | `0`/`1` | `1`=禁用鼠标移动回调 |
 
@@ -261,7 +262,7 @@ ScrollBar（见 §24）、UpButton/DownButton、内容容器（通常是 Stack�
 
 | 属性 | 格式 | 说明 |
 |------|------|------|
-| `StateOffsetIncrement` | `"0,N"` | 状态帧纵向步进（正 Y = 向上），默认 4 态 |
+| `StateOffsetIncrement` | `"0,N"` | 状态帧纵向步进（PNG/DDS 像素行向下），默认 4 态 |
 | `States` | 整数 | 状态帧数 |
 
 ```xml
@@ -290,7 +291,7 @@ ScrollBar（见 §24）、UpButton/DownButton、内容容器（通常是 Stack�
 | 外观 | 纹理（固定尺寸） | 纯色 | 九宫格纹理 |
 | 形状 | 圆形/箭头/X 号 | 矩形 | 矩形框架 |
 | 缩放 | 否 | 是 | 是（九宫格） |
-| 子元素 | 否 | 是 | 是 |
+| 子元素 | 是 | 是 | 是 |
 
 ## 7. BoxButton
 
@@ -413,7 +414,7 @@ Color="Red"                                                      ← 纯色无�
 |------|------|------|
 | `Texture` | 纹理名 | 纹理资源。可选带 `.dds` 后缀 |
 | `StretchMode` | `"None"`/`"Tile"`/`"TileY"` | 缩放模式 |
-| `TextureOffset` | `"X,Y"` | 精灵表子帧偏移（正 Y = 向上） |
+| `TextureOffset` | `"X,Y"` | 精灵表子帧偏移（PNG/DDS 像素行向下） |
 | `Color` | `R,G,B,A` | 纹理染色叠加。`"0,0,0,50"`=半透明黑遮罩 |
 | `Rotate` | 度数 | 旋转。支持 `90`、`270` |
 | `FlipY` | `0`/`1` | 垂直翻转 |
@@ -709,7 +710,7 @@ Lua：`Controls.ProgressMeter:SetPercent(0.75)`
 | 属性 | 格式 | 说明 |
 |------|------|------|
 | `Texture` | 纹理名 | 填充纹理 |
-| `TextureOffset` | `"X,Y"` | 纹理帧偏移（正 Y = 向上） |
+| `TextureOffset` | `"X,Y"` | 纹理帧偏移（PNG/DDS 像素行向下） |
 | `Direction` | `"Right"`/`"Up"` | 填充方向：左→右 / 下→上 |
 | `Percent` | `"0"`~`"1"` | 填充比例 |
 
@@ -1029,7 +1030,7 @@ PullDown 的 `<InstanceData Name="InstanceOne">` 本质就是 Instance——Lua 
 | Stack | 所有控件 |
 | ScrollPanel | Stack、ScrollBar、UpButton、DownButton、以及内容控件 |
 | GridButton | Container、Image、Label、GridData、AlphaAnim |
-| Button | 无（纯纹理） |
+| Button | Image、Label 等（官方 ActionPanel.xml 的 EndTurnButtonLabel 含 Label） |
 | BoxButton | Image、Label 等 |
 | Slider | Thumb |
 | ScrollBar | Thumb |

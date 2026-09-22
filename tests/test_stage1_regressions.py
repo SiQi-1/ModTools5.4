@@ -240,6 +240,26 @@ class Civ6projTeaserTestCase(unittest.TestCase):
         self.assertTrue(teaser_line)
         self.assertIn("LOC_SIQI_TEST_DESCRIPTION", teaser_line[0])
 
+    def test_deleted_missing_content_is_removed_without_losing_metadata(self) -> None:
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "Siqi_Test.civ6proj"
+            target.write_text('<Project><PropertyGroup><Guid>mod-id</Guid>'
+                              '<ProjectGuid>project-id</ProjectGuid><AssociationData>dependencies</AssociationData>'
+                              '</PropertyGroup><ItemGroup><Content Include="Scripts/obsolete.lua" />'
+                              '<Content Include="manual.lua" /></ItemGroup></Project>', encoding="utf-8")
+            self.page._project = build_sample_project()
+            basic = self._basic_payload("old teaser")
+            basic["data"]["project_info"]["civ6proj_path"] = str(target)
+            basic["data"]["file_info"]["delete_requests"] = ["Scripts/obsolete.lua", "../manual.lua"]
+            self.page._project.sections["基础信息"] = basic
+            result = self.page._build_civ6proj_preview("Siqi_Test", {}, set())
+            self.assertNotIn('Include="Scripts/obsolete.lua"', result)
+            self.assertIn('Include="manual.lua"', result)
+            self.assertIn("dependencies", result)
+            self.assertIn("project-id", result)
+
 
 class LegacyFlatBasicInfoTestCase(unittest.TestCase):
     """#7：旧式平铺「基础信息」加载后 prefix 保留，回写不丢。"""

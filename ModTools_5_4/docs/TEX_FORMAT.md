@@ -9,6 +9,15 @@
 - 领袖外交前景 fallback（`LeaderFallback.xlp` 的 `FALLBACK_NEUTRAL_*`）：目前仍使用工具内置的 TextureAsset（后续如需与 ModBuddy 完全一致，可再对齐到 TextureInstance）。
 
 ## 生成触发方式
+
+### 独立 UI 纹理（2026-09-23）
+
+美术页「独立 UI 纹理」或 `modgen texture add` 导入任意原尺寸 PNG（含透明度、非正方形、纵向精灵表）。声明为 `美术.data.ui_textures: [{"name":"UI_MY_PANEL","path":"D:/art/panel.png"}]`。名称以 UI_ 开头、无扩展名。
+
+复用 UISliceTexture 输出，不裁圆、不加黑边、不产生 IconTextureAtlases；TEX 宽高取完整 PNG（精灵表包含全部帧），mip 关闭。XLP EntryID / ObjectName 与逻辑名一致，游戏 UI 用 `Texture="UI_MY_PANEL"`。保存声明后须运行完整生成；最终 BLP 仍由 SDK / ModBuddy 编译。
+
+GUI 和 AI 的 UI 美术校验会阻断非法/重复命名或缺失源图。移除声明撤下后续 XLP 登记，保留源 PNG。
+
 - 在“工程总览”中生成 `IMG/图片生成清单.txt` 或 `Textures/纹理生成清单.txt`，会输出 PNG（IMG）+ 纹理（Textures）。
 - “生成所有文件”同样会输出 PNG（IMG）+ 纹理（Textures）。
 
@@ -53,3 +62,7 @@
 - mip 最小缩到 `1x1`，或
 - 改为 BC 压缩（例如 BC3/BC7），
 可以在 Beta 后续迭代再加。
+
+## 重复导出的覆盖行为（2026-09-23 修复）
+
+批量生成的纹理计划是虚拟预览，磁盘上不存在计划文件。已有 DDS 或 TEX 时，将此虚拟组纳入覆盖选择；`overwrite=all` 重新转换，`none` 保留。不要把 `texture_skipped` 解释成“源图未变”：它也可能表示缺图或用户选择不覆盖。变更 PNG 后应核对 DDS 尺寸/像素，保证游戏素材与预览一致。

@@ -1,4 +1,28 @@
 # Changelog
+
+## 2026-09-23 - 统一自定义 LOC 文本与纹理覆盖修复
+
+- `文本.custom_entries` 支持 `{tag, text, group?, source?}` 声明，保存于既有文本分节，追加到统一 Text SQL/XML；固定使用现有简体中文 `zh_Hans_CN`。GUI 文本预览支持显示，当前通过 .CIV 编辑，未新增表格编辑器。
+- GUI 生成与 modgen validate 共用声明校验；生成额外阻断与自动 LOC 冲突。`generate_all` / `generate_file` 返回 `custom_text_invalid`，不写入生成物；旧工程无声明时输出不变。
+- 修复批量生成将虚拟纹理计划排除在覆盖候选之外的问题：PNG 更新后已有 DDS/TEX 永远跳过。现将存在的纹理输出组加入 GUI 覆盖选择；AI `overwrite=all` 覆盖纹理，`none` 保留。不会写出虚拟计划文件。
+- 验证：4 项自定义文本测试覆盖 SQL/XML 引号、换行转义、持久化、自动 LOC 冲突和旧工程兼容；29 项 SQL/XML 预览回归通过；5 项纹理测试增加修改源尺寸后 all/none 重生成验证。
+- 20.0 应用验证：原 3 个玩法 SQL 合为 Core，300 个自定义 LOC 纳入标准 Text 输出；数据库 7 张受影响表及 396 条文本与合并前相同。38 张 HTML UI 纹理逐像素核对并通过官方 SDK 编译，仍非整 Mod / 游戏实机验收。
+
+## 2026-09-23 - 独立 UI 纹理导入与完整美术输出
+
+- 美术页新增「独立 UI 纹理」编辑区：多选 PNG、原尺寸与透明通道保留、改名/换源/移除与尺寸状态提示。保存于既有美术 data.ui_textures，不新增分节。
+- GUI / modgen 共享 `project/ui_textures.py`：名称、大小写重复、PNG 存在性及尺寸校验；生成前还拦截与已有美术输出的名称冲突。AI 沿用 `ui_icons_invalid` 与 `ui_icon_issues`，同步接口文档。
+- 自动导出 IMG、RGBA DDS、UISliceTexture TEX，并加入既有 UITexture XLP / Art.xml 链；不经过图标圆形裁切或 Icons.xml，不改已有实体图标规则。
+- 新增 `modgen texture add/list/remove`；CLI 导入解析绝对路径，同名替换需 `--replace`，保存前自动备份。同步 modgen 契约、README、AGENT 与 TEX 文档。
+- 验证：独立纹理测试覆盖原尺寸、alpha、XLP、GUI 保存重载、重复命名、生成阻断与 CLI；既有 UI 图标 32 项回归通过。20.0 工程 31 张 HTML 纹理已通过官方 SDK Windows BLP 编译（新 UI 素材集隔离验收，不代表整 Mod 完成或实机验收）。
+- 修正本地 UI 控件技能中的按钮精灵表方向及 Button 子元素描述；以官方 Controls_Close.dds / ActionPanel.xml 为依据。
+
+## 2026-09-22 - 修复议程类型及已删除工程文件的残留引用
+
+- 修复议程生成器向 Types 写入不存在的 KIND_AGENDA，导致数据库外键不完整；Agendas 主表及 KIND_TRAIT 注册照常生成。
+- 将议程去重测试改为在启用外键的 SQLite 模式下执行生成的 Types 语句，防止错误快照继续通过。
+- 修复 `.civ6proj` 更新时保留已明确删除的 Content 引用；即使磁盘文件已不存在也会清除，只处理经过安全路径校验的 delete_requests，保留依赖、GUID 和未请求删除的手工项。增加回归测试。
+- 问题由 20.0 乌啾工程完整 SQL 加载测试发现；未修改 .CIV 格式或 modgen 命令契约。
 ## 2026-09-19 - 0056：新增「UI图标」段（.CIV 可声明与游戏实体无关的自定义 UI 图标）
 
 - **需求**：`modgen_work/需求_自定义UI图标.md`（20.0 乌啾工程的新闻 7 分类 / 报童 4 动作 / 顶部追踪器

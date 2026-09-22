@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import copy
 import os
+import re
+import sqlite3
 import unittest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -111,7 +113,14 @@ class DuplicateTypeEntriesTestCase(unittest.TestCase):
         project = self._project_with_duplicate("议程", mutate)
         self.page._project = project
         data_sql, _text_sql = self.page._build_agenda_sql_pair()
-        self.assertEqual(data_sql.count("('AGENDA_SIQI_DEMO', 'KIND_AGENDA')"), 1)
+        # Execute the emitted Types block against a foreign-key-enforced vanilla schema.
+        with sqlite3.connect(":memory:") as db:
+            db.executescript("PRAGMA foreign_keys=ON; CREATE TABLE Kinds(Kind TEXT PRIMARY KEY); "
+                             "INSERT INTO Kinds VALUES('KIND_TRAIT'); "
+                             "CREATE TABLE Types(Type TEXT PRIMARY KEY, Kind TEXT REFERENCES Kinds(Kind));")
+            for statement in re.findall(r"INSERT INTO Types.*?;", data_sql, re.S):
+                db.executescript(statement)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM Types").fetchone()[0], 1)
         self.assertEqual(data_sql.count("LOC_AGENDA_SIQI_DEMO_NAME"), 1)
 
     def test_governor_duplicate_type(self) -> None:

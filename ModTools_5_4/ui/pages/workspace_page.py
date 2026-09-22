@@ -74,6 +74,8 @@ from ...project.civ6proj_generator import (
 from ...project.output_manifest import OutputManifest, make_output_manifest, safe_relative_path
 from ...project.sql_utils import build_insert_block, deduplicate_rows, sql_escape, sql_literal
 from ...project.sql_builders import build_belief_sql_pair, build_policy_sql_pair
+from ...project.custom_text import validate_custom_text, custom_text_groups
+from ...project.ui_textures import texture_entries, validate_ui_textures, build_ui_texture_plans
 from ...project.ui_icons import (
     UI_ICON_SECTION,
     build_source_state_map as build_ui_icon_source_states,
@@ -1147,6 +1149,20 @@ class WorkspacePage(BasePage):
             ("文明市民文本", civ_citizen_groups),
             ("领袖外交文本", leader_diplomacy_groups),
         ]
+
+        # Custom UI/Lua LOC entries belong to this generated Text file, not a second SQL writer.
+        automatic_rows = [row for _title, groups in sections for _name, rows in groups for row in rows]
+        reserved_tags = {
+            self._decode_sql_value(self._split_sql_fields(row.strip()[1:-1])[1])
+            for row in automatic_rows
+        }
+        text_section = self._project.sections.get("文本")
+        self._last_custom_text_issues = validate_custom_text(text_section, reserved_tags=reserved_tags)
+        if self._last_custom_text_issues:
+            return "-- 自定义文本校验失败：\n" + "\n".join("-- " + e for e in self._last_custom_text_issues)
+        custom_groups = custom_text_groups(text_section)
+        if custom_groups:
+            sections.append(("自定义 UI / Lua 文本", custom_groups))
 
         # 组装时跨组去重：同一行（tag+文本）只输出一次，归入第一个出现的组。
         # 此前 `ordered_rows` 的去重结果只用于 total_rows 计数，实际输出仍遍历
@@ -4636,7 +4652,8 @@ class WorkspacePage(BasePage):
             agenda_name = str(_value_or_default(table_data, "Name") or "")
             agenda_desc = str(_value_or_default(table_data, "Description") or "")
 
-            types_rows.append(f"('{self._sql_escape(agenda_type)}', 'KIND_AGENDA')")
+            # Agendas are keyed by Agendas.AgendaType; vanilla Kinds has no KIND_AGENDA.
+            # Only the generated agenda trait belongs in Types (KIND_TRAIT).
 
             agendas_rows.append(
                 "(" + ", ".join(
@@ -8290,9 +8307,17 @@ class WorkspacePage(BasePage):
         front_end_cdata = self._build_action_data_xml("FrontEndActions", front_entries)
         in_game_cdata = self._build_action_data_xml("InGameActions", in_game_entries)
 
+        # Explicit deletion requests must remove stale project references even if
+        # custom-file already removed the disk file. Keep unmentioned manual items.
+        deleted_paths = {
+            rel.replace("/", "\\").lower()
+            for raw in (file_info.get("delete_requests") or [])
+            if (rel := self._safe_delete_relative_path(raw))
+        }
         include_paths = [
             path for path in sorted(files.keys())
-            if path != proj_name
+            if path.replace("/", "\\").lower() not in deleted_paths
+            and path != proj_name
             and not path.lower().endswith(".civ6proj")
             and path != self._img_plan_relative_path()
             and path != self._textures_plan_relative_path()
@@ -8445,7 +8470,8 @@ class WorkspacePage(BasePage):
                         if tag_name not in {"Content", "Folder"}:
                             continue
                         include_value = str(child.getAttribute("Include") or "")
-                        if _is_generated_asset_entry(tag_name, include_value):
+                        if (_is_generated_asset_entry(tag_name, include_value)
+                                or (tag_name == "Content" and include_value.replace("/", "\\").lower() in deleted_paths)):
                             removable.append(child)
                     for child in removable:
                         group.removeChild(child)
@@ -8661,16 +8687,19 @@ class WorkspacePage(BasePage):
         LOGGER.info("[UIIcons] entries updated: count=%d", len(self._project.sections[UI_ICON_SECTION]))
 
     def _collect_ui_icon_issues(self) -> dict[str, list[dict[str, object]]]:
-        """校验「UI图标」段（GUI 生成前检查与 AI 接口共用）。"""
+        """校验 UI 图标与独立纹理（GUI 生成前检查与 AI 接口共用）。"""
         report = validate_ui_icons(
             self._project.sections.get(UI_ICON_SECTION),
             entity_icon_names=self._entity_icon_names(),
             output_dir=self._ui_icon_output_dir(),
         )
-        return {
-            "errors": list(report.get("errors") or []),
-            "warnings": list(report.get("warnings") or []),
-        }
+        errors = list(report.get("errors") or [])
+        entries = texture_entries(self._art_workspace.export_project_payload())
+        reserved = [Path(str(p.get("relative_path", ""))).stem for p in
+                    self._collect_icons_atlas_image_plans() + self._collect_leader_direct_image_plans()
+                    + self._collect_governor_direct_image_plans() + self._collect_moment_image_plans()] if entries else []
+        errors.extend({"message": message} for message in validate_ui_textures(entries, reserved_names=reserved))
+        return {"errors": errors, "warnings": list(report.get("warnings") or [])}
 
     def _validate_ui_icons(self) -> bool:
         """生成前阻断性校验：有 ERROR 时弹窗并返回 False。"""
@@ -8682,8 +8711,8 @@ class WorkspacePage(BasePage):
         more = "\n..." if len(errors) > 30 else ""
         QMessageBox.warning(
             self,
-            "UI图标校验失败",
-            "「UI图标」段存在错误，已阻止生成（该段只影响 Icons.xml 与 IMG/Textures，"
+            "UI 美术资源校验失败",
+            "UI 图标或独立纹理声明存在错误，已阻止生成（只影响美术输出，"
             "修正后即可生成）：\n\n" + "\n".join(lines) + more,
         )
         return False
@@ -8909,6 +8938,12 @@ class WorkspacePage(BasePage):
 
         return plans
 
+    def _collect_ui_texture_image_plans(self) -> list[dict[str, object]]:
+        entries = texture_entries(self._art_workspace.export_project_payload())
+        # Keep incomplete GUI edits previewable; generation validation blocks errors.
+        if validate_ui_textures(entries): return []
+        return build_ui_texture_plans(entries)
+
     def _build_img_output_plan(self) -> list[dict[str, object]]:
         merged: dict[str, dict[str, object]] = {}
         for plan in (
@@ -8916,6 +8951,7 @@ class WorkspacePage(BasePage):
             + self._collect_leader_direct_image_plans()
             + self._collect_governor_direct_image_plans()
             + self._collect_moment_image_plans()
+            + self._collect_ui_texture_image_plans()
         ):
             rel_path = str(plan.get("relative_path") or "").replace("\\", "/").strip()
             if not rel_path:
@@ -9090,6 +9126,9 @@ class WorkspacePage(BasePage):
                     "category": "ui_slice",
                 }
             )
+
+        # Independent UI textures keep their rectangular dimensions and alpha.
+        plans.extend(self._collect_ui_texture_image_plans())
 
         # 5) LeaderFallback（领袖外交前景 fallback）
         for entry in self._iter_section_entries("领袖"):
@@ -10245,6 +10284,14 @@ class WorkspacePage(BasePage):
                 return None
             return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
 
+        self._build_text_workspace_preview("sql")
+        text_issues = self._last_custom_text_issues
+        if text_issues:
+            if interactive:
+                QMessageBox.warning(self, "自定义文本校验失败", "\n".join(text_issues))
+                return None
+            return {"ok": False, "error": "custom_text_invalid", "issues": text_issues}
+
         ui_icon_issues = self._collect_ui_icon_issues()
         if ui_icon_issues.get("errors"):
             if interactive:
@@ -10422,6 +10469,14 @@ class WorkspacePage(BasePage):
                 return None
             return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
 
+        self._build_text_workspace_preview("sql")
+        text_issues = self._last_custom_text_issues
+        if text_issues:
+            if interactive:
+                QMessageBox.warning(self, "自定义文本校验失败", "\n".join(text_issues))
+                return None
+            return {"ok": False, "error": "custom_text_invalid", "issues": text_issues}
+
         ui_icon_issues = self._collect_ui_icon_issues()
         if ui_icon_issues.get("errors"):
             if interactive:
@@ -10455,6 +10510,17 @@ class WorkspacePage(BasePage):
 
         existing = [rel for rel, _content in sorted(batch_items) if (root_dir / Path(rel)).exists()]
 
+        img_plans = self._build_img_output_plan()
+        textures_plans = self._build_textures_output_plan()
+        # Textures_Generation_Plan is a virtual preview, never a file on disk.
+        # Include its group in overwrite choices when any generated texture exists.
+        if any(
+            (root_dir / "Textures" / f"{plan['name']}.{extension}").exists()
+            for plan in textures_plans if plan.get("name")
+            for extension in ("dds", "tex")
+        ):
+            existing.append(texture_plan_path)
+
         basic = self._load_basic_info_payload_from_project() or {}
         file_info = basic.get("file_info") if isinstance(basic, dict) else {}
         delete_requests = file_info.get("delete_requests") if isinstance(file_info, dict) else []
@@ -10481,8 +10547,6 @@ class WorkspacePage(BasePage):
             overwrite_set = set(existing)
             delete_set = set(delete_candidates)
 
-        img_plans = self._build_img_output_plan()
-        textures_plans = self._build_textures_output_plan()
         total_steps = max(1, len(delete_set) + len(batch_items) + len(img_plans) + len(textures_plans))
         progress = None
         if interactive:

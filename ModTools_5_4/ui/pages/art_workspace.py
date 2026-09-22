@@ -47,6 +47,7 @@ from PyQt6.QtWidgets import (
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB, _resolve_data_path
+from ...project.ui_textures import validate_ui_textures, source_path
 from ...project.ui_icons import (
     DEFAULT_UI_ICON_SIZES,
     UI_ICON_SECTION,
@@ -653,6 +654,7 @@ class ArtWorkspacePanel(QWidget):
         self._ui_icon_columns_dirty = True
         self._last_entity_icon_names: list[str] | None = None
         self._state: dict[str, object] = {
+            "ui_textures": [],
             "alias_map": {},
             "source_map": {},
             "need_map": {},
@@ -833,6 +835,7 @@ class ArtWorkspacePanel(QWidget):
         content_layout.addWidget(civ_group)
         content_layout.addWidget(alias_group)
         content_layout.addWidget(ui_icon_group)
+        content_layout.addWidget(self._build_ui_texture_editor())
         content_layout.addWidget(moments_group)
         content_layout.addWidget(leader_xlp_group)
         content_layout.addWidget(source_group)
@@ -972,6 +975,7 @@ class ArtWorkspacePanel(QWidget):
 
     def import_project_payload(self, payload: dict[str, object] | None) -> None:
         default_state: dict[str, object] = {
+            "ui_textures": [],
             "alias_map": {},
             "source_map": {},
             "need_map": {},
@@ -988,6 +992,7 @@ class ArtWorkspacePanel(QWidget):
         if not isinstance(payload, dict):
             self._state = default_state
             self._sync_extra_flags_to_ui()
+            self._render_ui_texture_table()
             return
 
         # 兼容：
@@ -1031,6 +1036,7 @@ class ArtWorkspacePanel(QWidget):
             self._state["art_xml_source_path"] = ""
 
         self._sync_extra_flags_to_ui()
+        self._render_ui_texture_table()
 
         try:
             LOGGER.info(
@@ -1043,6 +1049,87 @@ class ArtWorkspacePanel(QWidget):
             )
         except Exception:
             return
+
+    def _build_ui_texture_editor(self) -> QGroupBox:
+        group = QGroupBox("独立 UI 纹理（背景、按钮、装饰图案）")
+        layout = QVBoxLayout(group)
+        hint = QLabel("导入 PNG 后保留原尺寸与透明通道，自动生成 IMG、DDS/TEX 并登记到 UITexture XLP。"
+                      "名称须以 UI_ 开头；在游戏 XML 中用 Texture=该名称，无需创建图标或游戏实体。")
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+        toolbar = QHBoxLayout()
+        add = QPushButton("导入 PNG…")
+        add.clicked.connect(self._import_ui_textures)
+        remove = QPushButton("移除选中纹理")
+        remove.clicked.connect(self._remove_ui_texture)
+        toolbar.addWidget(add); toolbar.addWidget(remove); toolbar.addStretch()
+        layout.addLayout(toolbar)
+        self._ui_texture_table = QTableWidget(0, 3)
+        self._ui_texture_table.setHorizontalHeaderLabels(["纹理名称（UI_*）", "源 PNG", "尺寸 / 状态"])
+        self._ui_texture_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        self._ui_texture_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self._ui_texture_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self._ui_texture_table.setMinimumHeight(160)
+        self._ui_texture_table.setMaximumHeight(320)
+        self._ui_texture_table.itemChanged.connect(self._edit_ui_texture)
+        layout.addWidget(self._ui_texture_table)
+        self._render_ui_texture_table()
+        return group
+
+    def _render_ui_texture_table(self) -> None:
+        table = getattr(self, "_ui_texture_table", None)
+        if table is None: return
+        entries = self._state.get("ui_textures") or []
+        if not isinstance(entries, list): entries = []
+        table.blockSignals(True)
+        table.setRowCount(len(entries))
+        for row, entry in enumerate(entries):
+            if not isinstance(entry, dict): entry = {}
+            errors = validate_ui_textures([entry])
+            size = read_png_size(source_path(entry)) if entry.get("path") else None
+            status = errors[0] if errors else f"{size[0]} × {size[1]} · 原尺寸"
+            for col, value in enumerate((entry.get("name", ""), entry.get("path", ""), status)):
+                item = QTableWidgetItem(str(value)); item.setToolTip(str(value))
+                if col == 2: item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                table.setItem(row, col, item)
+        table.blockSignals(False)
+
+    def _import_ui_textures(self) -> None:
+        paths, _ = QFileDialog.getOpenFileNames(self, "导入独立 UI 纹理", "", "PNG 图片 (*.png)")
+        entries = [dict(e) for e in self._state.get("ui_textures", []) if isinstance(e, dict)]
+        names = {str(e.get("name", "")).casefold() for e in entries}
+        for path in paths:
+            stem = re.sub(r"[^A-Za-z0-9_]", "_", Path(path).stem).strip("_") or "TEXTURE"
+            base = stem if stem.startswith("UI_") else "UI_" + stem
+            name = base; number = 2
+            while name.casefold() in names:
+                name = f"{base}_{number}"; number += 1
+            entry = {"name": name, "path": str(Path(path).resolve())}
+            errors = validate_ui_textures([entry])
+            if errors:
+                QMessageBox.warning(self, "无法导入纹理", "\n".join(errors)); continue
+            entries.append(entry); names.add(name.casefold())
+        self._state["ui_textures"] = entries
+        LOGGER.info("[UITextures] declarations updated: count=%d", len(entries))
+        self._render_ui_texture_table(); self._refresh_previews()
+
+    def _remove_ui_texture(self) -> None:
+        row = self._ui_texture_table.currentRow()
+        entries = list(self._state.get("ui_textures") or [])
+        if 0 <= row < len(entries):
+            entries.pop(row); self._state["ui_textures"] = entries
+            self._render_ui_texture_table(); self._refresh_previews()
+
+    def _edit_ui_texture(self, item: QTableWidgetItem) -> None:
+        if item.column() not in (0, 1): return
+        entries = [dict(e) for e in self._state.get("ui_textures", [])]
+        key = "name" if item.column() == 0 else "path"
+        value = item.text().strip()
+        if value: entries[item.row()][key] = value
+        else: entries[item.row()].pop(key, None)
+        self._state["ui_textures"] = entries
+        LOGGER.info("[UITextures] declarations updated: count=%d", len(entries))
+        self._render_ui_texture_table(); self._refresh_previews()
 
     def export_project_payload(self) -> dict[str, object]:
         alias_map = self._state.get("alias_map") if isinstance(self._state.get("alias_map"), dict) else {}
@@ -1062,6 +1149,7 @@ class ArtWorkspacePanel(QWidget):
             "format": ART_SECTION_FORMAT,
             "schema_version": ART_SECTION_SCHEMA,
             "data": {
+                "ui_textures": [dict(e) for e in self._state.get("ui_textures", []) if isinstance(e, dict)],
                 "alias_map": dict(alias_map),
                 "source_map": dict(source_map),
                 "need_map": {str(k): bool(v) for k, v in need_map.items()},

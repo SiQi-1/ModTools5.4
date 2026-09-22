@@ -246,6 +246,8 @@ Windows Registry Editor Version 5.00
 复合编辑器：议程主表 + 历史议程（领袖绑定）/ 互斥议程 / 议程外交 Modifier（支持从数据库导入官方 SubjectRequirementSetId 模板）+ AI 偏好列表。
 
 ### 美术
+
+美术页新增「独立 UI 纹理」：批量导入背景、按钮、精灵表 PNG，保留原尺寸和透明度，自动输出 IMG / DDS / TEX / XLP。CLI 等价入口：`python -m modgen.cli texture add 工程.CIV --name UI_MY_PANEL --source D:/art/panel.png`，随后「生成所有文件」。使用规则见 [modgen 契约](modgen/AGENTS.md#独立-ui-纹理背景--按钮--精灵表)。
 管理 Icons.xml / ArtDef / XLP / Art.xml / Textures 输出。
 - 图标预览和别名配置
 - 领袖 XLP 独立生成

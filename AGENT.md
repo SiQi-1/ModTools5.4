@@ -15,6 +15,8 @@
 
 - ModTools 是**可视化编辑工具**：AI 的工作是**编写 `.CIV` 工程文件（JSON，schema 0.1.0）**，由工具生成 SQL/XML/图标/ArtDef/XLP 等所有输出。**主内容（13 分类/修改器/文本）AI 不直接写 SQL/XML**；确需自定义 SQL/XML/Lua 时，**只能走"自定义文件通道"**（见下节）——工具仍是唯一写入者。
 - 输出模型：`workspace` 是 section 索引字典，顺序固定（`CIV_SECTION_ORDER`，18 节）。基础信息/美术/文本/修改器 4 节存 dict，其余各节存条目列表（含「UI图标」）。
+- **自定义 UI/Lua 文本**：`文本.custom_entries` 声明 `{tag, text, group?, source?}`，由工具并入标准 Text SQL/XML。这里允许显式 LOC；实体名称/描述仍填中文。自定义或自动 LOC 冲突阻断生成；详见 `modgen/AGENTS.md`。
+- **独立 UI 纹理**（2026-09-23）：背景、按钮和精灵表使用 `美术.data.ui_textures` 的 `{name: "UI_...", path: "绝对 PNG 路径"}`，或 `modgen texture add/list/remove`。通过生成链输出原尺寸 IMG/DDS/TEX/XLP；不借用实体/图标，不手写工程美术资产。详情见 `modgen/AGENTS.md`。
 - **「UI图标」段**（2026-09-19）：声明**与游戏实体无关**的自定义 UI 图标（新闻分类、单位动作、追踪器等），
   条目形如 `{"icon_name":"ICON_X","name_zh":"备注","sizes":[32,50],"images":{"icon":{"path":"D:/x.png"}}}`。
   只影响 `Icons.xml` 与 IMG/Textures，**不产出 SQL / Players / 文本**；图集名自动为 `ATLAS_X`；

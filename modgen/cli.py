@@ -543,6 +543,14 @@ def _cmd_generate_ability(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_texture(args: argparse.Namespace) -> int:
+    from .texture import edit_texture
+    entries = edit_texture(args.civ, args.texture_op, name=getattr(args, "name", None),
+                           source=getattr(args, "source", None), replace=getattr(args, "replace", False))
+    print(json.dumps(entries, ensure_ascii=False, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="modgen", description="文明6 Mod 工程(.CIV)生成与校验工具")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -663,6 +671,17 @@ def build_parser() -> argparse.ArgumentParser:
     prev.add_argument("--out", default="", help="预览输出目录（默认 modgen_work/preview_<工程名>/）")
     prev.add_argument("--dry-run", action="store_true", help="只打印文件清单，不落盘")
     prev.set_defaults(func=_cmd_preview)
+
+    texture = sub.add_parser("texture", help="独立 UI 纹理：原尺寸 PNG → IMG/DDS/TEX/XLP（生成时输出）")
+    texture_ops = texture.add_subparsers(dest="texture_op", required=True)
+    for operation in ("add", "list", "remove"):
+        tp = texture_ops.add_parser(operation)
+        tp.add_argument("civ", help="工程 .CIV 路径")
+        if operation != "list": tp.add_argument("--name", required=True, help="UI_ 开头的纹理逻辑名")
+        if operation == "add":
+            tp.add_argument("--source", required=True, help="源 PNG，保留原尺寸与透明通道")
+            tp.add_argument("--replace", action="store_true", help="显式更新已存在的同名纹理")
+        tp.set_defaults(func=_cmd_texture)
 
     # 修改器四类（共享 prefix/infix）
     def _add_shared(parser_: argparse.ArgumentParser) -> None:

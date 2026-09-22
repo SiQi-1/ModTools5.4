@@ -202,8 +202,12 @@ def validate_project(
         for index, entry in enumerate(entries):
             for error in validate_entry(section, entry, prefix=prefix or "", infix=infix or 0):
                 errors.append(f"{section}[{index}]: {error}")
+    from ModTools_5_4.project.custom_text import validate_custom_text
+    errors.extend(validate_custom_text(workspace.get("文本")))
     # UI图标分节（非实体美术资源声明）
     errors.extend(validate_ui_icon_section(workspace.get("UI图标")))
+    from ModTools_5_4.project.ui_textures import texture_entries, validate_ui_textures
+    errors.extend(validate_ui_textures(texture_entries(workspace.get("美术"))))
     # 修改器直接工作区
     modifier_payload = workspace.get("修改器")
     if isinstance(modifier_payload, dict):

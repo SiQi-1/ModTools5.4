@@ -196,3 +196,50 @@ modifier: modifier_type = MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER (COL
   <File>Data/Siqi_Leaders_0055_Wonders.sql</File>
 </UpdateDatabase>
 ```
+
+---
+
+## 技巧 5：发遗物 / 放巨作前，建筑必须先在 `Building_GreatWorks` 里「登记」槽位
+
+**实机问题（0055 神社遗物）**：`MODIFIER_PLAYER_GRANT_RELIC`（`EFFECT_GRANT_RELIC`）发遗物时，
+引擎要找一个**能存放遗物的建筑**，判据是 `Building_GreatWorks` 里有没有该建筑的槽位行。
+神社（`BUILDING_SHRINE`）本体一个巨作槽都没有 → 识别不通过 → 遗物发不出去。
+而本 Mod 的"神社 +1 遗物槽"是 **Modifier** 给的（`EFFECT_ADJUST_EXTRA_GREAT_WORK_SLOTS`）——
+**Modifier 给的槽不算"登记"**，两者互相不认。
+
+| 概念 | 作用 | 写法 |
+|---|---|---|
+| **槽容量** | 让建筑能装几个巨作（手动放置有效） | `MODIFIER_PLAYER_CITIES_ADJUST_EXTRA_GREAT_WORK_SLOTS`，参数 `BuildingType` / `GreatWorkSlotType` / `Amount`（原版 `TRAIT_DOUBLE_ARCHAEOLOGY_SLOTS`、`TRAIT_EXTRA_PALACE_SLOTS`、`SUNDIATA_KEITA_MARKET_GREAT_WRITING_SLOTS` 同款） |
+| **槽登记** | 让引擎知道"这种建筑可以装这种巨作"（0 槽也写一行） | `Building_GreatWorks` 插行，`NumSlots` 可写 **0** |
+
+> **为什么"容量够"还不够**：原版马里（桑迪亚塔）给市场 +2 写作槽，而 `BUILDING_MARKET` 在
+> `Building_GreatWorks` 里**根本没有行** —— 说明 Modifier 给的槽对手动放置/容量统计是有效的。
+> 但 `EFFECT_GRANT_RELIC` 这种"引擎自己找空槽位"的发放走的是**登记表**（作者 0055 实测：
+> 只靠 Modifier 给槽时遗物发不出来），所以原版建筑要补一行登记。
+
+**冲突安全的登记 SQL**（走自定义文件通道，独立动作 id + 尽量晚的 `LoadOrder`）：
+
+```sql
+INSERT OR IGNORE INTO Building_GreatWorks (BuildingType, GreatWorkSlotType, NumSlots)
+SELECT 'BUILDING_SHRINE', 'GREATWORKSLOT_RELIC', 0
+WHERE NOT EXISTS (
+    SELECT 1 FROM Building_GreatWorks
+    WHERE BuildingType = 'BUILDING_SHRINE' AND GreatWorkSlotType = 'GREATWORKSLOT_RELIC'
+);
+```
+
+- 主键 = `(BuildingType, GreatWorkSlotType)`；`NumSlots` 有默认值 **1**，所以要 0 槽必须显式写 0；
+- `INSERT OR IGNORE`：主键撞车不报错、**不覆盖**别人的数值；`WHERE NOT EXISTS`：即使该表没有主键约束也不会插重复行；
+- **只 INSERT 不 UPDATE**：别的 Mod 若已给该建筑登记（甚至给了 1 槽），整条跳过，保持对方数值；
+- **加载顺序尽量晚**（0055 用 `LoadOrder 200000`，比奇观补丁的 199999 更晚）：让别人的登记行先落地才跳得掉。
+  唯一残留风险是"比我们还晚、且用**裸 INSERT** 的 Mod"会撞主键 —— 任何登记补丁都躲不掉，晚加载是唯一缓解。
+
+**相关事实**：`GREATWORKSLOT_*` 共 7 种（`ART`/`ARTIFACT`/`CATHEDRAL`/`MUSIC`/`PALACE`/`RELIC`/`WRITING`）；
+原版有遗物槽的建筑只有 5 个：`BUILDING_TEMPLE`(1)、`BUILDING_PRASAT`(1)、`BUILDING_STAVE_CHURCH`(1)、
+`BUILDING_MONT_ST_MICHEL`(2)、`BUILDING_ST_BASILS_CATHEDRAL`(3)。
+⚠ **遗物必须用 `GREATWORKSLOT_RELIC`** —— 写成 `GREATWORKSLOT_PALACE` 时槽位在 UI 上照样显示，但遗物进不去（0055 踩过）。
+
+- 现成实现参考：原版发遗物只有 3 处 —— 部落村庄 `GOODY_CULTURE_GRANT_ONE_RELIC`（带 `RelicSource`）、
+  贞德激活 `GREATPERSON_JOAN_OF_ARC_ACTIVE`、宗教紧急事件奖励；坎迪（Kandy）那条不是"发"而是
+  `EFFECT_ADJUST_NATURAL_WONDER_RELIC`（改自然奇观触发时获得的遗物数量）。
+  也就是说：**"把遗物塞进某个指定建筑"这种效果原版没有**，能做的只是"发 1 个遗物，由引擎自己找空槽位"。

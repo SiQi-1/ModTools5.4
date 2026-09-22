@@ -80,6 +80,21 @@
   - 会合并进生成的 `.civ6proj` Actions 注册（`custom_project_files_provider`）
 - 因此流程固定为：**导出 → 放补丁 → 再导出**（第二次导出把补丁注册进 civ6proj）
 
+### d. 双端同步：ModBuddy 工程目录 × 游戏 Mods 目录（0055 实测）
+工具只写 **ModBuddy 工程目录**（`.CIV` 里 `civ6proj_path` 指向的那个），游戏实际读的是
+`文档\My Games\Sid Meier's Civilization VI\Mods\<工程名>\`。**两端都要改**，否则实机测的还是旧内容。
+
+| 改动类型 | ModBuddy 端（工具写） | Mods 端（同步动作） |
+|---|---|---|
+| 生成文件（Data/Text/Icons…） | `--ai-exec generate_all` 全量重写 | **逐文件比对哈希**，只复制 DIFF 的（全量覆盖也行，但别漏文件） |
+| 新增自定义 SQL | `custom-file write --no-action` → `add_file_action`（独立 id + `load_order`）→ **`save_project`** → `generate_all` | 复制 SQL 到 `Data/`，并在 `.modinfo` 的 `InGameActions` 加**同 id、同 LoadOrder** 的动作块，`<Files>` 加一行 |
+| 美术（ArtDefs/XLPs/IMG/BLP） | ArtDefs/XLPs/IMG | 需要 ModBuddy Build（BLP/Cooker），工具不管 |
+
+- `.civ6proj` 的 `UpdateArt` 文件是占位符 `(Mod Art Dependency File)`，`.modinfo` 里是构建后的真实 `.dep`（如 `LOC_SIQI_LEADERS_0055_NAME.dep`）—— 这条差异是**正常**的，不算不同步。
+- 校验思路（脚本化）：解析 `.civ6proj` 的 `InGameActions`/`FrontEndActions` CDATA 与 `.modinfo` 对应块，
+  比对 (类型, id, LoadOrder, 文件列表)；再检查"动作引用的文件都在 `<Files>` 里、且磁盘存在"。
+- ⚠ `add_file_action` 只改内存：**不 `save_project` 就退出，动作会丢**（下次 `generate_all` 后消失，症状是 `.civ6proj` 里没有该动作块）。
+
 ## 验证命令速查（全部为 ModTools5.4 仓库内置，不依赖外部脚本）
 
 | 命令 | 验证什么 |

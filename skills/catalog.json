@@ -59,6 +59,7 @@
         "GP"
       ],
       "read": [
+        "05-modtools-civ/project-extensions.md",
         "04-lua/code-style.md",
         "04-lua/INDEX.md"
       ]
@@ -85,6 +86,7 @@
         "XLP"
       ],
       "read": [
+        "05-modtools-civ/project-extensions.md",
         "05-modtools-civ/ui-assets.md",
         "04-lua/code-style.md",
         "04-lua/lua-xml-controls.md"
@@ -98,9 +100,18 @@
         "SQL补丁",
         "custom-file",
         "加载顺序",
-        "部署"
+        "部署",
+        "Core.sql",
+        "Core",
+        "扩展",
+        "源码",
+        "project-check",
+        "build",
+        "extension",
+        "工作流"
       ],
       "read": [
+        "05-modtools-civ/project-extensions.md",
         "05-modtools-civ/pipeline.md"
       ]
     },

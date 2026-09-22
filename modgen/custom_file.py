@@ -81,6 +81,7 @@ def write_custom_file(
     *,
     action_type: str = "",
     register_action: bool = True,
+    civ_path: Path | None = None,
 ) -> dict[str, Any]:
     """把自定义文件写入工程目录，并按分类注册文件动作（原地修改 payload）。
 
@@ -88,6 +89,14 @@ def write_custom_file(
     front 与 in_game，其余注册 in_game）；register_action=False 只写文件不注册。
     返回 {"path", "absolute", "actions": [(scope, action_type), ...], "added_files": n}。
     """
+    if "extensions" in payload:
+        from ModTools_5_4.project import extensions as ext
+        if not register_action:
+            raise CustomFileError("受管扩展需声明角色；Lua 库可使用 extension write --role import")
+        role = next((k for k, v in ext.ROLES.items() if v == action_type), None) if action_type else None
+        if action_type and not role:
+            raise CustomFileError(f"扩展不支持动作：{action_type}")
+        return ext.write_extension(payload, civ_path, rel_path, content, role=role)
     rel = custom_files.sanitize_relative_path(rel_path)
     if not rel:
         raise CustomFileError(f"非法相对路径：{rel_path}（禁止绝对路径与 .. 穿越）")
@@ -129,8 +138,16 @@ def write_custom_file(
     }
 
 
-def list_custom_files(payload: dict[str, Any]) -> dict[str, Any]:
+def list_custom_files(payload: dict[str, Any], *, civ_path: Path | None = None) -> dict[str, Any]:
     """列出工程目录磁盘文件 + 已注册的文件动作。"""
+    if "extensions" in payload:
+        from ModTools_5_4.project import extensions as ext
+        plan = ext.plan_extensions(payload, civ_path)
+        return {"root": plan.get("source_root", ""), "files": [
+            {"path": e["path"], "size": len(plan["files"].get(e["path"], "").encode("utf-8")),
+             "role": e["role"], "feature": e["feature"]} for e in plan["entries"]],
+            "front_end_actions": plan["front_end_actions"], "in_game_actions": plan["in_game_actions"],
+            "errors": plan["errors"]}
     root = project_root_dir(payload)
     files = []
     if root.exists():
@@ -167,8 +184,12 @@ def remove_custom_file(
     rel_path: str,
     *,
     keep_file: bool = False,
+    civ_path: Path | None = None,
 ) -> dict[str, Any]:
     """从文件动作移除指定文件（可选删除磁盘文件）；返回移除统计。"""
+    if "extensions" in payload:
+        from ModTools_5_4.project import extensions as ext
+        return ext.remove_extension(payload, civ_path, rel_path, keep_file=keep_file)
     rel = custom_files.sanitize_relative_path(rel_path)
     if not rel:
         raise CustomFileError(f"非法相对路径：{rel_path}（禁止绝对路径与 .. 穿越）")

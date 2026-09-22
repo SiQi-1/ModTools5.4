@@ -24,6 +24,17 @@ class ActionContract:
 
 
 ACTION_PARAMS: dict[str, dict[str, dict[str, Any]]] = {
+    "extension": {
+        "operation": {"type": "string", "enum": ["init", "write", "list", "check", "remove"]},
+        "relative_path": {"type": "string"}, "content": {"type": "string"},
+        "gameplay": {"type": "boolean"}, "ui": {"type": "boolean"},
+        "role": {"type": "string", "enum": ["database", "gameplay", "ui", "import", "text", "icons", "colors"]},
+        "id": {"type": "string"}, "feature": {"type": "string"},
+        "scope": {"type": "string", "enum": ["front", "in_game", "both"]},
+        "phase": {"type": "string", "enum": ["before_generated", "after_generated"]},
+        "depends_on": {"type": "array"}, "keep_file": {"type": "boolean"},
+    },
+    "project_check": {},
     "open_project": {"path": {"type": "string", "required": True}},
     "save_project": {"path": {"type": "string", "required": False}},
     "generate_all": {"overwrite": {"type": "string", "enum": ["ask", "all", "none"]}},

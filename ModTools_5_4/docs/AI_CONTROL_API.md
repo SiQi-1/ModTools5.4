@@ -58,10 +58,12 @@ python ModTools5.4.py 我的工程.CIV --ai-exec '{"action":"civ6proj_create"}' 
 | `civ6proj_create` | `directory?`, `file_name?`, `fields?`, `create_art_xml?` | 新建 ModBuddy 兼容 .civ6proj + 空白 Art.xml 并绑定到当前工程（无需 ModBuddy 新建工程）。默认目录 `文档\Firaxis ModBuddy\Civilization VI\<文件名>\` |
 | `quick_config` | — | 一键配置：扫描工程目录，自动追加 UpdateDatabase/UpdateText/UpdateIcons 等文件动作 |
 | `import_from_db` | `section`, `type`, `replace?` | 从游戏库导入条目。section=区域/建筑/单位/改良设施/伟人/政策卡；type=原版 Type（如 `DISTRICT_CAMPUS`）；replace=true 时填 Replaces（仅区域/建筑/单位） |
-| `project_file_write` | `relative_path`, `content`, `register_action?`, `action_type?` | **自定义文件通道**：写 SQL/XML/Lua 进工程目录；默认自动按路径注册文件动作（Scripts/*.lua→AddGameplayScripts、UI/*.xml+lua→AddUserInterfaces、Import/*.lua→ImportFiles、Data/*.sql|xml→UpdateDatabase、Icons/→UpdateIcons、Text/→UpdateText；`action_type` 显式指定）；一键生成**原样透传** |
-| `project_file_read` | `relative_path` | 读取工程目录文件内容（UTF-8 文本） |
-| `project_file_list` | — | 列出工程目录全部文件（path/size）+ 已注册文件动作 |
-| `project_file_delete` | `relative_path`, `remove_action?` | 删除工程目录文件（默认同时从文件动作移除引用） |
+| `extension` | `operation: init/write/list/check/remove`, `relative_path?`, `content?`, `gameplay?`, `ui?`, `id?`, `role?`, `scope?`, `phase?`, `feature?`, `depends_on?`, `keep_file?` | 管理 .CIV 扩展源码；init 默认 Core，可附 GP/UI；修改自动保存 .CIV，需先保存工程；完整字段见 [项目级扩展](../../skills/05-modtools-civ/project-extensions.md) |
+| `project_check` | — | 当前编辑状态的统一数据、源码/依赖、预览、动作与 SQL 冲突检查，需要 modgen 同包模块 |
+| `project_file_write` | `relative_path`, `content`, `register_action?`, `action_type?` | **自定义文件通道**：有 extensions 清单时写源码并自动保存，不能 register_action=false；旧工程写绑定输出目录；默认自动按路径注册文件动作（Scripts/*.lua→AddGameplayScripts、UI/*.xml+lua→AddUserInterfaces、Import/*.lua→ImportFiles、Data/*.sql|xml→UpdateDatabase、Icons/→UpdateIcons、Text/→UpdateText；`action_type` 显式指定）；一键生成**原样透传** |
+| `project_file_read` | `relative_path` | 受管文件读源码；其他旧文件读输出目录（UTF-8） |
+| `project_file_list` | — | 扩展工程仍返回 root/files(path/size/role/feature)/动作，另含 errors；旧工程列出输出目录文件及动作 |
+| `project_file_delete` | `relative_path`, `remove_action?` | 受管文件删除源码及清单，生成时清理输出副本，remove_action=false 被拒绝；旧文件保持原行为 |
 | `add_file_action` | `type`, `files`, `id?`, `load_order?` | 精确注册文件动作（UpdateIcons/UpdateText/UpdateColors 自动同时注册 FrontEnd+InGame） |
 | `search` | `keyword`, `category?`, `limit?` | 能力实现搜索（与 GUI 小工具 / `modgen search` 同一 BM25 引擎；category=civilization/leader/trait/district/building/unit/improvement/project/policy/**technology(科技)**/**civic(市政)**/governor/governor_promotion/great_person/unit_ability/unit_promotion） |
 | `skill` | `keyword?`, `limit?`, `file?`, `section?`, `plan?` | 章节检索返回 results/count/reading_plan；plan=true 只给必读清单；file 读全文，section 读标题及子节。keyword 或 file 至少一项。与 modgen skill 同一实现。 |
@@ -72,6 +74,10 @@ python ModTools5.4.py 我的工程.CIV --ai-exec '{"action":"civ6proj_create"}' 
 `generate_all` / `generate_file` 同样校验 `文本.custom_entries`：格式错误、自定义 tag 重复或与自动生成 LOC 冲突，返回 `{"ok": false, "error": "custom_text_invalid", "issues": [...]}`，不写入生成物。当前正文语言为 `zh_Hans_CN`，GUI 文本预览与 SQL/XML 共用此声明。
 
 `generate_all(overwrite="all")` 会覆盖现有 DDS/TEX；`none` 保留现有纹理。交互覆盖列表包含虚拟纹理计划（若已有纹理），勾选它覆盖纹理组；虚拟计划本身不落盘。
+
+`get_state.extensions` 返回源清单；`get_manifest.extension_paths/extension_errors` 返回当前扩展路径与错误。受管 UI 只注册 XML 入口，Lua 同名配对作为 Content；独立 MTX_ 动作由清单编译，旧 add_file_action 对同一路径的声明不覆盖受管元数据。
+
+`generate_all` / `generate_file` 对扩展源码、依赖、重名及已知主键冲突返回 `extensions_invalid` 并阻断写入。完整数据检查仍通过 project_check；CLI build 先自动配置和 project-check，再生成源码，不等于 ModBuddy 编译或游戏部署。
 
 ## 典型 AI 工作流
 
@@ -89,11 +95,15 @@ curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"civ6proj_create","param
 curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"get_manifest"}'
 curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"import_from_db","params":{"section":"建筑","type":"BUILDING_MONUMENT"}}'
 
-# 6) 确需 Lua/自定义 SQL 时（自定义文件通道：写入 + 自动注册动作 + 原样透传）
+# 6) 先一次初始化功能所需的 Core / Gameplay / UI，再写各部分源码
+curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"extension","params":{"operation":"init","gameplay":true,"ui":true}}'
+# 默认 Core 路径通过 extension list/get_state 查询；project_file_write 自动写源码
 curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"project_file_write","params":{"relative_path":"Scripts/My.lua","content":"function Initialize()\nend"}}'
 curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"project_file_write","params":{"relative_path":"Data/Extra.sql","content":"INSERT INTO Types VALUES (''TYPE_X'',''KIND_X'');"}}'
 
-# 7) 一键生成全部文件（非交互，全量覆盖；自定义文件原样透传）
+# 7) 统一检查，再一键生成全部文件（同步扩展源码）
+curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"project_check","params":{}}'
+# 非交互全量覆盖
 curl -s -X POST http://127.0.0.1:8765/api -d '{"action":"generate_all","params":{"overwrite":"all"}}'
 
 # 8) 截图确认 GUI 现状

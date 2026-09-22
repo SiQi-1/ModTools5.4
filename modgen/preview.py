@@ -56,20 +56,30 @@ def _build_page(civ_path: Path) -> Any:
 
 def build_preview_files(civ_path: Path) -> dict[str, str]:
     """构建 .CIV → 生成文件内容映射（{相对路径: 内容}），不落盘。"""
-    return build_preview_manifest(civ_path)["files"]
+    result = build_preview_manifest(civ_path)
+    if result.get("extension_errors"):
+        raise PreviewError("\n".join(e["message"] for e in result["extension_errors"]))
+    return result["files"]
 
 
-def build_preview_manifest(civ_path: Path) -> dict[str, Any]:
+def build_preview_manifest(civ_path: Path, *, page=None) -> dict[str, Any]:
     """构建完整清单：files/folders/can_generate/civ6proj_path/readonly_custom_paths。
 
     readonly_custom_paths = 工程目录里自定义（外部）文件的路径集合——它们是
     "原样透传、不参与生成"的文件，供 check-conflicts 区分生成内容与自定义内容。
     """
-    page = _build_page(civ_path)
+    owned_page = page is None
+    page = page if page is not None else _build_page(civ_path)
     files, folders, can_generate, civ6proj_path = page._project_root_manifest()
     if not isinstance(files, dict):
         raise PreviewError("生成总览未返回文件清单")
-    return {
+    extensions = getattr(page, "_extension_plan", {})
+    basic = page._load_basic_info_payload_from_project() or {}
+    action_info = extensions if page._project.extensions else basic.get("file_info", {})
+    result = {
+        "extension_errors": extensions.get("errors", []),
+        "extension_paths": sorted(extensions.get("files", {})),
+        "actions": {key: action_info.get(key, []) for key in ("front_end_actions", "in_game_actions")},
         "files": {str(rel).replace("\\", "/"): str(content) for rel, content in files.items()},
         "folders": sorted(str(folder).replace("\\", "/") for folder in folders),
         "can_generate": bool(can_generate),
@@ -78,6 +88,10 @@ def build_preview_manifest(civ_path: Path) -> dict[str, Any]:
             str(path).replace("\\", "/") for path in page._readonly_custom_paths
         ),
     }
+    if owned_page:
+        page.close()
+        page.deleteLater()
+    return result
 
 
 def preview_section(civ_path: Path, section: str, fmt: str = "sql") -> str:

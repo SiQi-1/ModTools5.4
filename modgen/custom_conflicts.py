@@ -1,239 +1,114 @@
-"""modgen check-conflicts：自定义 SQL × 生成 SQL 的冲突检测与协调。
+"""Conservative generated/custom SQL conflict checks with explicit coverage limits.
 
-协调规则（与 skills/05-modtools-civ/pipeline.md 一致）：
-- **硬错误**：同表同主键（VALUES 第一列）同时出现在 生成 SQL 与 自定义 SQL →
-  游戏加载主键冲突；自定义 SQL 内部重复同样报错；
-- **警告**：自定义 SQL UPDATE/DELETE 的表 ∈ 生成 SQL 写入的表 →
-  下次生成会覆盖回退（反模式），应回 .CIV 改或改用 INSERT OR REPLACE；
-- `INSERT ... SELECT`（继承/数据迁移）不产生 VALUES，不参与主键对比（合法模式）；
-- 加载顺序由工具保证：自定义 UpdateDatabase load_order=10000 > 生成数据 9999。
-
-生成 SQL 经 preview 引擎（无头 GUI）取得，需要 PyQt；缺失时明确报错。
+Literal INSERT rows use known primary keys, including composite keys. Dynamic
+SQL, INSERT SELECT and runtime semantics remain outside static verification.
 """
 from __future__ import annotations
-
-import re
 from pathlib import Path
-from typing import Any, Optional
-
-from . import custom_file
+from typing import Any
 from .preview import PreviewError, build_preview_manifest
-
-_INSERT_RE = re.compile(
-    r"INSERT\s+(?:OR\s+(?:REPLACE|IGNORE)\s+)?INTO\s+[\"'\[]?([A-Za-z_][A-Za-z0-9_]*)",
-    re.IGNORECASE,
-)
-_UPDATE_RE = re.compile(r"UPDATE\s+[\"'\[]?([A-Za-z_][A-Za-z0-9_]*)\s+SET\b", re.IGNORECASE)
-_DELETE_RE = re.compile(r"DELETE\s+FROM\s+[\"'\[]?([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE)
-
-
-def _first_value(value_group: str) -> str:
-    """取 VALUES(...) 组的第一个值（忽略字符串内的逗号，按括号/引号深度切）。"""
-    text = str(value_group or "").strip()
-    if not text:
-        return ""
-    depth = 0
-    in_quote = ""
-    for index, ch in enumerate(text):
-        if in_quote:
-            if ch == in_quote:
-                in_quote = ""
-            continue
-        if ch in ("'", '"'):
-            in_quote = ch
-            continue
-        if ch == "(":
-            depth += 1
-        elif ch == ")":
-            depth -= 1
-            if depth < 0:
-                break
-        elif ch == "," and depth == 0:
-            return text[:index].strip().strip("'\"")
-    return text.strip().strip("'\"")
-
-
-def _extract_value_group(statement: str) -> str:
-    """从 INSERT 语句里取 VALUES 后的第一个括号组（无 VALUES 返回空串）。"""
-    match = re.search(r"VALUES\s*\(([\s\S]*)", statement, re.IGNORECASE)
-    if not match:
-        return ""
-    text = match.group(1)
-    depth = 0
-    in_quote = ""
-    out: list[str] = []
-    for ch in text:
-        if in_quote:
-            out.append(ch)
-            if ch == in_quote:
-                in_quote = ""
-            continue
-        if ch in ("'", '"'):
-            in_quote = ch
-            out.append(ch)
-            continue
-        if ch == "(":
-            depth += 1
-            out.append(ch)
-            continue
-        if ch == ")":
-            depth -= 1
-            if depth < 0:
-                break
-            out.append(ch)
-            continue
-        out.append(ch)
-    return "".join(out)
+from .sql_inspect import insert_rows, updated_tables, xml_rows, schema_keys, row_key
 
 
 def parse_inserts(sql_text: str) -> list[tuple[str, str]]:
-    """SQL 文本 → [(表名, 主键值), ...]（只取 VALUES 首列；INSERT...SELECT 跳过）。"""
-    rows: list[tuple[str, str]] = []
-    for statement in str(sql_text or "").split(";"):
-        stmt = statement.strip()
-        if not stmt:
-            continue
-        match = _INSERT_RE.search(stmt)
-        if not match:
-            continue
-        table = match.group(1)
-        value_group = _extract_value_group(stmt)
-        if not value_group:
-            continue  # INSERT...SELECT 等无 VALUES 语句：不参与主键对比
-        pk = _first_value(value_group)
-        if pk:
-            rows.append((table, pk))
-    return rows
+    """Compatibility helper: all literal VALUES rows' first values (not PKs)."""
+    rows, _ = insert_rows(sql_text)
+    return [(table, str(values[0])) for table, _cols, values in rows if values and values[0] is not None]
 
 
 def parse_updated_tables(sql_text: str) -> set[str]:
-    """UPDATE / DELETE 涉及的表名集合。"""
-    tables: set[str] = set()
-    for statement in str(sql_text or "").split(";"):
-        stmt = statement.strip()
-        if not stmt:
-            continue
-        for regex in (_UPDATE_RE, _DELETE_RE):
-            match = regex.search(stmt)
-            if match:
-                tables.add(match.group(1))
-    return tables
+    return updated_tables(sql_text)
 
 
-def _sql_files(files: dict[str, str]) -> dict[str, str]:
-    return {
-        rel: content
-        for rel, content in files.items()
-        if rel.lower().startswith("data/") and rel.lower().endswith(".sql")
-    }
-
-
-def check_conflicts(civ_path: Path, *, payload: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-    """检测自定义 SQL 与生成 SQL 的冲突。返回 {errors, warnings, generated_files, custom_files}。"""
+def check_conflicts(civ_path: Path, *, payload: dict | None = None, manifest: dict | None = None) -> dict[str, Any]:
     if payload is None:
         from .merger import load_civ
-
         payload = load_civ(civ_path)
     try:
-        root = custom_file.project_root_dir(payload)
-    except custom_file.CustomFileError as exc:
+        manifest = manifest if manifest is not None else build_preview_manifest(civ_path)
+    except (PreviewError, ValueError, OSError) as exc:
         return {"errors": [{"message": str(exc)}], "warnings": [], "generated_files": [], "custom_files": []}
+    errors = list(manifest.get("extension_errors", []))
+    warnings = []
+    files = manifest["files"]
+    readonly = {p.casefold() for p in manifest.get("readonly_custom_paths", [])}
+    extension_entries = (payload.get("extensions") or {}).get("files", [])
+    extensions = {e["path"].casefold(): e for e in extension_entries}
+    action_scopes: dict[str, set[str]] = {}
+    action_files = set()
+    for key, entries in manifest.get("actions", {}).items():
+        scope = "front" if key == "front_end_actions" else "in_game"
+        for action in entries:
+            if action.get("type") != "UpdateDatabase":
+                continue
+            for raw in action.get("files", []):
+                rel = str(raw).replace("\\", "/")
+                action_scopes.setdefault(rel.casefold(), set()).add(scope)
+                action_files.add(rel)
+    for entry in extension_entries:
+        if entry["role"] == "database":
+            action_files.add(entry["path"])
+    # Separate database actions from text/icons, even when they share SQL syntax.
+    candidates = {p: text for p, text in files.items()
+                  if Path(p).suffix.lower() in {".sql", ".xml"}
+                  and (p.lower().startswith("data/") or p in action_files)
+                  and (p.casefold() not in extensions or extensions[p.casefold()]["role"] == "database")}
+    custom = {p: text for p, text in candidates.items()
+              if p.casefold() in readonly or p.casefold() in extensions}
+    generated = {p: text for p, text in candidates.items() if p not in custom}
+    for rel in sorted(action_files):
+        if rel.casefold() not in {p.casefold() for p in files}:
+            warnings.append({"file": rel, "message": "UpdateDatabase 动作引用的文件不在输出清单中"})
 
-    try:
-        manifest = build_preview_manifest(civ_path)
-    except PreviewError as exc:
-        return {
-            "errors": [{"message": f"无法生成预览（{exc}）；check-conflicts 需要 PyQt6 环境。"}],
-            "warnings": [],
-            "generated_files": [],
-            "custom_files": [],
-        }
+    def scopes(path: str) -> set[str]:
+        entry = extensions.get(path.casefold())
+        if entry:
+            return {"front", "in_game"} if entry["scope"] == "both" else {entry["scope"]}
+        return action_scopes.get(path.casefold(), {"front" if Path(path).stem.lower().endswith("_configs") else "in_game"})
 
-    all_files = manifest["files"]
-    readonly = {path.lower() for path in manifest["readonly_custom_paths"]}
-    # 生成 SQL = 非 readonly 的 Data/*.sql；自定义 SQL = readonly 的 Data/*.sql
-    # （manifest 里自定义文件是"原样透传"内容，但判别依据是 readonly 标记）
-    generated_sql = {
-        rel: content
-        for rel, content in all_files.items()
-        if rel.lower().startswith("data/") and rel.lower().endswith(".sql") and rel.lower() not in readonly
-    }
-    custom_disk_sql = {
-        rel: content
-        for rel, content in all_files.items()
-        if rel.lower().startswith("data/") and rel.lower().endswith(".sql") and rel.lower() in readonly
-    }
-    generated_keys: dict[tuple[str, str], str] = {}
-    generated_tables: set[str] = set()
-    for rel, content in generated_sql.items():
-        for table, pk in parse_inserts(content):
-            generated_tables.add(table.lower())
-            generated_keys.setdefault((table.lower(), pk.casefold()), rel)
+    def rows(path, content):
+        return (xml_rows(content), set()) if path.lower().endswith(".xml") else insert_rows(content)
 
-    # 自定义 SQL 清单：file_info UpdateDatabase 动作里、非生成清单的 .sql（含磁盘缺失的）
-    info = custom_file.file_info(payload)
-    in_game = info.get("in_game_actions") if isinstance(info.get("in_game_actions"), list) else []
-    action_sql: list[str] = []
-    for entry in in_game:
-        if not isinstance(entry, dict) or str(entry.get("type") or "") != "UpdateDatabase":
-            continue
-        for raw in entry.get("files") or []:
-            rel = str(raw).replace("\\", "/").strip()
-            if rel.lower().endswith(".sql"):
-                action_sql.append(rel)
-
-    generated_lower = {rel.lower() for rel in generated_sql}
-    custom_files: list[dict[str, Any]] = []
-    for rel in sorted(set(action_sql)):
-        if rel.lower() in generated_lower:
-            continue
-        content = custom_disk_sql.get(rel, "")
-        if not content:
-            disk = root / Path(rel.replace("/", "\\"))
-            if disk.exists() and disk.is_file():
-                content = custom_file._read_text(root, rel)
-        custom_files.append({"path": rel, "on_disk": bool(content), "content": content})
-
-    errors: list[dict[str, Any]] = []
-    warnings: list[dict[str, Any]] = []
-    custom_keys: dict[tuple[str, str], str] = {}
-    for item in custom_files:
-        rel = item["path"]
-        content = str(item.get("content") or "")
-        if not content:
-            warnings.append({"file": rel, "message": "UpdateDatabase 动作引用了文件，但磁盘上不存在（未生成/被删除）"})
-            continue
-        for table, pk in parse_inserts(content):
-            key = (table.lower(), pk.casefold())
-            if key in custom_keys:
-                errors.append({
-                    "file": rel,
-                    "table": table,
-                    "pk": pk,
-                    "message": f"自定义 SQL 内部主键重复：{table} {pk}（另见 {custom_keys[key]}）",
-                })
-            custom_keys[key] = rel
-            if key in generated_keys:
-                errors.append({
-                    "file": rel,
-                    "table": table,
-                    "pk": pk,
-                    "generated_file": generated_keys[key],
-                    "message": f"主键与生成 SQL 冲突：{table} {pk}（生成文件 {generated_keys[key]}；"
-                               "改 .CIV 对应条目，或在 .CIV 中删除该条目后再自定义）",
-                })
-        for table in parse_updated_tables(content):
-            if table.lower() in generated_tables:
-                warnings.append({
-                    "file": rel,
-                    "table": table,
-                    "message": f"自定义 SQL 对生成 SQL 写入的表执行 UPDATE/DELETE（{table}）："
-                               "下次生成会覆盖回退——建议回 .CIV 改条目，或用 INSERT OR REPLACE 改写行",
-                })
-
-    return {
-        "errors": errors,
-        "warnings": warnings,
-        "generated_files": sorted(generated_sql),
-        "custom_files": [{"path": item["path"], "on_disk": item["on_disk"]} for item in custom_files],
-    }
+    # Each action scope has a separate key space and custom table schema.
+    for scope in ("front", "in_game"):
+        scoped = {p: t for p, t in candidates.items() if scope in scopes(p)}
+        keys, columns = schema_keys({p: t for p, t in scoped.items() if p.lower().endswith(".sql")})
+        generated_keys, generated_tables, custom_keys = {}, set(), {}
+        for path, content in generated.items():
+            if path not in scoped:
+                continue
+            parsed, _ = rows(path, content)
+            for table, cols, values in parsed:
+                generated_tables.add(table.casefold())
+                key = row_key(table, cols, values, keys, columns)
+                if key:
+                    generated_keys.setdefault(key, path)
+        for path, content in custom.items():
+            if path not in scoped:
+                continue
+            parsed, skipped = rows(path, content)
+            unknown = set()
+            for table, cols, values in parsed:
+                key = row_key(table, cols, values, keys, columns)
+                if key is None:
+                    if keys.get(table.casefold()) != ():
+                        unknown.add(table)
+                    continue
+                pk = key[1][0] if len(key[1]) == 1 else list(key[1])
+                common = {"file": path, "scope": scope, "table": table, "pk": pk}
+                if key in custom_keys:
+                    errors.append({**common, "message": f"自定义数据主键重复（另见 {custom_keys[key]}）"})
+                custom_keys[key] = path
+                if key in generated_keys:
+                    errors.append({**common, "generated_file": generated_keys[key],
+                                   "message": "主键与生成数据冲突：请在 .CIV 或扩展中保留一个维护入口"})
+            for table in sorted(unknown | skipped):
+                warnings.append({"file": path, "scope": scope, "table": table,
+                                 "message": "静态主键检查未覆盖该表的部分语句：主键未知、动态表达式或 INSERT SELECT；需数据库/游戏验证"})
+            for table in updated_tables(content) if path.lower().endswith(".sql") else ():
+                if table.casefold() in generated_tables:
+                    warnings.append({"file": path, "scope": scope, "table": table,
+                                     "message": "自定义 SQL 对生成表执行 UPDATE/DELETE：优先在 .CIV 修改；必要补丁需明确依赖及影响，勿机械改成 REPLACE"})
+    return {"errors": errors, "warnings": warnings, "generated_files": sorted(generated),
+            "custom_files": [{"path": p, "on_disk": True} for p in sorted(custom)],
+            "coverage": "已知主键的静态 VALUES/XML Row；不在游戏库执行 SQL、不验证 Lua 运行时"}

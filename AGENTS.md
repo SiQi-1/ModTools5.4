@@ -40,4 +40,4 @@
 
 - ModifierType / EffectType / RequirementType / CollectionType **优先引用游戏库已有类型**；确需新建必须同时写 `DynamicModifiers` 行；
 - JSON 值**禁止写 `""`**（空值 → 省略字段或写 `null`）；
-- 主内容（.CIV 条目）**不写 Lua、不手写 SQL/XML**（一切输出由工具从 .CIV 生成）；确需 Lua/自定义 SQL/XML 时走**自定义文件通道**（`modgen custom-file` / AI 动作 `project_file_write`，工具是唯一写入者）。
+- 主内容（.CIV 条目）**不写 Lua、不手写 SQL/XML**（一切输出由工具从 .CIV 生成）；确需 Lua/自定义 SQL/XML 时走**自定义文件通道**（`modgen extension` / `custom-file` / AI 动作 `extension`、`project_file_write`，工具是唯一写入者）。

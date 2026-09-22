@@ -3,7 +3,7 @@
 制作 Mod、编写 .CIV、回答文明6实现问题时，按下列顺序读取：
 
 1. [技能规则正文](skills/RULES.md)：数据来源、工具写入边界、任务必读项、验证要求。
-2. [统一工作流](skills/WORKFLOW.md)：检索依据 → 选择通道 → 生成 → 校验 → 交付。
+2. [统一工作流](skills/WORKFLOW.md)：检索依据 → 规划完整功能 → 管理数据与扩展源码 → 统一检查与生成 → 交付。
 3. [modgen 契约](modgen/AGENTS.md)：当前命令与字段要求。
 4. 使用 `python -m modgen.cli skill "任务描述" --plan`，读取对应资料与相关章节。
 

@@ -25,7 +25,7 @@ IN_GAME_ONLY_ACTIONS = {
 }
 
 # 各动作默认加载顺序（与 GUI 快速动作一致；自定义 UpdateDatabase 用 10000 > 生成数据 9999，
-# 保证自定义 SQL（SELECT 继承/自定义表/UPDATE）在工具生成的 INSERT 之后执行）
+# 旧通道同 (type,id) 合并会保留旧顺序；受管扩展由 extensions.py 独立规划）
 DEFAULT_LOAD_ORDER: dict[str, int] = {
     "UpdateText": 0,
     "UpdateColors": 0,

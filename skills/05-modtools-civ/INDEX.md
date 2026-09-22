@@ -12,6 +12,7 @@
 | [UI 美术与文本](ui-assets.md) | UI图标、独立纹理、按钮背景、自定义 LOC |
 | [常见陷阱](civ-pitfalls.md) | 数据、挂载、语义与生成后的自检 |
 | [制作参考](authoring-reference.md) | 命名、相邻加成、TypeProperties |
+| [项目级扩展](project-extensions.md) | Core.sql、Lua/UI、源码清单、依赖、project-check/build |
 | [自定义文件与交付](pipeline.md) | SQL/XML/Lua 通道、动作、加载顺序、部署 |
 
 ## 当前依据

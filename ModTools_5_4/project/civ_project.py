@@ -1,7 +1,7 @@
 """CIV project file model (.CIV is JSON in content)."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import json
 
@@ -23,9 +23,13 @@ class CivProject:
 
     project_name: str
     sections: dict[str, object]
+    extensions: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, object]:
-        return project_envelope(self.project_name, self.sections)
+        payload = project_envelope(self.project_name, self.sections)
+        if self.extensions:
+            payload["extensions"] = self.extensions
+        return payload
 
     @classmethod
     def from_dict(cls, payload: dict[str, object]) -> "CivProject":
@@ -33,7 +37,9 @@ class CivProject:
         if not isinstance(payload, dict):
             raise ValueError("工程文件缺少 meta 节点")
         project_name, normalized = parse_project_payload(payload)
-        return cls(project_name=project_name, sections=normalized)
+        from .extensions import manifest
+        extensions = manifest(payload)
+        return cls(project_name=project_name, sections=normalized, extensions=extensions or {})
 
 
 def create_empty_project(project_name: str = "未命名工程") -> CivProject:

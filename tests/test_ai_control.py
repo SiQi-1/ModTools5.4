@@ -64,6 +64,28 @@ class AiControlTestCase(unittest.TestCase):
         self.assertEqual(generate_all["version"], "1")
         self.assertEqual(generate_all["params"]["overwrite"]["enum"], ["ask", "all", "none"])
 
+    def test_extension_actions_and_manifest_contract(self) -> None:
+        result = self.context.execute("extension", {"operation": "init", "gameplay": True, "ui": True})
+        self.assertTrue(result["ok"], result)
+        manifest = self.context.execute("get_manifest", {})
+        self.assertFalse(manifest["extension_errors"])
+        self.assertEqual(len(manifest["extension_paths"]), 4)
+        result = self.context.execute("extension", {"operation": "check"})
+        self.assertTrue(result["ok"], result)
+        saved = json.loads(self.civ_path.read_text(encoding="utf-8"))
+        self.assertEqual(saved["extensions"]["version"], 1)
+        contract = next(a for a in self.context.execute("help", {})["actions"] if a["name"] == "extension")
+        self.assertIn("init", contract["params"]["operation"]["enum"])
+        core = next(entry["path"] for entry in saved["extensions"]["files"] if entry["id"] == "core")
+        written = self.context.execute("project_file_write", {
+            "relative_path": core,
+            "content": "INSERT INTO Units (UnitType,Name) VALUES ('UNIT_SIQI_DEMO','duplicate');",
+        })
+        self.assertTrue(written["ok"], written)
+        blocked = self.context.execute("generate_all", {"overwrite": "all"})
+        self.assertEqual(blocked.get("error"), "extensions_invalid", blocked)
+        self.assertTrue(any(issue.get("table") == "Units" for issue in blocked["issues"]))
+
     def test_unknown_action_raises(self) -> None:
         with self.assertRaises(AiActionError):
             self.context.execute("no_such_action", {})

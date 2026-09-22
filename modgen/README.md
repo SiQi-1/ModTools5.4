@@ -1,6 +1,6 @@
 # modgen
 
-文明6 Mod 工程(.CIV) 生成与校验工具。规则与 ModTools 5.4 编辑器一致，纯标准库实现，不依赖 PyQt。
+文明6 Mod 工程(.CIV) 生成与校验工具。规则与 ModTools 5.4 编辑器一致。数据和扩展源码命令为纯标准库；完整预览、检查与生成需要 PyQt。
 
 > AI Agent 请阅读 [AGENTS.md](AGENTS.md)（必读）。
 
@@ -16,7 +16,9 @@
 - `validate`：条目/工程规则校验（ERROR 硬错误 / WARNING 建议）
 - `merge`：条目合并进工程（内容分类与修改器；同 id 去重，自动备份 .bak）
 - `civ6proj`：从 .CIV 基础信息生成 ModBuddy 兼容 .civ6proj + 空白 Art.xml（`--update-civ` 回写路径）
-- `custom-file`：自定义 SQL/XML/Lua 文件通道——写入工程目录并自动注册文件动作（write/list/remove；与 AI 控制接口 `project_file_write` 同语义）
+- `extension`：Core/Gameplay/UI 配套初始化、源码清单、依赖、旧文件纳管（init/write/import/list/check/remove）；纯标准库
+- `project-check` / `build`：统一检查与 ModBuddy 工程源码生成，需 PyQt；不调用 ModBuddy 编译或部署
+- `custom-file`：自定义 SQL/XML/Lua 文件通道——有扩展清单时写源码目录，旧工程写绑定的输出目录（write/list/remove；与 AI 控制接口 `project_file_write` 同语义）
 - `skill`：本地技能库（仓库根 `skills/`，随发布包分发）章节检索——中文 bigram + 英文词边界 + BM25；`--plan` 必读清单、`--file --section` 章节、`--check` 质量检查、`--json` 结构化输出
 - `search`：能力实现搜索（**BM25 检索**：中文 bigram + 领域词典 + 字段权重 + 相关性排序；支持"通往你城市的贸易路线加产出"这类自然语言；与 GUI 小工具同一实现）
 - `query`：游戏库只读查询（仅 SELECT/WITH/PRAGMA/EXPLAIN，自动限行）
@@ -59,6 +61,8 @@ modgen/
 ├── merger.py                 # 合并进 .CIV（自动备份）
 ├── modifier_merger.py        # 修改器条目合并进工程"修改器"节
 ├── project_scaffold.py       # new-project 工程骨架（运行时纯标准库）
+├── extension_cli.py          # 扩展源码管理、project-check/build；核心复用 project/extensions.py
+├── sql_inspect.py            # SQL 词法、VALUES 多行/复合主键及 XML Row 保守检查
 ├── custom_file.py            # custom-file 自定义 SQL/XML/Lua 文件通道（写工程目录 + 注册文件动作）
 ├── texture.py                # texture 原尺寸 PNG 声明增删（校验复用 project/ui_textures.py）
 ├── skill_cli.py              # 知识命令展示（路由/章节/质量检查）

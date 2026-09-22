@@ -9,7 +9,7 @@
 生成"合规的文明6 Mod 工程条目"（.CIV 工作区结构），而不是直接生成 SQL/XML。
 规则来自 ModTools 5.4 编辑器（GUI）——工具生成的条目保证编辑器能打开、能正确导出。
 
-- **不依赖** PyQt6 / GUI 的数据命令为纯标准库；preview / check-conflicts 使用 GUI 生成引擎，需 PyQt
+- **不依赖** PyQt6 / GUI 的数据与 extension 命令为纯标准库；preview / check-conflicts / project-check / build 使用 GUI 生成引擎，需 PyQt
 - **Type 永远由工具生成**，AI 不要手写 Type（详见"硬规则"）
 - 中文文本存条目（name/Description 等），LOC tag 由导出约定自动注册，条目里不写 LOC
 
@@ -34,7 +34,18 @@ python -m modgen.cli merge 工程.CIV 修改器 --entry modifier.json [--kind mo
 # 生成 ModBuddy 兼容 .civ6proj 工程（+ 空白 Art.xml，无需 ModBuddy 新建工程）
 python -m modgen.cli civ6proj 工程.CIV [--out 目录] [--update-civ]
 
-# 自定义文件通道：自定义 SQL/XML/Lua 写入工程目录并自动注册文件动作（--action 可显式指定，--no-action 跳过）
+# 项目级扩展：.CIV 保存清单；源码在 工程.extensions/，无须先绑定输出
+python -m modgen.cli extension init 工程.CIV --gameplay --ui
+python -m modgen.cli extension write 工程.CIV --core --content-file modgen_work/Core.sql
+python -m modgen.cli extension write 工程.CIV --path Scripts/My.lua --role gameplay --feature events --depends-on core --content-file modgen_work/My.lua
+python -m modgen.cli extension list 工程.CIV --json
+python -m modgen.cli extension check 工程.CIV --json
+python -m modgen.cli extension import 工程.CIV --path Scripts/Old.lua --role gameplay
+python -m modgen.cli extension remove 工程.CIV --path Scripts/Old.lua
+python -m modgen.cli project-check 工程.CIV --json
+python -m modgen.cli build 工程.CIV --overwrite all --json
+
+# 自定义文件通道：有扩展清单时写源码目录，旧工程写绑定的输出目录（--action 可显式指定，旧工程可用 --no-action 跳过）
 python -m modgen.cli custom-file write 工程.CIV --path Scripts/My.lua --content-file modgen_work/My.lua
 python -m modgen.cli custom-file write 工程.CIV --path Data/Extra.sql --content "INSERT INTO ..."
 python -m modgen.cli custom-file list 工程.CIV
@@ -63,7 +74,7 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 
 ## 必须遵守的工作流
 
-先读 [规则正文](../skills/RULES.md) 与 [统一工作流](../skills/WORKFLOW.md)，执行 `skill "任务描述" --plan` 并读取相关章节。先核实依据，再 new-project / generate / validate / merge；已有工程只修改目标内容。涉及自定义 SQL 时执行 check-conflicts，预览、工程导出、部署和实机分别验收。
+先读 [规则正文](../skills/RULES.md) 与 [统一工作流](../skills/WORKFLOW.md)，执行 `skill "任务描述" --plan` 并读取相关章节。先核实依据，再 new-project / generate / validate / merge；已有工程只修改目标内容。扩展任务执行 project-check / build；旧自定义 SQL 用 check-conflicts，预览、工程导出、部署和实机分别验收。
 
 ## 导出与部署（GUI 一键按钮 → AI 控制接口）
 
@@ -95,18 +106,11 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - **图片**：项目图标有图片槽（目标 **256×256**，`images.icon` 已预填尺寸骨架，AI 只需填 `path`）；信仰 `has_images=False`（GUI 无图片槽，图标经美术页别名/数据库处理，无需导入图片）；其余分类一律空 `images: {}`，路径由用户提供。
 - **图标名**：约定 `ICON_{Type}`，由生成器自动填（如 `ICON_PROJECT_SIQI_P0035_TEST`）。
 - **引用**：`bindings` / `trait_bindings` 中的 section/name 必须指向存在的对象。
-- **自定义文件**：确需 Lua/自定义 SQL/XML 时用 `custom-file` 命令（AI 控制接口 `project_file_write`
-  同语义）——按路径自动分类注册文件动作（Scripts/*.lua→AddGameplayScripts、UI/*.xml+lua→AddUserInterfaces、
-  Import/*.lua→ImportFiles、Data/*.sql|xml→UpdateDatabase、Icons/→UpdateIcons、Text/→UpdateText）；
-  路径穿越被拒绝；内容原样透传进 .civ6proj 与 ActionData，不被生成器改写。
-- **自定义 SQL 协调**：加载顺序 = UpdateDatabase 10000（生成数据 9999 之后）；同表同主键禁止与生成
-  SQL 双写（`check-conflicts` 报 ERROR）；UPDATE/DELETE 生成表 = 反模式（WARNING）；SELECT 仅用于
-  `INSERT...SELECT` 继承与自定义表填充。
-- **需要"更晚"的加载顺序时**：`custom-file write` 自动注册的动作 **id 就是类型名**（`UpdateDatabase`）、
-  load order 10000；注册按 **(type, id)** 合并，所以同 id 只会被并进原组、**拿不到自己的顺序**。
-  要独立顺序必须给**独立 id** + 显式 `load_order`（AI 接口 `add_file_action` 支持），例如遍历原版表
-  （`INSERT INTO BuildingModifiers … SELECT … FROM Buildings WHERE IsWonder = 1`）用 `LoadOrder 199999`，
-  确保资料片/其他 Mod 的数据已就位；同时确认该文件**没有**留在原组（否则执行两次 → 主键冲突）。
+- **自定义文件**：新任务先启用 extension 清单，SQL/XML/Lua 正文通过 extension write 或 custom-file write / AI project_file_write 存到源码目录，生成时按清单注册并复制到输出。Scripts 用 gameplay；UI XML/Lua 配对，动作只引用 XML；Import 用 import；数据库、文本、图标分别声明 database/text/icons。旧工程未启用时保留按路径分类与输出目录透传。路径越界被拒绝。
+- **自定义 SQL 协调**：默认把未被 .CIV 支持的 Gameplay SQL 放入 Core.sql；相同主键不得双写，UPDATE/DELETE 需明确依赖，不得机械替换成 REPLACE。
+- **加载顺序**：扩展清单独立编译 MTX_ 动作，按作用域、前后阶段和依赖决定顺序。旧 custom-file 自动动作仍按 (type,id) 合并并保留旧顺序，不能只凭默认 10000 推断加载时机。完整契约见 [项目级扩展](../skills/05-modtools-civ/project-extensions.md)。
+- **统一检查与生成**：project-check 组合数据、源码/依赖、预览、动作和 SQL 冲突；build 自动配置后检查、生成并保存动作，默认 overwrite=none，all 才覆盖已有输出。build 不调用 ModBuddy Build/Cooker，不部署。
+- **兼容**：未启用 extensions 的旧 .CIV 不变。启用后 custom-file write 自动写源码；无动作文件不适用，Lua 库声明 import。CLI 修改备份 .CIV.bak；AI extension 修改自动保存。GUI/CLI/AI 共用 project/extensions.py。
 
 ## 分类说明
 
@@ -129,6 +133,7 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 
 ## 专项字段与规则（涉及时必读）
 
+- [项目级扩展](../skills/05-modtools-civ/project-extensions.md)：清单完整字段、Core、GP/UI 配套、迁移、依赖和静态检查边界。
 - [UI 美术与文本](../skills/05-modtools-civ/ui-assets.md)：UI图标、ui_textures、custom_entries 的完整字段与命令；包含 texture add/list/remove、覆盖策略、尺寸与动作要求。
 - [修改器与类型来源](../skills/05-modtools-civ/modifiers.md)：生成器参数、原版快照、modifier_type_source、preview_text 与引用验证。
 

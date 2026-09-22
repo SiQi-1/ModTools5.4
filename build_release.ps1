@@ -31,7 +31,8 @@ $addDataArgs = @(
     "--add-data", "$db;.",
     "--add-data", "$pkg\data;ModTools_5_4/data",
     "--add-data", "$pkg\resources;ModTools_5_4/resources",
-    "--add-data", "$pkg\From;ModTools_5_4/From"
+    "--add-data", "$pkg\From;ModTools_5_4/From",
+    "--add-data", "$(Join-Path $root 'modgen\schemas');modgen/schemas"
 )
 
 & $PythonExe -m PyInstaller --noconfirm --clean --onefile --noconsole --name $AppName @addDataArgs $entry

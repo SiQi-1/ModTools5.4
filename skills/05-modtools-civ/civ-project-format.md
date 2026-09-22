@@ -61,3 +61,7 @@
 
 - 工具按 section 生成独立文件：`<基础信息.file_name>_<section>.sql` / `Text.sql` / `Icons.xml` 等
 - 用户可用工具"生成预览"检查产物；AI 侧出口检查用 `python -m modgen.cli validate 工程.CIV`
+
+## 项目级扩展清单
+
+顶层可选 `extensions` 与 meta/workspace 并列，version=1；不增加第 19 个 workspace 分节。声明 source_root、files 及可选 retired_paths，源码位于 .CIV 旁。完整字段与迁移见 [项目级扩展](project-extensions.md)。旧工程没有该字段时保持兼容。

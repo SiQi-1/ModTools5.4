@@ -73,5 +73,30 @@
     "query": "自定义文件加载顺序",
     "expected": "05-modtools-civ/pipeline.md",
     "top": 3
+  },
+  {
+    "query": "Core.sql",
+    "expected": "05-modtools-civ/project-extensions.md",
+    "top": 3
+  },
+  {
+    "query": "项目级扩展",
+    "expected": "05-modtools-civ/project-extensions.md",
+    "top": 3
+  },
+  {
+    "query": "源码与输出",
+    "expected": "05-modtools-civ/project-extensions.md",
+    "top": 3
+  },
+  {
+    "query": "project-check",
+    "expected": "05-modtools-civ/project-extensions.md",
+    "top": 3
+  },
+  {
+    "query": "扩展依赖",
+    "expected": "05-modtools-civ/project-extensions.md",
+    "top": 3
   }
 ]

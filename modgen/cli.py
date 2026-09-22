@@ -108,16 +108,17 @@ def _cmd_custom_file(args: argparse.Namespace) -> int:
                 content,
                 action_type=args.action or "",
                 register_action=not args.no_action,
+                civ_path=civ_path,
             )
             save_civ(civ_path, payload)
             print(f"已写入自定义文件：{result['absolute']}")
             if result["actions"]:
                 specs = "、".join(f"{scope}/{atype}" for scope, atype in result["actions"])
                 print(f"已注册文件动作：{specs}")
-            print("提示：GUI「一键生成」/ --ai-exec generate_all 会原样透传该文件进 .civ6proj 与 ActionData。")
+            print("提示：已启用扩展管理时写入源码目录；build / GUI 一键生成会同步到 ModBuddy 工程。")
             return 0
         if args.sub == "list":
-            summary = list_custom_files(payload)
+            summary = list_custom_files(payload, civ_path=civ_path)
             print(f"工程目录：{summary['root']}")
             print(f"磁盘文件 {len(summary['files'])} 个：")
             for item in summary["files"]:
@@ -127,9 +128,11 @@ def _cmd_custom_file(args: argparse.Namespace) -> int:
                 print(f"{label} {len(entries)} 条：")
                 for entry in entries:
                     print(f"  {entry['type']} id={entry['id']} load={entry['load_order']} files={entry['files']}")
-            return 0
+            for error in summary.get("errors", []):
+                print(f"ERROR: {error['message']}", file=sys.stderr)
+            return 1 if summary.get("errors") else 0
         if args.sub == "remove":
-            result = remove_custom_file(payload, args.path, keep_file=args.keep_file)
+            result = remove_custom_file(payload, args.path, keep_file=args.keep_file, civ_path=civ_path)
             save_civ(civ_path, payload)
             print(
                 f"已从动作移除 {result['removed_actions']} 处引用；"
@@ -585,7 +588,7 @@ def build_parser() -> argparse.ArgumentParser:
     sk.set_defaults(func=_cmd_skill)
 
     cc = sub.add_parser("check-conflicts", help="自定义 SQL × 生成 SQL 冲突检测（主键重复=ERROR；UPDATE 生成表=WARNING）")
-    cc.add_argument("civ", help="工程 .CIV 路径（需已绑定 .civ6proj；需 PyQt 环境）")
+    cc.add_argument("civ", help="工程 .CIV 路径（扩展可直接检查源码；完整预览需 PyQt）")
     cc.add_argument("--json", action="store_true", help="JSON 输出（供 AI 消费）")
     cc.set_defaults(func=_cmd_check_conflicts)
 
@@ -609,6 +612,9 @@ def build_parser() -> argparse.ArgumentParser:
     cp.add_argument("--no-art-xml", action="store_true", help="不生成空白 Art.xml")
     cp.add_argument("--update-civ", action="store_true", help="把生成路径回写进 .CIV 基础信息（自动备份 .bak）")
     cp.set_defaults(func=_cmd_civ6proj)
+
+    from .extension_cli import register as register_extensions
+    register_extensions(sub)
 
     cf = sub.add_parser("custom-file", help="自定义 SQL/XML/Lua 文件通道：写入 .civ6proj 工程目录并注册文件动作")
     cf_sub = cf.add_subparsers(dest="sub", required=True)

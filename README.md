@@ -106,7 +106,8 @@
 | 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现；**`modgen skill <关键词>` 本地技能库章节检索**（仓库根 skills/，写法/模板/工作流/Lua 知识）；`query "SQL"` 查游戏库表结构/数据 |
 | 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures；`preview` 可无头预览将导出的全部文件（需 PyQt） |
 | .civ6proj 工程 | `modgen civ6proj 工程.CIV [--update-civ]` 直接生成 ModBuddy 兼容工程文件 + 空白 Art.xml，**无需 ModBuddy 新建工程** |
-| **自定义文件通道** | 自定义 SQL/XML/Lua：`modgen custom-file write/list/remove` 或 AI 控制接口 `project_file_write`——写入工程目录、自动注册文件动作、一键生成原样透传 |
+| **项目级扩展** | `extension init --gameplay --ui` 创建 Core/脚本配套；.CIV 管清单、旁目录存源码，`project-check` / `build` 统一检查与生成，见 [指南](skills/05-modtools-civ/project-extensions.md) |
+| **自定义文件通道** | 自定义 SQL/XML/Lua：`modgen custom-file write/list/remove` 或 AI 控制接口 `project_file_write`——扩展工程写源码目录并编译动作，旧工程写输出目录并原样透传 |
 | GUI 一键按钮 | **AI 控制接口**：`python ModTools5.4.py 工程.CIV --ai-port 8765` 后经 HTTP 驱动一键生成/一键配置/导入/截图（协议见 `ModTools_5_4/docs/AI_CONTROL_API.md`）；一次性执行 `--ai-exec '<json动作>'` |
 
 ### 边界（务必向用户强调）

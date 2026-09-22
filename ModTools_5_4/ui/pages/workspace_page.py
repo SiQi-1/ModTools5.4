@@ -624,6 +624,9 @@ class WorkspacePage(BasePage):
             raise ValueError("尚未指定工程保存路径")
         if target_path.suffix.upper() != CIV_FILE_EXTENSION:
             target_path = target_path.with_suffix(CIV_FILE_EXTENSION)
+        if self._project.extensions and self._project_file_path:
+            from ...project.extensions import copy_sources_for_save_as
+            copy_sources_for_save_as(self._project.to_dict(), self._project_file_path, target_path)
         self._project_service.save(target_path, self._project)
         self._project_file_path = target_path
         if 0 <= self._active_session_index < len(self._sessions):
@@ -8291,6 +8294,11 @@ class WorkspacePage(BasePage):
         front_entries = file_info.get("front_end_actions") if isinstance(file_info.get("front_end_actions"), list) else []
         in_game_entries = file_info.get("in_game_actions") if isinstance(file_info.get("in_game_actions"), list) else []
 
+        if self._project.extensions:
+            plan = getattr(self, "_extension_plan", {})
+            front_entries = plan.get("front_end_actions", front_entries)
+            in_game_entries = plan.get("in_game_actions", in_game_entries)
+
         localized_text_cdata = "\n".join(
             [
                 "<LocalizedText>",
@@ -9944,6 +9952,7 @@ class WorkspacePage(BasePage):
 
         basic = self._load_basic_info_payload_from_project() or {}
         file_info = basic.get("file_info") if isinstance(basic, dict) else {}
+        generated_extension_guard = set(files)
         managed_action_paths: set[str] = set()
         if isinstance(file_info, dict):
             action_sources = []
@@ -10055,16 +10064,33 @@ class WorkspacePage(BasePage):
 
         self._readonly_custom_paths = set()
         self._cached_custom_project_files = []
+        from ...project.extensions import plan_extensions
+        self._extension_plan = plan_extensions(
+            self._project.to_dict(), self._project_file_path,
+            generated_paths=generated_extension_guard,
+        )
+        extension_files = self._extension_plan["files"]
+        extension_paths = {p.lower() for p in extension_files}
+        deleted_paths = {
+            str(p).replace("\\", "/").lower()
+            for p in self._project.extensions.get("retired_paths", [])
+        }
+        files = {p: text for p, text in files.items() if p.lower() not in deleted_paths}
         if isinstance(civ6proj_path, Path) and civ6proj_path.exists():
             external_files, external_folders, custom_paths = self._collect_external_project_files(
                 root_dir=civ6proj_path.parent,
                 civ6proj_name=proj_name,
-                generated_paths=set(files.keys()),
+                generated_paths=set(files.keys()) | set(extension_files),
             )
-            files.update(external_files)
+            files.update({p: text for p, text in external_files.items() if p.lower() not in deleted_paths})
             folders.update(external_folders)
-            self._readonly_custom_paths = set(custom_paths)
-            self._cached_custom_project_files = list(custom_paths)
+            self._readonly_custom_paths = {p for p in custom_paths if p.lower() not in deleted_paths}
+            self._cached_custom_project_files = sorted(self._readonly_custom_paths)
+
+        files = {p: text for p, text in files.items() if p.lower() not in extension_paths}
+        files.update(extension_files)
+        for rel in extension_files:
+            folders.update(parent.as_posix() for parent in Path(rel).parents if str(parent) != ".")
 
         files[proj_name] = self._build_civ6proj_preview(proj_name, files, folders)
 
@@ -10252,6 +10278,17 @@ class WorkspacePage(BasePage):
             return False
         return self._validate_ui_icons()
 
+    def _extension_generation_issues(self, files: dict[str, str]) -> list[dict]:
+        issues = list(getattr(self, "_extension_plan", {}).get("errors", []))
+        if self._project.extensions and not issues:
+            from modgen.custom_conflicts import check_conflicts
+            checked = check_conflicts(self._project_file_path, payload=self._project.to_dict(), manifest={
+                "files": files, "readonly_custom_paths": sorted(self._readonly_custom_paths),
+                "actions": {key: self._extension_plan[key] for key in ("front_end_actions", "in_game_actions")},
+            })
+            issues.extend(checked["errors"])
+        return issues
+
     def generate_single_output_file(
         self, relative_path: str, *, overwrite: bool | None = None
     ) -> dict[str, object] | None:
@@ -10305,6 +10342,12 @@ class WorkspacePage(BasePage):
             }
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
+        extension_errors = self._extension_generation_issues(files)
+        if extension_errors:
+            if interactive:
+                QMessageBox.warning(self, "扩展工程校验失败", "\n".join(e["message"] for e in extension_errors))
+                return None
+            return {"ok": False, "error": "extensions_invalid", "issues": extension_errors}
         if not can_generate or civ6proj_path is None:
             if interactive:
                 QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
@@ -10490,6 +10533,12 @@ class WorkspacePage(BasePage):
             }
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
+        extension_errors = self._extension_generation_issues(files)
+        if extension_errors:
+            if interactive:
+                QMessageBox.warning(self, "扩展工程校验失败", "\n".join(e["message"] for e in extension_errors))
+                return None
+            return {"ok": False, "error": "extensions_invalid", "issues": extension_errors}
         if not can_generate or civ6proj_path is None:
             if interactive:
                 QMessageBox.warning(self, "无法生成", "请先在基础信息中导入 .civ6proj 文件后再生成。")
@@ -10786,6 +10835,7 @@ class WorkspacePage(BasePage):
                 "in_game_actions": _compact_actions("in_game_actions"),
             },
             "custom_files": custom_files_list,
+            "extensions": self._project.extensions or None,
         }
 
     def ai_run_quick_config(self) -> dict[str, object]:
@@ -10910,6 +10960,50 @@ class WorkspacePage(BasePage):
     def _ai_sync_basic_info_to_project(self) -> None:
         self._save_basic_info_payload_to_project(self._basic_info_workspace.export_project_payload())
 
+    def ai_extension(self, operation: str = "list", **params) -> dict[str, object]:
+        """Managed source operations share the Qt-free extension service."""
+        from ...project import extensions as ext
+        import copy
+        self._sync_workspace_sections_from_editors()
+        payload = copy.deepcopy(self._project.to_dict())
+        civ = self._project_file_path
+        if civ is None:
+            return {"ok": False, "error": "unsaved_project", "message": "先 save_project，再管理扩展源码"}
+        try:
+            if operation == "init":
+                result = ext.init_extensions(payload, civ, gameplay=bool(params.get("gameplay")), ui=bool(params.get("ui")))
+            elif operation in {"list", "check"}:
+                self._project_root_manifest()
+                result = dict(self._extension_plan)
+                result.pop("files", None)
+                result["ok"] = not result["errors"]
+                return result
+            elif operation == "write":
+                if not isinstance(params.get("content"), str):
+                    raise ext.ExtensionError("content 必须为字符串")
+                result = ext.write_extension(
+                    payload, civ, params.get("relative_path"), params["content"],
+                    **{k: params[k] for k in ("role", "id", "feature", "scope", "phase", "depends_on") if k in params},
+                )
+            elif operation == "remove":
+                result = ext.remove_extension(payload, civ, params.get("relative_path"), keep_file=bool(params.get("keep_file")))
+            else:
+                raise ext.ExtensionError(f"未知扩展操作：{operation}")
+            self._basic_info_workspace.import_project_payload(ext.basic_data(payload))
+            self._project.extensions = payload["extensions"]
+            self.save_project()
+            self._refresh_project_root_workspace()
+            return result
+        except (ValueError, OSError) as exc:
+            return {"ok": False, "error": "extension_invalid", "message": str(exc)}
+
+    def ai_project_check(self) -> dict[str, object]:
+        from modgen.extension_cli import check_project
+        self._sync_workspace_sections_from_editors()
+        if self._project_file_path is None:
+            return {"ok": False, "errors": [{"message": "先保存 .CIV"}]}
+        return check_project(self._project_file_path, payload=self._project.to_dict(), page=self)
+
     def ai_project_file_write(
         self,
         relative_path: str,
@@ -10919,6 +11013,14 @@ class WorkspacePage(BasePage):
         action_type: str = "",
     ) -> dict[str, object]:
         """把自定义 SQL/XML/Lua 文件写进工程目录（一键生成原样透传），并注册文件动作。"""
+        if self._project.extensions:
+            from ...project.extensions import ROLES
+            if not register_action:
+                return {"ok": False, "error": "extension_role_required", "message": "受管文件需声明 role，Lua 库使用 import"}
+            role = next((key for key, value in ROLES.items() if value == action_type), None) if action_type else None
+            if action_type and role is None:
+                return {"ok": False, "error": "bad_action_type", "message": f"扩展不支持动作：{action_type}"}
+            return self.ai_extension("write", relative_path=relative_path, content=content, **({"role": role} if role else {}))
         from ...project.custom_files import sanitize_relative_path
 
         rel = sanitize_relative_path(relative_path)
@@ -10954,6 +11056,16 @@ class WorkspacePage(BasePage):
         rel = sanitize_relative_path(relative_path)
         if not rel:
             return {"ok": False, "error": "invalid_path", "message": f"非法相对路径：{relative_path}"}
+        if self._project.extensions:
+            from ...project import extensions as ext
+            try:
+                entry = next((e for e in self._project.extensions["files"] if e["path"].casefold() == rel.casefold()), None)
+                if entry:
+                    target = ext.safe_path(ext.source_root(self._project.to_dict(), self._project_file_path), entry["path"])
+                    raw = target.read_bytes()
+                    return {"ok": True, "path": entry["path"], "content": raw.decode("utf-8-sig"), "size": len(raw), "source": True}
+            except (ValueError, OSError) as exc:
+                return {"ok": False, "error": "source_read_failed", "message": str(exc)}
         root = self._ai_project_root_dir()
         if root is None:
             return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj。"}
@@ -10973,6 +11085,11 @@ class WorkspacePage(BasePage):
         return {"ok": True, "path": rel, "content": text, "size": len(raw)}
 
     def ai_project_file_list(self) -> dict[str, object]:
+        if self._project.extensions:
+            from modgen.custom_file import list_custom_files
+            self._sync_workspace_sections_from_editors()
+            summary = list_custom_files(self._project.to_dict(), civ_path=self._project_file_path)
+            return {"ok": not summary.get("errors"), **summary}
         root = self._ai_project_root_dir()
         if root is None:
             return {"ok": False, "error": "no_civ6proj", "message": "请先新建/选择 .civ6proj。"}
@@ -11010,6 +11127,10 @@ class WorkspacePage(BasePage):
         }
 
     def ai_project_file_delete(self, relative_path: str, *, remove_action: bool = True) -> dict[str, object]:
+        if self._project.extensions:
+            if not remove_action:
+                return {"ok": False, "error": "extension_role_required", "message": "受管文件删除必须同步移除声明"}
+            return self.ai_extension("remove", relative_path=relative_path)
         from ...project.custom_files import sanitize_relative_path
 
         rel = sanitize_relative_path(relative_path)

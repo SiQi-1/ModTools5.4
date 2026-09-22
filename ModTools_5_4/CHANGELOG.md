@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-23 - 项目级扩展与 Core / Lua 统一工作流
+
+- 新增可选 `.CIV.extensions` 清单，工程旁保存独立源码；角色、作用域、前后阶段、功能归属与依赖统一管理。Qt-free project/extensions.py 供 CLI/GUI/AI 共用，旧工程保持原通道。
+- extension init 配套创建 Core / Gameplay / UI；同名旧输出自动纳管并保留内容。支持 write/import/list/check/remove、跨目录另存复制、路径与链接边界检查、删除计划及重建；缺失源码不回退到旧输出。
+- 扩展动作使用独立 MTX_ ID、明确加载顺序并排除旧动作重复登记。UI 动作只引用 XML，同名 Lua 进入 Content。预览只读；生成前阻断源码/依赖/路径重名及已知主键冲突。
+- 新增 project-check / build；build 自动配置、检查并生成 ModBuddy 工程源码，不调用 ModBuddy 编译/Cooker/部署。AI 新增 extension/project_check；get_state/get_manifest 返回扩展信息，已有文件写接口在扩展工程中写源码。
+- SQL 检查覆盖多行 VALUES、复合主键、重排字段、XML Row、注释和字符串分号；按数据库作用域隔离。未知主键、动态值与 INSERT SELECT 明确报告静态覆盖边界，移除机械改写 REPLACE 的错误建议。
+- 同步规则、完整功能工作流、迁移指南、检索路由及 API/CLI 契约；发布资源加入 AI 项目检查需要的 modgen schemas。验证：主套件 431 项无失败（429 通过、2 项符号链接权限跳过）；modgen 96 项通过；知识检查 225 篇 / 20 场景零问题。最终相关回归 37 项无失败（36 通过、1 项权限跳过），含触发器边界；Python 编译与发布脚本语法检查通过，未执行完整安装包或游戏构建。
+
 ## 2026-09-23 - AI 知识框架与检索重构
 
 - 新增 skills/RULES.md / WORKFLOW.md / SOURCES.md；根入口强制按任务读取依据，AGENT 保留兼容指针；专项指南覆盖 UI图标、独立纹理、自定义 LOC、原版快照与自定义文件。

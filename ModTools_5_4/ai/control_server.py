@@ -125,7 +125,10 @@ class ControlContext:
             ctx._require_workspace()
             ws = ctx.workspace_page
             manifest = ctx.generation_service.manifest(ws)
-            return manifest.to_dict()
+            result = manifest.to_dict()
+            result["extension_errors"] = getattr(ws, "_extension_plan", {}).get("errors", [])
+            result["extension_paths"] = sorted(getattr(ws, "_extension_plan", {}).get("files", {}))
+            return result
 
         def _h_generate_all(_ctx, params):
             ctx._require_workspace()
@@ -177,6 +180,16 @@ class ControlContext:
             return ctx.workspace_page.ai_import_entry_from_db(
                 section, obj_type, replace=bool(params.get("replace", False))
             )
+
+        def _h_extension(_ctx, params):
+            ctx._require_workspace()
+            options = dict(params)
+            operation = str(options.pop("operation", "list"))
+            return ctx.workspace_page.ai_extension(operation, **options)
+
+        def _h_project_check(_ctx, _params):
+            ctx._require_workspace()
+            return ctx.workspace_page.ai_project_check()
 
         def _h_project_file_write(_ctx, params):
             ctx._require_workspace()
@@ -336,6 +349,8 @@ class ControlContext:
         self.register("civ6proj_create", "新建 ModBuddy 兼容 .civ6proj（directory/file_name/fields/create_art_xml）", _h_civ6proj_create)
         self.register("quick_config", "一键配置：扫描工程目录追加文件动作", _h_quick_config)
         self.register("import_from_db", "从游戏库导入条目（section/type/replace?）", _h_import_from_db)
+        self.register("extension", "管理工程扩展源码（init/write/list/check/remove），修改自动保存 .CIV", _h_extension)
+        self.register("project_check", "统一检查当前 .CIV、扩展、预览和 SQL 冲突", _h_project_check)
         self.register("project_file_write", "写自定义 SQL/XML/Lua 文件进工程目录并注册动作（relative_path/content/register_action?/action_type?）", _h_project_file_write)
         self.register("project_file_read", "读取工程目录文件内容（relative_path）", _h_project_file_read)
         self.register("project_file_list", "列出工程目录文件与文件动作", _h_project_file_list)

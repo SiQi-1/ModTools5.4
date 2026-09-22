@@ -27,7 +27,8 @@
 
 - 主内容通过 `new-project`、`generate`、`generate-*` 建骨架，Type 由工具生成，再按 schema 填入意图；不靠复制旧工程搭新骨架。
 - AI 编写的 JSON 值禁止空字符串：省略字段或写 `null`，不要写字符串 `"null"`、通用占位 `"NONE"`。参数名和枚举需查证，图片路径必须真实。
-- 主内容不手写 SQL/XML，不把 Lua 塞进条目。确需特殊 SQL、UI XML 或 Lua，内容临时文件放 `modgen_work/`，通过 `custom-file write` / `project_file_write` 写入并注册；工具是工程文件的唯一写入者。
+- 主内容不手写 SQL/XML，不把 Lua 塞进条目。确需特殊 SQL、UI XML 或 Lua，内容临时文件放 `modgen_work/`，先启用 [项目级扩展](05-modtools-civ/project-extensions.md)，通过 `extension write` / `custom-file write` / AI `extension` 写入源码并按清单注册；工具是工程文件的唯一写入者。
+- 默认将未被 .CIV 支持的 Gameplay SQL 集中到 Core.sql；不同数据库作用域或前后阶段有明确需求时再分文件。一次规划完整功能的数据、GP、UI、文本与资源，登记功能归属和依赖。源码和 ModBuddy 输出分离，缺失源码不得用输出副本替代。
 - 修改生成内容应回到 .CIV；自定义 SQL 不得与生成数据同主键双写，不得为消除告警随意改成 REPLACE。
 
 ## R5 按任务读取
@@ -39,12 +40,12 @@
 | Lua/事件 | [Lua 规范](04-lua/code-style.md)、[Lua 索引](04-lua/INDEX.md) 中对应模式 |
 | UI/按钮/控件 | [控件参考](04-lua/lua-xml-controls.md)、[美术与文本指南](05-modtools-civ/ui-assets.md) |
 | 图标/背景/纹理/LOC | [美术与文本指南](05-modtools-civ/ui-assets.md)，区分实体图标、UI图标、独立纹理与自定义文本 |
-| 自定义 SQL/XML/Lua | [自定义文件与交付](05-modtools-civ/pipeline.md) |
+| 自定义 SQL/XML/Lua | [项目级扩展](05-modtools-civ/project-extensions.md)、[自定义文件与交付](05-modtools-civ/pipeline.md) |
 
 ## R6 验证与交付
 
 - 保存/合并前 `validate`；ERROR 必须修复，WARNING 逐项说明处理依据。
-- `preview` 检查文件清单及相关 SQL/XML；自定义 SQL 后运行 `check-conflicts`。预览需 PyQt，纯数据命令不需要。
+- 扩展工程执行 `project-check` 统一检查数据、源码、依赖、预览、动作及 SQL 冲突；用 `preview` 核对具体内容。旧自定义 SQL 流程继续使用 `check-conflicts`。完整检查/预览需 PyQt，`extension check` 等纯数据命令不需要。
 - 检查引用、挂载链、文本、动作注册及输出目录。构建、部署、游戏内测试分别记录；校验通过不能宣称实机效果已验证。
 - 无法执行某项验证时说明原因和剩余步骤，继续完成可执行的检查。交付包括变更、依据、验证结果及尚未确认的边界。
 

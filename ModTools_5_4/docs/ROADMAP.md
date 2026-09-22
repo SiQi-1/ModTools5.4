@@ -44,7 +44,7 @@
 ### 4) 美术与输出链路
 - Icons.xml / ArtDef / XLP / Art.xml / Textures（PNG→DDS→TEX→XLP）/ Moments / 领袖独立 XLP；格式说明见 `docs/TEX_FORMAT.md`。
 - **「UI图标」段**（2026-09-19）：`.CIV` 可声明与游戏实体无关的自定义 UI 图标（新闻分类/单位动作/追踪器等），
-  只影响 `Icons.xml` 与 IMG/Textures；美术页专属编辑区（列表增删、源图选择与状态提示），
+  只影响 `Icons.xml` 与 IMG/Textures；美术页专属编辑区（列表增删、源图选择与状态提示，工作区树不单列节点），
   校验接入 GUI 生成前检查与 `modgen validate`，命名空间（`ICON_<实体类型>_*`）冲突报 ERROR。
   实现单一来源 `project/ui_icons.py`（Qt-free，GUI/modgen 共用）；11 类实体图标产出未改动。
 - 领袖颜色配置与城邦旗帜实时预览；工程根一键生成 + 覆盖冲突弹窗 + 删除计划（含路径穿越防护）。

@@ -2436,15 +2436,6 @@ class ArtWorkspacePanel(QWidget):
         self._render_ui_icon_table()
         self._refresh_previews()
 
-    def focus_ui_icon_entry(self, index: int = -1) -> None:
-        """把 UI 图标表格滚动到指定行（-1 = 不选中具体行）。供工作区树导航调用。"""
-        count = self._ui_icon_table.rowCount()
-        if index < 0 or index >= count:
-            self._ui_icon_table.clearSelection()
-            return
-        self._ui_icon_table.setCurrentCell(index, 0)
-        self._ui_icon_table.scrollToItem(self._ui_icon_table.item(index, 0) or self._ui_icon_table.item(index, 4))
-
     def _refresh_previews(self) -> None:
         art_xml_files = self._build_art_xml_preview_files()
         self._preview_groups = {

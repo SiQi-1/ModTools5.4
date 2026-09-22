@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -451,6 +452,51 @@ class UIIconGenerationTestCase(unittest.TestCase):
         texture_names = {str(plan.get("name")) for plan in self.page._build_textures_output_plan()}
         self.assertIn("ICON_TEST_NEWS_ICON_32", texture_names)
         self.assertIn("ICON_TEST_NEWS_ICON_50", texture_names)
+
+    def _tree_section_labels(self) -> list[str]:
+        tree = self.page._tree
+        root = tree.topLevelItem(0)
+        return [
+            root.child(i).text(0)
+            for i in range(root.childCount())
+        ]
+
+    def test_tree_has_no_separate_ui_icon_node(self) -> None:
+        """「UI图标」在树里不单列节点（编辑入口只有美术页，避免与「美术」重复一栏）。"""
+        self.page._rebuild_tree()
+        labels = self._tree_section_labels()
+        self.assertNotIn(UI_ICON_SECTION, labels)
+        # 美术页仍在，且是唯一入口
+        self.assertIn("美术", labels)
+        # 数据分节照旧存在（不是从 .CIV 里删掉）
+        self.assertIn(UI_ICON_SECTION, self.page._project.sections)
+
+    def test_tree_has_no_ui_icon_node_even_with_entries(self) -> None:
+        self.page._project.sections[UI_ICON_SECTION] = [{
+            "icon_name": "ICON_TEST_TREE",
+            "images": {"icon": {"path": str(sample_ui_icon_png())}},
+        }]
+        self.page._rebuild_tree()
+        labels = self._tree_section_labels()
+        self.assertNotIn(UI_ICON_SECTION, labels)
+        self.assertFalse(
+            any(UI_ICON_SECTION in str(label) for label in labels),
+            labels,
+        )
+
+    def test_old_project_without_section_loads_without_extra_tree_row(self) -> None:
+        """老工程（.CIV 里没有「UI图标」键）打开后：树不多一栏，分节仍被归一化出来。"""
+        payload = build_sample_project().to_dict()
+        payload["workspace"].pop(UI_ICON_SECTION, None)
+        legacy_path = Path(self._tmp.name) / "legacy_no_ui_icon.CIV"
+        legacy_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        self.window.open_project_file(legacy_path)
+        labels = self._tree_section_labels()
+        self.assertNotIn(UI_ICON_SECTION, labels)
+        self.assertIn("美术", labels)
+        # 归一化补空列表：生成流程照常，不报错
+        self.assertEqual(self.page._project.sections.get(UI_ICON_SECTION), [])
 
 
 if __name__ == "__main__":

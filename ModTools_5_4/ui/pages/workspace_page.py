@@ -691,6 +691,10 @@ class WorkspacePage(BasePage):
         root.setExpanded(True)
 
         for section in CIV_SECTION_ORDER:
+            if section in CIV_UI_ICON_SECTIONS:
+                # 「UI图标」不是可导航分节：它是美术资源的附属声明，编辑入口在「美术」页，
+                # 所以不在树里单列节点（避免与「美术」重复的空白一栏）。
+                continue
             section_item = QTreeWidgetItem([section])
             if section in CIV_DIRECT_WORKSPACE_SECTIONS:
                 section_item.setData(0, Qt.ItemDataRole.UserRole, {"kind": "section_leaf", "section": section})
@@ -11051,9 +11055,6 @@ class WorkspacePage(BasePage):
 
         if kind == "section_group":
             section = str(payload.get("section") or "")
-            if section == UI_ICON_SECTION:
-                self._show_ui_icon_workspace(-1)
-                return
             self._workspace_title.setText(section)
             self._workspace_info.setText("这是子条目组。可新增子条目，并查看 SQL/XML 预览。")
             self._workspace_path.setText(f"路径：{self._project.project_name} / {section}")
@@ -11065,9 +11066,6 @@ class WorkspacePage(BasePage):
             section = str(payload.get("section") or "")
             entry_name = str(payload.get("entry_name") or "")
             index = int(payload.get("index") or 0)
-            if section == UI_ICON_SECTION:
-                self._show_ui_icon_workspace(index, entry_name=entry_name)
-                return
             self._workspace_title.setText(entry_name)
             self._workspace_info.setText("已进入子条目工作区。")
             self._workspace_path.setText(f"路径：{self._project.project_name} / {section} / {entry_name}（#{index + 1}）")
@@ -11079,16 +11077,3 @@ class WorkspacePage(BasePage):
             self._section_item_workspace.set_item(section, index, entry_payload, fallback_name=entry_name)
             self._workspace_stack.setCurrentWidget(self._section_item_workspace)
             return
-
-    def _show_ui_icon_workspace(self, index: int = -1, *, entry_name: str = "") -> None:
-        """「UI图标」节点 → 美术页的 UI 图标编辑区（该段无 SQL/文本编辑器，只在美术页编辑）。"""
-        self._workspace_title.setText(UI_ICON_SECTION)
-        self._workspace_info.setText(
-            "UI图标段：声明与游戏实体无关的自定义 UI 图标（新闻分类/单位动作/追踪器等）。"
-            "只影响 Icons.xml 与 IMG/Textures 输出，不生成 SQL 与文本。"
-        )
-        suffix = f" / {entry_name}" if entry_name else ""
-        self._workspace_path.setText(f"路径：{self._project.project_name} / {UI_ICON_SECTION}{suffix}")
-        self._art_workspace.refresh_from_sections(self._project.sections)
-        self._workspace_stack.setCurrentWidget(self._art_workspace)
-        self._art_workspace.focus_ui_icon_entry(index)

@@ -31,7 +31,8 @@
 | `alias` | ✘ | 非空 → 出 `IconAliases` 行复用该图标，不出自带图集/纹理 |
 
 - 图集名 = `ATLAS_` + `icon_name` 去掉 `ICON_`（如 `ICON_SIQI_WUJIU_NEWS_CITY` → `ATLAS_SIQI_WUJIU_NEWS_CITY`）；
-- GUI 入口：工作区树「UI图标」节点 → 美术页的「UI图标」编辑区；
+- GUI 入口：**美术页的「UI图标」编辑区**（工作区树里没有独立节点——它不是可导航分节，
+  只是美术资源的附属声明；`.CIV` 里该分节照常读写）；
 - 校验：`modgen validate` 与 GUI 生成前检查同源（缺源图 / 命名非法 / 段内重复 / 命名空间冲突 = ERROR）；
 - 单独查产物：`python -m modgen.cli preview <工程.CIV> --section UI图标`（直接打印 Icons.xml）。
 

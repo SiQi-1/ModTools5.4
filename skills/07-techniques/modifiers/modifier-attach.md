@@ -1,5 +1,7 @@
 # modifier-attach -- ATTACH_MODIFIER 链式机制
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
 ATTACH_MODIFIER 系列 EffectType 是整个 Modifier 系统的**链式枢纽**。一个"外层"Modifier（使用这些 EffectType）将另一个"内层"Modifier（由 `ModifierId` 参数指定）挂载到指定集合的每个成员上。这是实现"先圈范围，再挂效果"的核心模式。
 
 典型场景：

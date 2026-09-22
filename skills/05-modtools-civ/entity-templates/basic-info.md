@@ -11,7 +11,7 @@
 | | `language` | 语言（`简体中文`），主体只写 zh_Hans_CN |
 | `shared_workspace_params` | `prefix` / `infix` | 同 global_settings |
 | | `file_name` | 工程文件名（如 `Siqi_Leaders_0032`），生成 SQL/XML 的基名 |
-| `project_info` | `civ6proj_path` | 目标 ModBuddy 工程 .civ6proj 绝对路径（工具输出写入点，AGENTS.md §0） |
+| `project_info` | `civ6proj_path` | 目标 ModBuddy 工程 .civ6proj 绝对路径（工具输出写入点，[规则正文](../../RULES.md)） |
 | | `mod_name`/`teaser`/`description` | 创意工坊展示文本（description 可含 `[NEWLINE]`） |
 | | `authors`/`thanks` | 作者/鸣谢 |
 | | `guid` | 工程 GUID（新建时工具生成；复用工程时保留原值） |
@@ -23,5 +23,5 @@
 ## 出口检查
 
 - [ ] prefix/infix 与用户既有工程一致（查 `D:\文明6mod用文件夹\ModTools5.4\*.CIV` 现有工程惯例）
-- [ ] `civ6proj_path` 指向真实存在的 ModBuddy 工程（AGENTS.md §0 路径）
+- [ ] `civ6proj_path` 指向真实存在的 ModBuddy 工程（[规则正文](../../RULES.md) 路径）
 - [ ] file_name 与工程命名一致（如 `Siqi_Leaders_0032`）

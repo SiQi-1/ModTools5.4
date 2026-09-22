@@ -55,7 +55,7 @@ INSERT INTO DistrictReplaces (CivUniqueDistrictType, ReplacesDistrictType) VALUE
 ```
 
 - 非特色区域不写此表
-- ReplacesDistrictType 枚举值见 [reference/enums/DistrictType.txt](../../reference/enums/DistrictType.txt)（41 条，含中文名，不含 Mod 区域）
+- ReplacesDistrictType 枚举值见 [DistrictType 查询依据](../SOURCES.md#类型与枚举)（41 条，含中文名，不含 Mod 区域）
 
 ---
 
@@ -303,7 +303,7 @@ INSERT INTO District_CitizenGreatPersonPoints (DistrictType, GreatPersonClassTyp
 ('DISTRICT_SIQI_{SHORT}', 'GREAT_PERSON_CLASS_SCIENTIST', 1);
 ```
 
-GreatPersonClassType 见 [reference/enums/GreatPersonClassType.txt](../../reference/enums/GreatPersonClassType.txt)（10 条，含中文名，不含 Mod）
+GreatPersonClassType 见 [GreatPersonClassType 查询依据](../SOURCES.md#类型与枚举)（10 条，含中文名，不含 Mod）
 
 ---
 
@@ -316,7 +316,7 @@ INSERT INTO District_ValidTerrains (DistrictType, TerrainType) VALUES
 ('DISTRICT_SIQI_{SHORT}', 'TERRAIN_GRASS');
 ```
 
-TerrainType 查 [reference/enums/TerrainType.txt](../../reference/enums/TerrainType.txt)。
+TerrainType 查 [TerrainType 查询依据](../SOURCES.md#类型与枚举)。
 
 ### District_RequiredFeatures
 
@@ -325,7 +325,7 @@ INSERT INTO District_RequiredFeatures (DistrictType, FeatureType) VALUES
 ('DISTRICT_SIQI_{SHORT}', 'FEATURE_FOREST');
 ```
 
-FeatureType 查 [reference/enums/FeatureType.txt](../../reference/enums/FeatureType.txt)。
+FeatureType 查 [FeatureType 查询依据](../SOURCES.md#类型与枚举)。
 
 ---
 

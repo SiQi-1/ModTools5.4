@@ -244,4 +244,4 @@ INSERT INTO LocalizedText (Language, Tag, Text) VALUES
 
 | 文件 | 内容 |
 |------|------|
-| `reference/enums/GovernmentSlotType.txt` | 5 种政策槽位 |
+| [GovernmentSlotType 查询依据](../SOURCES.md#类型与枚举) | 5 种政策槽位 |

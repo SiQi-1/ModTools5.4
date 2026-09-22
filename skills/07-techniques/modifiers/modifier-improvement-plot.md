@@ -1,5 +1,7 @@
 # modifier-improvement-plot -- 改良/地块/地形类 EffectType
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
 ---
 
 ### EFFECT_ADJUST_CITY_ALLOWED_IMPROVEMENT
@@ -12,7 +14,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，要解锁的改良 |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，要解锁的改良 |
 
 > **溯源**：总督梁（测量员）— `AQUACULTURE_CAN_BUILD_FISHERY` 解锁渔场；总督瑞娜（园艺家）— `PARKS_RECREATION_CAN_BUILD_CITY_PARK` 解锁城市公园。`MODIFIER_CITY_ADJUST_ALLOWED_IMPROVEMENT` 首次定义于 `Expansion1_Modifiers.xml`（R&F）。
 
@@ -80,7 +82,7 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，产出加成量 |
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，指定改良 |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，指定改良 |
 
 > **溯源**：瑞典露天博物馆 — `OPEN_AIR_MUSEUM_CULTURE_FOR_TERRAIN_CLASS_CITIES`（GS `Expansion2_Improvements_Major.xml`），`ImprovementType=IMPROVEMENT_OPEN_AIR_MUSEUM`，`YieldType=YIELD_CULTURE`，`Amount=2`。地形类型筛选由 Requirement 控制（分别对雪地、冻土等挂载），不在 Effect 参数中指定。首次定义于 `Expansion2_Modifiers.xml`。
 
@@ -98,7 +100,7 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数或小数，产出加成量 |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，指定地形 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，指定地形 |
 
 > **溯源**：葡萄牙航海学校 — `NAVIGATION_SCHOOL_NAVAL_COAST_SCIENCE`（Portugal DLC `Portugal_Buildings.xml`），`TerrainType=TERRAIN_COAST`，`YieldType=YIELD_SCIENCE`，`Amount=0.5`。注意 `Amount` 支持小数（每个海岸 +0.5 科技）。`MODIFIER_CITY_ADJUST_CITY_YIELD_PER_TERRAIN_TYPE` 定义于 `Portugal_Modifiers.xml`。
 
@@ -115,7 +117,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 整数，额外累积量 |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，指定地形 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，指定地形 |
 
 > **溯源**：加拿大领袖（威尔弗里德·劳雷尔）能力"最后的西部净土"— `TUNDRA_RESOURCE_EXTRACTION`（GS `Expansion2_Leaders_Major.xml`），对冻土、冻土丘陵、雪地、雪地丘陵各挂一条，`Amount=1`。首次定义于 `Expansion2_Modifiers.xml`。
 >
@@ -134,7 +136,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，指定地貌 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，指定地貌 |
 | `Amount` | **必写** | 整数，魅力变化值 |
 
 > **溯源**：巴西文明能力"亚马逊"— `TRAIT_AMAZON_RAINFOREST_EXTRA_APPEAL`（Base `Civilizations.xml`），`FeatureType=FEATURE_JUNGLE`，`Amount=2`（雨林 +2 魅力）。`MODIFIER_PLAYER_CITIES_ADJUST_FEATURE_APPEAL_MODIFIER` 为原版定义；`MODIFIER_CITY_ADJUST_FEATURE_APPEAL_MODIFIER` 定义于 `Byzantium_Gaul_Modifiers.xml`（拜占庭/高卢 DLC），作用于单城。
@@ -151,7 +153,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，要解锁前置条件的地貌 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，要解锁前置条件的地貌 |
 | `CivicType` | **必写** | 与该前置关联的人文。`CIVIC_MEDIEVAL_FAIRES / ...`（值来自数据库 Civics 表） |
 
 > **溯源**：越南文明能力"九龙江平原"— `TRAIT_PLANT_MEDIEVAL_WOODS`（KublaiKhan_Vietnam DLC `KublaiKhan_Vietnam_Civilizations.xml`），`FeatureType=FEATURE_FOREST`，`CivicType=CIVIC_MEDIEVAL_FAIRES`。效果：无需等到中世纪集市即可在任何地块（不仅是雨林旁）种植树林。无 `Amount` 参数 — 纯解锁开关。注意：EffectType 名为 `EFFECT_ADJUST_FEATURE_PREREQ` 但 ModifierType 名为 `MODIFIER_PLAYER_ADJUST_FEATURE_UNLOCK`（非对称命名）。`MODIFIER_PLAYER_ADJUST_FEATURE_UNLOCK` 定义于 `KublaiKhan_Vietnam_Modifiers.xml`。
@@ -188,8 +190,8 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，要标记为村庄的改良 |
-| `GoodyHutImprovementType` | 可选 | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，替换的村庄类型，通常填 `IMPROVEMENT_GOODY_HUT` |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，要标记为村庄的改良 |
+| `GoodyHutImprovementType` | 可选 | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，替换的村庄类型，通常填 `IMPROVEMENT_GOODY_HUT` |
 
 > **溯源**：苏美尔领袖能力"史诗任务"— `TRAIT_BARBARIAN_CAMP_GOODY`（Base `Civilizations.xml`），`ImprovementType=IMPROVEMENT_BARBARIAN_CAMP`，`GoodyHutImprovementType=IMPROVEMENT_GOODY_HUT`。定义于 Base `Modifiers.xml`。
 
@@ -207,7 +209,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 整数（通常 `1` = 1 房）或小数（`0.5` = 半房） |
-| `ImprovementType` | 可选 | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，限定特定改良。不填则影响所有改良 |
+| `ImprovementType` | 可选 | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，限定特定改良。不填则影响所有改良 |
 
 > **溯源**：印尼甘榜屋 — `KAMPUNG_HOUSING`（Indonesia_Khmer DLC），挂载于 `IMPROVEMENT_KAMPUNG` 本身，`Amount=1`。基尔瓦基斯瓦尼 — `KILWA_IMPROVEMENT_HOUSING`（GS），`Amount=1`。`MODIFIER_SINGLE_CITY_ADJUST_IMPROVEMENT_HOUSING` 定义于 Base `Modifiers.xml`；`MODIFIER_PLAYER_CITIES_ADJUST_IMPROVEMENT_HOUSING` 定义于 GS。Effects.csv 中 `ImprovementType` 参数标记为 ESTIMATED — 实际官方使用中多数不填此参数，改用 SubjectRequirementSetId 或由改良自身挂载。
 
@@ -223,8 +225,8 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，指定改良 |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，新增允许的地形 |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，指定改良 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，新增允许的地形 |
 
 > **溯源**：`MODIFIER_PLAYER_CITIES_ADJUST_IMPROVEMENT_VALID_TERRAIN` 定义于 `Expansion2_Modifiers.xml`（GS）。注意：不存在 `MODIFIER_SINGLE_CITY_ADJUST_IMPROVEMENT_VALID_TERRAIN` — 仅玩家级城市集合版本可用。
 
@@ -240,7 +242,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，指定地形 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，指定地形 |
 | `Ignore` | **必写** | 整数（`1` = 忽略不可通行，`0` = 恢复不可通行）。注意：不是 `true`/`false` |
 
 > **溯源**：印加文明能力"米塔制度"— `TRAIT_WORK_GRASS_MOUNTAIN` 等五条（GS `Expansion2_Civilizations_Major.xml`），分别对五种山脉子类型（`GRASS/PLAINS/DESERT/TUNDRA/SNOW_MOUNTAIN`）设置 `Ignore=1`，使山脉变为可工作可改良（配合梯田改良）。`MODIFIER_PLAYER_ADJUST_TERRAIN_WORKABLE` 定义于 `Expansion2_Modifiers.xml`。
@@ -257,7 +259,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，要解锁的改良 |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，要解锁的改良 |
 
 > **溯源**：Base `Modifiers.xml` 定义。与 `EFFECT_ADJUST_CITY_ALLOWED_IMPROVEMENT` 的区别：本 Effect 作用于 `COLLECTION_OWNER`（玩家级），后者作用于 `COLLECTION_OWNER` 的城市 Modifier（如总督指派）。通常挂载于 CivilizationTrait 或 LeaderTrait 全局解锁改良。
 
@@ -291,7 +293,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 整数（百分比） |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，受折扣影响的地形 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，受折扣影响的地形 |
 
 > **溯源**：加拿大领袖能力 — `TUNDRA_PLOT_COST`、`TUNDRA_HILLS_PLOT_COST`、`SNOW_PLOT_COST`、`SNOW_HILLS_PLOT_COST`（GS `Expansion2_Leaders_Major.xml`），均 `Amount=-50`（冻土、雪地购地半价）。`MODIFIER_PLAYER_CITIES_ADJUST_PLOT_PURCHASE_COST_TERRAIN` 定义于 `Expansion2_Modifiers.xml`。
 
@@ -333,8 +335,8 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，每相邻一个指定改良的产出加成 |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，受加成的地形（被加成的本体） |
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，相邻触发的改良（触发源） |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，受加成的地形（被加成的本体） |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，相邻触发的改良（触发源） |
 
 > **溯源**：印加梯田 — `TRAIT_TERRACE_GRASS_MOUNTAIN` 等五条（GS `Expansion2_Civilizations_Major.xml`），`TerrainType=TERRAIN_GRASS_MOUNTAIN`（五种山脉子类型各一条），`ImprovementType=IMPROVEMENT_TERRACE_FARM`，`YieldType=YIELD_FOOD`，`Amount=1`。效果：草地山脉每相邻一个梯田 +1 粮。注意：山脉有五种子类型，需全部列出。`MODIFIER_PLAYER_CITIES_ADJUST_TERRAIN_YIELD_FROM_ADJACENT_IMPROVEMENTS` 定义于 `Expansion2_Modifiers.xml`。
 >
@@ -352,8 +354,8 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `DistrictType` | **必写** | [Districts.DistrictType](../../../reference/enums/DistrictType.txt)，指定区域 |
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，新增允放的地貌 |
+| `DistrictType` | **必写** | [Districts.DistrictType](../../SOURCES.md#类型与枚举)，指定区域 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，新增允放的地貌 |
 
 > **溯源**：埃及文明能力"尼罗河的赠礼"— `TRAIT_FLOODPLAINS_VALID_HOLY_SITE` 等九条（Base `Civilizations.xml`），覆盖所有专业区域 + 水渠 + 航空港 + 航天基地 + 社区，`FeatureType=FEATURE_FLOODPLAINS`。定义于 Base `Modifiers.xml`。
 
@@ -369,7 +371,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，新增允放的地貌 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，新增允放的地貌 |
 
 > **溯源**：埃及能力 — `TRAIT_FLOODPLAINS_VALID_WONDER`（Base `Civilizations.xml`），`FeatureType=FEATURE_FLOODPLAINS`。与 `EFFECT_ADJUST_VALID_FEATURES_DISTRICTS` 的区别：本 Effect 无 `DistrictType` 参数，作用于 **所有奇观**。定义于 Base `Modifiers.xml`。
 
@@ -389,8 +391,8 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，产出加成量 |
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，相邻地貌 |
-| `DistrictType` | **必写** | [Districts.DistrictType](../../../reference/enums/DistrictType.txt)，获得加成的区域 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，相邻地貌 |
+| `DistrictType` | **必写** | [Districts.DistrictType](../../SOURCES.md#类型与枚举)，获得加成的区域 |
 | `Description` | **必写** | `LOC_` 文本键 |
 | `TilesRequired` | 可选 | 整数，默认 `1`。每 N 格触发 1 次加成（例如 `2` = 每 2 格 +1，即"半级"相邻加成） |
 
@@ -444,7 +446,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `FeatureType` | **必写** | [Features.FeatureType](../../../reference/enums/FeatureType.txt)，指定地貌 |
+| `FeatureType` | **必写** | [Features.FeatureType](../../SOURCES.md#类型与枚举)，指定地貌 |
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，每格产出量 |
 
@@ -464,8 +466,8 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，产出加成量 |
-| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../../reference/enums/ImprovementType.txt)，相邻触发改良 |
-| `DistrictType` | **必写** | [Districts.DistrictType](../../../reference/enums/DistrictType.txt)，获得加成的区域 |
+| `ImprovementType` | **必写** | [Improvements.ImprovementType](../../SOURCES.md#类型与枚举)，相邻触发改良 |
+| `DistrictType` | **必写** | [Districts.DistrictType](../../SOURCES.md#类型与枚举)，获得加成的区域 |
 | `Description` | **必写** | `LOC_` 文本键 |
 | `TilesRequired` | 可选 | 整数，默认 `1`（每格 +1）。`2` = 每 2 格 +1 = "半级"加成 |
 
@@ -488,8 +490,8 @@
 |------|--------|---------|
 | `YieldType` | **必写** | YieldType.txt |
 | `Amount` | **必写** | 整数，产出加成量 |
-| `TerrainType` | **必写** | [Terrains.TerrainType](../../../reference/enums/TerrainType.txt)，相邻地形 |
-| `DistrictType` | **必写** | [Districts.DistrictType](../../../reference/enums/DistrictType.txt)，获得加成的区域 |
+| `TerrainType` | **必写** | [Terrains.TerrainType](../../SOURCES.md#类型与枚举)，相邻地形 |
+| `DistrictType` | **必写** | [Districts.DistrictType](../../SOURCES.md#类型与枚举)，获得加成的区域 |
 | `Description` | **必写** | `LOC_` 文本键 |
 | `TilesRequired` | 可选 | 整数，默认 `1`（每格 +1） |
 

@@ -14,3 +14,5 @@ _search = mt_bridge.skills_search
 default_skills_root = _search.default_skills_root
 search_skills = _search.search_skills
 read_skill_file = _search.read_skill_file
+
+reading_plan = _search.reading_plan

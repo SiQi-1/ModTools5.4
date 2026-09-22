@@ -270,7 +270,7 @@ INSERT INTO Units (
 
 | # | 列名 | 值参考 | 写不写 |
 |---|------|--------|--------|
-| 32 | PromotionClass | 晋升树类型，见 [reference/enums/UnitPromotionClassType.txt](../../reference/enums/UnitPromotionClassType.txt)（待建） | **必写**（战斗单位） |
+| 32 | PromotionClass | 晋升树类型，见 [UnitPromotionClassType 查询依据](../SOURCES.md#类型与枚举)（待建） | **必写**（战斗单位） |
 | 33 | InitialLevel | 初始等级，默认 1 | 按需 |
 | 34 | NumRandomChoices | 随机晋升选项数，默认 0 | 按需 |
 | 66 | CanEarnExperience | 可获取经验，默认 1 | 按需 |
@@ -290,7 +290,7 @@ INSERT INTO Units (
 | # | 列名 | 值参考 | 写不写 |
 |---|------|--------|--------|
 | 40 | CanTrain | 1=可锤子生产，默认 1 | 按需 |
-| 41 | StrategicResource | 战略资源 Type，见 [reference/enums/ResourceType.txt](../../reference/enums/ResourceType.txt) 战略类 | 按需 |
+| 41 | StrategicResource | 战略资源 Type，见 [ResourceType 查询依据](../SOURCES.md#类型与枚举) 战略类 | 按需 |
 | 42 | PurchaseYield | `YIELD_GOLD` / `YIELD_FAITH` | 按需 |
 | 43 | MustPurchase | 1=只能买不能锤。不填 PurchaseYield=虚拟单位（不可产不可买） | 按需 |
 | 44 | Maintenance | 维护费，一般 1 或 0 | 按需 |
@@ -306,7 +306,7 @@ INSERT INTO Units (
 
 | # | 列名 | 值参考 | 写不写 |
 |---|------|--------|--------|
-| 48 | PseudoYieldType | AI 行为引导。见 [reference/enums/PseudoYieldType.txt](../../reference/enums/PseudoYieldType.txt)（待建） | 按需 |
+| 48 | PseudoYieldType | AI 行为引导。见 [PseudoYieldType 查询依据](../SOURCES.md#类型与枚举)（待建） | 按需 |
 | 53 | ParkCharges | 国家公园次数。参考：自然学家=1，加拿大骑警=2 | 按需 |
 | 63 | DisasterCharges | 发起灾难次数（天启模式预言者） | 按需 |
 | 65 | ImmediatelyName | 1=立即命名 | 按需 |
@@ -324,7 +324,7 @@ INSERT INTO Units (
 
 | # | 列名 | 值参考 | 写不写 |
 |---|------|--------|--------|
-| 60 | AdvisorType | 见 [reference/enums/AdvisorType.txt](../../reference/enums/AdvisorType.txt) | 可选 |
+| 60 | AdvisorType | 见 [AdvisorType 查询依据](../SOURCES.md#类型与枚举) | 可选 |
 | 61 | EnabledByReligion | 1=需要创立宗教才能购买/训练 | 按需 |
 | 62 | TrackReligion | 1=所属宗教单位。参考：传教士/使徒/审判官/上师/武僧 | 按需 |
 
@@ -414,7 +414,7 @@ INSERT INTO UnitAiInfos (UnitType, AiType) VALUES
 ('UNIT_SIQI_{SHORT}', 'UNITAI_COMBAT');
 ```
 
-一个单位可写多行，同时有多个 AiType。AiType 枚举见 [reference/enums/UnitAiType.txt](../../reference/enums/UnitAiType.txt)（22 条）。
+一个单位可写多行，同时有多个 AiType。AiType 枚举见 [UnitAiType 查询依据](../SOURCES.md#类型与枚举)（22 条）。
 
 > **引用校验（0054 实测）**：`AiType` 必须存在于 `UnitAiTypes` 表，否则游戏加载直接报
 > `[Gameplay] ERROR: Invalid Reference on UnitAiInfos.AiType`。常见坑：**`UNITTYPE_RECON` 不存在**。
@@ -532,7 +532,7 @@ INSERT INTO TypeTags (Type, Tag) VALUES
 ('ABILITY_SIQI_{SHORT}', 'CLASS_SIQI_{SHORT}');
 ```
 
-- 单位一般绑定现成通用 CLASS 标签（如 `CLASS_MELEE`）。通用 CLASS 见 [reference/enums/AbilityClassTag.txt](../../reference/enums/AbilityClassTag.txt)
+- 单位一般绑定现成通用 CLASS 标签（如 `CLASS_MELEE`）。通用 CLASS 见 [AbilityClassTag 查询依据](../SOURCES.md#类型与枚举)
 - 自定义能力可以新建 CLASS 标签，单位和能力同时绑定
 - Type 可以是 `UNIT_xxx` / `ABILITY_xxx` / `TRAIT_xxx` / `CIVILIZATION_xxx` 等
 

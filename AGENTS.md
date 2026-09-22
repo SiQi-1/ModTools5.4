@@ -13,8 +13,11 @@
 
 必读（按序）：
 
-1. **`AGENT.md`**（仓库根）——.CIV 作者规范与游戏知识（权威）。含两大硬规则：ModifierType 优先引用游戏库已有类型、JSON 禁止 `""`；以及"主内容不写 Lua，自定义 SQL/XML/Lua 仅走自定义文件通道"的边界声明。
-2. **`modgen/AGENTS.md`** —— modgen 工具用法（`new-project` / `generate` / `validate` / `merge` / `preview` / `search` / `skill` / `query` / `loc` / `civ6proj` / `custom-file`，AI 生成 .CIV 的标准工作流与临时文件约定）。
+1. **[skills/RULES.md](skills/RULES.md)** —— 唯一制作规则正文；无论是否熟悉都要读。
+2. **[skills/WORKFLOW.md](skills/WORKFLOW.md)** —— 统一流程；按 `modgen skill "任务描述" --plan` 读取任务必读资料。
+3. **[modgen/AGENTS.md](modgen/AGENTS.md)** —— 当前命令与字段契约。
+
+`AGENT.md` 保留兼容入口；同会话已读且未变化的资料可复用。实现前简短注明所用文件/章节与待验证项。
 
 其余按需：`README.md`「AI 生成 .CIV」章节（开局提示词，给人/AI 的摘要）、`CIV6_MOD_TUTORIAL.md`（全流程教程，人读为主）。
 

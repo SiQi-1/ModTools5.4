@@ -44,6 +44,8 @@ ACTION_PARAMS: dict[str, dict[str, dict[str, Any]]] = {
     "skill": {
         "keyword": {"type": "string", "required": False},
         "file": {"type": "string", "required": False},
+        "section": {"type": "string", "required": False},
+        "plan": {"type": "boolean", "required": False},
         "limit": {"type": "integer", "required": False},
     },
 }

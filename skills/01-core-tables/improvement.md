@@ -386,8 +386,8 @@ INSERT INTO LocalizedText (Language, Tag, Text) VALUES
 
 | 文件 | 内容 |
 |------|------|
-| `reference/enums/ImprovementType.txt` | 官方改良 ~63 个，分基础改良/军事工程/特色改良/特殊机制 |
-| `reference/enums/PlunderType.txt` | PlunderType 可选值 |
-| `reference/enums/TerrainType.txt` | ValidTerrains / ValidAdjacentTerrains 用 |
-| `reference/enums/FeatureType.txt` | ValidFeatures / InvalidAdjacentFeatures 用 |
-| `reference/enums/ResourceType.txt` | ValidResources / ValidAdjacentResources 用 |
+| [ImprovementType 查询依据](../SOURCES.md#类型与枚举) | 官方改良 ~63 个，分基础改良/军事工程/特色改良/特殊机制 |
+| [PlunderType 查询依据](../SOURCES.md#类型与枚举) | PlunderType 可选值 |
+| [TerrainType 查询依据](../SOURCES.md#类型与枚举) | ValidTerrains / ValidAdjacentTerrains 用 |
+| [FeatureType 查询依据](../SOURCES.md#类型与枚举) | ValidFeatures / InvalidAdjacentFeatures 用 |
+| [ResourceType 查询依据](../SOURCES.md#类型与枚举) | ValidResources / ValidAdjacentResources 用 |

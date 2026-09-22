@@ -20,13 +20,13 @@
 | `civilization_name` / `civilization_description` / `civilization_adjective` | 游戏内显示文本（工具生成 LOC_CIVILIZATION_xxx） | `01-core-tables/civilization.md` |
 | `description_suffix` | 描述尾注（可选） | — |
 | `loc_name` / `loc_description` / `loc_adjective` | 显式 LOC 控制（默认自动生成，一般不动） | `02-config-files/text.md` |
-| `level` | `CIVILIZATION_LEVEL_FULL_CIV`（完整文明）；城邦/部落不在此写 | `reference/enums/` |
+| `level` | `CIVILIZATION_LEVEL_FULL_CIV`（完整文明）；城邦/部落不在此写 | [枚举 查询依据](../../SOURCES.md#类型与枚举) |
 | `ethnicity` | `ETHNICITY_*`（外观民族） | DB 验证 |
 | `city_name_depth` | 城市名池深度（每格几组名） | — |
 | `trait_name` / `trait_description` | 文明特质名/描述 → 工具生成 `TRAIT_CIVILIZATION_{TYPE}` 及 LOC | `01-core-tables/civilization.md` |
-| `trait_bindings` | 特质挂载（TraitType ↔ 本条目） | AGENTS.md §5 陷阱 12 |
+| `trait_bindings` | 特质挂载（TraitType ↔ 本条目） | [规则正文](../../RULES.md) |
 | `icon_image_name` / `images` | 文明图标（用户 PNG 或游戏库） | `02-config-files/icons.md` |
-| `city_info` / `citizen_info` | **城市名/公民名池，必须显式给**（不自动继承，AGENTS.md §5 陷阱 2） | `01-core-tables/civilization.md` CityNames |
+| `city_info` / `citizen_info` | **城市名/公民名池，必须显式给**（不自动继承，[规则正文](../../RULES.md)） | `01-core-tables/civilization.md` CityNames |
 | `start_bias` | 出生地偏好（`START_BIAS_*`） | DB 验证 |
 
 ## 连带必做（不在本条目内）

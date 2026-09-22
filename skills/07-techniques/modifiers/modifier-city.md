@@ -1,5 +1,7 @@
 # modifier-city — 城市（成长/住房/宜居度/忠诚度/人口）类 EffectType
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
 ---
 
 ### EFFECT_ADD_PLAYER_UPGRADE_MILITARY_FORMATION_ON_CITY_CONQUEST
@@ -145,7 +147,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 折扣百分比（25 = 打 75 折）。原版示例值：`25` |
-| `UnitDomain` | 选写 | `DOMAIN_LAND / DOMAIN_SEA` 等（[MilitaryDomain.txt](../../../reference/enums/MilitaryDomain.txt)）。限定生效域，不写则全生效 |
+| `UnitDomain` | 选写 | `DOMAIN_LAND / DOMAIN_SEA` 等（[MilitaryDomain.txt](../../SOURCES.md#类型与枚举)）。限定生效域，不写则全生效 |
 
 > ⚠️ 打折同时捆绑了直接生产/购买军团军队的能力。即使用此效果提供打折，也会同时解锁该城市的军团/军队生产/购买权限。
 
@@ -241,7 +243,6 @@
 |------|--------|---------|
 | `Amount` | **必写** | 战斗力加成值（整数）。原版示例值：`5` |
 
-> 需要 ModifierStrings（Preview 上下文，参考 `LOC_COMBAT_PREVIEW_CITY_FRIENDLY_COMBAT_BONUS`）。系统通过战斗预览显示此效果，不写 ModifierStrings 则 UI 不显示加成数值。
 > 完整规则（三种 Context、占位符 `{1_Amount}` / `{Property}`、工具生成链路）见 [modifier-techniques.md 技巧 3](../modifier-techniques.md)。
 
 ---
@@ -571,7 +572,7 @@
 |------|--------|---------|
 | `ScalingFactor` | **必写** | 旅游业绩缩放系数（百分比，100 = 原始值，300 = 3 倍）。原版示例值：`150`、`200`、`300` |
 | `BoostsWonders` | 选写 | `1` = 加成作用于奇观旅游业绩 |
-| `GreatWorkObjectType` | 选写 | 限定巨作类型：`GREATWORKOBJECT_WRITING / PORTRAIT / LANDSCAPE / SCULPTURE / RELIGIOUS / ARTIFACT / MUSIC / RELIC`（[GreatWorkObjectType.txt](../../../reference/enums/GreatWorkObjectType.txt)）。可逗号分隔多个 |
+| `GreatWorkObjectType` | 选写 | 限定巨作类型：`GREATWORKOBJECT_WRITING / PORTRAIT / LANDSCAPE / SCULPTURE / RELIGIOUS / ARTIFACT / MUSIC / RELIC`（[GreatWorkObjectType.txt](../../SOURCES.md#类型与枚举)）。可逗号分隔多个 |
 | `ImprovementType` | 选写 | 限定改良设施类型，如 `IMPROVEMENT_BEACH_RESORT`。仅对指定改良的旅游业绩生效 |
 | `Religious` | 选写 | `1` = 加成作用于宗教旅游业绩 |
 
@@ -589,7 +590,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `MinimumEra` | **必写** | 起始时代，如 `ERA_MODERN`（[EraType.txt](../../../reference/enums/EraType.txt)） |
+| `MinimumEra` | **必写** | 起始时代，如 `ERA_MODERN`（[EraType.txt](../../SOURCES.md#类型与枚举)） |
 | `Modifier` | **必写** | 百分比加成（100 = +100%，即翻倍）。原版示例值：`100` |
 
 ---

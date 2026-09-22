@@ -23,11 +23,11 @@
 
 ## 要点
 
-- 特殊单位若需独特能力 → 「修改器」section 的 `unit_abilities` 建能力条目，再在本条目 `unit_ability_bindings` 绑定（链完整，AGENTS.md §5 陷阱 12）
-- TypeProperties（LIFESPAN 等）为 DLL 硬编码名，**不能自创**；工具表单内选择（查 `reference/type-properties-guide.md`）
+- 特殊单位若需独特能力 → 「修改器」section 的 `unit_abilities` 建能力条目，再在本条目 `unit_ability_bindings` 绑定（链完整，[规则正文](../../RULES.md)）
+- TypeProperties（LIFESPAN 等）为 DLL 硬编码名，**不能自创**；工具表单内选择（查 [TypeProperties 参考](../../05-modtools-civ/authoring-reference.md)）
 - 单位模型/图标贴图由美术 section 或工具"生成图标定义"处理
 
 ## 出口检查
 
-- [ ] PromotionClass/UNITAI/TAG 全部 DB 验证（`SELECT DISTINCT ...`，AGENTS.md §2）
+- [ ] PromotionClass/UNITAI/TAG 全部 DB 验证（`SELECT DISTINCT ...`，[规则正文](../../RULES.md)）
 - [ ] 能力绑定在 unit_abilities 或游戏库中存在

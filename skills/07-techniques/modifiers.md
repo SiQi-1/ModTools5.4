@@ -111,50 +111,23 @@
 
 ## 三、查找 ModifierType——强制流程
 
-### 第一步：在子文件中搜索
+### 第一步：定位效果与参数
 
-用 `Grep` 在对应子文件中搜索你的效果关键词。例如要找"击杀单位后回血"：
+使用 `modgen skill` 读对应效果章节，再用 `modgen search` / `query` 查真实实现；入口见 [资料依据](../SOURCES.md)。本页 SQL 是关系参考，主内容通过 .CIV 工具生成，自定义补丁通过 custom-file 写入。
 
-```bash
-Grep "HEAL.*COMBAT" skills/07-techniques/modifiers/modifier-unit-combat.md
-```
+### 第二步：核实类型来源
 
-找到匹配的 EffectType，读取该条目获取：
-- **标准 ModifierType**（可直接用）
-- **CollectionType**
-- **参数名和参数值类型**
+参考表中的 ModifierType 可能来自其他 Mod，不能因它出现在技能或本机缓存就认定原版。对照 [原版快照](../../ModTools_5_4/data/vanilla_modifier_types.json)：符合语义的原版类型优先复用；快照外的自定义类型需由工具生成 Types / DynamicModifiers 注册。具体字段见 [修改器指南](../05-modtools-civ/modifiers.md)。
 
-### 第二步：判断是否需要自定义 DynamicModifiers
+### 第三步：必要时创建类型
 
-```
-在子文件中搜到 EffectType？
-  ├─ YES，且条目下有 ModifierType 列 → 标准类型，直接用，不需要注册
-  └─ NO
-      └─ 去 Effects.csv 中搜
-          ├─ 搜到 EffectType
-          │   → 需要自定义 DynamicModifiers（见第三步）
-          └─ 也搜不到 → 你的需求可能无法用 Modifier 实现，考虑 Lua
-```
-
-### 第三步：自定义 DynamicModifiers（仅当子文件中没有时）
-
-```sql
--- 在 Modifiers.sql 中，顺序：先 Types，再 DynamicModifiers，再写 Modifiers 表
-
-INSERT INTO Types (Type, Kind) VALUES
-('MODIFIER_SIQI_<编号>_<描述>', 'KIND_MODIFIER');
-
-INSERT INTO DynamicModifiers (ModifierType, CollectionType, EffectType) VALUES
-('MODIFIER_SIQI_<编号>_<描述>', 'COLLECTION_OWNER', 'EFFECT_XXX');
-```
-
-> `CollectionType` 和 `EffectType` 的值从 Effects.csv 中查。
+确认没有符合语义的原版 ModifierType，且 CollectionType / EffectType 已有真实定义，再由 generate-modifier 建立骨架，填写参数并校验。不要因一次搜索无结果就新造类型或判断必须使用 Lua；先核对相关模式、数据来源与能力边界。
 
 ---
 
-## 四、完整 INSERT 链路（固定写法顺序）
+## 四、完整 INSERT 链路（关系参考）
 
-**不论效果简单还是复杂，以下表的顺序不可变。按需跳过不需要的表，但次序不能乱。**
+下表用于检查挂载链是否完整，不规定所有环境的执行顺序。主内容遵循生成器；自定义 SQL 按实际外键依赖与加载方式排序，并在目标 schema 下验证。
 
 ```
 1. TraitModifiers / DistrictModifiers / UnitAbilityModifiers / …  ← 挂载
@@ -162,14 +135,14 @@ INSERT INTO DynamicModifiers (ModifierType, CollectionType, EffectType) VALUES
 3. DynamicModifiers（仅自定义 ModifierType 时需要）
 4. Modifiers
 5. ModifierArguments
-6. ModifierStrings（战斗力类必写，其余按需）
+6. ModifierStrings（目标战斗效果的 Preview 必写；其他 Context 核实后使用）
 7. RequirementSets（按需）
 8. RequirementSetRequirements（按需）
 9. Requirements（按需）
 10. RequirementArguments（按需）
 ```
 
-### 3.1 挂载（总是先写）
+### 3.1 挂载（必须形成完整链）
 
 ```sql
 INSERT INTO TraitModifiers (TraitType, ModifierId) VALUES
@@ -234,9 +207,9 @@ INSERT INTO ModifierArguments (ModifierId, Name, Value) VALUES
 ('MODIFIER_SIQI_0042_GRANT_TECH_MINING', 'TechType', 'TECH_MINING');
 ```
 
-一个 ModifierId 可能有多个参数行，子文件条目列出的参数全部要写。
+一个 ModifierId 可能有多个参数行；区分必填与可选参数，对照当前 schema 和真实实例，不机械填写所有参考参数。
 
-### 3.4 ModifierStrings（战斗力类**必写**，其余按需）
+### 3.4 ModifierStrings（Preview 支持范围）
 
 > **仅 `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 支持 Preview**。该效果类型（`MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH`、`MODIFIER_PLAYER_UNITS_ADJUST_COMBAT_STRENGTH` 等）**必须写**，
 > 否则战斗预览面板看不到加成来源 —— **不报错、静默失效**，最容易整批漏掉。
@@ -367,6 +340,6 @@ EntityModifiers（直接，用于政策卡/科技/建筑/单位能力）
 
 | 文件 | 用途 |
 |------|------|
-| `reference/csv-export/Effects.csv` | EffectType 参数速查 |
-| `reference/csv-export/Requirements.csv` | RequirementType 参数速查 |
-| `reference/enums/CollectionType.txt` | ~40 个 CollectionType |
+| [参数查询依据](../SOURCES.md#类型与枚举) | EffectType 参数速查 |
+| [参数查询依据](../SOURCES.md#类型与枚举) | RequirementType 参数速查 |
+| [CollectionType 查询依据](../SOURCES.md#类型与枚举) | ~40 个 CollectionType |

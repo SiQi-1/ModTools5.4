@@ -28,3 +28,18 @@
 4. **`images`**：对象字典（含 `icon_image_name`/`portrait_image_name` 等子键的源）；图标 PNG 由用户提供或工具从游戏库取
 5. **`subtables`**：次级表列表（如建筑的特殊产出表），条目键内以子表数组承载
 6. 所有值禁 `""`（`civ-pitfalls.md` 规则 2）
+
+## 其他参考入口
+
+- [basic-info — 基础信息 section（.CIV 的根基）](basic-info.md)
+- [building — 建筑条目（section「建筑」）](building.md)
+- [civilization — 文明条目（section「文明」）](civilization.md)
+- [district — 区域条目（section「区域」）](district.md)
+- [governor — 总督条目（section「总督」）](governor.md)
+- [greatperson — 伟人条目（section「伟人」）](greatperson.md)
+- [improvement — 改良设施条目（section「改良设施」）](improvement.md)
+- [leader — 领袖条目（section「领袖」）](leader.md)
+- [policy-project — 政策卡与项目条目（sections「政策卡」「项目」）](policy-project.md)
+- [promotion — 单位晋升条目（section「单位晋升」）](promotion.md)
+- [religion-agenda — 信仰与议程条目（sections「信仰」「议程」）](religion-agenda.md)
+- [unit — 单位条目（section「单位」）](unit.md)

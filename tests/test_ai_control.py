@@ -188,6 +188,19 @@ class AiControlTestCase(unittest.TestCase):
         self.assertIn("content", full)
         self.assertTrue(full["content"])
 
+    def test_skill_action_plan_and_section_read(self) -> None:
+        plan = self.context.execute("skill", {"keyword": "UI 按钮", "plan": True})
+        self.assertIn("05-modtools-civ/ui-assets.md", plan["reading_plan"]["required"])
+        result = self.context.execute("skill", {"keyword": "独立UI纹理", "limit": 1})
+        item = result["results"][0]
+        self.assertIn("start_line", item)
+        self.assertIn("reading_plan", result)
+        section = self.context.execute("skill", {"file": item["rel"], "section": item["section"]})
+        self.assertIn("ui_textures", section["content"])
+        from ModTools_5_4.ai.control_server import AiActionError
+        with self.assertRaises(AiActionError):
+            self.context.execute("skill", {"keyword": "UI", "section": "无文件"})
+
     def test_check_conflicts_action(self) -> None:
         """AI 通道可检测自定义 SQL × 生成 SQL 冲突（先保存工程）。"""
         target_dir = Path(self._tmp.name) / "mod_cc"

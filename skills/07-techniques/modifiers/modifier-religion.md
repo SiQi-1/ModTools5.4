@@ -1,5 +1,7 @@
 # modifier-religion -- 宗教类 EffectType
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
 > 覆盖 42 个宗教相关 EffectType。按字母序排列，每个效果均从游戏数据库溯源至上游主体（信条/特质/建筑/政策/总督/城邦等）。
 
 ---

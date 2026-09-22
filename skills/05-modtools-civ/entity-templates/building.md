@@ -27,7 +27,7 @@
 | `building_greatworks` | **巨作槽位**（GreatWorkSlotType/数量） | `01-core-tables/building.md` 巨作段 |
 | `subtables` | 次级表 | — |
 
-## 铁律（AGENTS.md §5 陷阱 3 的 .CIV 形态）
+## 铁律（[规则正文](../../RULES.md) 的 .CIV 形态）
 
 - 建筑特质必须独立 `TRAIT_BUILDING_{TYPE}`（工具在 `trait_bindings`/内部自动生成，**不可复用文明/领袖特质**）
 

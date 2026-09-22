@@ -252,9 +252,9 @@ INSERT INTO CivilizationCitizenNames (CivilizationType, CitizenName, Female, Mod
 
 | 列 | 查哪个文件 |
 |------|------------|
-| TerrainType | [reference/enums/TerrainType.txt](../../reference/enums/TerrainType.txt) — 17 条，含中文名 |
-| ResourceType | [reference/enums/ResourceType.txt](../../reference/enums/ResourceType.txt) — 54 条，按战略/奢侈品/加成/文物分组，含中文名 |
-| FeatureType | [reference/enums/FeatureType.txt](../../reference/enums/FeatureType.txt) — 50 条，按类型分组，含中文名 |
+| TerrainType | [TerrainType 查询依据](../SOURCES.md#类型与枚举) — 17 条，含中文名 |
+| ResourceType | [ResourceType 查询依据](../SOURCES.md#类型与枚举) — 54 条，按战略/奢侈品/加成/文物分组，含中文名 |
+| FeatureType | [FeatureType 查询依据](../SOURCES.md#类型与枚举) — 50 条，按类型分组，含中文名 |
 
 ### INSERT 模板
 

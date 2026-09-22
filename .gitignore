@@ -48,3 +48,5 @@ ModTools_5_4/data/local_text_New.sqlite
 
 
 美术占位素材/
+# Published AI protocol documentation is not a temporary ai_* artifact.
+!ModTools_5_4/docs/AI_CONTROL_API.md

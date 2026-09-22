@@ -348,7 +348,7 @@ INSERT INTO Building_GreatPersonPoints (BuildingType, GreatPersonClassType, Poin
 ('BUILDING_SIQI_{SHORT}', 'GREAT_PERSON_CLASS_SCIENTIST', 1);
 ```
 
-GreatPersonClassType 见 [reference/enums/GreatPersonClassType.txt](../../reference/enums/GreatPersonClassType.txt)（10 条）。
+GreatPersonClassType 见 [GreatPersonClassType 查询依据](../SOURCES.md#类型与枚举)（10 条）。
 
 ### Building_GreatWorks
 
@@ -422,7 +422,7 @@ INSERT INTO Building_ValidTerrains (BuildingType, TerrainType) VALUES
 ('BUILDING_SIQI_{SHORT}', 'TERRAIN_GRASS');
 ```
 
-可放置地形。TerrainType 查 [reference/enums/TerrainType.txt](../../reference/enums/TerrainType.txt)。
+可放置地形。TerrainType 查 [TerrainType 查询依据](../SOURCES.md#类型与枚举)。
 
 ### Building_RequiredFeatures
 
@@ -442,7 +442,7 @@ INSERT INTO Building_ValidFeatures (BuildingType, FeatureType) VALUES
 
 **允许**在该地貌上放置（本来会阻止的）。奇观用居多。
 
-FeatureType 查 [reference/enums/FeatureType.txt](../../reference/enums/FeatureType.txt)。
+FeatureType 查 [FeatureType 查询依据](../SOURCES.md#类型与枚举)。
 
 ---
 

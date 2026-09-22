@@ -21,7 +21,7 @@
 
 | 列名 | 说明 |
 |------|------|
-| DistrictType | 区域 Type（区域枚举见 [reference/enums/DistrictType.txt](../reference/enums/DistrictType.txt)） |
+| DistrictType | 区域 Type（区域枚举见 [DistrictType 查询依据](SOURCES.md#类型与枚举)） |
 | YieldChangeId | 规则 ID，引用 Adjacency_YieldChanges.ID |
 
 ### INSERT 模板
@@ -49,13 +49,13 @@ INSERT INTO District_Adjacencies (DistrictType, YieldChangeId) VALUES
 | 4 | TilesRequired | INTEGER | NOT NULL, default=1 | **必写** | 每 N 个相邻格触发 1 次加成。标准 1（每格 1 次），填 2 = 每 2 格 +1 |
 | 5 | OtherDistrictAdjacent | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接任意区域（有产出加成的区域也算） |
 | 6 | AdjacentSeaResource | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接海洋资源 |
-| 7 | AdjacentTerrain | TEXT | 可空 | 条件 | 邻接特定地形。见 [reference/enums/TerrainType.txt](../reference/enums/TerrainType.txt) |
-| 8 | AdjacentFeature | TEXT | 可空 | 条件 | 邻接特定地貌。见 [reference/enums/FeatureType.txt](../reference/enums/FeatureType.txt) |
+| 7 | AdjacentTerrain | TEXT | 可空 | 条件 | 邻接特定地形。见 [TerrainType 查询依据](SOURCES.md#类型与枚举) |
+| 8 | AdjacentFeature | TEXT | 可空 | 条件 | 邻接特定地貌。见 [FeatureType 查询依据](SOURCES.md#类型与枚举) |
 | 9 | AdjacentRiver | BOOLEAN | NOT NULL, default=0 | 条件 | 临河 |
 | 10 | AdjacentWonder | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接奇观（人造） |
 | 11 | AdjacentNaturalWonder | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接自然奇观 |
 | 12 | AdjacentImprovement | TEXT | 可空 | 条件 | 邻接特定改良设施 |
-| 13 | AdjacentDistrict | TEXT | 可空 | 条件 | 邻接特定区域。见 [reference/enums/DistrictType.txt](../reference/enums/DistrictType.txt) |
+| 13 | AdjacentDistrict | TEXT | 可空 | 条件 | 邻接特定区域。见 [DistrictType 查询依据](SOURCES.md#类型与枚举) |
 | 14 | PrereqCivic | TEXT | 可空 | 条件 | 解锁此加成的市政 |
 | 15 | PrereqTech | TEXT | 可空 | 条件 | 解锁此加成的科技 |
 | 16 | ObsoleteCivic | TEXT | 可空 | 可选 | 某市政后失效（一般不用） |

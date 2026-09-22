@@ -20,10 +20,10 @@
 | `foreground_image_name` / `background_image_name` | 文明选择背景图 | `02-config-files/icons.md` |
 | `diplo_foreground_image_name` / `diplo_background_image_name` / `select_foreground_image_name` / `select_background_image_name` | 外交/选择界面图 | `02-config-files/icons.md` |
 | `images` | 图片源对象（无图留 `{}`） | — |
-| `bindings` | 特质挂载（能力/议程绑定） | AGENTS.md §5 陷阱 12 |
+| `bindings` | 特质挂载（能力/议程绑定） | [规则正文](../../RULES.md) |
 | `diplomacy` | **外交文本结构**（问候/拒绝/议程反馈等；游戏内每句引一条 LOC） | `02-config-files/diplo-text.md` |
 
-## 铁律（AGENTS.md §5 陷阱 1 的 .CIV 形态）
+## 铁律（[规则正文](../../RULES.md) 的 .CIV 形态）
 
 - 新建领袖继承基类：`InheritFrom` 语义 = 继承特质，**新建领袖一律 `LEADER_DEFAULT`**（工具在 bindings/内部表处理）
 - 领袖议程：优先从游戏库 `RandomAgendas` 选（`group_workspace.py` 逻辑），自定义议程走「议程」section

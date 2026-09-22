@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "always_read": [
+    "RULES.md",
+    "WORKFLOW.md"
+  ],
+  "routes": [
+    {
+      "id": "civ",
+      "aliases": [
+        ".CIV",
+        "工程",
+        "文明",
+        "领袖",
+        "区域",
+        "建筑",
+        "单位",
+        "实体"
+      ],
+      "read": [
+        "05-modtools-civ/INDEX.md",
+        "05-modtools-civ/entity-templates/INDEX.md"
+      ]
+    },
+    {
+      "id": "modifiers",
+      "aliases": [
+        "Modifier",
+        "ModifierType",
+        "ModifierStrings",
+        "preview_text",
+        "Requirement",
+        "EffectType",
+        "modifier_type_source",
+        "vanilla_modifier_types",
+        "修改器",
+        "条件",
+        "战斗力",
+        "奇观",
+        "相邻加成",
+        "原版类型",
+        "EFFECT_",
+        "MODIFIER_",
+        "REQUIREMENT_",
+        "COLLECTION_"
+      ],
+      "read": [
+        "05-modtools-civ/modifiers.md",
+        "07-techniques/modifiers/patterns/pre-code-checklist.md",
+        "07-techniques/modifier-techniques.md"
+      ]
+    },
+    {
+      "id": "lua",
+      "aliases": [
+        "Lua",
+        "事件",
+        "脚本",
+        "GP"
+      ],
+      "read": [
+        "04-lua/code-style.md",
+        "04-lua/INDEX.md"
+      ]
+    },
+    {
+      "id": "ui",
+      "aliases": [
+        "UI",
+        "界面",
+        "按钮",
+        "控件",
+        "纹理",
+        "图标",
+        "ui_textures",
+        "custom_entries",
+        "LOC",
+        "精灵表",
+        "文本",
+        "Texture",
+        "Button",
+        "Image",
+        "DDS",
+        "TEX",
+        "XLP"
+      ],
+      "read": [
+        "05-modtools-civ/ui-assets.md",
+        "04-lua/code-style.md",
+        "04-lua/lua-xml-controls.md"
+      ]
+    },
+    {
+      "id": "custom_files",
+      "aliases": [
+        "自定义文件",
+        "自定义 SQL",
+        "SQL补丁",
+        "custom-file",
+        "加载顺序",
+        "部署"
+      ],
+      "read": [
+        "05-modtools-civ/pipeline.md"
+      ]
+    },
+    {
+      "id": "sources",
+      "aliases": [
+        "类型",
+        "枚举",
+        "参数",
+        "API",
+        "原版",
+        "数据库",
+        "查询"
+      ],
+      "read": [
+        "SOURCES.md"
+      ]
+    }
+  ]
+}

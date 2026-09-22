@@ -67,7 +67,6 @@ from .preview import (
 )
 from .project_scaffold import create_new_project_file
 from .search import object_modifier_summary, resolve_db_paths, search_keyword
-from .skills import read_skill_file, search_skills
 from .validator import check_entry, validate_project
 
 SEARCH_HINT = (
@@ -77,32 +76,8 @@ SEARCH_HINT = (
 
 
 def _cmd_skill(args: argparse.Namespace) -> int:
-    """skill：本地技能库（仓库根 skills/）全文检索。"""
-    from pathlib import Path as _Path
-
-    root = _Path(args.skills_dir) if args.skills_dir else None
-    if root is not None and not root.exists():
-        print(f"ERROR: 技能库目录不存在：{root}", file=sys.stderr)
-        return 1
-    if args.file:
-        content = read_skill_file(args.file, root=root)
-        if content is None:
-            print(f"ERROR: 技能文件不存在或路径非法：{args.file}", file=sys.stderr)
-            return 1
-        print(content.rstrip("\n"))
-        return 0
-    results = search_skills(args.keyword, root=root, limit=args.limit)
-    if not results:
-        print(f"未在技能库中找到与「{args.keyword}」相关的内容。")
-        print("提示：试英文关键词/表名（如 Modifier、TraitModifiers），或 `modgen search` 查游戏库实现。")
-        return 1
-    print(f"命中 {len(results)} 个技能文件（--file <相对路径> 查看全文）：")
-    for item in results:
-        marker = "★" if item["name_hit"] else " "
-        print(f"  {marker} {item['rel']}  (得分 {item['score']:.0f})")
-        for snippet in item["snippets"]:
-            print(f"      | {snippet}")
-    return 0
+    from .skill_cli import run
+    return run(args)
 
 
 def _parse_json_list(raw: str | None) -> list[dict[str, Any]]:
@@ -597,10 +572,15 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--text-db", default="", help="文本库路径（中文检索用；默认读 settings.json）")
     search.set_defaults(func=_cmd_search)
 
-    sk = sub.add_parser("skill", help="本地技能库全文检索（仓库根 skills/；文件名+内容词频评分）")
-    sk.add_argument("keyword", help="关键词：中文效果词/表名/写法（如 Modifier、相邻加成、TraitModifiers）")
-    sk.add_argument("--file", default="", help="输出命中文件的全文（相对路径，如 05-modtools-civ/pipeline.md）")
-    sk.add_argument("--limit", type=int, default=10, help="结果数上限（默认 10）")
+    sk = sub.add_parser("skill", help="技能规则、任务路由、章节检索与质量检查")
+    sk.add_argument("keyword", nargs="?", default="", help="自然语言任务、中文关键词或完整英文 Type")
+    mode = sk.add_mutually_exclusive_group()
+    mode.add_argument("--file", default="", help="读取技能 Markdown 相对路径")
+    mode.add_argument("--plan", action="store_true", help="只返回任务必读清单")
+    mode.add_argument("--check", action="store_true", help="检查知识结构与真实检索用例")
+    sk.add_argument("--section", default="", help="配合 --file 读取指定标题及子节")
+    sk.add_argument("--json", action="store_true", help="输出结构化结果")
+    sk.add_argument("--limit", type=int, default=10, help="返回文件数")
     sk.add_argument("--skills-dir", default="", help="技能库目录（默认仓库根 skills/）")
     sk.set_defaults(func=_cmd_skill)
 

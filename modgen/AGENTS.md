@@ -2,17 +2,14 @@
 
 > **本文件是 AI Agent 的必读说明**。使用本目录的工具生成/校验 .CIV 工程前，请先完整阅读。
 >
-> **同源声明**：本文件的硬规则（ModifierType 优先引用游戏库已有类型 / JSON 禁止 `""` /
-> 主内容不写 Lua，自定义 SQL/XML/Lua 仅走自定义文件通道）
-> 与根目录 `AGENT.md` **同源一致，任一处为准**；作者规范与游戏知识细节见 `AGENT.md`。
-> 任务分流见根目录 `AGENTS.md`；改 modgen 工具本身（工具优化向）见根目录 `CLAUDE.md`。
+> 制作规则见 [RULES](../skills/RULES.md)，执行顺序见 [统一工作流](../skills/WORKFLOW.md)。本文件只维护命令与字段契约；工具开发见 [CLAUDE](../CLAUDE.md)。
 
 ## 本工具是什么
 
 生成"合规的文明6 Mod 工程条目"（.CIV 工作区结构），而不是直接生成 SQL/XML。
 规则来自 ModTools 5.4 编辑器（GUI）——工具生成的条目保证编辑器能打开、能正确导出。
 
-- **不依赖** PyQt6 / GUI，纯标准库，任何环境可直接运行
+- **不依赖** PyQt6 / GUI 的数据命令为纯标准库；preview / check-conflicts 使用 GUI 生成引擎，需 PyQt
 - **Type 永远由工具生成**，AI 不要手写 Type（详见"硬规则"）
 - 中文文本存条目（name/Description 等），LOC tag 由导出约定自动注册，条目里不写 LOC
 
@@ -64,25 +61,9 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 
 `--prefix`/`--infix` 来自工程"基础信息"（前缀如 SIQI、中缀编号如 35）。
 
-## 推荐工作流（AI 必须遵守）
+## 必须遵守的工作流
 
-1. **新工程**：`new-project` 生成工程骨架（含基础信息/美术/修改器/文本 结构）——
-   不要手工拷贝旧工程、不要手写 workspace 骨架；
-2. `generate` 生成条目骨架（Type/LOC/默认值/子表结构已就位）
-3. 把用户意图填入骨架：必填字段、数值、子表内容（如子表为空需确认是否应填）
-4. `validate` 校验（`--entry` 单条目 或 整个工程）
-   - ERROR = 硬错误，必须修
-   - WARNING = 建议（type 与规则生成值不一致多为语义式命名，需确认）
-5. 修正后 `merge` 进工程（内容分类与**修改器**均可 merge；merge 默认校验，不合格会拒绝）
-6. **生成→校验闭环**：`preview 工程.CIV --dry-run` 查看将导出的全部文件清单，
-   `preview --section 分类` 检查具体 SQL/XML 内容——早发现字段/引用/文本问题，不要等 GUI。
-7. 切勿跳过 validate 直接 merge——merge 默认校验，不合格会拒绝。
-8. **自定义文件（确需 Lua / 自定义 SQL/XML 时）**：`custom-file write` 写入工程目录并自动
-   注册文件动作（先 `civ6proj --update-civ` 绑定目录）；**绝不手工放文件**——工具是唯一写入者；
-   内容临时文件放 `modgen_work/`。自定义文件经一键生成**原样透传**，不被生成器改写。
-9. **协调检测（自定义 SQL 后必跑）**：`python -m modgen.cli check-conflicts 工程.CIV [--json]`——
-   同表同主键双写=ERROR（改 .CIV 条目）；UPDATE/DELETE 生成表=WARNING（反模式，用 INSERT OR REPLACE）；
-   `INSERT...SELECT` 继承/自定义表合法不告警。加载顺序由工具保证（自定义 UpdateDatabase=10000 > 生成数据 9999）。
+先读 [规则正文](../skills/RULES.md) 与 [统一工作流](../skills/WORKFLOW.md)，执行 `skill "任务描述" --plan` 并读取相关章节。先核实依据，再 new-project / generate / validate / merge；已有工程只修改目标内容。涉及自定义 SQL 时执行 check-conflicts，预览、工程导出、部署和实机分别验收。
 
 ## 导出与部署（GUI 一键按钮 → AI 控制接口）
 
@@ -146,140 +127,28 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 | 议程 | AGENDA | (type) | 顶层无 abbr |
 | **UI图标** | （无 Type） | icon_name | **非实体分节**：与游戏实体无关的自定义 UI 图标（新闻分类/单位动作/追踪器…），只出 `Icons.xml` 与 IMG/Textures，见下节 |
 
-## UI图标规则（非实体美术资源声明）
+## 专项字段与规则（涉及时必读）
 
-给**不属于任何游戏实体**的 UI 元素声明专属图标（替代借 `ICON_YIELD_*` 凑）。写进 `workspace["UI图标"]` 列表：
+- [UI 美术与文本](../skills/05-modtools-civ/ui-assets.md)：UI图标、ui_textures、custom_entries 的完整字段与命令；包含 texture add/list/remove、覆盖策略、尺寸与动作要求。
+- [修改器与类型来源](../skills/05-modtools-civ/modifiers.md)：生成器参数、原版快照、modifier_type_source、preview_text 与引用验证。
 
-```jsonc
-{
-  "icon_name": "ICON_SIQI_WUJIU_NEWS_CITY",   // 必填，须以 ICON_ 开头
-  "name_zh": "城建图标",                       // 选填，仅 GUI 显示
-  "sizes": [32, 50],                           // 选填，缺省 22/32/38/50/64/80/128/256
-  "images": {"icon": {"path": "D:/art/news_city.png"}},  // 必填：工程外的源 PNG
-  "alias": null                                // 选填；有别名时出 IconAliases 行，无值省略或 null
-}
-```
-
-- **图集名自动推导**：`ATLAS_` + `icon_name` 去掉 `ICON_`（`ICON_X_32` 的文件名 → `ATLAS_X` 的 `IconSize=32` 行）；
-- **命名空间硬约束**：`icon_name` 不得落进实体内置图标空间（`ICON_<实体类型>_*`，如 `ICON_DISTRICT_NEWS`
-  会与 `DISTRICT_NEWS` 撞车）→ `validate` 报 ERROR；
-- 源 PNG **必须存在**（工程外路径 / 工程目录相对路径 / 文件名按 `IMG|Images|Art` 搜索）→ 不存在报 ERROR；
-  未设源图 = WARNING（该条被跳过）；源图最小边 < `max(sizes)` = WARNING（放大会模糊）；
-- **不产出 SQL / Players / PlayerItems / 文本**——它只是美术资源，不是游戏实体；
-- 校验：`python -m modgen.cli validate 工程.CIV`（与 GUI 生成前检查同源实现）；
-- 单独看产物：`python -m modgen.cli preview 工程.CIV --section UI图标`（直接打印 Icons.xml）；
-- 生成完整产物（Icons.xml + `IMG/ICON_X_<size>.png` + `Textures/…dds|.tex`）需 `.civ6proj` 已绑定，
-  用 GUI / AI 接口 `generate_all`。
-
-
-## 自定义 UI / Lua LOC 文本
-
-实体名称、描述等仍填中文并由工具生成 LOC；不属于实体的 UI/Lua 文本可在 `workspace["文本"]["custom_entries"]` 声明：
-
-```json
-[{"tag":"LOC_MY_NEWS_TITLE","text":"乌啾的新闻社","group":"新闻界面","source":"news_ui"}]
-```
-
-- `tag` 必填，`LOC_` 开头，仅大写字母、数字、下划线；`text` 为非空中文正文。可选 `group` 决定输出注释分组，未填写时省略；`source` 是可选作者标记，工具不解释。
-- 使用现有简体中文 `zh_Hans_CN` 输出，追加至标准 `Text/<文件名前缀>_Text_CN.sql`（其他语言设置沿用已有文件后缀规则），SQL/XML 预览均支持。引号/换行自动转义；不要再手写文本 SQL。
-- `validate` 检查字段及自定义 LOC 重复；GUI/AI 生成还检查与实体等自动 LOC 的冲突，有错时返回 `custom_text_invalid` 并阻断生成。不要用此通道覆盖实体文本。
-- 当前在 .CIV 中编辑，GUI 文本区负责预览；保存/重载保留条目。旧工程没有此字段时行为不变，不新增分节或 schema 版本。
-
-## 独立 UI 纹理（背景 / 按钮 / 精灵表）
-
-无需创建实体或图标，在 `workspace["美术"]["data"]["ui_textures"]` 声明列表：
-
-```json
-[{"name": "UI_MY_PANEL", "path": "D:/art/panel.png"}]
-```
-
-- GUI：美术页 →「独立 UI 纹理」→ 导入 PNG，可多选；支持改名、换源路径和移除。
-- CLI：`texture add` 只登记资源并保存 `.CIV`（自动 `.bak`），不立即生成工程文件：
+## 知识与证据查询
 
 ```powershell
-python -m modgen.cli texture add 工程.CIV --name UI_MY_PANEL --source D:/art/panel.png
-python -m modgen.cli texture add 工程.CIV --name UI_MY_PANEL --source D:/art/revised.png --replace
-python -m modgen.cli texture list 工程.CIV
-python -m modgen.cli texture remove 工程.CIV --name UI_MY_PANEL
+python -m modgen.cli skill "任务描述" --plan --json
+python -m modgen.cli skill "城市奇观相邻加成" --json
+python -m modgen.cli skill --file RULES.md
+python -m modgen.cli skill --file 05-modtools-civ/ui-assets.md --section "通道选择"
+python -m modgen.cli skill --check --json
+python -m modgen.cli search "城市产出"
+python -m modgen.cli search --object 农场
+python -m modgen.cli query "PRAGMA table_info(Units)" --json
+python -m modgen.cli loc LOC_UNIT_WARRIOR_NAME
 ```
 
-- 名称以 `UI_` 开头，仅英文字母、数字、下划线，不含扩展名；重名比较忽略大小写。CLI 更新同名资源必须显式 `--replace`。
-- PNG 必须存在，宽高各 1～8192；CLI / GUI 文件选择器保存绝对路径。手填 `.CIV` 也应使用绝对路径；相对路径按运行目录解析。
-- 绑定 `.civ6proj` 后执行 GUI「生成所有文件」或 AI `generate_all`，原尺寸与 alpha 保留，不裁圆、不重采样为图标、不补黑边。
-- 重新生成覆盖策略也适用于 DDS/TEX：`overwrite=all` 更新已有纹理，`none` 保留；GUI 覆盖选择中的虚拟纹理计划控制整组输出，不生成计划文件。
-- 产物：`IMG/<name>.png`、`Textures/<name>.dds` 和 `.tex`；自动登记到 UITexture XLP 和对应 Art.xml 库。XML 直接 `Texture="UI_MY_PANEL"`，不生成 Icons.xml 图集行或 SQL。
-- `validate` 校验名称、重复、源 PNG 和尺寸；GUI/AI 生成同时检查与现有美术输出的名称冲突，有错则整次生成阻断。AI 沿用 `ui_icons_invalid` / `ui_icon_issues` 字段，涵盖图标与独立纹理。
-- 移除只删除声明，不删除源图片；后续生成撤下 XLP 登记。旧导出图片可能保留为未引用文件，不承诺物理清理。
-- `.CIV` 格式版本与分节数不变，老工程没有 `ui_textures` 时按空列表处理。自定义 UI XML / Lua 仍须走 `custom-file` 通道。
+skill 只检索发布知识 Markdown，中文 bigram、英文词边界、章节 BM25 与规则/指南权重排序。旧 keyword / --file / --limit / --skills-dir 参数兼容；--plan 返回必读清单，--section 需配 --file，--check 返回质量问题并以非零状态退出，--json 输出结构化结果。未检索到不是能力不存在的证明。
 
-## 修改器规则（generate-modifier 等）
-
-- **ModifierId 命名**：`MODIFIER_{前缀}_{项目号:04d}_{描述}`（如 `MODIFIER_SIQI_0035_ADJ_STRENGTH`）；
-  Requirement 用 `REQUIREMENT_`、ReqSet 用 `REQSET_`、Ability 用 `ABILITY_{前缀}_{中缀}{编号:04d}_{简称}`。
-- **EffectType / RequirementType / CollectionType 必须真实存在**——generator 会校验并拒绝未知类型，
-  validate 也会对未知类型报错（参数集合来自 `schemas/modifier_schemas.json`，源自游戏库权威数据）。
-- **参数名必须属于该 Effect/Requirement 的参数集合**（多写/拼错报 error，标准参数缺失给 warning）。
-- **引用**：`owner_reqset` / `subject_reqset` / `bound_requirements` 必须指向工程内存在的 ReqSet/Requirement。
-- 生成的 Modifier 参数骨架 value 为 null，AI 需填入实际值（数值/Type/文本）。
-- 注意：`generate-modifier` 产物是"自定义 ModifierType"（modifier_type = modifier_id），
-  若要用游戏内置 ModifierType，需另行指定。
-- **ModifierStrings 预览文本**：`effect_type = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的 modifier **必须填 `preview_text`**
-  （原版 226 个实例里 221 个都写了；不写不报错，但战斗预览面板不显示该加成来源）。
-  工具会生成两行：`ModifierStrings(ModifierId,'Preview','LOC_{ModifierId}_PREVIEW')` + 对应 `LocalizedText`
-  （前者在 `modifier_workspace`，后者在 `workspace_page._modifier_strength_preview_text_rows()`），**都要求 `preview_text` 非空**。
-  写法：数值型 `+{1_Amount} [ICON_Strength] 战斗力（来源）`；`Key`（属性）型 `+{Property} [ICON_Strength] 战斗力（来源）`。
-- **自定义 ModifierType 必须注册**：`.CIV` 里 `modifier_type` 不属于**原版快照**
-  （`ModTools_5_4/data/vanilla_modifier_types.json`，989 条，由
-  `python -m modgen.tools.extract_vanilla_modifier_types` 从游戏自带 XML 提取）时，
-  导出会补 `INSERT INTO Types(KIND_MODIFIER)` + `INSERT INTO DynamicModifiers` 行。
-  - 判定**不看本机运行缓存库** `DebugGameplay.sqlite`（它含玩家装过的所有 Mod 的类型，
-    "库里有"≠"原版有"）；沿用它会把别人的自定义类型误当原版、不补行，
-    结果 Mod 在没装那个旧 Mod 的机器上加载失败。
-  - 条目可用 `modifier_type_source` 覆盖：`null`=自动（按快照）/ `"new"`=强制新建 /
-    `"vanilla"`=强制视为游戏已有（用于快照漏收的极端情况）。
-  - `validate` 会对「强制新建却属原版」「强制已有却不在快照」报 **ERROR**；
-    自动判定为自定义时给 WARNING（提示将补注册行）。
-
-## 知识查询：优先使用工具内置能力（新设备无需外部知识库）
-
-生成 .CIV 所需的知识（"某个效果/能力是怎么实现的"）**由工具本身提供**，不要依赖外部资料：
-
-0. **`modgen skill`（本地技能库全文检索，2026-08-17 起随发布包分发）**：
-   ```bash
-   python -m modgen.cli skill <关键词>              # 仓库根 skills/ 全文检索（文件名+内容词频评分，命中文件+片段）
-   python -m modgen.cli skill <关键词> --file <相对路径>   # 输出命中文件全文（现查现读）
-   ```
-   - 模板/写法/工作流知识（核心表 SQL 写法、Lua API、.CIV 工作流、效果技巧）在**仓库根 `skills/`**；
-   - 与 `search` 的分工：**"怎么做/怎么写" → skill**；**"某个效果在游戏里现成实现" → search**。
-1. **`modgen search`（命令行首选，AI 直接可用）**：
-   ```bash
-   python -m modgen.cli search <关键词>          # 自然语言/中文效果词（"通往你城市的贸易路线加产出"）或英文 Type/参数（WAR/YIELD_PRODUCTION）
-   python -m modgen.cli search --object <关键词>  # 列出命中对象的全部 Modifier 实现（EffectType/参数/条件集/条件，照抄用）
-   ```
-   - **排序为 BM25 相关性**（中文 bigram + 领域词典 + 字段权重，与 GUI 能力实现搜索同一实现）：
-     可以直接用整句中文描述意图，结果按相关性从高到低排列（不再是"整句子串匹配"）；
-   - 路径自动解析：`--game-db/--text-db` 参数 > 当前目录 `settings.json` > 游戏默认 Cache；中文检索需要文本库（settings.json 的 `active_text_db_path`）；
-   - 例：`search --object 农场` → 高棉「大人工湖」→ `TRAIT_FARM_AQUEDUCT_ADJECENCY_FOOD [EFFECT_ADJUST_PLOT_YIELD]` + `REQUIREMENT_PLOT_IMPROVEMENT_TYPE_MATCHES(IMPROVEMENT_FARM)` ——"相邻农场+食物"的现成实现，直接照抄。
-2. **能力实现搜索（ModTools 小工具 → 能力实现搜索）**（GUI 场景）：
-   - 中文搜效果/描述，或英文搜 Type/参数；打开对象后右侧展示**完整实现**（含 ATTACH/GRANT_ABILITY 嵌套展开）；
-   - **用途**：与 `modgen search --object` 相同，只是 GUI 版。
-3. **游戏库（DebugGameplay.sqlite）**：`modgen validate` 会校验 EffectType/RequirementType/参数名归属；不确定的表结构/字段名直接查库。
-   ```bash
-   python -m modgen.cli query "SELECT ModifierType, CollectionType, EffectType FROM DynamicModifiers WHERE ModifierType LIKE '%PLOT_YIELD%' LIMIT 10"
-   python -m modgen.cli query "PRAGMA table_info(Units)"        # 查表结构（只读）
-   python -m modgen.cli query "SELECT ..." --json                # JSON 输出
-   ```
-   `query` 只允许 SELECT/WITH/PRAGMA/EXPLAIN（只读打开），行数上限 50（`--limit` 调，最大 500）。
-4. **文本库（LOC 查询）**：不确定某个 LOC 文本内容时：
-   ```bash
-   python -m modgen.cli loc LOC_TRAIT_CIVILIZATION_XXX_NAME     # 含 {LOC_...} 引用链展开
-   ```
-5. **modgen schemas**：`modgen/schemas/modifier_schemas.json`（789 效果类型参数集）与 `entry_schemas.json` 是工具内置的权威数据。
-
-> **方法论（硬性要求）**：判断"某个效果有没有现成实现"的唯一正确方法是 **search 查原版**，**不要凭记忆断言做不到**——绝大多数效果游戏里都有对应 Modifier（相邻加成、地块产出等）。确需 Lua 的只有自定义界面/事件逻辑等极少数场景，此时经自定义文件通道写入，Lua 知识查 `modgen skill`（skills/04-lua/）。
-> 注意：知识一律用上述工具内能力查询（技能库已内迁仓库根 `skills/`，随发布包分发，`modgen skill` 检索；外部目录仅为开发机历史备份，不作为依赖）。
-> 硬规则不变：ModifierType 优先引用游戏库已有类型（确需新建时补 DynamicModifiers 行）；JSON 禁止 `""`；
-> 主内容不写 Lua（自定义 SQL/XML/Lua 仅走 `custom-file` 自定义文件通道）。
+search 查游戏库实现；query 只读 SELECT/WITH/PRAGMA/EXPLAIN，默认 50 行、最大 500；loc 查询已配置文本库。来源和不可用的历史资料说明见 [SOURCES](../skills/SOURCES.md)。
 
 ## 重新生成 schema
 

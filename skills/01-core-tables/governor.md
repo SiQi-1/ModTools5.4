@@ -318,4 +318,4 @@ INSERT INTO LocalizedText (Language, Tag, Text) VALUES
 
 | 文件 | 内容 |
 |------|------|
-| `reference/enums/GovernorType.txt` | 官方 8 总督 + MOD/SIQI 总督 |
+| [GovernorType 查询依据](../SOURCES.md#类型与枚举) | 官方 8 总督 + MOD/SIQI 总督 |

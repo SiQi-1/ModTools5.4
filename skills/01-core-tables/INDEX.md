@@ -23,11 +23,11 @@
 
 ## 通用规则
 
-- 所有 Type 名先查 `../../reference/enums/`（.txt）确认可用，再写 INSERT
+- 所有 Type 名先按 [枚举查询依据](../SOURCES.md#类型与枚举)核实类型与来源，再写 INSERT
 - 相邻加成（区域/改良共用）见 [../district-adjacency.md](../district-adjacency.md)
 - 实体间公共列：`{实体}Type` 必写、`TraitType` 独立特质（建筑/区域/改良不可复用文明特质）
 - 文本 LOC_ 命名格式见 `../02-config-files/text.md`
 
 ## 登记纪律
 
-新增/改名本目录文件后，必须同步本 INDEX 与 `../SKILLS_OUTLINE.md`（AGENTS.md §8 硬规则）。
+新增/改名本目录文件后，必须同步本 INDEX 与 `../SKILLS_OUTLINE.md`（[规则正文](../RULES.md) 硬规则）。

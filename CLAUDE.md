@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > **任务路由（先判断目的）**：本文件是**工具优化向**（开发/改进 ModTools、modgen、GUI、测试、打包）。
 > 若任务是**实际应用向**（制作文明6 Mod、编写/修改 `.CIV`、回答 Mod 制作问题）→ 请读根目录 `AGENTS.md`（任务分流表）+ `AGENT.md` + `modgen/AGENTS.md`，本文件大部分内容与任务无关。
 
-> **Agent 知识统一在根目录 `AGENT.md`**：涉及文明6 mod 制作知识、编写 `.CIV` 工程文件时，**先读 AGENT.md**（含两大硬规则：ModifierType 优先引用游戏库已有类型；JSON 禁止写 `""`；以及"主内容不写 Lua，自定义 SQL/XML/Lua 仅走自定义文件通道"的边界声明）。
+> **制作知识入口**：[skills/RULES.md](skills/RULES.md) 为规则正文，[skills/WORKFLOW.md](skills/WORKFLOW.md) 为统一流程；AGENT.md 保留兼容指针。
 
 ## Project Overview
 
@@ -63,8 +63,8 @@ ModTools_5_4/
 │   ├── entity_defaults.py      # Shared policy field defaults (editor + pure builder)
 │   ├── sql_utils.py            # Qt-free SQL literals, escaping, row deduplication, INSERT blocks
 │   ├── sql_builders/
-│   │   └── policies.py         # Policy section data -> (data SQL, localized text SQL), no GUI/DB
-│   │       └── beliefs.py          # Belief section data -> (data SQL, localized text SQL), no GUI/DB
+│   │   ├── policies.py         # Policy section data -> (data SQL, localized text SQL), no GUI/DB
+│   │   └── beliefs.py          # Belief section data -> (data SQL, localized text SQL), no GUI/DB
 │   └── civ6proj_generator.py   # ★ 纯标准库 .civ6proj 生成器（复刻 ModBuddy 向导产物 + 空白 Art.xml；GUI/modgen/AI 三处共用）
 ├── db/
 │   ├── interface.py            # Text DB tag resolution (LOC_xxx lookup)
@@ -117,7 +117,7 @@ ModTools_5_4/
 │   └── TEX_FORMAT.md           # Texture file format reference
 └── logs/                       # modtools_5_4.log (git-tracked history; prefer not adding more)
 ```
-根目录文档：`README.md`（使用教程）、`CIV6_MOD_TUTORIAL.md`（从零全流程教程，随包分发）、`AGENT_SETUP.md`（新设备初始化，给 AI agent）、`modgen/AGENTS.md`（AI 生成 .CIV 必读）、`skills/`（本地技能库 260+ 文件，随发布包分发，入口 `skills/AGENTS.md`，检索 `modgen skill`）。
+根目录文档：`README.md`（使用教程）、`CIV6_MOD_TUTORIAL.md`（从零全流程教程，随包分发）、`AGENT_SETUP.md`（新设备初始化，给 AI agent）、`modgen/AGENTS.md`（AI 生成 .CIV 必读）、`skills/`（分层本地技能库，随发布包分发，入口 `skills/AGENTS.md`，检索 `modgen skill`）。
 
 ## Tests
 
@@ -128,7 +128,7 @@ ModTools_5_4/
 
 ## Key Design Decisions
 
-**AI authoring rules (agent 直接写 .CIV 时)**: 见根目录 `AGENT.md`（权威；游戏深度知识在仓库根 `skills/`，`modgen skill` 检索——2026-08-17 内迁自外部工作区，随发布包分发）。两大硬规则：(1) ModifierType 必须优先引用游戏库 DynamicModifiers 已存在的类型，禁止发明新类型（确需新建时才允许，且必须同时写 DynamicModifiers 行）；(2) JSON 值**禁止写 `""`**——空值必须省略字段或写 `null`，`""` 会生成 SQL `''` 字面量导致类型/外键报错（生成器已兜底：空参数行跳过、`None` 输出 `NULL`）。主内容（.CIV 条目）**不写 Lua、不手写 SQL/XML**；确需 Lua/自定义 SQL/XML 时走**自定义文件通道**（`modgen custom-file` / AI 动作 `project_file_write`，规则与分类见 `project/custom_files.py`——GUI 一键配置与 modgen 单一实现）。
+**AI authoring rules**: 只在 [skills/RULES.md](skills/RULES.md) 维护行为规则；命令契约在 modgen/AGENTS.md。任务必读映射在 skills/catalog.json；知识修改后执行 `python -m modgen.cli skill --check` 和相关 unittest。
 
 **Project files**: `.CIV` files are JSON with a `meta` (format marker + schema version 0.1.0) and `workspace` (section-indexed dict). Sections follow a fixed order (`CIV_SECTION_ORDER`, 18 sections). "Direct workspace" sections (基础信息, 美术, 文本, 修改器) store a dict; all other sections store a list of objects — including the artefact-only section 「UI图标」 (custom UI icons unrelated to any game entity: edited in the 美术 page, validated by `project/ui_icons.py`, emits only `Icons.xml` + IMG/Textures). It is deliberately **not** a navigable tree node (it would duplicate the 美术 row); the workspace tree skips `CIV_UI_ICON_SECTIONS`.
 

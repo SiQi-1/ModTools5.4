@@ -1,6 +1,6 @@
 # Lua 代码规范
 
-基于 19.47 Mod 提炼。18.0 为前期风格，19.47 为当前标准。
+来源：19.47 Mod 的组织方式。项目命名与模块布局是参考模式；环境隔离、API 查证及工具写入要求遵循 [规则正文](../RULES.md)。
 
 ---
 
@@ -60,7 +60,7 @@
 ### 要点（实测）
 
 1. **AddUserInterfaces 必须带 `<Properties><Context>InGame</Context></Properties>`**——缺 Context 属性时 UI 上下文不加载（0014 曾漏写，参考 10.0/3.1/19.47 修正）。Context 值：`InGame`（游戏内）/ `FrontEnd`（主菜单）
-2. **只注册 .xml**，同名 .lua 自动配对加载（AGENTS.md 陷阱 10：两个文件必须成对存在）
+2. **只注册 .xml**，同名 .lua 自动配对加载（同名 XML/Lua 配对，见 [自定义文件指南](../05-modtools-civ/pipeline.md)）
 3. **AddGameplayScripts 不需要 Properties**（0048 等实证）
 4. 纯逻辑 UI 脚本（无可见控件，如"UI 监听 → EXECUTE_SCRIPT → GP"模式）：XML 里放一个隐藏 Grid 容器即可（0048 同款）：
    ```xml

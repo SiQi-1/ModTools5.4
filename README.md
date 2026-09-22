@@ -50,7 +50,7 @@
 | 入口 | 适用 |
 |------|------|
 | `python -m modgen.cli search <效果词>` | **AI / 命令行首选**（`--object` 列出 Modifier 完整实现，照抄用） |
-| `python -m modgen.cli skill <关键词>` | **本地技能库全文检索**（仓库根 skills/，随发布包分发：SQL 模板/Lua API/.CIV 工作流/效果技巧；`--file` 看全文） |
+| `python -m modgen.cli skill <关键词>` | **本地技能库章节检索**（仓库根 skills/，随发布包分发：SQL 模板/Lua API/.CIV 工作流/效果技巧；`--plan` 必读清单、`--file --section` 读章节、`--check` 质量检查） |
 | 小工具窗口 → 能力实现搜索 | GUI 场景（卡片列表 + 详情树 + 图标/颜色渲染） |
 
 - 中文搜效果/描述（自动效果词映射："宣战"→WAR），英文搜 Type/参数（`WAR`、`YIELD_PRODUCTION`）
@@ -103,7 +103,7 @@
 | 13 个内容分类 | 文明/领袖/区域/建筑/单位/单位晋升/改良设施/总督/伟人/政策卡/项目/信仰/议程 |
 | 修改器四类 | Modifier / Requirement / RequirementSet / UnitAbility（效果类型存在性 + 参数骨架自动校验；`merge 工程.CIV 修改器` 直接合并） |
 | 文本 | 中文文本直接写入条目，LOC tag 由导出自动注册；`loc <LOC_TAG>` 查询文本 |
-| 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现；**`modgen skill <关键词>` 本地技能库全文检索**（仓库根 skills/，写法/模板/工作流/Lua 知识）；`query "SQL"` 查游戏库表结构/数据 |
+| 知识查询 | `modgen search`（命令行）/ 能力实现搜索（GUI）——搜效果→找对象→抄实现；**`modgen skill <关键词>` 本地技能库章节检索**（仓库根 skills/，写法/模板/工作流/Lua 知识）；`query "SQL"` 查游戏库表结构/数据 |
 | 生成输出 | 合并进 .CIV 后由 GUI 一键生成 SQL/XML/图标/ArtDef/XLP/Textures；`preview` 可无头预览将导出的全部文件（需 PyQt） |
 | .civ6proj 工程 | `modgen civ6proj 工程.CIV [--update-civ]` 直接生成 ModBuddy 兼容工程文件 + 空白 Art.xml，**无需 ModBuddy 新建工程** |
 | **自定义文件通道** | 自定义 SQL/XML/Lua：`modgen custom-file write/list/remove` 或 AI 控制接口 `project_file_write`——写入工程目录、自动注册文件动作、一键生成原样透传 |
@@ -317,3 +317,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 - 应用图标与部分图片为基于游戏素材的二次创作。
 
 以上素材仅服务于"为文明6制作 Mod"这一用途，版权归 Firaxis Games / 2K 及其相关方所有。若涉及侵权，请联系移除。本工具自身代码采用 MIT 许可证（见根目录 `LICENSE`）。
+
+### AI 知识工作流
+
+制作任务先读 [规则正文](skills/RULES.md) 与 [统一工作流](skills/WORKFLOW.md)。`python -m modgen.cli skill "任务描述" --plan --json` 返回任务必读资料；规则、指南、参数参考和历史案例分层读取。检索失败时换词并查来源，不能凭记忆补结论。维护知识后运行 `python -m modgen.cli skill --check`。

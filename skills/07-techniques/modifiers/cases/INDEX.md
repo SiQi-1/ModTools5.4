@@ -54,3 +54,7 @@
 | Siqi_Leaders_0032 | 原神系列 | 8个自定义 DynamicModifier + 复数领袖 |
 | SIQI_LEADERS_0006 | 早期 | 17个 Grant Ability 变体(含条件/Property/双标签) |
 | Siqi_Leaders_0026 | 早期 | OwnerRequirementSetId + SubjectRequirementSetId 叠条件 |
+
+## 其他参考入口
+
+- [战斗资料的历史来源补充](case-legacy-combat-sources.md)

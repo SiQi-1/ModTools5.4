@@ -1,6 +1,6 @@
 # .CIV 工程文件格式（稳定摘要）
 
-> 本文只写**稳定结构**；精确键名/字段以 `reference/modtools-civ/MANIFEST.md` 钉住的快照和样例工程（`D:\文明6mod用文件夹\ModTools5.4\*.CIV`）为准。**禁止把快照内容抄进本文件**。
+> 稳定结构见本页；精确字段以 [当前实体 schema](../../modgen/schemas/entry_schemas.json)、[当前修改器 schema](../../modgen/schemas/modifier_schemas.json) 和当前实现为准。
 
 ## 总览
 
@@ -51,7 +51,7 @@
 
 > **参数形态**（modifiers/requirements 的 `parameters`）：`[{"name": "Amount", "value": 1.0}, {"name": "YieldType", "value": {"yield_type": "YIELD_FOOD", "display": "食物", "name": "食物", "value": "YIELD_FOOD"}}]` —— value 可为**标量**（数字/字符串）或**选择器对象**（从游戏库选的枚举，含 display 中文名）。对照 `data/effect_type_parameters.json` 确认参数名/类型。
 
-> 与手写 SQL 的对应关系：modifiers ↔ `Modifiers`+`ModifierArguments`；requirement_sets/requirements ↔ `RequirementSets`+`Requirements`+`RequirementArguments`+`RequirementSetRequirements`；owner 表 ↔ 挂载链（`TraitModifiers`/`BuildingModifiers` 等，对应 AGENTS.md §5 陷阱 12）。**Modifier 知识全部复用 `skills/07-techniques/`，只是落盘载体从 SQL 换成 JSON。**
+> 与手写 SQL 的对应关系：modifiers ↔ `Modifiers`+`ModifierArguments`；requirement_sets/requirements ↔ `RequirementSets`+`Requirements`+`RequirementArguments`+`RequirementSetRequirements`；owner 表 ↔ 挂载链（`TraitModifiers`/`BuildingModifiers` 等，对应 [规则正文](../RULES.md)）。**Modifier 知识全部复用 `skills/07-techniques/`，只是落盘载体从 SQL 换成 JSON。**
 
 ## 生成链路（为什么 .CIV 写对了就够）
 
@@ -60,4 +60,4 @@
 ```
 
 - 工具按 section 生成独立文件：`<基础信息.file_name>_<section>.sql` / `Text.sql` / `Icons.xml` 等
-- 用户可用工具"生成预览"检查产物；AI 侧出口检查用 `check_civ.py`
+- 用户可用工具"生成预览"检查产物；AI 侧出口检查用 `python -m modgen.cli validate 工程.CIV`

@@ -1,5 +1,7 @@
 # modifier-greatpeople — 伟人/巨作类 EffectType
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
 ---
 
 ### EFFECT_ADD_EXPENDED_GREAT_PERSON_TILES
@@ -77,7 +79,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `GreatWorkObjectType` | **必写** | 巨作对象类型。`GREATWORKOBJECT_WRITING / PORTRAIT / LANDSCAPE / SCULPTURE / RELIGIOUS / ARTIFACT / MUSIC / RELIC`（[GreatWorkObjectType.txt](../../../reference/enums/GreatWorkObjectType.txt)） |
+| `GreatWorkObjectType` | **必写** | 巨作对象类型。`GREATWORKOBJECT_WRITING / PORTRAIT / LANDSCAPE / SCULPTURE / RELIGIOUS / ARTIFACT / MUSIC / RELIC`（[GreatWorkObjectType.txt](../../SOURCES.md#类型与枚举)） |
 | `YieldType` | **必写** | 产出类型。`YIELD_SCIENCE / CULTURE / GOLD / FAITH / PRODUCTION / FOOD`（YieldType.txt） |
 | `YieldChange` | **必写** | 每件巨作的基础产出值（整数，与 `ScalingFactor` 配合使用） |
 | `ScalingFactor` | **可选** | 产量倍率（整数，除以 100）。例：`ScalingFactor=300` + `YieldChange=2` → 每件巨作 +6 产出。不写时等同于 100（×1） |
@@ -124,7 +126,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 幸福度值（整数，例：`1`、`2`） |
-| `GreatPersonClassType` | **必写** | 伟人类型。`GREAT_PERSON_CLASS_SCIENTIST / ENGINEER / ...`（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **必写** | 伟人类型。`GREAT_PERSON_CLASS_SCIENTIST / ENGINEER / ...`（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 | `HappinessType` | **必写** | 幸福度等级。`HAPPINESS_ECSTATIC / HAPPY / CONTENT / DISPLEASED / UNHAPPY`（HappinessType.txt） |
 
 > **溯源**：苏格兰文明能力「**苏格兰启蒙运动**」——拥有学院的快乐城市每招募一位大科学家 +1 幸福度（`HappinessType=HAPPY`，`Amount=1`）；欣喜若狂时 +2（`HappinessType=ECSTATIC`，`Amount=2`）。拥有工业区的快乐城市每招募一位大工程师同理。用法：仅在该城市已达到指定 `HappinessType` 等级时，按该城市消耗的指定类型伟人数 × Amount 提供额外幸福度。
@@ -179,7 +181,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 每回合伟人点数（整数，例：`1`、`2`） |
-| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 同盟效果——与盟友贸易路线相连的城市区域 +1 伟人点数（`COLLECTION_ALLIANCE_DISTRICTS`）
@@ -202,8 +204,8 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 增加的槽位数（整数，例：`1`、`2`、`3`、`4`） |
-| `BuildingType` | **必写** | 目标建筑。`BUILDING_PALACE / AMPHITHEATER / MARKET / MUSEUM_ARTIFACT / BANK / ...`（[BuildingType.txt](../../../reference/enums/BuildingType.txt)） |
-| `GreatWorkSlotType` | **必写** | 槽位类型。`GREATWORKSLOT_PALACE / WRITING / ARTIFACT / ART / MUSIC / CATHEDRAL / RELIC`（[GreatWorkSlotType.txt](../../../reference/enums/GreatWorkSlotType.txt)） |
+| `BuildingType` | **必写** | 目标建筑。`BUILDING_PALACE / AMPHITHEATER / MARKET / MUSEUM_ARTIFACT / BANK / ...`（[BuildingType.txt](../../SOURCES.md#类型与枚举)） |
+| `GreatWorkSlotType` | **必写** | 槽位类型。`GREATWORKSLOT_PALACE / WRITING / ARTIFACT / ART / MUSIC / CATHEDRAL / RELIC`（[GreatWorkSlotType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 英国文明能力「**大英博物馆**」——考古博物馆 +3 文物槽位（`BuildingType=BUILDING_MUSEUM_ARTIFACT`，`GreatWorkSlotType=GREATWORKSLOT_ARTIFACT`，`Amount=3`）
@@ -226,7 +228,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 每次击杀获得的伟人点数（整数，例：`5`、`10`） |
-| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：法国单位「**帝国卫队**」——击杀敌人 +10 陆军统帅伟人点数（`Amount=10`，`GreatPersonClassType=GREAT_PERSON_CLASS_GENERAL`）。马其顿单位「**伙友骑兵**」——击杀敌人 +5 陆军统帅伟人点数（`Amount=5`）。CollectionType 为 `COLLECTION_OWNER`（玩家），但效果实际作用于玩家的单位，通常配合 `SubjectRequirementSetId` 限定单位类型。
 
@@ -243,7 +245,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **可选** | 百分比倍率（整数，例：`25` = 25%，`100` = 100%） |
-| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 维京单位「**沃林**」——击杀敌人后按战斗力 25% 获得陆军统帅/海军统帅伟人点数（`Amount=25`）
@@ -263,8 +265,8 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `EraType` | **可选** | 时代。`ERA_ANCIENT / CLASSICAL / MEDIEVAL / RENAISSANCE / INDUSTRIAL / MODERN / ATOMIC / INFORMATION / FUTURE`（[EraType.txt](../../../reference/enums/EraType.txt)）。不写则仅一次性生效 |
-| `GreatPersonClassType` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `EraType` | **可选** | 时代。`ERA_ANCIENT / CLASSICAL / MEDIEVAL / RENAISSANCE / INDUSTRIAL / MODERN / ATOMIC / INFORMATION / FUTURE`（[EraType.txt](../../SOURCES.md#类型与枚举)）。不写则仅一次性生效 |
+| `GreatPersonClassType` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 阿拉伯文明能力「**最后的预言家**」——确保在最后一个大预言家被招募时必然获得一位大预言家（只传 `GreatPersonClassType=GREAT_PERSON_CLASS_PROPHET`，不传 `EraType`）
@@ -308,7 +310,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 每回合伟人点数（整数，例：`1`、`2`、`4`） |
-| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有伟人类型生效（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源（广泛使用）**：
 > - 政策卡（玩家级 `COLLECTION_OWNER`）：「**文学传统**」→ +2 大作家点数；「**鼓舞**」→ +2 大科学家点数；「**启示**」→ +2 大预言家点数；「**将军**」→ +2 陆军统帅点数；「**航海**」→ +2 海军统帅点数；「**旅行商人**」→ +2 大商人点数；「**不干涉主义**」→ +4 大商人点数；「**军事组织**」→ +4 陆军统帅点数；「**诺贝尔奖**」→ +4 大科学家点数；「**交响曲**」→ +4 大音乐家点数；「**发明**」→ +4 大工程师点数；「**壁画**」→ +2 大艺术家点数
@@ -339,7 +341,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 百分比值（整数，例：`50` = +50%，`100` = +100%） |
-| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有类型生效（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **可选** | 伟人类型。不写则对所有类型生效（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 世界议会决议「**赞助**」——所有主要文明伟人点数 +100%/+50%/-50%（`COLLECTION_MAJOR_PLAYERS`）
@@ -541,7 +543,7 @@
 
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
-| `GreatPersonClass` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)）。**注意：参数名为 `GreatPersonClass`（非 `GreatPersonClassType`）** |
+| `GreatPersonClass` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)）。**注意：参数名为 `GreatPersonClass`（非 `GreatPersonClassType`）** |
 | `TechBoost` | **必写** | `0` = 市政尤里卡，`1` = 科技尤里卡 |
 | `OtherPlayers` | **可选** | `1` = 为所有其他玩家也提供尤里卡 |
 
@@ -561,7 +563,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 生成伟人数量（整数，例：`1`） |
-| `GreatPersonClassType` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../../reference/enums/GreatPersonClassType.txt)） |
+| `GreatPersonClassType` | **必写** | 伟人类型（[GreatPersonClassType.txt](../../SOURCES.md#类型与枚举)） |
 
 > **溯源**：
 > - 奇观「**巨石阵**」——免费获得一位大预言家（`Amount=1`，`GreatPersonClassType=GREAT_PERSON_CLASS_PROPHET`，受 `STONEHENGE_PROPHET_REQUIREMENTS` 限制：仅当玩家可招募大预言家时生效）
@@ -625,7 +627,7 @@
 | 参数 | 写不写 | 值/引用 |
 |------|--------|---------|
 | `Amount` | **必写** | 每件巨作提供的一次性产出值（整数，例：`350`） |
-| `GreatWorkObjectType` | **必写** | 巨作对象类型。`GREATWORKOBJECT_ARTIFACT / WRITING / ...`（[GreatWorkObjectType.txt](../../../reference/enums/GreatWorkObjectType.txt)） |
+| `GreatWorkObjectType` | **必写** | 巨作对象类型。`GREATWORKOBJECT_ARTIFACT / WRITING / ...`（[GreatWorkObjectType.txt](../../SOURCES.md#类型与枚举)） |
 | `YieldType` | **必写** | 产出类型。`YIELD_SCIENCE / CULTURE / GOLD / FAITH / PRODUCTION / FOOD`（YieldType.txt） |
 
 > **溯源**：大科学家「**玛丽·利基**」激活效果——所在城市每件文物提供 350 科技（`Amount=350`，`GreatWorkObjectType=GREATWORKOBJECT_ARTIFACT`，`YieldType=YIELD_SCIENCE`）。注意：此为**一次性产出**（Grant），非每回合持续产出。触发时机为伟人激活的瞬间，数量按城市当时拥有的指定巨作数量计算。
@@ -673,9 +675,9 @@
 
 | 枚举文件 | 在此文件中被引用的 EffectType 数量 |
 |----------|----------------------------------|
-| `reference/enums/GreatPersonClassType.txt` | 11 个 EffectType |
-| `reference/enums/GreatWorkObjectType.txt` | 3 个 EffectType |
-| `reference/enums/GreatWorkSlotType.txt` | 1 个 EffectType |
-| `reference/enums/BuildingType.txt` | 1 个 EffectType |
-| `reference/enums/EraType.txt` | 1 个 EffectType |
+| [GreatPersonClassType 查询依据](../../SOURCES.md#类型与枚举) | 11 个 EffectType |
+| [GreatWorkObjectType 查询依据](../../SOURCES.md#类型与枚举) | 3 个 EffectType |
+| [GreatWorkSlotType 查询依据](../../SOURCES.md#类型与枚举) | 1 个 EffectType |
+| [BuildingType 查询依据](../../SOURCES.md#类型与枚举) | 1 个 EffectType |
+| [EraType 查询依据](../../SOURCES.md#类型与枚举) | 1 个 EffectType |
 | 数据库 Yields 表 | 4 个 EffectType |

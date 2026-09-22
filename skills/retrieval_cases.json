@@ -1,0 +1,77 @@
+[
+  {
+    "query": "独立UI纹理",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 1
+  },
+  {
+    "query": "独立 UI 纹理",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 1
+  },
+  {
+    "query": "按钮背景",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 3
+  },
+  {
+    "query": "ui_textures",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 1
+  },
+  {
+    "query": "自定义UI图标",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 3
+  },
+  {
+    "query": "custom_entries",
+    "expected": "05-modtools-civ/ui-assets.md",
+    "top": 1
+  },
+  {
+    "query": "ModifierType 原版",
+    "expected": "05-modtools-civ/modifiers.md",
+    "top": 3
+  },
+  {
+    "query": "vanilla_modifier_types",
+    "expected": "05-modtools-civ/modifiers.md",
+    "top": 3
+  },
+  {
+    "query": "modifier_type_source",
+    "expected": "05-modtools-civ/modifiers.md",
+    "top": 1
+  },
+  {
+    "query": "ModifierStrings",
+    "expected": "07-techniques/modifier-techniques.md",
+    "top": 3
+  },
+  {
+    "query": "preview_text 预览文本",
+    "expected": "07-techniques/modifier-techniques.md",
+    "top": 3
+  },
+  {
+    "query": "城市奇观相邻加成",
+    "expected": "07-techniques/modifier-techniques.md",
+    "top": 1
+  },
+  {
+    "query": "需求上下文",
+    "expected": "07-techniques/modifier-techniques.md",
+    "top": 3
+  },
+  {
+    "query": "按钮精灵表方向",
+    "expected": "04-lua/lua-xml-controls.md",
+    "top": 3
+  },
+  {
+    "query": "自定义文件加载顺序",
+    "expected": "05-modtools-civ/pipeline.md",
+    "top": 3
+  }
+]

@@ -1,5 +1,9 @@
 # modifier-diplomacy -- 外交/影响力/使者/不满/议程类 EffectType
 
+> 类型来源：本页为历史参数与实例参考，可能含其他 Mod 的自定义 ModifierType。使用前按 [原版/自定义判定](../../05-modtools-civ/modifiers.md) 核实，不因表中列出便跳过注册。
+
+> 历史 CSV 来源未随包分发；推定参数和历史可用范围须按 [资料依据](../../SOURCES.md) 核实，不能直接作为已验证结论。
+
 共 ~85 个 EffectType，分为 10 大类：
 - **外交行动**: 禁用/偏好/覆盖外交行为
 - **外交产出修正**: 因外交事件获得外交产出 buff/debuff

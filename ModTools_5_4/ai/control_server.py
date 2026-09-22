@@ -240,13 +240,19 @@ class ControlContext:
 
             from .. import skills_search
 
+            section = str(params.get("section") or "").strip()
+            if section and not raw_file:
+                raise AiActionError("section 需要配合 file")
             if raw_file:
-                content = skills_search.read_skill_file(raw_file)
+                content = skills_search.read_skill_file(raw_file, section=section)
                 if content is None:
                     raise AiActionError(f"技能文件不存在或路径非法：{raw_file}")
                 return {"file": raw_file, "content": content}
+            plan = skills_search.reading_plan(keyword)
+            if params.get("plan"):
+                return {"reading_plan": plan}
             results = skills_search.search_skills(keyword, limit=limit)
-            return {"results": results, "count": len(results)}
+            return {"results": results, "count": len(results), "reading_plan": plan}
 
         def _h_check_conflicts(_ctx, _params):
             """自定义 SQL × 生成 SQL 冲突检测（需已保存的 .CIV + modgen 源码环境）。"""

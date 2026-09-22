@@ -14,6 +14,15 @@ $entry = Join-Path $root "ModTools5.4.py"
 $db = Join-Path $root "local_text_New.sqlite"
 $pkg = Join-Path $root "ModTools_5_4"
 
+# 知识入口/命令/检索质量不合格时，在打包前停止。
+Push-Location $root
+try {
+    & $PythonExe -B -m modgen.cli skill --check
+    if ($LASTEXITCODE -ne 0) { throw "Knowledge quality check failed" }
+} finally {
+    Pop-Location
+}
+
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
 if (Test-Path $build) { Remove-Item $build -Recurse -Force }
 
@@ -65,6 +74,7 @@ Copy-Item (Join-Path $root "README.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENT_SETUP.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENT.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENTS.md") $releaseDir -Force
+Copy-Item (Join-Path $root "CLAUDE.md") $releaseDir -Force
 Copy-Item (Join-Path $root "CIV6_MOD_TUTORIAL.md") $releaseDir -Force
 Copy-Item $pkg (Join-Path $releaseDir "ModTools_5_4") -Recurse -Force
 Get-ChildItem (Join-Path $releaseDir "ModTools_5_4") -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
@@ -73,6 +83,11 @@ $toolsDst = Join-Path $releaseDir "tools"
 New-Item -ItemType Directory -Path $toolsDst | Out-Null
 Copy-Item (Join-Path $root "tools\setup_env.py") $toolsDst -Force
 Copy-Item (Join-Path $root "tools\register_file_association.py") $toolsDst -Force
+
+# 只分发维护归档说明，不分发停用脚本。
+$legacyNotes = Join-Path $toolsDst "legacy_skill_builders"
+New-Item -ItemType Directory -Path $legacyNotes -Force | Out-Null
+Copy-Item (Join-Path $root "tools\legacy_skill_builders\README.md") $legacyNotes -Force
 
 $zipPath = Join-Path $root "$AppName.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }

@@ -23,6 +23,8 @@ from ModTools_5_4.ui.pages import entity_table_form as etf  # noqa: E402
 from ModTools_5_4.project.civ_project import CIV_SECTION_ORDER  # noqa: E402
 from sample_project import build_sample_project  # noqa: E402
 
+from modgen import rules  # noqa: E402
+
 OUT_PATH = Path(__file__).resolve().parents[1] / "schemas" / "entry_schemas.json"
 
 SCHEMA_BUILDERS = {
@@ -69,6 +71,9 @@ def main() -> int:
     sections: dict = {}
     for section in CIV_SECTION_ORDER:
         if section in ("基础信息", "美术", "文本", "修改器"):
+            continue
+        if section in rules.UI_ICON_SECTIONS:
+            # 「UI图标」不是实体分类（无 main_table、无 Type），只由 validator 单独校验
             continue
         entries = fixture.get(section, [])
         if entries:

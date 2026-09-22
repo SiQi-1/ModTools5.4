@@ -12,12 +12,44 @@
 from __future__ import annotations
 
 import copy
+from pathlib import Path
 import re
 from typing import Any
 
 from . import rules
 from .modifier_validator import check_modifier_data
 from .schema_store import load_schemas
+
+
+def validate_ui_icon_section(section_value: Any, *, output_dir: Any = None) -> list[str]:
+    """校验「UI图标」段（与 GUI 同源实现，纯标准库）。
+
+    规则见 ``ModTools_5_4/project/ui_icons.py``：图标名缺失/前缀错误/非法字符/
+    段内重复/落进 11 类实体内置图标命名空间、源 PNG 不存在 = ERROR（阻断生成）。
+    命名空间判定沿用「不发明实体类型」的同一原则——UI 图标名不得占用
+    实体内置图标名（``ICON_{实体类型}`` 及 ``_PORTRAIT/_FILL/_SLOT``）的空间。
+
+    ``output_dir`` 为空时无法定位工程目录，只做名字类校验（跳过源图存在性），
+    避免把「无法判定」误报成「文件不存在」。
+    """
+    from ModTools_5_4.project.ui_icons import validate_ui_icons  # noqa: PLC0415
+
+    report = validate_ui_icons(
+        section_value,
+        entity_icon_names=rules.entity_icon_names(),
+        output_dir=Path(output_dir) if output_dir else None,
+        check_source_files=bool(output_dir),
+    )
+    messages: list[str] = []
+    for issue in report.get("errors") or []:
+        if not isinstance(issue, dict):
+            continue
+        index = issue.get("index")
+        text = str(issue.get("message") or "").strip()
+        if not text:
+            continue
+        messages.append(f"UI图标[{index}]: {text}")
+    return messages
 
 
 def _deep_copy(value: Any) -> Any:
@@ -170,6 +202,8 @@ def validate_project(
         for index, entry in enumerate(entries):
             for error in validate_entry(section, entry, prefix=prefix or "", infix=infix or 0):
                 errors.append(f"{section}[{index}]: {error}")
+    # UI图标分节（非实体美术资源声明）
+    errors.extend(validate_ui_icon_section(workspace.get("UI图标")))
     # 修改器直接工作区
     modifier_payload = workspace.get("修改器")
     if isinstance(modifier_payload, dict):

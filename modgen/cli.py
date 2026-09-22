@@ -560,7 +560,7 @@ def build_parser() -> argparse.ArgumentParser:
     gen.add_argument("--leader-abbr", default="", help="议程：绑定领袖简称")
     gen.set_defaults(func=_cmd_generate)
 
-    val = sub.add_parser("validate", help="校验条目或整个工程")
+    val = sub.add_parser("validate", help="校验条目或整个工程（含「UI图标」段：图标名/重名/源图）")
     val.add_argument("civ", nargs="?", help="工程 .CIV 路径（校验工程时）")
     val.add_argument("--section", choices=rules.CONTENT_SECTIONS, help="分类（校验单条目时）")
     val.add_argument("--entry", help="条目 JSON 文件（校验单条目时）")
@@ -658,7 +658,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     prev = sub.add_parser("preview", help="无头预览 .CIV 将导出的 SQL/XML/图标/ArtDef 等文件（验证闭环）")
     prev.add_argument("civ", help="工程 .CIV 路径")
-    prev.add_argument("--section", default="", help="只预览单个分类（内容分类或 修改器）")
+    prev.add_argument("--section", default="", help="只预览单个分类（内容分类 / UI图标 / 修改器）")
     prev.add_argument("--format", default="sql", choices=["sql", "xml"], help="单分类预览格式")
     prev.add_argument("--out", default="", help="预览输出目录（默认 modgen_work/preview_<工程名>/）")
     prev.add_argument("--dry-run", action="store_true", help="只打印文件清单，不落盘")

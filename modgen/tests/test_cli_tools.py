@@ -60,11 +60,12 @@ class NewProjectTestCase(unittest.TestCase):
     def test_build_workspace_structure(self) -> None:
         payload = build_project("测试工程", prefix="SIQI", infix=35, file_name="Siqi_Leaders_0035")
         workspace = payload["workspace"]
-        # 17 节，顺序与 CIV_SECTION_ORDER 一致
-        expected_order = ["基础信息"] + list(rules.CONTENT_SECTIONS) + ["美术", "文本", "修改器"]
+        # 分节顺序与 CIV_SECTION_ORDER 一致
+        expected_order = ["基础信息"] + list(rules.CONTENT_SECTIONS) + ["美术", "UI图标", "文本", "修改器"]
         self.assertEqual(list(workspace.keys()), expected_order)
         for section in rules.CONTENT_SECTIONS:
             self.assertEqual(workspace[section], [])
+        self.assertEqual(workspace["UI图标"], [])
         self.assertEqual(payload["meta"]["schema_version"], "0.1.0")
 
     def test_basic_info_params_applied(self) -> None:
@@ -493,6 +494,79 @@ class SkillCommandTestCase(unittest.TestCase):
         index = read_skill_file("05-modtools-civ/INDEX.md")
         self.assertIsNotNone(index)
         self.assertIn("ModTools", index)
+
+
+class UIIconValidateTestCase(unittest.TestCase):
+    """「UI图标」段校验：重名 / 缺源图 / 非法图标名分别报 ERROR。"""
+
+    def _project(self, entries: list[dict]) -> dict:
+        payload = build_project("测试工程", prefix="SIQI", infix=35)
+        payload["workspace"]["UI图标"] = entries
+        return payload
+
+    def _errors(self, entries: list[dict], tmp: str = "") -> list[str]:
+        output_dir = Path(tmp) if tmp else None
+        from modgen.validator import validate_ui_icon_section
+
+        return validate_ui_icon_section(entries, output_dir=output_dir)
+
+    def test_clean_project_has_no_ui_icon_errors(self) -> None:
+        payload = self._project([])
+        self.assertEqual(validate_project(payload), [])
+
+    def test_missing_source_reports_error_when_output_dir_known(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = self._errors([
+                {"icon_name": "ICON_TEST_NEWS", "sizes": [32, 50],
+                 "images": {"icon": {"path": str(Path(tmp) / "nope.png")}}},
+            ], tmp)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("ICON_TEST_NEWS", errors[0])
+        self.assertIn("源 PNG 不存在", errors[0])
+
+    def test_bad_icon_name_prefix_reports_error(self) -> None:
+        errors = self._errors([{"icon_name": "TEST_NEWS_ICON"}])
+        self.assertEqual(len(errors), 1)
+        self.assertIn("必须以 ICON_ 开头", errors[0])
+
+    def test_duplicate_icon_name_reports_error(self) -> None:
+        errors = self._errors([
+            {"icon_name": "ICON_TEST_DUP", "alias": "ICON_YIELD_FOOD"},
+            {"icon_name": "ICON_TEST_DUP", "alias": "ICON_YIELD_FOOD"},
+        ])
+        self.assertEqual(len(errors), 1)
+        self.assertIn("重复", errors[0])
+
+    def test_entity_icon_conflict_reports_error(self) -> None:
+        """落在实体内置图标命名空间（ICON_<实体头>_*）必须报 ERROR。"""
+        self.assertIn("ICON_UNIT", rules.entity_icon_names())
+        for candidate in ("ICON_UNIT", "ICON_UNIT_SIQI_NEWS", "ICON_DISTRICT_NEWS"):
+            with self.subTest(candidate=candidate):
+                errors = self._errors([{"icon_name": candidate, "alias": "ICON_YIELD_FOOD"}])
+                self.assertEqual(len(errors), 1, errors)
+                self.assertIn("命名空间", errors[0])
+
+    def test_non_entity_namespace_is_accepted(self) -> None:
+        """新闻/动作类图标（不属于实体命名空间）不报错。"""
+        errors = self._errors([
+            {"icon_name": "ICON_SIQI_WUJIU_NEWS_CITY", "alias": "ICON_YIELD_FOOD"},
+            {"icon_name": "ICON_SIQI_WUJIU_ACT_SCOOP", "alias": "ICON_YIELD_FOOD"},
+        ])
+        self.assertEqual(errors, [])
+
+    def test_missing_source_skipped_when_output_dir_unknown(self) -> None:
+        """无法定位工程目录时不做源图存在性判定（避免误报）。"""
+        errors = self._errors([{"icon_name": "ICON_TEST_NEWS", "images": {"icon": {"path": "news.png"}}}])
+        self.assertEqual(errors, [])
+
+    def test_alias_only_entry_is_valid(self) -> None:
+        errors = self._errors([{"icon_name": "ICON_TEST_ALIAS", "alias": "ICON_YIELD_PRODUCTION"}])
+        self.assertEqual(errors, [])
+
+    def test_validate_project_includes_ui_icon_errors(self) -> None:
+        payload = self._project([{"icon_name": "NO_PREFIX"}])
+        errors = validate_project(payload)
+        self.assertTrue(any("UI图标" in error and "ICON_ 开头" in error for error in errors), errors)
 
 
 class CheckConflictsCommandTestCase(unittest.TestCase):

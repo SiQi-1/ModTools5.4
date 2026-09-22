@@ -41,7 +41,7 @@
 | 文件 | 内容 |
 |------|------|
 | `pipeline.md` | **单会话流水线**（能力边界矩阵 + 6 步 + 补丁模式 + 验证命令） |
-| `civ-project-format.md` | .CIV 整体结构（meta/workspace、17 section、dict vs list） |
+| `civ-project-format.md` | .CIV 整体结构（meta/workspace、18 section、dict vs list、UI图标段） |
 | `civ-pitfalls.md` | 工具契约规则 + 合并后的必炸清单（禁 Lua/禁 `""`/Triggered…） |
 | `entity-templates/INDEX.md` | 实体模板地图（各实体入口键 + 桥接技能） |
 | `entity-templates/basic-info.md` | 基础信息 section（prefix/infix/命名根基） |
@@ -49,7 +49,7 @@
 
 ## 数据源（快照，钉 commit）
 
-- `reference/modtools-civ/project/civ_project.py` — 17 section 顺序/形态（**禁止手改**，`sync_modtools.py` 独占）
+- `reference/modtools-civ/project/civ_project.py` — 18 section 顺序/形态（**禁止手改**，`sync_modtools.py` 独占）
 - `reference/modtools-civ/data/effect_type_parameters.json` — EffectType 参数（写修改器必查）
 - `reference/modtools-civ/data/font_icons_registry.json` — `[ICON_x]` 拼写权威源
 - `reference/modtools-civ/data/standard_colors.json` / `text_color_presets.json` — 配色/文本色

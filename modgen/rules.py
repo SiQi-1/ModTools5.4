@@ -84,6 +84,45 @@ CONTENT_SECTIONS: tuple[str, ...] = (
     "总督", "伟人", "政策卡", "项目", "信仰", "议程",
 )
 
+# 非实体产物型分节（存条目列表、有专属编辑器，但不产出 SQL/文本/Players 数据）。
+# 「UI图标」= 与游戏实体无关的自定义 UI 图标声明，只影响 Icons.xml 与 IMG/Textures。
+UI_ICON_SECTIONS: tuple[str, ...] = ("UI图标",)
+
+# workspace 分节顺序（与 CIV_SECTION_ORDER 一致）
+WORKSPACE_SECTION_ORDER: tuple[str, ...] = (
+    ("基础信息",) + CONTENT_SECTIONS + ("美术",) + UI_ICON_SECTIONS + ("文本", "修改器")
+)
+
+# ── 实体内置图标名（Icons.xml 由 ModTools 美术页生成，此处是只读契约）──────────
+# 用途：「UI图标」段的 icon_name 不得覆盖这些名字（重名 → 游戏内图标错乱）。
+# 规则来源：ModTools_5_4/ui/pages/art_workspace.py:_build_icons_xml
+#   文明/领袖: ICON_{type}
+#   单位:      ICON_{type} + ICON_{type}_PORTRAIT
+#   区域/建筑/改良设施/项目: ICON_{type}
+#   政策卡:    ICON_{type}（官方图集 ICON_ATLAS_POLICIES）
+#   信仰:      ICON_{type}
+#   总督:      ICON_{type} + _FILL/_SLOT
+#   伟人:      由 class_data.UnitType 推导（ICON_{UnitType}[_PORTRAIT]），非固定后缀
+# 新增分类时须同步本元组（modgen/tests/test_cli_tools.py 有契约测试）。
+ENTITY_ICON_NAME_HEADS: tuple[str, ...] = (
+    "CIVILIZATION", "LEADER", "DISTRICT", "BUILDING", "UNIT",
+    "IMPROVEMENT", "PROJECT", "POLICY", "BELIEF", "GOVERNOR",
+)
+ENTITY_ICON_NAME_SUFFIXES: tuple[str, ...] = ("", "_PORTRAIT", "_FILL", "_SLOT")
+
+
+def entity_icon_names() -> list[str]:
+    """实体内置图标名的**通用模板集合**（如 ``ICON_DISTRICT``、``ICON_UNIT_PORTRAIT``）。
+
+    只是「前缀 + 后缀」的组合，不含具体 Type——用于让 modgen 在无 GUI、无工程
+    数据时也能给出重名提示（GUI 侧用真实 Icons.xml 精确判定）。
+    """
+    return [
+        f"ICON_{head}{suffix}"
+        for head in ENTITY_ICON_NAME_HEADS
+        for suffix in ENTITY_ICON_NAME_SUFFIXES
+    ]
+
 # 各分类条目必填基础键（总督用 code 生成 Type；议程/伟人/晋升树无顶层 abbr）
 SECTION_REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
     "文明": ("abbr", "name"),

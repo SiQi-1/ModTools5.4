@@ -52,12 +52,15 @@ def build_workspace(
     guid: str = "",
     language: str = "简体中文",
 ) -> dict[str, Any]:
-    """构建 17 节 workspace（内容分类为空列表，直接工作区取骨架默认结构）。"""
+    """构建 workspace（内容分类为空列表，直接工作区取骨架默认结构）。"""
     scaffold = load_scaffold()
 
     workspace: dict[str, Any] = {}
     # 内容分类：空列表（按 CIV_SECTION_ORDER 顺序）
     for section in rules.CONTENT_SECTIONS:
+        workspace[section] = []
+    # UI图标：非实体产物型分节（与实体无关的自定义 UI 图标声明，存条目列表）
+    for section in rules.UI_ICON_SECTIONS:
         workspace[section] = []
 
     # 基础信息：应用 prefix/infix/file_name/mod_name 等工程参数
@@ -128,9 +131,9 @@ def build_workspace(
     # 文本
     workspace["文本"] = copy.deepcopy(scaffold.get("文本") or {"preview_settings": {}})
 
-    # 按 CIV_SECTION_ORDER 重排（基础信息 → 内容分类 → 美术/文本/修改器）
+    # 按 CIV_SECTION_ORDER 重排（基础信息 → 内容分类 → 美术 → UI图标 → 文本/修改器）
     ordered: dict[str, Any] = {}
-    for section in ("基础信息",) + rules.CONTENT_SECTIONS + ("美术", "文本", "修改器"):
+    for section in rules.WORKSPACE_SECTION_ORDER:
         if section in workspace:
             ordered[section] = workspace[section]
     return ordered

@@ -2160,6 +2160,7 @@
     "Description": "",
     "icon_image_name": "",
     "images": {},
+    "use_official_icon": false,
     "belief_bonuses": [],
     "subtables": {}
    },

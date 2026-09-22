@@ -62,6 +62,7 @@ from ...project import (
     CIV_DIRECT_WORKSPACE_SECTIONS,
     CIV_FILE_EXTENSION,
     CIV_SECTION_ORDER,
+    CIV_UI_ICON_SECTIONS,
     CivProject,
     create_empty_project,
 )
@@ -73,6 +74,13 @@ from ...project.civ6proj_generator import (
 from ...project.output_manifest import OutputManifest, make_output_manifest, safe_relative_path
 from ...project.sql_utils import build_insert_block, deduplicate_rows, sql_escape, sql_literal
 from ...project.sql_builders import build_belief_sql_pair, build_policy_sql_pair
+from ...project.ui_icons import (
+    UI_ICON_SECTION,
+    build_source_state_map as build_ui_icon_source_states,
+    entity_icon_name_patterns,
+    iter_ui_icon_entries,
+    validate_ui_icons,
+)
 
 
 MODIFIER_SECTION_FORMAT = "MODTOOLS54_MODIFIER_WORKSPACE"
@@ -494,7 +502,11 @@ class WorkspacePage(BasePage):
             custom_project_files_provider=self._custom_project_files_for_actions,
             has_custom_unit_abilities_getter=lambda: bool(self._modifier_custom_unit_abilities()),
         )
-        self._art_workspace = ArtWorkspacePanel()
+        self._art_workspace = ArtWorkspacePanel(
+            ui_icon_entities_provider=self._entity_icon_names,
+            ui_icon_notifier=self._handle_ui_icons_changed,
+            output_dir_provider=self._ui_icon_output_dir,
+        )
 
         self._modifier_workspace = ModifierWorkspacePanel(
             save_to_project_callback=self._save_modifier_payload_to_project,
@@ -810,6 +822,18 @@ class WorkspacePage(BasePage):
             if fmt == "xml":
                 return self._sql_preview_to_xml(data_sql)
             return data_sql
+
+        if section == UI_ICON_SECTION:
+            # 该段不产出 SQL/文本，预览直接给 Icons.xml（与美术页同一实现）
+            icons_xml = ""
+            try:
+                for filename, content in self._art_workspace.export_preview_file_groups().get("Icons", []):
+                    if str(filename or "").strip().lower() == "icons.xml":
+                        icons_xml = str(content or "")
+                        break
+            except Exception:
+                LOGGER.exception("[UIIcons] preview build failed")
+            return icons_xml or "<!-- 暂无 UI 图标声明（在「美术」页的 UI图标 区新增） -->"
 
         if section != "文明":
             base_name = {
@@ -7451,7 +7475,8 @@ class WorkspacePage(BasePage):
         self._refresh_project_root_workspace()
 
         for section in CIV_SECTION_ORDER:
-            if section in CIV_DIRECT_WORKSPACE_SECTIONS:
+            if section in CIV_DIRECT_WORKSPACE_SECTIONS or section in CIV_UI_ICON_SECTIONS:
+                # 「UI图标」没有独立面板（只在美术页编辑），无需预热子条目组预览
                 continue
             self._group_workspace.set_section(section)
 
@@ -8601,6 +8626,64 @@ class WorkspacePage(BasePage):
             return []
         return [entry for entry in data if isinstance(entry, dict)]
 
+    def _ui_icons_section(self) -> list[dict[str, object]]:
+        """「UI图标」段条目（缺失节点时按空列表处理，兼容旧工程）。"""
+        return iter_ui_icon_entries(self._project.sections.get(UI_ICON_SECTION))
+
+    def _ui_icon_output_dir(self) -> Path | None:
+        """源图相对路径的解析基准 = .civ6proj 所在工程目录。"""
+        civ6proj = self._civ6proj_target_path()
+        return civ6proj.parent if isinstance(civ6proj, Path) else None
+
+    def _entity_icon_names(self) -> list[str]:
+        """11 类实体内置图标名 + 其命名空间前缀（「UI图标」段重名校验依据）。
+
+        与 ``ArtWorkspacePanel._build_icons_xml`` 的收集结果同源：直接取该面板
+        最近一次构建 Icons.xml 时收集到的图集/定义行图标名，再展开成命名空间，
+        避免两处规则漂移（例如 ``ICON_DISTRICT_NEWS`` 同样会与 ``DISTRICT_NEWS`` 撞车）。
+        """
+        try:
+            return entity_icon_name_patterns(self._art_workspace.entity_icon_names())
+        except Exception:
+            LOGGER.exception("[UIIcons] entity icon name collection failed")
+            return []
+
+    def _handle_ui_icons_changed(self, entries: list[dict[str, object]]) -> None:
+        """美术页编辑「UI图标」后的回写：同步分节 + 刷新树与总览预览。"""
+        self._project.sections[UI_ICON_SECTION] = [
+            dict(entry) for entry in entries if isinstance(entry, dict)
+        ]
+        self._rebuild_tree()
+        LOGGER.info("[UIIcons] entries updated: count=%d", len(self._project.sections[UI_ICON_SECTION]))
+
+    def _collect_ui_icon_issues(self) -> dict[str, list[dict[str, object]]]:
+        """校验「UI图标」段（GUI 生成前检查与 AI 接口共用）。"""
+        report = validate_ui_icons(
+            self._project.sections.get(UI_ICON_SECTION),
+            entity_icon_names=self._entity_icon_names(),
+            output_dir=self._ui_icon_output_dir(),
+        )
+        return {
+            "errors": list(report.get("errors") or []),
+            "warnings": list(report.get("warnings") or []),
+        }
+
+    def _validate_ui_icons(self) -> bool:
+        """生成前阻断性校验：有 ERROR 时弹窗并返回 False。"""
+        issues = self._collect_ui_icon_issues()
+        errors = issues.get("errors") or []
+        if not errors:
+            return True
+        lines = [str(item.get("message") or "") for item in errors[:30]]
+        more = "\n..." if len(errors) > 30 else ""
+        QMessageBox.warning(
+            self,
+            "UI图标校验失败",
+            "「UI图标」段存在错误，已阻止生成（该段只影响 Icons.xml 与 IMG/Textures，"
+            "修正后即可生成）：\n\n" + "\n".join(lines) + more,
+        )
+        return False
+
     def _collect_icon_source_states(self) -> dict[str, dict[str, object]]:
         output: dict[str, dict[str, object]] = {}
 
@@ -8668,6 +8751,11 @@ class WorkspacePage(BasePage):
             images = entry.get("images") if isinstance(entry.get("images"), dict) else {}
             _store(str(images.get("unit_icon_name") or f"ICON_{unit_type}"), images.get("unit_icon"))
             _store(str(images.get("unit_portrait_name") or f"ICON_{unit_type}_PORTRAIT"), images.get("unit_portrait"))
+
+        # 「UI图标」段：与实体同一套 source_map 约定（键 = 图标名，值 = 源图 state），
+        # 后续 IMG/Textures 计划按 base_icon_name 查到源图即自动出图。
+        for icon_name, state in build_ui_icon_source_states(self._ui_icons_section()).items():
+            _store(icon_name, state)
 
         return output
 
@@ -10119,7 +10207,7 @@ class WorkspacePage(BasePage):
         if missing_required:
             self._show_missing_required_fields_dialog(missing_required)
             return False
-        return True
+        return self._validate_ui_icons()
 
     def generate_single_output_file(
         self, relative_path: str, *, overwrite: bool | None = None
@@ -10152,6 +10240,18 @@ class WorkspacePage(BasePage):
                 self._show_missing_required_fields_dialog(missing)
                 return None
             return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
+
+        ui_icon_issues = self._collect_ui_icon_issues()
+        if ui_icon_issues.get("errors"):
+            if interactive:
+                self._validate_ui_icons()
+                return None
+            return {
+                "ok": False,
+                "error": "ui_icons_invalid",
+                "issues": ui_icon_issues["errors"],
+                "warnings": ui_icon_issues.get("warnings") or [],
+            }
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
         if not can_generate or civ6proj_path is None:
@@ -10317,6 +10417,18 @@ class WorkspacePage(BasePage):
                 self._show_missing_required_fields_dialog(missing)
                 return None
             return {"ok": False, "error": "required_fields_missing", "missing": [list(item) for item in missing]}
+
+        ui_icon_issues = self._collect_ui_icon_issues()
+        if ui_icon_issues.get("errors"):
+            if interactive:
+                self._validate_ui_icons()
+                return None
+            return {
+                "ok": False,
+                "error": "ui_icons_invalid",
+                "issues": ui_icon_issues["errors"],
+                "warnings": ui_icon_issues.get("warnings") or [],
+            }
 
         files, folders, can_generate, civ6proj_path = self._project_root_manifest()
         if not can_generate or civ6proj_path is None:
@@ -10549,6 +10661,7 @@ class WorkspacePage(BasePage):
             validate_units=self._section_has_entries("单位"),
             validate_districts=self._section_has_entries("区域"),
         )
+        ui_icon_issues = self._collect_ui_icon_issues()
 
         # 文件动作 + 工程目录自定义文件清单（AI 与 GUI 视角一致）
         file_info_data = basic.get("file_info") if isinstance(basic, dict) else {}
@@ -10599,6 +10712,7 @@ class WorkspacePage(BasePage):
             },
             "sections": sections,
             "required_missing": [list(item) for item in missing],
+            "ui_icon_issues": ui_icon_issues,
             "file_info": {
                 "front_end_actions": _compact_actions("front_end_actions"),
                 "in_game_actions": _compact_actions("in_game_actions"),
@@ -10878,6 +10992,13 @@ class WorkspacePage(BasePage):
             name = entry.get("name")
             if isinstance(name, str) and name.strip():
                 return name.strip()
+            # 「UI图标」段：备注名优先，回退图标名
+            icon_name = entry.get("icon_name")
+            if isinstance(icon_name, str) and icon_name.strip():
+                note = entry.get("name_zh")
+                if isinstance(note, str) and note.strip():
+                    return f"{note.strip()}（{icon_name.strip()}）"
+                return icon_name.strip()
             class_data = entry.get("class_data")
             if isinstance(class_data, dict):
                 class_name = class_data.get("Name")
@@ -10930,6 +11051,9 @@ class WorkspacePage(BasePage):
 
         if kind == "section_group":
             section = str(payload.get("section") or "")
+            if section == UI_ICON_SECTION:
+                self._show_ui_icon_workspace(-1)
+                return
             self._workspace_title.setText(section)
             self._workspace_info.setText("这是子条目组。可新增子条目，并查看 SQL/XML 预览。")
             self._workspace_path.setText(f"路径：{self._project.project_name} / {section}")
@@ -10941,6 +11065,9 @@ class WorkspacePage(BasePage):
             section = str(payload.get("section") or "")
             entry_name = str(payload.get("entry_name") or "")
             index = int(payload.get("index") or 0)
+            if section == UI_ICON_SECTION:
+                self._show_ui_icon_workspace(index, entry_name=entry_name)
+                return
             self._workspace_title.setText(entry_name)
             self._workspace_info.setText("已进入子条目工作区。")
             self._workspace_path.setText(f"路径：{self._project.project_name} / {section} / {entry_name}（#{index + 1}）")
@@ -10952,3 +11079,16 @@ class WorkspacePage(BasePage):
             self._section_item_workspace.set_item(section, index, entry_payload, fallback_name=entry_name)
             self._workspace_stack.setCurrentWidget(self._section_item_workspace)
             return
+
+    def _show_ui_icon_workspace(self, index: int = -1, *, entry_name: str = "") -> None:
+        """「UI图标」节点 → 美术页的 UI 图标编辑区（该段无 SQL/文本编辑器，只在美术页编辑）。"""
+        self._workspace_title.setText(UI_ICON_SECTION)
+        self._workspace_info.setText(
+            "UI图标段：声明与游戏实体无关的自定义 UI 图标（新闻分类/单位动作/追踪器等）。"
+            "只影响 Icons.xml 与 IMG/Textures 输出，不生成 SQL 与文本。"
+        )
+        suffix = f" / {entry_name}" if entry_name else ""
+        self._workspace_path.setText(f"路径：{self._project.project_name} / {UI_ICON_SECTION}{suffix}")
+        self._art_workspace.refresh_from_sections(self._project.sections)
+        self._workspace_stack.setCurrentWidget(self._art_workspace)
+        self._art_workspace.focus_ui_icon_entry(index)

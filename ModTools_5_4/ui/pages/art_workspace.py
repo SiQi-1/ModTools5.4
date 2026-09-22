@@ -14,6 +14,7 @@ import logging
 import sqlite3
 from pathlib import Path
 import re
+from typing import Callable, Iterable
 import uuid
 from xml.etree import ElementTree as ET
 
@@ -29,6 +30,7 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
@@ -45,6 +47,22 @@ from PyQt6.QtWidgets import (
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB, _resolve_data_path
+from ...project.ui_icons import (
+    DEFAULT_UI_ICON_SIZES,
+    UI_ICON_SECTION,
+    build_source_state_map as build_ui_icon_source_states,
+    build_ui_icons_xml_rows,
+    entry_alias as ui_icon_entry_alias,
+    entry_display_name as ui_icon_entry_display_name,
+    entry_icon_name as ui_icon_entry_name,
+    entry_source_path as ui_icon_entry_source_path,
+    iter_ui_icon_entries,
+    parse_sizes as parse_ui_icon_sizes,
+    read_png_size,
+    resolve_source_path as resolve_ui_icon_source_path,
+    set_entry_source_path as set_ui_icon_entry_source_path,
+    validate_ui_icons,
+)
 from ..ui_widget_kit import MomentTextureSearchTemplate
 
 try:
@@ -351,6 +369,12 @@ def _safe_text(value: object | None) -> str:
     return "" if value is None else str(value).strip()
 
 
+def _apply_small_button(button: QPushButton) -> None:
+    """把表格内的小按钮压到紧凑尺寸（与工作区其它页的表格按钮一致）。"""
+    button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+    button.setMinimumWidth(0)
+
+
 # ---- 信仰官方固定图标 ----
 # 依据游戏文件 Base/Assets/UI/Icons/Icons_Beliefs.xml 与
 # Base/Assets/Gameplay/Data/Beliefs.xml 实测映射：
@@ -462,6 +486,49 @@ class _LeaderXlpRow:
         return f"{self.leader_type.lower()}.xlp"
 
 
+@dataclass(slots=True)
+class _UIIconRow:
+    """「UI图标」段的一行（GUI 编辑态；写回时按 UI图标 条目结构落盘）。"""
+
+    icon_name: str = ""
+    name_zh: str = ""
+    sizes_text: str = ""
+    source_path: str = ""
+    alias: str = ""
+
+    @classmethod
+    def from_entry(cls, entry: object) -> "_UIIconRow":
+        raw_sizes = entry.get("sizes") if isinstance(entry, dict) else None
+        # 条目没写 sizes → 编辑框留空（= 用默认值），不把默认列表固化成条目字段
+        sizes_text = ""
+        if raw_sizes not in (None, "", [], ()):
+            sizes_text = ",".join(str(size) for size in parse_ui_icon_sizes(raw_sizes))
+        return cls(
+            icon_name=ui_icon_entry_name(entry),
+            name_zh=ui_icon_entry_display_name(entry) if ui_icon_entry_name(entry) else "",
+            sizes_text=sizes_text,
+            source_path=ui_icon_entry_source_path(entry),
+            alias=ui_icon_entry_alias(entry),
+        )
+
+    @property
+    def sizes(self) -> list[int]:
+        return parse_ui_icon_sizes(self.sizes_text)
+
+    def to_entry(self) -> dict[str, object]:
+        """写回条目：空值一律省略字段（JSON 禁止写 ``""`` 的约定）。"""
+        entry: dict[str, object] = {"icon_name": self.icon_name}
+        if self.name_zh:
+            entry["name_zh"] = self.name_zh
+        if self.sizes_text:
+            entry["sizes"] = self.sizes
+        if self.alias:
+            entry["alias"] = self.alias
+        if self.source_path:
+            set_ui_icon_entry_source_path(entry, self.source_path)
+        return entry
+
+
 class _CulturePickerDialog(QDialog):
     def __init__(
         self,
@@ -565,10 +632,26 @@ class ArtWorkspacePanel(QWidget):
     SIZE_BELIEF = [32, 38, 50, 64, 256]
     SIZE_GOVERNOR_MAIN = [22, 32, 64]
     SIZE_GOVERNOR_FILL_SLOT = [22, 32]
+    # 「UI图标」段的缺省多尺寸（条目 sizes 为空时使用）
+    SIZE_UI_ICON = list(DEFAULT_UI_ICON_SIZES)
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        ui_icon_entities_provider: "Callable[[], Iterable[str]] | None" = None,
+        ui_icon_notifier: "Callable[[list[dict[str, object]]], None] | None" = None,
+        output_dir_provider: "Callable[[], Path | None] | None" = None,
+        source_dir_provider: "Callable[[], Iterable[str]] | None" = None,
+    ) -> None:
         super().__init__()
         self._sections: dict[str, object] = {}
+        self._ui_icon_entities_provider = ui_icon_entities_provider
+        self._ui_icon_notifier = ui_icon_notifier
+        self._output_dir_provider = output_dir_provider
+        self._source_dir_provider = source_dir_provider
+        self._ui_icon_rows: list[_UIIconRow] = []
+        self._ui_icon_columns_dirty = True
+        self._last_entity_icon_names: list[str] | None = None
         self._state: dict[str, object] = {
             "alias_map": {},
             "source_map": {},
@@ -668,6 +751,43 @@ class ArtWorkspacePanel(QWidget):
         moments_layout = QVBoxLayout(moments_group)
         moments_layout.addWidget(self._moment_table)
 
+        # ---- 「UI图标」段：与游戏实体无关的自定义 UI 图标（只影响 Icons.xml 与 IMG/Textures）----
+        self._ui_icon_table = QTableWidget(0, 6)
+        self._ui_icon_table.setHorizontalHeaderLabels(
+            ["图标名 (ICON_*)", "备注名", "尺寸(逗号分隔，留空=默认)", "源 PNG", "图片状态", "别名(留空=自带图集)"]
+        )
+        self._ui_icon_table.verticalHeader().setVisible(False)
+        self._ui_icon_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self._ui_icon_table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._ui_icon_table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._ui_icon_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+
+        self._ui_icon_add_button = QPushButton("新增 UI 图标")
+        self._ui_icon_add_button.clicked.connect(self._handle_ui_icon_add)
+        self._ui_icon_remove_button = QPushButton("删除选中行")
+        self._ui_icon_remove_button.clicked.connect(self._handle_ui_icon_remove)
+
+        ui_icon_hint = QLabel(
+            "给不属于任何游戏实体的 UI 元素（新闻分类、单位动作、追踪器等）声明专属图标。"
+            f"图标名须以 ICON_ 开头，图集名自动去掉 ICON_ 换成 ATLAS_；"
+            f"尺寸留空使用默认 {'/'.join(str(s) for s in self.SIZE_UI_ICON)}；"
+            "源图请放在工程外，建议最小边不小于最大输出尺寸。填了别名则改用该图标、不生成自带图集。"
+        )
+        ui_icon_hint.setObjectName("pageInfoLabel")
+        ui_icon_hint.setWordWrap(True)
+
+        ui_icon_toolbar = QHBoxLayout()
+        ui_icon_toolbar.setContentsMargins(0, 0, 0, 0)
+        ui_icon_toolbar.addWidget(self._ui_icon_add_button)
+        ui_icon_toolbar.addWidget(self._ui_icon_remove_button)
+        ui_icon_toolbar.addStretch(1)
+
+        ui_icon_group = QGroupBox("UI图标（自定义 UI 图标声明：只出 Icons.xml 与 IMG/Textures）")
+        ui_icon_layout = QVBoxLayout(ui_icon_group)
+        ui_icon_layout.addWidget(ui_icon_hint)
+        ui_icon_layout.addLayout(ui_icon_toolbar)
+        ui_icon_layout.addWidget(self._ui_icon_table)
+
         self._preview_summary = QLabel("预览文件：XLP 0 | ArtDef 0 | Icons 0")
         self._preview_summary.setWordWrap(True)
         self._preview_button = QPushButton("打开预览窗口")
@@ -712,6 +832,7 @@ class ArtWorkspacePanel(QWidget):
         content_layout.addWidget(controls_group)
         content_layout.addWidget(civ_group)
         content_layout.addWidget(alias_group)
+        content_layout.addWidget(ui_icon_group)
         content_layout.addWidget(moments_group)
         content_layout.addWidget(leader_xlp_group)
         content_layout.addWidget(source_group)
@@ -732,6 +853,7 @@ class ArtWorkspacePanel(QWidget):
         self._apply_leader_xlp_table_height()
         self._apply_source_table_height()
         self._apply_moment_table_height()
+        self._apply_ui_icon_table_height()
 
     @staticmethod
     def _apply_content_widths(table: QTableWidget, *, recalc_contents: bool, min_col_width: int = 44) -> None:
@@ -792,6 +914,7 @@ class ArtWorkspacePanel(QWidget):
         self._apply_content_widths(self._leader_xlp_table, recalc_contents=True)
         self._apply_content_widths(self._source_table, recalc_contents=self._source_columns_dirty)
         self._apply_content_widths(self._moment_table, recalc_contents=self._moment_columns_dirty)
+        self._apply_content_widths(self._ui_icon_table, recalc_contents=self._ui_icon_columns_dirty)
         if self._civ_table.columnCount() >= 6:
             self._civ_table.setColumnWidth(3, max(200, self._civ_table.columnWidth(3)))
             self._civ_table.setColumnWidth(5, max(300, self._civ_table.columnWidth(5)))
@@ -800,9 +923,16 @@ class ArtWorkspacePanel(QWidget):
             self._moment_table.setColumnWidth(2, max(180, self._moment_table.columnWidth(2)))
             self._moment_table.setColumnWidth(4, max(360, self._moment_table.columnWidth(4)))
             self._moment_table.setColumnWidth(5, max(220, self._moment_table.columnWidth(5)))
+        if self._ui_icon_table.columnCount() >= 6:
+            self._ui_icon_table.setColumnWidth(0, max(220, self._ui_icon_table.columnWidth(0)))
+            self._ui_icon_table.setColumnWidth(2, max(190, self._ui_icon_table.columnWidth(2)))
+            self._ui_icon_table.setColumnWidth(3, max(320, self._ui_icon_table.columnWidth(3)))
+            self._ui_icon_table.setColumnWidth(4, max(210, self._ui_icon_table.columnWidth(4)))
+            self._ui_icon_table.setColumnWidth(5, max(180, self._ui_icon_table.columnWidth(5)))
         self._alias_columns_dirty = False
         self._source_columns_dirty = False
         self._moment_columns_dirty = False
+        self._ui_icon_columns_dirty = False
 
     def _apply_leader_xlp_table_height(self) -> None:
         self._leader_xlp_table.resizeRowsToContents()
@@ -830,6 +960,15 @@ class ArtWorkspacePanel(QWidget):
         target = max(56, header_height + rows_height + frame_height)
         self._moment_table.setMinimumHeight(target)
         self._moment_table.setMaximumHeight(target)
+
+    def _apply_ui_icon_table_height(self) -> None:
+        self._ui_icon_table.resizeRowsToContents()
+        header_height = self._ui_icon_table.horizontalHeader().height()
+        rows_height = sum(self._ui_icon_table.rowHeight(row) for row in range(self._ui_icon_table.rowCount()))
+        frame_height = self._ui_icon_table.frameWidth() * 2
+        target = max(56, header_height + rows_height + frame_height)
+        self._ui_icon_table.setMinimumHeight(target)
+        self._ui_icon_table.setMaximumHeight(target)
 
     def import_project_payload(self, payload: dict[str, object] | None) -> None:
         default_state: dict[str, object] = {
@@ -957,6 +1096,7 @@ class ArtWorkspacePanel(QWidget):
         self._alias_rows = self._build_alias_rows()
         self._source_rows = self._build_source_rows()
         self._leader_xlp_rows = self._build_leader_xlp_rows()
+        self._ui_icon_rows = [_UIIconRow.from_entry(entry) for entry in self._ui_icon_entries()]
         try:
             self._moment_rows = self._build_moment_rows()
         except Exception:
@@ -968,6 +1108,7 @@ class ArtWorkspacePanel(QWidget):
             self._render_moment_table()
         except Exception:
             LOGGER.exception("[ArtWorkspace] render moment table failed")
+        self._render_ui_icon_table()
         self._render_source_table()
         self._render_leader_xlp_table()
         self._state["art_xml_workspace_config"] = self._build_workspace_art_xml_config()
@@ -979,11 +1120,12 @@ class ArtWorkspacePanel(QWidget):
         except Exception:
             need_hits = -1
         LOGGER.info(
-            "[ArtWorkspace] refreshed rows: civ=%d alias=%d moment=%d source=%d | need_hits=%s",
+            "[ArtWorkspace] refreshed rows: civ=%d alias=%d moment=%d source=%d ui_icon=%d | need_hits=%s",
             len(self._civ_rows),
             len(self._alias_rows),
             len(self._moment_rows),
             len(self._source_rows),
+            len(self._ui_icon_rows),
             str(need_hits),
         )
 
@@ -2009,6 +2151,299 @@ class ArtWorkspacePanel(QWidget):
         if s.endswith("WILDCARD"):
             return 3
         return 3
+
+    # ── 「UI图标」段（自定义 UI 图标声明）────────────────────────────────
+
+    def _ui_icon_entries(self) -> list[dict[str, object]]:
+        """当前段内的条目（只读；写回走 ``_commit_ui_icon_rows``）。"""
+        return iter_ui_icon_entries(self._sections.get(UI_ICON_SECTION))
+
+    def _ui_icon_entity_icon_names(self) -> list[str]:
+        """11 类实体内置图标名（重名校验用；由 WorkspacePage 注入）。"""
+        provider = self._ui_icon_entities_provider
+        if not callable(provider):
+            return []
+        try:
+            return [str(name).strip() for name in provider() if str(name or "").strip()]
+        except Exception:
+            LOGGER.exception("[ArtWorkspace] ui icon entity name provider failed")
+            return []
+
+    def _ui_icon_output_dir(self) -> Path | None:
+        provider = self._output_dir_provider
+        if not callable(provider):
+            return None
+        try:
+            value = provider()
+        except Exception:
+            LOGGER.exception("[ArtWorkspace] ui icon output dir provider failed")
+            return None
+        return value if isinstance(value, Path) else None
+
+    def validate_ui_icon_entries(self) -> list[dict[str, object]]:
+        """校验当前「UI图标」段，返回 ERROR 清单（生成前的阻断校验在 WorkspacePage）。"""
+        report = validate_ui_icons(
+            self._sections.get(UI_ICON_SECTION),
+            entity_icon_names=self._ui_icon_entity_icon_names(),
+            output_dir=self._ui_icon_output_dir(),
+            source_dir_provider=self._source_dir_provider,
+        )
+        return list(report.get("errors") or [])
+
+    def _ui_icon_status_text(self, row: _UIIconRow) -> tuple[str, str]:
+        """(状态文本, tooltip)：给编辑者即时的源图/尺寸反馈。"""
+        icon_name = row.icon_name
+        if not icon_name:
+            return "未填写图标名", "图标名必填，且须以 ICON_ 开头。"
+        if row.alias:
+            return f"别名 → {row.alias}", "填了别名：改用该图标，不生成自带图集与纹理。"
+        if not row.source_path:
+            return "未选择源图", "源图为空：该条不会输出到 Icons.xml（生成时仅告警，不阻断）。"
+
+        sizes = row.sizes
+        required = max(sizes) if sizes else 0
+        resolved = resolve_ui_icon_source_path(
+            row.source_path,
+            output_dir=self._ui_icon_output_dir(),
+            source_dir_provider=self._source_dir_provider,
+        )
+        if resolved is None or not resolved.is_file():
+            return "源图不存在", f"找不到源图文件：{resolved if resolved is not None else row.source_path}"
+        size = read_png_size(resolved)
+        if size is None:
+            return "源图无法读取", f"无法读取 PNG 尺寸（文件损坏或非 PNG）：{resolved}"
+        width, height = size
+        shortest = min(width, height)
+        if required and shortest < required:
+            return (
+                f"{width}×{height}（偏小）",
+                f"源图最小边 {shortest}px 小于最大输出尺寸 {required}px，放大会模糊——"
+                f"建议源图至少 {required}×{required}。",
+            )
+        return f"{width}×{height}", f"源图：{resolved}\n输出尺寸：{','.join(str(s) for s in sizes)}"
+
+    def _render_ui_icon_table(self) -> None:
+        self._updating = True
+        try:
+            self._ui_icon_table.setRowCount(0)
+            for row_idx, row in enumerate(self._ui_icon_rows):
+                self._ui_icon_table.insertRow(row_idx)
+
+                name_edit = QLineEdit(row.icon_name)
+                name_edit.setPlaceholderText("ICON_XXX")
+                name_edit.editingFinished.connect(
+                    lambda edit=name_edit, index=row_idx: self._handle_ui_icon_name_changed(index, edit)
+                )
+                self._ui_icon_table.setCellWidget(row_idx, 0, name_edit)
+
+                note_edit = QLineEdit(row.name_zh)
+                note_edit.setPlaceholderText("（选填）仅用于本页识别")
+                note_edit.editingFinished.connect(
+                    lambda edit=note_edit, index=row_idx: self._handle_ui_icon_note_changed(index, edit)
+                )
+                self._ui_icon_table.setCellWidget(row_idx, 1, note_edit)
+
+                sizes_edit = QLineEdit(row.sizes_text)
+                sizes_edit.setPlaceholderText("/".join(str(s) for s in self.SIZE_UI_ICON))
+                sizes_edit.editingFinished.connect(
+                    lambda edit=sizes_edit, index=row_idx: self._handle_ui_icon_sizes_changed(index, edit)
+                )
+                self._ui_icon_table.setCellWidget(row_idx, 2, sizes_edit)
+
+                self._ui_icon_table.setCellWidget(row_idx, 3, self._build_ui_icon_source_cell(row_idx, row))
+
+                status_text, status_tip = self._ui_icon_status_text(row)
+                status_item = QTableWidgetItem(status_text)
+                status_item.setToolTip(status_tip)
+                self._ui_icon_table.setItem(row_idx, 4, status_item)
+
+                alias_edit = QLineEdit(row.alias)
+                alias_edit.setPlaceholderText("（选填）官方/其它图标名")
+                alias_edit.editingFinished.connect(
+                    lambda edit=alias_edit, index=row_idx: self._handle_ui_icon_alias_changed(index, edit)
+                )
+                self._ui_icon_table.setCellWidget(row_idx, 5, alias_edit)
+
+                self._ui_icon_table.setRowHeight(row_idx, 34)
+
+            self._ui_icon_columns_dirty = True
+            self._apply_table_column_widths()
+            self._apply_ui_icon_table_height()
+        finally:
+            self._updating = False
+
+    def _build_ui_icon_source_cell(self, row_idx: int, row: _UIIconRow) -> QWidget:
+        path_edit = QLineEdit(row.source_path)
+        path_edit.setPlaceholderText("源 PNG 路径（工程外）")
+        path_edit.setToolTip("可以直接粘贴路径，也可以用右侧按钮选择文件。")
+        path_edit.editingFinished.connect(
+            lambda edit=path_edit, index=row_idx: self._handle_ui_icon_source_changed(index, edit)
+        )
+
+        choose_button = QPushButton("选择图片")
+        _apply_small_button(choose_button)
+        choose_button.clicked.connect(
+            lambda _checked=False, index=row_idx: self._handle_ui_icon_pick_image(index)
+        )
+
+        clear_button = QPushButton("清除")
+        _apply_small_button(clear_button)
+        clear_button.clicked.connect(
+            lambda _checked=False, index=row_idx: self._handle_ui_icon_clear_image(index)
+        )
+
+        cell = QWidget()
+        layout = QHBoxLayout(cell)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        layout.addWidget(path_edit, 1)
+        layout.addWidget(choose_button, 0)
+        layout.addWidget(clear_button, 0)
+        return cell
+
+    def _current_ui_icon_row(self, index: int) -> _UIIconRow | None:
+        if 0 <= index < len(self._ui_icon_rows):
+            return self._ui_icon_rows[index]
+        return None
+
+    def _handle_ui_icon_name_changed(self, index: int, edit: QLineEdit) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        text = str(edit.text() or "").strip().upper()
+        if text and not text.startswith("ICON_"):
+            # 与 11 类实体的图标名约定一致：缺前缀自动补全，避免生成时才报错。
+            text = f"ICON_{text}"
+        if text == row.icon_name:
+            return
+        row.icon_name = text
+        edit.setText(text)
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_note_changed(self, index: int, edit: QLineEdit) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        text = str(edit.text() or "").strip()
+        if text == row.name_zh:
+            return
+        row.name_zh = text
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_sizes_changed(self, index: int, edit: QLineEdit) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        text = str(edit.text() or "").strip()
+        if text == row.sizes_text:
+            return
+        row.sizes_text = text
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_source_changed(self, index: int, edit: QLineEdit) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        text = str(edit.text() or "").strip()
+        if text == row.source_path:
+            return
+        row.source_path = text
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_alias_changed(self, index: int, edit: QLineEdit) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        text = str(edit.text() or "").strip().upper()
+        if text == row.alias:
+            return
+        row.alias = text
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_pick_image(self, index: int) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None:
+            return
+        start_dir = ""
+        if row.source_path:
+            start_dir = str(Path(row.source_path).parent)
+        elif self._ui_icon_output_dir() is not None:
+            start_dir = str(self._ui_icon_output_dir())
+        file_path, _selected = QFileDialog.getOpenFileName(
+            self,
+            "选择 UI 图标源图",
+            start_dir,
+            "PNG (*.png);;Images (*.png *.jpg *.jpeg *.webp *.bmp);;All Files (*)",
+        )
+        clean = str(file_path or "").strip()
+        if not clean:
+            return
+        row.source_path = clean
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_clear_image(self, index: int) -> None:
+        if self._updating:
+            return
+        row = self._current_ui_icon_row(index)
+        if row is None or not row.source_path:
+            return
+        row.source_path = ""
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_add(self) -> None:
+        self._ui_icon_rows.append(_UIIconRow())
+        self._commit_ui_icon_rows()
+
+    def _handle_ui_icon_remove(self) -> None:
+        row_index = self._ui_icon_table.currentRow()
+        if row_index < 0 or row_index >= len(self._ui_icon_rows):
+            QMessageBox.information(self, "删除 UI 图标", "请先在表格中选择要删除的行。")
+            return
+        del self._ui_icon_rows[row_index]
+        self._commit_ui_icon_rows()
+
+    def _commit_ui_icon_rows(self) -> None:
+        """把编辑态写回工程，并刷新表格/预览/外部状态。
+
+        写回时丢掉**完全空白**的行（不留垃圾条目），但保留编辑态里的空行本身——
+        用户刚点「新增 UI 图标」还没填内容时，行必须留在表格里等着被填写。
+        """
+        entries = [
+            row.to_entry()
+            for row in self._ui_icon_rows
+            if row.icon_name or row.source_path or row.name_zh or row.alias
+        ]
+        if entries != self._ui_icon_entries():
+            self._sections[UI_ICON_SECTION] = entries
+            notifier = self._ui_icon_notifier
+            if callable(notifier):
+                try:
+                    notifier(entries)
+                except Exception:
+                    LOGGER.exception("[ArtWorkspace] ui icon notifier failed")
+        self._render_ui_icon_table()
+        self._refresh_previews()
+
+    def focus_ui_icon_entry(self, index: int = -1) -> None:
+        """把 UI 图标表格滚动到指定行（-1 = 不选中具体行）。供工作区树导航调用。"""
+        count = self._ui_icon_table.rowCount()
+        if index < 0 or index >= count:
+            self._ui_icon_table.clearSelection()
+            return
+        self._ui_icon_table.setCurrentCell(index, 0)
+        self._ui_icon_table.scrollToItem(self._ui_icon_table.item(index, 0) or self._ui_icon_table.item(index, 4))
 
     def _refresh_previews(self) -> None:
         art_xml_files = self._build_art_xml_preview_files()
@@ -3306,6 +3741,9 @@ class ArtWorkspacePanel(QWidget):
         def_rows: list[str] = []
         alias_rows: list[str] = []
         alias_row_set: set[tuple[str, str]] = set()
+        # 11 类实体内置图标名（「UI图标」段重名校验依据）：随产出同步收集，
+        # 与实体图标的实际命名规则永不脱节（不依赖任何外部提供者，避免递归）。
+        entity_icon_names: set[str] = set()
 
         def _add_alias(name: str, other_name: str) -> None:
             key = (name, other_name)
@@ -3317,14 +3755,19 @@ class ArtWorkspacePanel(QWidget):
         def _add_atlas(atlas_name: str, icon_name: str, sizes: list[int]) -> None:
             for size in sizes:
                 atlas_rows.append(f'    <Row Name="{atlas_name}" IconSize="{size}" Filename="{icon_name}_{size}"/>')
+            entity_icon_names.add(icon_name)
+
+        def _add_definition(icon_name: str, atlas_name: str, index: int = 0) -> None:
+            def_rows.append(f'    <Row Name="{icon_name}" Atlas="{atlas_name}" Index="{index}"/>')
+            entity_icon_names.add(icon_name)
 
         for civ_type, _cn, _entry in civs:
             _add_atlas(f"ATLAS_{civ_type}", f"ICON_{civ_type}", self.SIZE_CIVILIZATION)
-            def_rows.append(f'    <Row Name="ICON_{civ_type}" Atlas="ATLAS_{civ_type}" Index="0"/>')
+            _add_definition(f"ICON_{civ_type}", f"ATLAS_{civ_type}")
 
         for leader_type, _cn, _entry in leaders:
             _add_atlas(f"ATLAS_{leader_type}", f"ICON_{leader_type}", self.SIZE_LEADER)
-            def_rows.append(f'    <Row Name="ICON_{leader_type}" Atlas="ATLAS_{leader_type}" Index="0"/>')
+            _add_definition(f"ICON_{leader_type}", f"ATLAS_{leader_type}")
 
         for gov_type, _cn, _entry in governors:
             main = f"ICON_{gov_type}"
@@ -3337,9 +3780,9 @@ class ArtWorkspacePanel(QWidget):
             _add_atlas(atlas_main, main, self.SIZE_GOVERNOR_MAIN)
             _add_atlas(atlas_fill, fill, self.SIZE_GOVERNOR_FILL_SLOT)
             _add_atlas(atlas_slot, slot, self.SIZE_GOVERNOR_FILL_SLOT)
-            def_rows.append(f'    <Row Name="{main}" Atlas="{atlas_main}" Index="0"/>')
-            def_rows.append(f'    <Row Name="{fill}" Atlas="{atlas_fill}" Index="0"/>')
-            def_rows.append(f'    <Row Name="{slot}" Atlas="{atlas_slot}" Index="0"/>')
+            _add_definition(main, atlas_main)
+            _add_definition(fill, atlas_fill)
+            _add_definition(slot, atlas_slot)
             _add_alias(promo, fill)
             _add_alias(f"{gov_type}_SLOT", slot)
             _add_alias(f"{gov_type}_FILL", fill)
@@ -3348,7 +3791,7 @@ class ArtWorkspacePanel(QWidget):
             table_data = entry.get("table_data") if isinstance(entry.get("table_data"), dict) else {}
             slot_type = _safe_text(table_data.get("GovernmentSlotType") or "SLOT_WILDCARD")
             idx = self._policy_slot_index(slot_type)
-            def_rows.append(f'    <Row Name="ICON_{policy_type}" Atlas="ICON_ATLAS_POLICIES" Index="{idx}"/>')
+            _add_definition(f"ICON_{policy_type}", "ICON_ATLAS_POLICIES", idx)
 
         def _apply_entity(
             entity_key: str,
@@ -3370,7 +3813,7 @@ class ArtWorkspacePanel(QWidget):
                     alias = f"{alias}_PORTRAIT"
             if has_own or not alias:
                 _add_atlas(atlas_name, icon_name, sizes)
-                def_rows.append(f'    <Row Name="{icon_name}" Atlas="{atlas_name}" Index="0"/>')
+                _add_definition(icon_name, atlas_name)
             else:
                 _add_alias(icon_name, alias)
 
@@ -3392,9 +3835,7 @@ class ArtWorkspacePanel(QWidget):
                 # 官方固定图标：直接引用官方图集 + 类别 Index，不生成自定义图集
                 # （政策卡同款机制；官方图集游戏内已加载，无需 IMG/DDS 纹理）。
                 idx = belief_official_icon_index(_belief_class_type(entry))
-                def_rows.append(
-                    f'    <Row Name="{icon_name}" Atlas="{BELIEF_OFFICIAL_ICON_ATLAS}" Index="{idx}"/>'
-                )
+                _add_definition(icon_name, BELIEF_OFFICIAL_ICON_ATLAS, int(idx or 0))
                 continue
             _apply_entity("belief", type_name, entry, icon_name=icon_name, atlas_name=f"ATLAS_{icon_name}", sizes=self.SIZE_BELIEF)
 
@@ -3419,7 +3860,7 @@ class ArtWorkspacePanel(QWidget):
             icon_alias = _safe_text(alias_map.get(icon_state_key))
             if icon_has_own or not icon_alias:
                 _add_atlas(f"ATLAS_{unit_type}", unit_icon_name, self.SIZE_UNIT)
-                def_rows.append(f'    <Row Name="ICON_{unit_type}" Atlas="ATLAS_{unit_type}" Index="0"/>')
+                _add_definition(f"ICON_{unit_type}", f"ATLAS_{unit_type}")
             else:
                 _add_alias(f"ICON_{unit_type}", icon_alias)
 
@@ -3429,9 +3870,26 @@ class ArtWorkspacePanel(QWidget):
                 portrait_alias = f"{portrait_alias}_PORTRAIT"
             if portrait_has_own or not portrait_alias:
                 _add_atlas(f"ATLAS_{unit_type}_PORTRAIT", unit_portrait_name, self.SIZE_UNIT_PORTRAIT)
-                def_rows.append(f'    <Row Name="ICON_{unit_type}_PORTRAIT" Atlas="ATLAS_{unit_type}_PORTRAIT" Index="0"/>')
+                _add_definition(f"ICON_{unit_type}_PORTRAIT", f"ATLAS_{unit_type}_PORTRAIT")
             else:
                 _add_alias(f"ICON_{unit_type}_PORTRAIT", portrait_alias)
+
+        # 「UI图标」段：与游戏实体无关的自定义 UI 图标（追加在 11 类之后，
+        # 不改动既有产出顺序与内容）。
+        ui_icons = build_ui_icons_xml_rows(
+            self._ui_icon_entries(),
+            entity_icon_names=entity_icon_names,
+            default_sizes=self.SIZE_UI_ICON,
+        )
+        atlas_rows.extend(ui_icons["atlas_rows"])
+        def_rows.extend(ui_icons["def_rows"])
+        for alias_row in ui_icons["alias_rows"]:
+            if alias_row not in alias_rows:
+                alias_rows.append(alias_row)
+        for issue in ui_icons["errors"]:
+            LOGGER.error("[ArtWorkspace][UI图标] %s", issue.get("message"))
+        for issue in ui_icons["warnings"]:
+            LOGGER.warning("[ArtWorkspace][UI图标] %s", issue.get("message"))
 
         lines: list[str] = [
             "<?xml version='1.0' encoding='utf-8'?>",
@@ -3451,7 +3909,16 @@ class ArtWorkspacePanel(QWidget):
             ])
         lines.append("</GameData>")
         lines.append("")
+        # 缓存最近一次 Icons.xml 里的实体图标名：GUI 生成前校验复用同一结果，
+        # 不再为校验重复解析一遍 XML（也避免 provider → 预览 → 构建 的递归）。
+        self._last_entity_icon_names = sorted(entity_icon_names)
         return "\n".join(lines)
+
+    def entity_icon_names(self) -> list[str]:
+        """最近一次 ``_build_icons_xml`` 中 11 类实体的内置图标名（懒加载）。"""
+        if self._last_entity_icon_names is None:
+            self._build_icons_xml()
+        return list(self._last_entity_icon_names or [])
 
     def _build_xlp_files(self) -> list[tuple[str, str]]:
         files = [

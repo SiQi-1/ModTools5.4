@@ -5,7 +5,56 @@ section, so every SQL/XML preview builder has real data to chew on.
 """
 from __future__ import annotations
 
+import os
+from pathlib import Path
+import struct
+import tempfile
+
 from ModTools_5_4.project.civ_project import create_empty_project
+
+
+def sample_ui_icon_png() -> Path:
+    """生成（并缓存）一张 256×256 示例 PNG，供「UI图标」段源图使用。
+
+    ``modgen validate`` 会对源 PNG 不存在报 ERROR，所以 fixture 里的
+    ``images.icon.path`` 必须指向真实文件；这里用标准库写一张最小
+    PNG（不引入 Pillow 依赖），路径可由 ``MODTOOLS54_SAMPLE_ICON_DIR``
+    覆盖，默认落在系统临时目录。
+    """
+    override = str(os.environ.get("MODTOOLS54_SAMPLE_ICON_DIR") or "").strip()
+    base = Path(override) if override else Path(tempfile.gettempdir()) / "modtools54_sample_icons"
+    target = base / "ICON_TEST_NEWS_ICON_256.png"
+    try:
+        if target.is_file() and target.stat().st_size > 0:
+            return target
+        base.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(_solid_rgba_png(256, 256, (32, 128, 200, 255)))
+    except OSError:
+        # 只读环境：退回工程内不写盘的路径（校验会对该条报 ERROR，测试自行跳过）
+        return target
+    return target
+
+
+def _solid_rgba_png(width: int, height: int, rgba: tuple[int, int, int, int]) -> bytes:
+    """用标准库拼一张纯色 RGBA PNG（8bit，无滤波，单 IDAT）。"""
+    import zlib
+
+    raw = bytearray()
+    for _row in range(height):
+        raw.append(0)  # filter type 0
+        raw.extend(bytes(rgba) * width)
+
+    def _chunk(kind: bytes, payload: bytes) -> bytes:
+        body = kind + payload
+        return struct.pack(">I", len(payload)) + body + struct.pack(">I", zlib.crc32(body) & 0xFFFFFFFF)
+
+    header = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return b"".join([
+        b"\x89PNG\r\n\x1a\n",
+        _chunk(b"IHDR", header),
+        _chunk(b"IDAT", zlib.compress(bytes(raw), 9)),
+        _chunk(b"IEND", b""),
+    ])
 
 
 def build_sample_project() -> object:
@@ -384,6 +433,14 @@ def build_sample_project() -> object:
             "AiLists": [{"ListType": "AI_LIST_SIQI_DEMO", "System": "Bias", "LeaderType": "LEADER_SIQI_DEMO"}],
             "AgendaModifiers": [],
         },
+    })
+
+    # ---------------- UI图标（与游戏实体无关的自定义 UI 图标） ----------------
+    project.sections["UI图标"].append({
+        "icon_name": "ICON_TEST_NEWS_ICON",
+        "name_zh": "示例UI图标",
+        "sizes": [32, 50],
+        "images": {"icon": {"path": str(sample_ui_icon_png())}},
     })
 
     # ---------------- 文本 ----------------

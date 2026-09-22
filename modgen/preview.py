@@ -81,7 +81,10 @@ def build_preview_manifest(civ_path: Path) -> dict[str, Any]:
 
 
 def preview_section(civ_path: Path, section: str, fmt: str = "sql") -> str:
-    """预览单个内容分类或修改器的输出文本（stdout 直接打印）。"""
+    """预览单个内容分类 / 修改器 / UI图标的输出文本（stdout 直接打印）。
+
+    「UI图标」段不产出 SQL，无论 ``--format`` 都返回 Icons.xml（与美术页同一实现）。
+    """
     page = _build_page(civ_path)
     fmt = str(fmt or "sql").lower()
     if fmt not in ("sql", "xml"):

@@ -56,6 +56,7 @@ python -m modgen.cli query "SELECT ModifierType, CollectionType FROM DynamicModi
 python -m modgen.cli loc LOC_TRAIT_XXX_NAME                                                 # LOC → 简体中文
 python -m modgen.cli preview 工程.CIV [--dry-run | --out 目录]                               # 无头预览将导出的全部文件
 python -m modgen.cli preview 工程.CIV --section 分类 [--format sql|xml]                      # 单分类输出文本
+python -m modgen.cli preview 工程.CIV --section UI图标                                        # 自定义 UI 图标 → Icons.xml
 
 # 原版 ModifierType 快照（自定义类型注册判定用；随包分发，缺失时回退旧启发式）
 python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out 路径] [--json]
@@ -143,6 +144,32 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 | 项目 | PROJECT | abbr | |
 | 信仰 | BELIEF | abbr | |
 | 议程 | AGENDA | (type) | 顶层无 abbr |
+| **UI图标** | （无 Type） | icon_name | **非实体分节**：与游戏实体无关的自定义 UI 图标（新闻分类/单位动作/追踪器…），只出 `Icons.xml` 与 IMG/Textures，见下节 |
+
+## UI图标规则（非实体美术资源声明）
+
+给**不属于任何游戏实体**的 UI 元素声明专属图标（替代借 `ICON_YIELD_*` 凑）。写进 `workspace["UI图标"]` 列表：
+
+```jsonc
+{
+  "icon_name": "ICON_SIQI_WUJIU_NEWS_CITY",   // 必填，须以 ICON_ 开头
+  "name_zh": "城建图标",                       // 选填，仅 GUI 显示
+  "sizes": [32, 50],                           // 选填，缺省 22/32/38/50/64/80/128/256
+  "images": {"icon": {"path": "D:/art/news_city.png"}},  // 必填：工程外的源 PNG
+  "alias": ""                                  // 选填，非空则出 IconAliases 行、不出自带图集
+}
+```
+
+- **图集名自动推导**：`ATLAS_` + `icon_name` 去掉 `ICON_`（`ICON_X_32` 的文件名 → `ATLAS_X` 的 `IconSize=32` 行）；
+- **命名空间硬约束**：`icon_name` 不得落进实体内置图标空间（`ICON_<实体类型>_*`，如 `ICON_DISTRICT_NEWS`
+  会与 `DISTRICT_NEWS` 撞车）→ `validate` 报 ERROR；
+- 源 PNG **必须存在**（工程外路径 / 工程目录相对路径 / 文件名按 `IMG|Images|Art` 搜索）→ 不存在报 ERROR；
+  未设源图 = WARNING（该条被跳过）；源图最小边 < `max(sizes)` = WARNING（放大会模糊）；
+- **不产出 SQL / Players / PlayerItems / 文本**——它只是美术资源，不是游戏实体；
+- 校验：`python -m modgen.cli validate 工程.CIV`（与 GUI 生成前检查同源实现）；
+- 单独看产物：`python -m modgen.cli preview 工程.CIV --section UI图标`（直接打印 Icons.xml）；
+- 生成完整产物（Icons.xml + `IMG/ICON_X_<size>.png` + `Textures/…dds|.tex`）需 `.civ6proj` 已绑定，
+  用 GUI / AI 接口 `generate_all`。
 
 ## 修改器规则（generate-modifier 等）
 

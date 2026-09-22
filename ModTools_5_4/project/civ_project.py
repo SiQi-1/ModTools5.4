@@ -11,6 +11,7 @@ from .schema import (
     CIV_GROUP_SECTIONS,
     CIV_SCHEMA_VERSION,
     CIV_SECTION_ORDER,
+    CIV_UI_ICON_SECTIONS,
     parse_project_payload,
     project_envelope,
 )

@@ -9,8 +9,9 @@
 |---|------|------|
 | 1 | **禁 Lua** | 工具不生成/不写 Lua、UI.xml。需求涉动态逻辑 → 明确告知用户该部分需手写（本仓库工作流 C/D） |
 | 2 | **JSON 禁 `""`** | 空值 = 省略字段或写 `null`；写 `""` 会生成 `''` 导致类型/外键失败。AI 写文件时必须清零（`check_civ.py` 会警告；工具自身保存的占位空串如 random_entries 空槽不算错误） |
-| 3 | **section 顺序固定** | 17 section 按 `CIV_SECTION_ORDER` 排列；多余/缺失由加载器归一化（写时仍按顺序） |
+| 3 | **section 顺序固定** | 18 section 按 `CIV_SECTION_ORDER` 排列；多余/缺失由加载器归一化（写时仍按顺序） |
 | 4 | **Type 由工具自动生成** | 前缀+infix+4位编号+缩写；手写 `type` 字段须符合同一格式，禁止自创前缀 |
+| 4b | **实体外的 UI 图标走「UI图标」段** | 新闻分类/单位动作/追踪器等**不属于任何游戏实体**的图标写进 `UI图标` 段（`icon_name` + `images.icon.path` + `sizes`）；`icon_name` 不得落进实体内置命名空间（`ICON_<实体类型>_*`，含 `_PORTRAIT`），源 PNG 必须存在，否则 `modgen validate` / GUI 生成前检查报 ERROR |
 
 ## 游戏层必炸（.CIV 落地形态）
 
@@ -27,6 +28,8 @@
 | 13 | 战斗力类 Modifier 漏 `preview_text` | EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的条目**必须填 `preview_text`**（`.CIV` 的 `modifiers[].preview_text`）。不填不报错，但**战斗预览面板看不到加成来源**；`modgen validate` 会给 WARNING。占位符用 `{1_Amount}`（数值）/ `{Property}`（Key 属性），**别写 `{Amount}`**（详见 `07-techniques/modifier-techniques.md` 技巧 3） |
 | 14 | 世界奇观效果挂 `DISTRICT_WONDER` | 奇观**落位**即生成虚拟 `DISTRICT_WONDER` 区域 → **未建成就生效**。必须改挂 `BuildingModifiers`：`INSERT INTO BuildingModifiers (BuildingType, ModifierId) SELECT BuildingType, '<ModifierId>' FROM Buildings WHERE IsWonder = 1;`（走自定义文件通道，独立动作 id + `LoadOrder 199999`）。详见 `07-techniques/modifier-techniques.md` 技巧 4 |
 | 15 | 建筑挂载的城市级效果把需求写错侧（或把 subject 当"这个建筑"） | 建筑挂载 + **城市级**效果时 **subject 就是城市**：城市/地块级需求写 `subject_reqset`（地块按**城市地块=市中心格**求值），**玩家/领袖级需求（本文明、某领袖）写 `owner_reqset`**（0050 `REQSET_SIQI_0050_IS_LEADER` ×20 条建筑挂载先例；原版 `KILWA_*` 也有写 subject 侧的，本工程统一 owner 侧）。`PLOT_ADJACENT_TO_OWNER` 的 **owner = 挂载对象**（改良设施/伟人/奇观本体），不是玩家 → "该奇观与这座城市相邻 1 环" 用 `{MinDistance=1, MaxDistance=1}`；`PLOT_ADJACENT_DISTRICT_TYPE_MATCHES{DISTRICT_CITY_CENTER}` 是**自指恒假**。产出类型优先 cities 版 `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_MODIFIER`。详见 `07-techniques/modifier-techniques.md` 技巧 4 |
+| 16 | 给建筑发遗物/放巨作，但建筑没在 `Building_GreatWorks` 登记槽位 | `EFFECT_GRANT_RELIC` 找"能装遗物的建筑"只认 `Building_GreatWorks` 的**登记行**，**Modifier 给的槽不算**（`EFFECT_ADJUST_EXTRA_GREAT_WORK_SLOTS` 只加容量）。给原版建筑补登记行要写自定义 SQL：`INSERT OR IGNORE … SELECT … WHERE NOT EXISTS(…)`（主键 `(BuildingType,GreatWorkSlotType)`，`NumSlots` 默认 1 所以要显式写 0），**只 INSERT 不 UPDATE**，独立动作 id + 尽量晚的 `LoadOrder`。槽类型别写错：遗物必须 `GREATWORKSLOT_RELIC`（写成 `PALACE` UI 照样显示但遗物进不去）。详见技巧 5 |
+| 17 | 只改了 ModBuddy 工程目录，忘了游戏 Mods 目录 | 工具只写 ModBuddy 端；游戏读的是 `文档\My Games\…\Mods\<工程名>\`。改完必须同步：生成文件按**哈希比对**只复制 DIFF 的；新增自定义 SQL 还要在 `.modinfo` 的 `InGameActions` 加同 id/同 `LoadOrder` 动作块 + `<Files>` 加一行。`add_file_action` 之后**必须 `save_project`**，否则动作只存在内存里，下次 `generate_all` 就没了 |
 
 ## 命名速记（详情 `skills/06-naming.md` + 工具 AGENT.md §3）
 
@@ -45,5 +48,8 @@
 - [ ] 事件类 Requirement `triggered=true`；Modifier 挂载链完整
 - [ ] 战斗力类 Modifier（EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER`）都填了 `preview_text`（否则战斗预览不显示来源）
 - [ ] 建筑挂载的城市级效果：城市/地块级需求在 **subject 侧**、玩家/领袖级在 **owner 侧**，且没有"城市相邻市中心"这类自指需求（陷阱 15）
+- [ ] 依赖"引擎自己找空槽位"的效果（发遗物/放巨作）已确认目标建筑在 `Building_GreatWorks` 有登记行（陷阱 16）
+- [ ] 生成后同步到游戏 Mods 目录（哈希比对复制 + 新自定义 SQL 补 `.modinfo` 动作），并确认 `add_file_action` 后已 `save_project`（陷阱 17）
 - [ ] 图标字段路径不虚构，无图时留 `{}`（模板字段 `images` 为空对象）
+- [ ] 实体之外的 UI 图标已写进 `UI图标` 段（不是硬塞进某个实体的 `icon_image_name`），且 `icon_name` 不占用 `ICON_<实体类型>_*` 命名空间、源 PNG 真实存在（陷阱 4b）
 - [ ] 文本 LOC 键与 `skills/02-config-files/text.md` 引用链一致

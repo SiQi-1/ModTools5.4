@@ -8,10 +8,15 @@ CIV_SCHEMA_VERSION = "0.1.0"
 
 CIV_SECTION_ORDER = [
     "基础信息", "文明", "领袖", "区域", "建筑", "单位", "单位晋升", "改良设施",
-    "总督", "伟人", "政策卡", "项目", "信仰", "议程", "美术", "文本", "修改器",
+    "总督", "伟人", "政策卡", "项目", "信仰", "议程", "美术", "UI图标", "文本", "修改器",
 ]
+
 CIV_DIRECT_WORKSPACE_SECTIONS = {"基础信息", "美术", "文本", "修改器"}
 CIV_GROUP_SECTIONS = [name for name in CIV_SECTION_ORDER if name not in CIV_DIRECT_WORKSPACE_SECTIONS]
+
+#: 有专属编辑器、但**不产出 SQL/文本/Players 数据**的分节（纯美术资源声明）。
+#: 生成流程、文本流程一律跳过它们；旧工程缺该节点时由 normalize_workspace 补空列表。
+CIV_UI_ICON_SECTIONS = ("UI图标",)
 
 
 def normalize_workspace(workspace: Any) -> dict[str, object]:

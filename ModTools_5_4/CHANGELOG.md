@@ -1,4 +1,73 @@
 # Changelog
+## 2026-09-19 - 0056：新增「UI图标」段（.CIV 可声明与游戏实体无关的自定义 UI 图标）
+
+- **需求**：`modgen_work/需求_自定义UI图标.md`（20.0 乌啾工程的新闻 7 分类 / 报童 4 动作 / 顶部追踪器
+  共 12 个图标不属于任何游戏实体，原先只能借 `ICON_YIELD_*` 凑）。本次只加「声明 + 出图 + 出 XML」，
+  **不改 11 类实体内置图标的命名规则与产出顺序**。
+- **新增分节 `UI图标`**（`CIV_SECTION_ORDER` 由 17 节 → 18 节，位置在「美术」之后、「文本」之前）：
+  条目列表，每条 `{icon_name, name_zh?, sizes?, images.icon.path, alias?}`。
+  老 `.CIV`（无该节点）由 `normalize_workspace` 补空列表照常加载/生成；`create_empty_project`
+  与 `modgen new-project` 同步产出空列表。
+- **单一事实来源 `ModTools_5_4/project/ui_icons.py`**（Qt-free，GUI / 生成校验 / modgen 三处共用）：
+  尺寸解析（逗号/空白/列表、去重升序、非法项回退默认）、图集名规则（`ICON_X` → `ATLAS_X`）、
+  `Icons.xml` 行构建、源图解析（绝对路径 / 工程相对路径 / 文件名按 `IMG|Images|Art` 搜索）、
+  PNG 尺寸只读（纯标准库，不依赖 Pillow）、段落校验。
+- **生成链路**：
+  - `art_workspace._build_icons_xml()` 在 11 类之后**追加** UI 图标行（atlas + Index=0 定义行；
+    `alias` 非空 → 只出 `IconAliases` 行、不出图集）；
+  - `workspace_page._collect_icon_source_states()` 把该段源图登记进 `source_map`；
+    既有 `_collect_icons_atlas_image_plans()` / `_build_textures_output_plan()` 无需改动即自动产出
+    `IMG/ICON_X_<size>.png` + `Textures/ICON_X_<size>.dds|.tex`；
+  - 该段**不参与** SQL / Players / PlayerItems / 文本流程。
+- **GUI（美术页新增「UI图标」区）**：列表 + 新增/删除行；每行可填图标名（缺 `ICON_` 自动补全）、
+  备注名、尺寸（逗号分隔，留空=默认 `22/32/38/50/64/80/128/256`）、源 PNG（文件选择 + 清除 + 手填路径）、
+  别名；「图片状态」列实时显示源图尺寸 / 不存在 / 偏小（最小边 < `max(sizes)` 时告警但不阻断）。
+  工作区树里「UI图标」节点（及其子条目）点击直接跳转到美术页的该区并定位到对应行。
+- **校验**（R6）：`icon_name` 非空且以 `ICON_` 开头、字符合法、段内不重复、
+  **不得落进实体内置图标命名空间**（`ICON_<实体类型>` 及其派生名，如 `ICON_DISTRICT_NEWS`
+  仍会与 `DISTRICT_NEWS` 撞车）→ ERROR；源 PNG 不存在 → ERROR；未设源图 → WARNING（该条跳过）；
+  源图最小边 < `max(sizes)` → WARNING。
+  GUI 一键生成/单文件生成前阻断（弹窗明示原因）；AI 接口返回
+  `{"ok": false, "error": "ui_icons_invalid", "issues": [...]}`，`get_state` 新增 `ui_icon_issues`。
+- **modgen**：`validate` 校验该段（`modgen/validator.py:validate_ui_icon_section`，与 GUI 同源；
+  无工程目录时跳过源图存在性判定以免误报）；`preview --section UI图标` 直接打印 Icons.xml；
+  `rules.UI_ICON_SECTIONS` / `WORKSPACE_SECTION_ORDER` / `entity_icon_names()`（实体内置图标命名空间契约）
+  就位；`new-project` 骨架含空 `UI图标` 列表；`extract_schemas.py` 跳过该段（它不是实体分类）。
+- **测试**：`tests/test_ui_icons.py`（29 例：13 纯函数 / 4 Icons.xml 逐字节回归 + 追加 / 8 GUI 编辑写回 /
+  4 端到端 generate_all 产出 Icons.xml+IMG+Textures + 非法条目阻断 + AI 状态与清单）、
+  `modgen/tests/test_cli_tools.py:UIIconValidateTestCase`（9 例：缺源图、前缀错误、段内重复、
+  实体命名空间冲突、无基准目录不误报、别名条目合法）；全套 GUI 测试 363 项 + modgen 96 项通过。
+  `tests/sample_project.py` 增加一条最小 `UI图标` 条目 + `sample_ui_icon_png()`（标准库生成 256×256 PNG）。
+
+## 2026-09-19 - 0055：神社遗物「槽位登记」补丁（自定义 SQL）+ 双端同步流程
+
+- **实机问题（作者实测）**：`MODIFIER_PLAYER_GRANT_RELIC`（`EFFECT_GRANT_RELIC`）与
+  "神社 +1 遗物槽"（`MODIFIER_SIQI_0055_SHRINE_EXTRA_RELIC_SLOT`，`EFFECT_ADJUST_EXTRA_GREAT_WORK_SLOTS`）不兼容 ——
+  发遗物时引擎要找"能存放遗物的建筑"，判据是 `Building_GreatWorks` 有没有该建筑的槽位行；
+  神社本体没有任何巨作槽 → 识别不通过 → 遗物发不出去。**Modifier 给的槽不算"登记"**。
+- **解法 1（本次实现，待实机验证）**：给神社补一行 `NumSlots = 0` 的遗物槽登记行（只登记、不加槽），
+  真正的 +1 槽仍由 Modifier 提供。新增自定义文件 `Data/Siqi_Leaders_0055_GreatWorkSlots.sql`：
+  `INSERT OR IGNORE … SELECT 'BUILDING_SHRINE','GREATWORKSLOT_RELIC',0 WHERE NOT EXISTS (…)` ——
+  主键 `(BuildingType, GreatWorkSlotType)` 撞车时跳过、不覆盖别人数值、只 INSERT 不 UPDATE；
+  未用 SQLite 内存库实测 5 种场景（空表/别人已登记 1 槽/神社有别的槽类型/后加载 Mod 用 OR REPLACE/裸 INSERT 会撞主键）。
+  注册为独立动作 `UpdateDatabaseGreatWorkSlots` + `LoadOrder 200000`（比奇观补丁的 199999 更晚，让别人的登记行先落地）。
+- **产品侧顺带修正**：Mods 端 `Data/Siqi_Leaders_0055_Modifiers.sql` 是旧版（`GREATWORKSLOT_PALACE`），
+  已与 ModBuddy 端同步为 `GREATWORKSLOT_RELIC`（写错成 PALACE 时槽位 UI 照样显示，但遗物进不去）。
+- **双端同步（本次补齐流程）**：工具只写 ModBuddy 工程目录，游戏读的是 `文档\My Games\…\Mods\Siqi_Leaders_0055\`。
+  本轮：① ModBuddy 端 `custom-file write --no-action` → `add_file_action` → **`save_project`** → `generate_all`；
+  ② Mods 端复制变更的 SQL（12 个生成文件按 MD5 逐一比对，只有 Modifiers.sql 与新增文件 DIFF），
+  并在 `.modinfo` 的 `InGameActions` 加同 id/同 LoadOrder 的动作块 + `<Files>` 加一行；
+  ③ 脚本复核：两端动作块 (类型,id,LoadOrder,文件列表) 完全一致（仅 `UpdateArt` 的
+  `(Mod Art Dependency File)` vs 构建后的 `.dep` 是正常差异），动作引用文件均已在 `<Files>` 且磁盘存在。
+- **踩坑记录**：`add_file_action` 只改内存 —— 第一次调用没跟 `save_project`，动作在下次 `generate_all` 后消失
+  （返回 `ok: true` 但 `.civ6proj` 里没有动作块）。
+- **知识库落地**：`skills/07-techniques/modifier-techniques.md` 新增**技巧 5**（槽容量 vs 槽登记、冲突安全登记 SQL、
+  槽类型别写错、原版 5 个有遗物槽的建筑与 3 处发遗物实现）；
+  `skills/05-modtools-civ/civ-pitfalls.md` 陷阱表新增第 16、17 条 + 自检清单两行；
+  `skills/05-modtools-civ/pipeline.md` 新增「### d. 双端同步：ModBuddy 工程目录 × 游戏 Mods 目录」。
+- 说明：本轮未改工具代码；登记补丁的实际效果（遗物能否发到神社）需实机验证，失败时的备选是
+  `NumSlots = 1`（真给一槽）并去掉对应的 +1 Modifier。
+
 ## 2026-09-17 - 修正：建筑挂载 + 城市级效果的**需求上下文**（Subject 是城市，不是建筑）
 
 - **问题（0055「天界天使学校」奇观加成）**：原写法用 `SubjectRequirementSetId` + `REQUIREMENT_PLOT_ADJACENT_DISTRICT_TYPE_MATCHES{DistrictType=DISTRICT_CITY_CENTER}`

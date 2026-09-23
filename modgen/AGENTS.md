@@ -89,9 +89,12 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - 自定义 SQL/XML/Lua：`custom-file write` 或 AI 接口 `project_file_write`（自动注册文件动作）。
 - 部署进游戏仍需 .modinfo：本期工具不生成（ModBuddy Build 时产物），文本类 Mod 可手写模板。
 
-## 临时文件约定（必须遵守）
+## 本地 Mod 工程与临时文件约定（必须遵守）
 
-- **所有临时条目文件（entry 等）一律写入 `modgen_work/` 目录**（仓库根下，已 gitignore，绝不提交 git）。
+遵守 [R4 仓库边界](../skills/RULES.md#r4-数据与写入边界)，具体目录与 Git 验收步骤见 [统一工作流](../skills/WORKFLOW.md)。
+
+- 新 Mod 工程及专用工作文件默认集中在 `modgen_work/<工程名>/`，已有工程位置保持不变；`.CIV` 和同级 `*.extensions/` 由仓库忽略，源码仍需保留和备份。
+- **所有临时条目、Mod 专用生成/修复脚本、专用测试、报告、预览和构建包一律写入 `modgen_work/` 目录**（仓库根下，已 gitignore，绝不提交到工具仓库）。通用工具回归测试仍放 `tests/` 或 `modgen/tests/`。
 - 不要在任何其他位置留下生成中间文件（工程目录、仓库根、modgen/ 内）。
 - `generate` 输出是 stdout——能直接消费就不要落盘；必须落盘时用 `modgen_work/`。
 - merge 会在工程旁生成 `.CIV.bak`（自动备份，已 gitignore，下次覆盖）。
@@ -106,6 +109,7 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - **图片**：项目图标有图片槽（目标 **256×256**，`images.icon` 已预填尺寸骨架，AI 只需填 `path`）；信仰 `has_images=False`（GUI 无图片槽，图标经美术页别名/数据库处理，无需导入图片）；其余分类一律空 `images: {}`，路径由用户提供。
 - **图标名**：约定 `ICON_{Type}`，由生成器自动填（如 `ICON_PROJECT_SIQI_P0035_TEST`）。
 - **引用**：`bindings` / `trait_bindings` 中的 section/name 必须指向存在的对象。
+- **议程绑定**：只用议程 `historical_agendas.LeaderType` 指定领袖；不要放入 `bindings` / `trait_bindings`。议程 Trait 通过 `AgendaTraits` 挂载，不进入 `LeaderTraits` / `CivilizationTraits`。校验会提示旧写法；导出兼容将旧领袖议程绑定转为 `HistoricalAgendas`，显式历史议程归属优先。
 - **自定义文件**：新任务先启用 extension 清单，SQL/XML/Lua 正文通过 extension write 或 custom-file write / AI project_file_write 存到源码目录，生成时按清单注册并复制到输出。Scripts 用 gameplay；UI XML/Lua 配对，动作只引用 XML；Import 用 import；数据库、文本、图标分别声明 database/text/icons。旧工程未启用时保留按路径分类与输出目录透传。路径越界被拒绝。
 - **自定义 SQL 协调**：默认把未被 .CIV 支持的 Gameplay SQL 放入 Core.sql；相同主键不得双写，UPDATE/DELETE 需明确依赖，不得机械替换成 REPLACE。
 - **加载顺序**：扩展清单独立编译 MTX_ 动作，按作用域、前后阶段和依赖决定顺序。旧 custom-file 自动动作仍按 (type,id) 合并并保留旧顺序，不能只凭默认 10000 推断加载时机。完整契约见 [项目级扩展](../skills/05-modtools-civ/project-extensions.md)。

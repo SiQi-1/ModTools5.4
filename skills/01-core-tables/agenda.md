@@ -2,7 +2,7 @@
 
 ## 原理
 
-议程在外交界面展示领袖的性格倾向。**自定义议程仅作为文本呈现**——AI 实际行为逻辑（OperationList）编译在游戏 DLL 中，Mod 无法新增。
+议程在外交界面展示领袖的性格倾向，可通过现有外交 Modifier 和条件实现关系加减分。不能因无法新增 DLL 中的 OperationList 行为，就把自定义议程误认为只有文本效果。
 
 ## 架构
 
@@ -14,14 +14,16 @@ AgendaType → AgendaTraits → TraitType (TRAIT_AGENDA_xxx)
 TraitType → TraitModifiers → 具体 modifier
 ```
 
-议程 Trait 是纯内部桥接，Name/Description 写 `''`。
+领袖只通过 `HistoricalAgendas` 绑定议程。**不要把议程 Trait 再写入 `LeaderTraits` 或 `CivilizationTraits`**；它由 `AgendaTraits` 挂载，议程的 `Traits`、`AgendaTraits` 与 `TraitModifiers` 仍需保留。
+
+`.CIV` 使用议程的 `historical_agendas.LeaderType` 字段，领袖 `bindings` 和文明 `trait_bindings` 不应添加议程。议程 Trait 的名称/描述可以省略；工具也可以生成对应 LOC 文本。
 
 ## 涉及的表
 
 | 表 | 列 | 写不写 |
 |----|-----|--------|
 | `Types` | `TRAIT_AGENDA_SQ_L{SHORT}_{N}`, `KIND_TRAIT` | **必写** |
-| `Traits` | `TraitType`, `Name`, `Description` | **必写**（Name/Description 填 `''`） |
+| `Traits` | `TraitType`, `Name`, `Description` | **必写**（名称/描述可省略或用 LOC） |
 | `Agendas` | `AgendaType`, `OperationList`, `Name`, `Description` | **必写**（OperationList 填 NULL） |
 | `HistoricalAgendas` | `LeaderType`, `AgendaType` | **必写** |
 | `AgendaTraits` | `AgendaType`, `TraitType` | **必写** |

@@ -3065,7 +3065,7 @@ class _SingleRowTableEditor(QWidget):
         for key, widget in self._widgets.items():
             value = payload.get(key)
             if value is None:
-                value = self._defaults.get(key, 0)
+                value = self._defaults.get(key)
             if isinstance(widget, BaseTemplateWidget) and hasattr(widget, "set_current_value"):
                 widget.set_current_value(_safe_text(value) or None)
             elif isinstance(widget, QSpinBox):
@@ -3081,7 +3081,7 @@ class _SingleRowTableEditor(QWidget):
         payload: dict[str, object] = {self._owner_key: self._owner_value}
         for key, widget in self._widgets.items():
             if isinstance(widget, BaseTemplateWidget):
-                payload[key] = _safe_text(_first_non_empty(widget.export_data()))
+                payload[key] = _safe_text(_first_non_empty(widget.export_data())) or None
             elif isinstance(widget, QSpinBox):
                 payload[key] = int(widget.value())
             elif isinstance(widget, QDoubleSpinBox):

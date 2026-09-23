@@ -33,3 +33,7 @@ Scripts → AddGameplayScripts；UI XML/Lua → AddUserInterfaces；Import → I
 工程源目录与游戏 Mods 目录是两份状态。通过 ModBuddy Build / 美术 Cooker 生成所需 .modinfo 与编译资源，再同步部署；核对动作、加载顺序、文件列表和实际文件。只同步源 SQL 不代表纹理或 UI 已完成构建。
 
 交付时分别报告源文件生成、构建、部署、游戏内验证状态。相关协议见 [AI 控制接口](../../ModTools_5_4/docs/AI_CONTROL_API.md)。
+
+## 手改 ModBuddy 工程的同步
+
+基础信息导入 `.civ6proj` 时，`project_info.association_data/project_guid/mod_version/compatible_versions` 保存依赖和工程元数据；随 `.CIV` 保存，并用于后续生成。未声明这些字段的旧 `.CIV` 仍保留已有输出工程属性。导入的 `localized_text_data` 中额外标签也随生成保留；独立简介标签需要真实文本定义。模型和图像仍以美术分节为准，不能用导入基础信息替代美术配置。

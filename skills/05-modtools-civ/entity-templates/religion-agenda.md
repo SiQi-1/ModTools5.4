@@ -21,6 +21,7 @@
 - `entity_table_form.py`：议程表字段 `Name`/`Description`（中文）+ `type_key="AgendaType"`
 - 工具生成链（`workspace_page.py`）：`Agendas`(AgendaType/Name/Description) → `AgendaTraits`（**自动生成 `TRAIT_{AgendaType}`**）→ `HistoricalAgendas`（绑定所属领袖，每个领袖建议只绑一个）→ 可选 `ExclusiveAgendas`（与随机议程互斥，AgendaTwo 候选来自游戏库 RandomAgendas）→ `AiLists`
 - 议程效果 = 「修改器」section（`MODIFIER_PLAYER_DIPLOMACY_SIMPLE_MODIFIER`，SubjectRequirementSetId 可从游戏库导入官方模板；ModifierString Preview 自动生成）
+- 领袖绑定只填 `historical_agendas.LeaderType`；不要把议程加入领袖 `bindings` 或文明 `trait_bindings`。`AgendaTraits` 保留，`LeaderTraits` 不重复挂载议程 Trait。旧工程的领袖议程绑定仅在未显式填写历史议程归属时兼容导出为 `HistoricalAgendas`。
 - 隐藏议程：`HiddenAgenda`（触发后可见）
 
 ## 出口检查

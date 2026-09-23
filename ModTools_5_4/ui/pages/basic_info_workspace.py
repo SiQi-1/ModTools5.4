@@ -876,6 +876,7 @@ class BasicInfoWorkspacePanel(QWidget):
         self._teaser_raw = ""
         self._description_raw = ""
         self._localized_text_data = ""
+        self._project_metadata: dict[str, str] = {}
 
         self._build_layout()
         self._apply_defaults()
@@ -1025,6 +1026,7 @@ class BasicInfoWorkspacePanel(QWidget):
         self._teaser_raw = ""
         self._description_raw = ""
         self._localized_text_data = ""
+        self._project_metadata: dict[str, str] = {}
         self._delete_requests = []
         self._refresh_quick_buttons_enabled()
         self._suspend_workspace_params_signal = old_state
@@ -1168,6 +1170,10 @@ class BasicInfoWorkspacePanel(QWidget):
                 "teaser_raw": teaser_raw,
                 "description_raw": description_raw,
                 "localized_text_data": localized_text_data,
+                "association_data": _child_text(base_group, "AssociationData", "<Associations />"),
+                "project_guid": _child_text(base_group, "ProjectGuid", ""),
+                "mod_version": _child_text(base_group, "ModVersion", "1"),
+                "compatible_versions": _child_text(base_group, "CompatibleVersions", "1.2,2.0"),
             },
             "file_info": {
                 "front_end_actions": front_end_actions,
@@ -1207,6 +1213,11 @@ class BasicInfoWorkspacePanel(QWidget):
         self._teaser_raw = _safe_text(str(project_info.get("teaser_raw", "")))
         self._description_raw = _safe_text(str(project_info.get("description_raw", "")))
         self._localized_text_data = _safe_text(str(project_info.get("localized_text_data", "")))
+        self._project_metadata = {
+            key: str(project_info[key]) for key in
+            ("association_data", "project_guid", "mod_version", "compatible_versions")
+            if project_info.get(key) is not None
+        }
 
         self._refresh_quick_buttons_enabled()
 
@@ -1246,6 +1257,7 @@ class BasicInfoWorkspacePanel(QWidget):
                 "teaser_raw": self._teaser_raw,
                 "description_raw": self._description_raw,
                 "localized_text_data": self._localized_text_data,
+                **self._project_metadata,
             },
             "file_info": {
                 "front_end_actions": front_entries,
@@ -1309,6 +1321,11 @@ class BasicInfoWorkspacePanel(QWidget):
         self._teaser_raw = _safe_text(str(project_info.get("teaser_raw", "")))
         self._description_raw = _safe_text(str(project_info.get("description_raw", "")))
         self._localized_text_data = _safe_text(str(project_info.get("localized_text_data", "")))
+        self._project_metadata = {
+            key: str(project_info[key]) for key in
+            ("association_data", "project_guid", "mod_version", "compatible_versions")
+            if project_info.get(key) is not None
+        }
 
         front_raw = file_info.get("front_end_actions", [])
         if not isinstance(front_raw, list):

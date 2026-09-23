@@ -92,7 +92,7 @@ python -m unittest discover -s modgen/tests -v
 
 ## 临时文件
 
-AI 会话的临时条目文件一律放仓库根 `modgen_work/`（已 gitignore，绝不提交 git）；`generate` 输出为 stdout 可直接消费。merge 备份 `.CIV.bak` 自动生成、下次覆盖。`preview` 默认把预览文件写到 `modgen_work/preview_<工程名>/`。
+遵守 [本地工程与临时文件约定](AGENTS.md#本地-mod-工程与临时文件约定必须遵守)：新 Mod 的工程、扩展源码和专用脚本/测试/报告/产物默认集中到 `modgen_work/<工程名>/`，不进入 ModTools 的 Git；已有工程保持路径，`.CIV` 和 `*.extensions/` 由忽略规则覆盖，正式源码需保留和备份。通用工具测试与参考数据仍纳入版本管理。AI 会话的临时条目文件一律放仓库根 `modgen_work/`；`generate` 输出为 stdout 可直接消费。merge 备份 `.CIV.bak` 自动生成、下次覆盖。`preview` 默认把预览文件写到 `modgen_work/preview_<工程名>/`。
 
 ## schema / 骨架更新
 

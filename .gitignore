@@ -3,8 +3,11 @@ ModTools_5_4/logs/
 logs/
 *.log
 
+# Local Mod projects are not tool source; keep their files on disk.
+*.[Cc][Ii][Vv]
+*.extensions/
+
 # Local working data
-*.CIV
 *.txt
 !requirements.txt
 local_db_queries/
@@ -33,6 +36,8 @@ __pycache__/
 *.bak*
 modgen_work/
 entry_*.json
+# Shipped tool schema is not an ad-hoc entry file.
+!modgen/schemas/entry_schemas.json
 _work/
 *.tmp
 ~$*

@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-24 - Mod 本地工程与工具仓库隔离
+
+- 补齐 `*.extensions/` 忽略规则，与不区分大小写的 `.CIV` 工程规则配套；给通用 `entry_schemas.json` 增加例外，避免被临时条目规则误排除。
+- 将已跟踪的 14 张单 Mod 占位素材移出 Git 索引，保留本地文件和备份；通用工具源码、参考数据和测试继续版本管理。
+- 修正规则、工作流、扩展指南与 modgen 文档：新项目和专用工作资料集中到 `modgen_work/<工程名>/`；已有工程保持路径；独立 Mod 仓库与 ModTools 仓库区分，并增加交付前 Git 状态与已跟踪文件核对。
+
+## 2026-09-23 - 议程绑定链修复
+
+- 通用 Trait 选择器移除议程；领袖/文明导出不再把议程 Trait 写入 LeaderTraits / CivilizationTraits。
+- 显式 historical_agendas.LeaderType 是议程绑定来源；旧领袖 bindings 中的议程仅在未指定归属时兼容导出 HistoricalAgendas，保留 AgendaTraits 和 TraitModifiers。
+- modgen 校验提示旧绑定，技能说明与契约同步更正，补充 SQL/XML 和旧项目兼容回归。
+- 验证：主套件 439 项（436 通过、3 条件跳过），modgen 96 项通过；技能检查 225 篇 / 20 场景零问题。20.0 实例的 19 项检查、27 组 Lua 行为和官方 SDK 编译通过，未进行游戏实机验收。
+
+## 2026-09-23 - 单位空引用与运行缓存污染修复
+
+- 单行子表的搜索选项未选择时保存 null，不再用数值默认值 0 填入单位类型；修复 UnitReplaces / UnitCaptures 导出非法单位引用。
+- 单位自定义 ABILITY_CLASS 标签是否生成改为依据随包官方 XML 快照，不再查询含已安装 Mod 的 DebugGameplay 缓存，避免同一工程第二次导出漏掉 Tags。
+- 回归覆盖空值/选择/清空，以及缓存已经含自定义标签时仍需注册；SQL/XML 输出保持同一声明路径。
+
+## 2026-09-23 - 导入工程元数据持久化
+
+- 修复手改 .civ6proj 的 AssociationData、ProjectGuid、ModVersion、CompatibleVersions 未进入 .CIV 的问题；导入、GUI 保存与工程重新生成均保留这些属性。旧 .CIV 未声明时继续保留已有工程属性。
+- 保留导入 LocalizedTextData 中的额外文本，避免独立 Teaser 标签在生成时失去定义。
+- 回归覆盖导入/保存、移除旧工程后重建、依赖显式清空、独立简介文本及旧工程兼容。
+
 ## 2026-09-23 - 项目级扩展与 Core / Lua 统一工作流
 
 - 新增可选 `.CIV.extensions` 清单，工程旁保存独立源码；角色、作用域、前后阶段、功能归属与依赖统一管理。Qt-free project/extensions.py 供 CLI/GUI/AI 共用，旧工程保持原通道。

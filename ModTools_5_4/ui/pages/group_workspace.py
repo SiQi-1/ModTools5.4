@@ -91,7 +91,6 @@ BINDABLE_SECTION_OPTIONS: list[tuple[str, str]] = [
     ("改良设施", "改良设施"),
     ("总督", "总督"),
     ("伟人", "伟人"),
-    ("议程", "议程"),
 ]
 
 LEADER_DIPLO_SCENES: list[tuple[str, str]] = [

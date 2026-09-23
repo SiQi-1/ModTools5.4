@@ -56,7 +56,7 @@ from ..ui_widget_kit import set_workspace_sections_provider
 from ..ui_widget_kit import _build_building_entries, _build_district_hierarchy, _build_improvement_entries, _build_unit_entries
 from ...app.settings_store import load_settings
 from ...application import ProjectService
-from ...db.paths import DEFAULT_GAME_DB
+from ...db.paths import DEFAULT_GAME_DB, _resolve_data_path
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...project import (
     CIV_DIRECT_WORKSPACE_SECTIONS,
@@ -1625,6 +1625,8 @@ class WorkspacePage(BasePage):
                     target_type = str(binding or "").strip()
                 if not target_type:
                     continue
+                if section == "议程" or target_type.startswith(("AGENDA_", "TRAIT_AGENDA_")):
+                    continue
                 if target_type.startswith("TRAIT_"):
                     trait_code = target_type
                 elif section == "总督":
@@ -1865,6 +1867,9 @@ class WorkspacePage(BasePage):
                 section = str(binding.get("section") or "").strip()
                 raw_type = str(binding.get("type") or "").strip()
                 if not raw_type:
+                    continue
+                # Agendas grant their trait through AgendaTraits, never LeaderTraits.
+                if section == "议程" or raw_type.startswith(("AGENDA_", "TRAIT_AGENDA_")):
                     continue
                 if raw_type.startswith("TRAIT_"):
                     target_trait = raw_type
@@ -3316,19 +3321,13 @@ class WorkspacePage(BasePage):
             "CLASS_MOBILE_RANGED",
             "CLASS_SUPPORT",
         }
-        existing_ability_class_tags: set[str] = set()
-        db_path = self._resolve_preview_game_db_path()
-        if db_path is not None:
-            try:
-                with closing(sqlite3.connect(str(db_path))) as conn:
-                    cursor = conn.execute("SELECT Tag FROM Tags WHERE Vocabulary = 'ABILITY_CLASS'")
-                    existing_ability_class_tags = {
-                        str(row[0] or "").strip()
-                        for row in cursor.fetchall()
-                        if str(row[0] or "").strip()
-                    }
-            except sqlite3.Error:
-                existing_ability_class_tags = set()
+        # Runtime caches include installed mods, including the project being exported.
+        # Only the shipped official snapshot can tell us which tags need no registration.
+        try:
+            snapshot = json.loads(_resolve_data_path("vanilla_ability_class_tags.json").read_text(encoding="utf-8"))
+            fixed_class_tags.update(snapshot["tags"])
+        except (OSError, ValueError, KeyError, TypeError):
+            LOGGER.warning("Vanilla ability class snapshot unavailable; using built-in tags")
 
         def _value_or_default(data: dict[str, object], key: str) -> object:
             value = data.get(key)
@@ -3540,7 +3539,7 @@ class WorkspacePage(BasePage):
                 tag = str(row.get("Tag") or "").strip()
                 if tag:
                     type_tags_rows.append(f"('{self._sql_escape(type_value)}', '{self._sql_escape(tag)}')")
-                    if tag.startswith("CLASS_") and tag not in fixed_class_tags and tag not in existing_ability_class_tags:
+                    if tag.startswith("CLASS_") and tag not in fixed_class_tags:
                         tags_rows.append(f"('{self._sql_escape(tag)}', 'ABILITY_CLASS')")
 
             type_properties = subtables.get("TypeProperties") if isinstance(subtables.get("TypeProperties"), list) else entry.get("type_properties") if isinstance(entry.get("type_properties"), list) else []
@@ -3577,7 +3576,7 @@ class WorkspacePage(BasePage):
                 if tag_value:
                     ability_type_tags_rows.append(f"('{ability_type}', '{self._sql_escape(tag_value)}')")
                     ability_type_tags_rows.append(f"('{self._sql_escape(unit_type)}', '{self._sql_escape(tag_value)}')")
-                    if tag_value.startswith("CLASS_") and tag_value not in fixed_class_tags and tag_value not in existing_ability_class_tags:
+                    if tag_value.startswith("CLASS_") and tag_value not in fixed_class_tags:
                         ability_tags_rows.append(f"('{self._sql_escape(tag_value)}', 'ABILITY_CLASS')")
 
                 ability_name = str(bind.get("AbilityName") or "").strip()
@@ -4696,6 +4695,25 @@ class WorkspacePage(BasePage):
                     text_rows.append(f"('zh_Hans_CN','{self._sql_escape(exit_kudo_tag)}','{self._sql_escape(exit_kudo_text)}')")
                 if exit_warn_tag and exit_warn_text:
                     text_rows.append(f"('zh_Hans_CN','{self._sql_escape(exit_warn_tag)}','{self._sql_escape(exit_warn_text)}')")
+
+            # Older projects offered agendas in the leader's generic binding picker.
+            # Preserve that assignment as HistoricalAgendas only when no explicit owner exists.
+            if not leader_type:
+                legacy_leaders = self._project.sections.get("领袖")
+                for legacy in legacy_leaders if isinstance(legacy_leaders, list) else []:
+                    if not isinstance(legacy, dict):
+                        continue
+                    bindings = legacy.get("bindings")
+                    for binding in bindings if isinstance(bindings, list) else []:
+                        if not isinstance(binding, dict):
+                            continue
+                        target = str(binding.get("type") or "").strip()
+                        if target not in (agenda_type, trait_type):
+                            continue
+                        legacy_type = str(legacy.get("type") or "").strip()
+                        if legacy_type:
+                            historical_rows.append(f"('{self._sql_escape(legacy_type)}', '{self._sql_escape(agenda_type)}')")
+                            leader_type = leader_type or legacy_type
 
             # Sub tables
             subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}
@@ -8312,6 +8330,23 @@ class WorkspacePage(BasePage):
             ]
         )
 
+        association_cdata = str(project_info.get("association_data") or "<Associations />")
+        mod_version = str(project_info.get("mod_version") or "1")
+        compatible_versions = str(project_info.get("compatible_versions") or "1.2,2.0")
+        # A separately localized teaser imported from ModBuddy must survive regeneration.
+        raw_localization = str(project_info.get("localized_text_data") or "")
+        if raw_localization:
+            try:
+                existing_text = ElementTree.fromstring(raw_localization)
+                generated_text = ElementTree.fromstring(localized_text_cdata)
+                generated_ids = {node.get("id") for node in generated_text}
+                for node in existing_text:
+                    if node.get("id") not in generated_ids:
+                        generated_text.append(node)
+                localized_text_cdata = ElementTree.tostring(generated_text, encoding="unicode")
+            except ElementTree.ParseError:
+                LOGGER.warning("Ignoring malformed imported LocalizedTextData")
+
         front_end_cdata = self._build_action_data_xml("FrontEndActions", front_entries)
         in_game_cdata = self._build_action_data_xml("InGameActions", in_game_entries)
 
@@ -8414,7 +8449,7 @@ class WorkspacePage(BasePage):
                 existing_guid = _read_child_text(base_group, "Guid")
                 existing_project_guid = _read_child_text(base_group, "ProjectGuid")
                 guid_value = guid or existing_guid
-                project_guid_value = existing_project_guid or guid_value
+                project_guid_value = str(project_info.get("project_guid") or existing_project_guid or guid_value)
 
                 _set_child_text(base_group, "Name", loc_name)
                 _set_child_text(base_group, "Teaser", teaser_value)
@@ -8427,6 +8462,9 @@ class WorkspacePage(BasePage):
                 _set_child_text(base_group, "SupportsSinglePlayer", self._bool_text(project_info.get("supports_single_player"), default=True))
                 _set_child_text(base_group, "SupportsMultiplayer", self._bool_text(project_info.get("supports_multiplayer"), default=True))
                 _set_child_text(base_group, "SupportsHotSeat", self._bool_text(project_info.get("supports_hotseat"), default=True))
+                for field, tag in (("association_data", "AssociationData"), ("mod_version", "ModVersion"), ("compatible_versions", "CompatibleVersions")):
+                    if field in project_info:
+                        _set_child_text(base_group, tag, str(project_info[field] or ""), cdata=field == "association_data")
                 _set_child_text(base_group, "FrontEndActionData", front_end_cdata, cdata=True)
                 _set_child_text(base_group, "InGameActionData", in_game_cdata, cdata=True)
                 _set_child_text(base_group, "LocalizedTextData", localized_text_cdata, cdata=True)
@@ -8554,8 +8592,8 @@ class WorkspacePage(BasePage):
             "    <Configuration Condition=\" '$(Configuration)' == '' \">Default</Configuration>",
             f"    <Name>{loc_name}</Name>",
             f"    <Guid>{self._xml_text(guid)}</Guid>",
-            f"    <ProjectGuid>{self._xml_text(guid)}</ProjectGuid>",
-            "    <ModVersion>1</ModVersion>",
+            f"    <ProjectGuid>{self._xml_text(project_info.get('project_guid') or guid)}</ProjectGuid>",
+            f"    <ModVersion>{self._xml_text(mod_version)}</ModVersion>",
             f"    <Teaser>{self._xml_text(teaser_value)}</Teaser>",
             f"    <Description>{loc_desc}</Description>",
             f"    <Authors>{self._xml_text(authors)}</Authors>",
@@ -8564,8 +8602,8 @@ class WorkspacePage(BasePage):
             f"    <SupportsSinglePlayer>{self._bool_text(project_info.get('supports_single_player'), default=True)}</SupportsSinglePlayer>",
             f"    <SupportsMultiplayer>{self._bool_text(project_info.get('supports_multiplayer'), default=True)}</SupportsMultiplayer>",
             f"    <SupportsHotSeat>{self._bool_text(project_info.get('supports_hotseat'), default=True)}</SupportsHotSeat>",
-            "    <CompatibleVersions>1.2,2.0</CompatibleVersions>",
-            "    <AssociationData><![CDATA[<Associations></Associations>]]></AssociationData>",
+            f"    <CompatibleVersions>{self._xml_text(compatible_versions)}</CompatibleVersions>",
+            f"    <AssociationData><![CDATA[{association_cdata}]]></AssociationData>",
             f"    <FrontEndActionData><![CDATA[{front_end_cdata}]]></FrontEndActionData>",
             f"    <InGameActionData><![CDATA[{in_game_cdata}]]></InGameActionData>",
             f"    <LocalizedTextData><![CDATA[{localized_text_cdata}]]></LocalizedTextData>",

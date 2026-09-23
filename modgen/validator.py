@@ -167,6 +167,16 @@ def check_entry(section: str, entry: dict[str, Any], *, prefix: str = "", infix:
             if not str(binding.get("section") or "").strip():
                 errors.append(f"trait_bindings[{index}] 缺少 section")
 
+    # Agendas are not ordinary leader/civilization trait bindings.
+    for binding_key in ("bindings", "trait_bindings"):
+        values = entry.get(binding_key)
+        for index, binding in enumerate(values if isinstance(values, list) else []):
+            if not isinstance(binding, dict):
+                continue
+            target = str(binding.get("type") or "").strip()
+            if binding.get("section") == "议程" or target.startswith(("AGENDA_", "TRAIT_AGENDA_")):
+                warnings.append(f"{binding_key}[{index}] 议程不能作为普通 Trait 绑定；请在议程 historical_agendas.LeaderType 指定领袖。旧领袖绑定仅兼容导出 HistoricalAgendas。")
+
     # 7. images 结构
     images = entry.get("images")
     if images is not None and not isinstance(images, dict):

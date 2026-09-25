@@ -132,6 +132,26 @@ class BuildCiv6ProjXmlTestCase(unittest.TestCase):
         self.assertIn("<SubType>Content</SubType>", text)
         self.assertIn('<Folder Include="Data\\" />', text)
 
+    def test_art_sources_are_not_registered_but_runtime_files_are(self) -> None:
+        source_files = ["Assets/Tile.ast", "./gEoMeTrIeS/Sub/Shape.fgx", "Materials/Stone.mtl",
+                        "Textures/Image.dds", "XLPs/tilebases.xlp", "ArtDefs/Landmarks.artdef",
+                        "Animations/Idle.anm", "Behaviors/B.beh", "DSGs/D.dsg",
+                        "EnvironmentLights/E.xml", "FireFX/F.xml", "LightRigs/R.xml",
+                        "Lights/L.xml", "ParticleEffects/P.xml", "IMG/portrait.png"]
+        runtime = ["Data/Test.sql", "UI/Panel.xml", "AssetsExtra/note.xml",
+                   "Platforms/Windows/BLPs/landmarks/tilebases.blp", "Data/Assets/List.xml"]
+        text = build_civ6proj_xml(mod_name="Test", file_name="Test",
+                                 content_files=source_files + runtime,
+                                 folder_paths=[p.rsplit("/", 1)[0] for p in source_files] + ["Data", "Platforms/Windows"])
+        items = [e for e in ET.fromstring(text).iter() if e.get('Include')]
+        includes = {e.get('Include').replace("\\", "/") for e in items}
+        for path in source_files:
+            self.assertNotIn(path, includes)
+            self.assertNotIn(path.rsplit("/", 1)[0] + "/", includes)
+        for path in runtime:
+            self.assertIn(path, includes)
+        self.assertIn('Test.Art.xml', includes)
+
     def test_action_data_embedded_as_cdata(self) -> None:
         text = build_civ6proj_xml(
             mod_name="测试",

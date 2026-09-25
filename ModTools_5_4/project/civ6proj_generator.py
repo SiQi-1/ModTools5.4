@@ -26,6 +26,24 @@ except ImportError:  # 仓库布局被破坏时的兜底（与 mt_bridge 同思�
 DEFAULT_COMPATIBLE_VERSIONS = "1.2,2.0"
 MSBUILD_NAMESPACE = "http://schemas.microsoft.com/developer/msbuild/2003"
 
+# Cooker resolves these source libraries through --pantry <ProjectDir>.
+# Content items are copied verbatim by Civ6.targets and would ship the sources.
+ART_SOURCE_DIRECTORIES = frozenset({
+    "img", "assets", "geometries", "materials", "textures", "animations",
+    "behaviors", "dsgs", "environmentlights", "firefx", "lightrigs", "lights",
+    "particleeffects", "artdefs", "xlps",
+})
+
+
+def is_art_source_path(relative_path: str) -> bool:
+    """Whether an item is in a standard source library, not a runtime directory.
+
+    Accept Windows separators, leading ./ and nested source subdirectories;
+    do not classify similarly named folders or cooked Platforms/... outputs.
+    """
+    parts = [p for p in str(relative_path or "").strip().replace("\\", "/").split("/") if p and p != "."]
+    return bool(parts and parts[0].casefold() in ART_SOURCE_DIRECTORIES)
+
 
 def new_guid() -> str:
     """生成小写 GUID（与 ModBuddy 写入的 Guid/ProjectGuid 格式一致）。"""
@@ -164,11 +182,15 @@ def build_civ6proj_xml(
     if art_xml_name:
         lines.append(f'    <None Include="{_xml_text(art_xml_name, attribute=True)}" />')
     for rel_path in content_files or []:
+        if is_art_source_path(rel_path):
+            continue
         include = str(rel_path).replace("/", "\\")
         lines.append(f'    <Content Include="{_xml_text(include, attribute=True)}">')
         lines.append("      <SubType>Content</SubType>")
         lines.append("    </Content>")
     for folder in folder_paths or []:
+        if is_art_source_path(folder):
+            continue
         include = str(folder).replace("/", "\\")
         if include and not include.endswith("\\"):
             include = f"{include}\\"

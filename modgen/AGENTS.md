@@ -56,7 +56,7 @@ python -m modgen.cli check-conflicts 工程.CIV [--json]                        
 python -m modgen.cli generate-modifier --effect EFFECT_XXX --collection COLLECTION_XXX --desc 效果描述 [--params '{"Amount":2,"YieldType":"YIELD_PRODUCTION"}']
 python -m modgen.cli generate-requirement --type REQUIREMENT_XXX --desc 条件描述 [--params '{"...":...}']
 python -m modgen.cli generate-reqset --desc 集合描述 --logic ALL [--requirements '["REQUIREMENT_A"]']
-python -m modgen.cli generate-ability --abbr 简称 --name 中文名 [--desc 中文描述]
+python -m modgen.cli generate-ability --abbr 简称 [--name 中文名] [--desc 中文描述]
 
 # 知识/验证工具
 python -m modgen.cli skill <关键词> [--file 相对路径]                                     # 本地技能库（仓库根 skills/）全文检索
@@ -116,6 +116,10 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - **统一检查与生成**：project-check 组合数据、源码/依赖、预览、动作和 SQL 冲突；build 自动配置后检查、生成并保存动作，默认 overwrite=none，all 才覆盖已有输出。build 不调用 ModBuddy Build/Cooker，不部署。
 - **兼容**：未启用 extensions 的旧 .CIV 不变。启用后 custom-file write 自动写源码；无动作文件不适用，Lua 库声明 import。CLI 修改备份 .CIV.bak；AI extension 修改自动保存。GUI/CLI/AI 共用 project/extensions.py。
 
+## UnitAbility 显示文本
+
+`generate-ability` 的 `--name` / `--desc` 均可省略，分别输出 `name_zh: null` / `description_zh: null`。原版 UnitAbilities 两列允许 NULL；内部标记、劳动力扣减等辅助能力无需显示名和说明。仅有玩家需要了解的独立效果才填写，内部能力同时关闭 `show_float_text_when_earned`。导出器保留 SQL NULL，且不生成对应空 LOC；名称或说明也可以只填其中一项。
+
 ## 分类说明
 
 | 分类 | Type 前缀 | 标识键 | 备注 |
@@ -140,6 +144,50 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - [项目级扩展](../skills/05-modtools-civ/project-extensions.md)：清单完整字段、Core、GP/UI 配套、迁移、依赖和静态检查边界。
 - [UI 美术与文本](../skills/05-modtools-civ/ui-assets.md)：UI图标、ui_textures、custom_entries 的完整字段与命令；包含 texture add/list/remove、覆盖策略、尺寸与动作要求。
 - [修改器与类型来源](../skills/05-modtools-civ/modifiers.md)：生成器参数、原版快照、modifier_type_source、preview_text 与引用验证。
+
+## HTML UI 纹理工具
+
+配套可分享技能：[civ6-html-ui](../skills/civ6-html-ui/SKILL.md)，完整用法/依赖见 [通用入口](../skills/civ6-html-ui/references/portable-use.md)。正式来源随仓库发布，不依赖个人 agent 安装。
+
+```bash
+python -m modgen.cli texture render --html design/index.html --out design/textures
+python -m modgen.cli texture import-manifest 工程.CIV --manifest design/textures/texture_manifest.json --dry-run
+python -m modgen.cli texture import-manifest 工程.CIV --manifest design/textures/texture_manifest.json --replace
+python -m modgen.cli texture verify --manifest design/textures/texture_manifest.json --project ModBuddy/MyMod
+```
+
+- `render`：本地 HTML 实现 textureSpecs/renderTexture；需 Node.js 22+ 与 Chromium/Chrome/Edge。`--node`/`--browser` 优先于 CIV6_UI_NODE/CIV6_UI_BROWSER，再查 PATH/常见浏览器路径；无 Codex 专用路径。`--replace` 才覆盖既有输出；不修改 CIV。
+- `import-manifest`：标准库命令，清单格式 `{ "UI_MYMOD_PANEL": [640,400] }`，PNG 默认与清单同目录，可用 `--png-dir`。全批名称/重复/PNG 头/尺寸和合并结果校验后只保存一次，保留无关纹理与工作区；同名需 `--replace`，`--dry-run` 不写 CIV 或备份。源路径保存为绝对路径，不生成 DDS。
+- `verify`：需 Pillow，只读检查源 PNG；加 `--project` 校验 DDS/TEX/UITexture XLP/Art.xml 及 alpha/可见像素。`--png-dir` 可覆盖源目录，`--tolerance` 为 0..255 最大单通道差，默认 0。不能代替 project-check 或实机验证。
+- 三命令成功输出 JSON，失败非零退出；均不编译 XML、不自动翻译 HTML、不运行 ModBuddy/Cooker、不生成 modinfo 或部署。
+- 现有 `texture add/list/remove` 契约不变；主数据、UI 扩展和完整生成仍分别走现有通道。
+
+## 领袖外交表情差分
+
+领袖条目可声明可选映射 fallback_images：键为外交状态，值为图片对象（path 必填，既有图片槽变换可选）。null / 空映射保留旧工程行为。DEFAULT 优先于 images.diplo_foreground，其余只导出明确提供的状态；有差分时必须有默认图。
+
+只填 path 的新状态图按比例完整放入 960×960 透明画布；显式变换沿用图片槽规则。默认资源仍为 FALLBACK_NEUTRAL_<short_type>，其他状态为 FALLBACK_STATE_<STATE>__LEADER_<short_type>，避免 NEUTRAL 与默认资源冲突。状态、路径、资源名由 project/leader_fallbacks.py 统一；GUI、schema、CLI 校验与导出共享该模型。
+
+validate 检查声明、状态、Type 和文件存在性，不加载 Qt/Pillow；GUI 生成前另检查图片可读性。完整生成会输出 PNG、DDS/TEX、LeaderFallback.xlp 和 FallbackLeaders.artdef。23 状态来自署名社区模板，其中 DECLAR_WAR_FROM_HUMAN 保留模板拼写，目标 SDK 和游戏触发仍需验收。字段例子与操作见 [领袖美术指南](../skills/05-modtools-civ/leader-art.md)。
+
+## 资源与发布产物检查
+
+~~~powershell
+python -m modgen.cli assets check MyMod/MyMod.civ6proj --json
+python -m modgen.cli audio check MyMod/MyMod.modinfo --json
+python -m modgen.cli art compare MyMod/ArtDefs Cooked/ArtDefs --json
+python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
+~~~
+
+- 四个入口只读、纯标准库，核心共用 project/asset_checks.py。与针对 .CIV 的 project-check 分开，不自动构建或上传。
+- assets check：输入 .civ6proj / .modinfo；解析命名空间、内嵌动作 XML 和显式文件引用，检查资源 XML、模板残留、已知 Leader_Matte 槽及 LeaderFallback → XLP → TEX/DDS 链。IMG/Textures 不要求作为源工程 Content；外部 pantry 引用列入未验证项。
+- audio check：同类工程输入；核对 UpdateAudio → INI → BNK、文件清单与可用 SoundBanksInfo 中的流式 WEM；INI 要求 ASCII 无 BOM，非 CRLF 提示。无 bank 元数据不能证明所有流式媒体完整。
+- art compare：两个目录，默认比较 .artdef；可重复 --suffix 选择支持的资源 XML 后缀。忽略缩进/换行/注释和属性顺序，保留属性值、文本与子节点顺序；缺失、_MissingArt 和结构变化报错，并输出差异位置（最多 100 项）。
+- workshop check：输入含 workshop.json、content 的 workspace；content 内需唯一 .modinfo，或 --modinfo 明确指定相对路径。检查 GUID、元数据类型、声明文件、动作引用、可选封面 PNG 头和既有条目 ID。dependencies 为 UInt64 整数列表；现有条目允许省略可选元数据。
+- --json 报告包含 kind、target、ok、errors、warnings、unverified、checked；art 另有 comparisons。无静态错误退出 0，错误退出 1；警告/未验证不改变退出码。0 不代表 SDK 编译、游戏显示、Wwise 版本、Steam 所有权已经验证。
+- 文件引用禁止绝对路径、越界和逃出输入根目录的链接；不修补源文件。Blender、Wwise、Cooker 和工坊上传器仍按各指南独立使用。
+
+来源、版本及许可见 [第三方说明](../THIRD_PARTY_NOTICES.md)。
 
 ## 知识与证据查询
 
@@ -166,3 +214,24 @@ search 查游戏库实现；query 只读 SELECT/WITH/PRAGMA/EXPLAIN，默认 50 
 ```bash
 python modgen/tools/extract_schemas.py
 ```
+
+## 地标 AST 与 Landmarks 资源包
+
+本通道生成静态 TileBase，美术 XML/AST/XLP 由工具写出；不在 CIV 主内容手写 XML。共享核心是 `ModTools_5_4/project/landmarks.py`，CLI 是 `modgen/landmark.py`。完整制作技能：[civ6-landmarks](../skills/civ6-landmarks/SKILL.md)。
+
+```powershell
+python -m modgen.cli landmark catalog --sdk-assets "<SDK Assets>" --query Sphinx
+python -m modgen.cli landmark compose --recipe recipe.json --sdk-assets "<SDK Assets>" --out MyMod.landmarks
+python -m modgen.cli landmark import MyMod.CIV --bundle MyMod.landmarks/manifest.json [--dry-run] [--replace]
+python -m modgen.cli landmark verify --bundle MyMod.landmarks/manifest.json [--sdk-assets "<SDK Assets>"] [--project "<工程目录>"]
+python -m modgen.cli landmark cook --bundle MyMod.landmarks/manifest.json --sdk-assets "<SDK Assets>" --sdk "<SDK>" --out modgen_work/art-check [--project "<工程目录>"]
+```
+
+- 配方 schema 与字段见[工具契约](../skills/civ6-landmarks/references/workflow.md)；根 format=`MODTOOLS54_LANDMARK_RECIPE`。主内容 Type 必须先存在于 CIV，资产名与附件字段严格校验。
+- `compose` 静态复用 SDK TileBase 的实例/材质组/可见状态，清除源附件和动画行为，再创建本地附件；不支持任意动画 AST 或单位骨骼转换。
+- 资源包含 AST、Landmarks、TileBase XLP、可选补充 Buildings、recipe 与 manifest 散列。CIV 只存 `workspace.美术.data.landmark_bundle.manifest` 绝对路径；当前一个 CIV 一个包。
+- `import` 校验完整批次后保存一次并备份 CIV，自动设置 need/source map、Landmarks/TileBase 标记与来源 SDK Art ID；不同包切换需 `--replace`。移动源目录后重新导入，当前不自动重定位。
+- GUI 导入/导出保留声明；预览有 AST 组。工程总览允许 AST；生成 Assets 等标准美术源目录，但不登记为 civ6proj Content/Folder/None；更新既有工程时清除这些目录的旧注册，磁盘源文件保留，仍由目录扫描与 Cooker pantry 读取；补充建筑与已有 Buildings 合并。
+- 包文件散列变化会阻断导出，调整应回到配方重新 compose；依赖或绑定变化后再次 import。`validate` 同时检查资源包来源存在且散列一致。
+- `verify --project` 检查源文件、引用链和错误的美术源目录注册；不要求 AST Content。`verify` 不调用 SDK 二进制；`cook` 需要 Windows 官方 Cooker，使用新英文临时目录解决中文路径问题，只编译地标资源链。两者均不是游戏内视觉验收。
+- Mod 源 `*.landmarks/` 与 CIV/扩展目录一起保留在本地或独立 Mod 仓库；通用示例和测试不包含官方几何/纹理文件。

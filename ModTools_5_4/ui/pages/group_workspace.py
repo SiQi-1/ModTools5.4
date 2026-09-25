@@ -51,6 +51,7 @@ from ...db.paths import DEFAULT_GAME_DB
 from ..ui_widget_kit import IconTokenTextEdit, NewlineTokenTextEdit, build_template_widget, ColorPickerDialog
 from .entity_table_form import AgendaCompositeEditor, BeliefCompositeEditor, BuildingCompositeEditor, DistrictCompositeEditor, ImprovementCompositeEditor, PolicyCompositeEditor, ProjectCompositeEditor, UnitCompositeEditor
 from .great_people_editor import GreatPeopleCompositeEditor
+from ..leader_fallback_editor import LeaderFallbackEditor
 
 SECTION_FILE_BASENAME = {
     "文明": "Civilizations",
@@ -3756,6 +3757,9 @@ class LeaderItemEditor(QWidget):
         image_layout.addWidget(self._select_background_image, 5, 2, 1, 2)
         image_group.setLayout(image_layout)
         basic_layout.addWidget(image_group)
+        self._fallback_editor = LeaderFallbackEditor()
+        self._fallback_editor.dataChanged.connect(self._emit_data_changed)
+        basic_layout.addWidget(self._fallback_editor)
         basic_group.setLayout(basic_layout)
 
         binding_group = QGroupBox("领袖绑定区域")
@@ -4056,6 +4060,7 @@ class LeaderItemEditor(QWidget):
         self._foreground_image.set_state(images.get("foreground"))
         self._background_image.set_state(images.get("background"))
         self._diplo_foreground_image.set_state(images.get("diplo_foreground"))
+        self._fallback_editor.set_value(entry.get("fallback_images"))
         self._diplo_background_image.set_state(images.get("diplo_background"))
         self._select_foreground_image.set_state(images.get("select_foreground"))
         self._select_background_image.set_state(images.get("select_background"))
@@ -4151,6 +4156,7 @@ class LeaderItemEditor(QWidget):
             "foreground_image_name": _safe_text(self._foreground_name.text()),
             "background_image_name": _safe_text(self._background_name.text()),
             "diplo_foreground_image_name": _safe_text(self._diplo_foreground_name.text()),
+            "fallback_images": self._fallback_editor.value(),
             "diplo_background_image_name": _safe_text(self._diplo_background_name.text()),
             "select_foreground_image_name": _safe_text(self._select_foreground_name.text()),
             "select_background_image_name": _safe_text(self._select_background_name.text()),

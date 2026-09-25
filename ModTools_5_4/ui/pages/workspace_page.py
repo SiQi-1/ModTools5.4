@@ -1,6 +1,8 @@
 """Workspace page with project tree and content area."""
 from __future__ import annotations
 
+from ...project.leader_fallbacks import default_image, fallback_rows, validate_fallbacks
+
 from contextlib import closing
 from pathlib import Path
 from dataclasses import dataclass
@@ -67,6 +69,7 @@ from ...project import (
     create_empty_project,
 )
 from ...project.civ6proj_generator import (
+    is_art_source_path,
     create_mod_project,
     default_modbuddy_project_dir,
     sanitize_file_name,
@@ -8155,7 +8158,7 @@ class WorkspacePage(BasePage):
         rel = str(relative_path or "").replace("\\", "/").strip().lower()
         if not rel:
             return False
-        allowed_exts = {".xml", ".xlp", ".artdef", ".civ6proj", ".sql", ".lua"}
+        allowed_exts = {".xml", ".xlp", ".artdef", ".ast", ".civ6proj", ".sql", ".lua"}
         return any(rel.endswith(ext) for ext in allowed_exts)
 
     def _collect_external_project_files(
@@ -8364,10 +8367,7 @@ class WorkspacePage(BasePage):
             and not path.lower().endswith(".civ6proj")
             and path != self._img_plan_relative_path()
             and path != self._textures_plan_relative_path()
-            and not path.startswith("IMG/")
-            and not path.startswith("Textures/")
-            and not path.startswith("XLPs/")
-            and not path.startswith("ArtDefs/")
+            and not is_art_source_path(path)
         ]
 
         content_lines = []
@@ -8382,7 +8382,7 @@ class WorkspacePage(BasePage):
             )
 
         folder_lines = []
-        project_folders = [folder for folder in sorted(folders) if folder not in {"IMG", "Textures", "XLPs", "ArtDefs"}]
+        project_folders = [folder for folder in sorted(folders) if not is_art_source_path(folder)]
         for folder in project_folders:
             include = folder.replace("/", "\\")
             if not include.endswith("\\"):
@@ -8492,31 +8492,16 @@ class WorkspacePage(BasePage):
                         elif child.tagName == "Folder":
                             existing_folder.add(include_key)
 
-                def _is_generated_asset_entry(tag_name: str, include_value: str) -> bool:
-                    normalized = str(include_value or "").replace("/", "\\").strip().lower()
-                    if not normalized:
-                        return False
-                    if tag_name == "Folder":
-                        return (
-                            normalized in {"img", "img\\"}
-                            or normalized.startswith("img\\")
-                            or normalized in {"textures", "textures\\"}
-                            or normalized.startswith("textures\\")
-                        )
-                    if tag_name == "Content":
-                        return normalized.startswith("img\\") or normalized.startswith("textures\\")
-                    return False
-
                 for group in item_groups:
                     removable: list[object] = []
                     for child in group.childNodes:
                         if child.nodeType != child.ELEMENT_NODE:
                             continue
                         tag_name = child.tagName
-                        if tag_name not in {"Content", "Folder"}:
+                        if tag_name not in {"Content", "Folder", "None"}:
                             continue
                         include_value = str(child.getAttribute("Include") or "")
-                        if (_is_generated_asset_entry(tag_name, include_value)
+                        if (is_art_source_path(include_value)
                                 or (tag_name == "Content" and include_value.replace("/", "\\").lower() in deleted_paths)):
                             removable.append(child)
                     for child in removable:
@@ -8745,6 +8730,9 @@ class WorkspacePage(BasePage):
                     self._collect_icons_atlas_image_plans() + self._collect_leader_direct_image_plans()
                     + self._collect_governor_direct_image_plans() + self._collect_moment_image_plans()] if entries else []
         errors.extend({"message": message} for message in validate_ui_textures(entries, reserved_names=reserved))
+        for leader in self._iter_section_entries("领袖"):
+            errors.extend({"message": f"{leader.get('type')}: {message}"}
+                          for message in validate_fallbacks(leader, check_images=True))
         return {"errors": errors, "warnings": list(report.get("warnings") or [])}
 
     def _validate_ui_icons(self) -> bool:
@@ -8758,7 +8746,7 @@ class WorkspacePage(BasePage):
         QMessageBox.warning(
             self,
             "UI 美术资源校验失败",
-            "UI 图标或独立纹理声明存在错误，已阻止生成（只影响美术输出，"
+            "UI 图标、独立纹理或领袖差分声明存在错误，已阻止生成（只影响美术输出，"
             "修正后即可生成）：\n\n" + "\n".join(lines) + more,
         )
         return False
@@ -8917,6 +8905,8 @@ class WorkspacePage(BasePage):
                 if not file_names:
                     continue
                 state = images.get(image_key) if isinstance(images.get(image_key), dict) else {}
+                if image_key == "diplo_foreground":
+                    state = default_image(entry)
                 source_path = str(state.get("path") or "").strip() if isinstance(state, dict) else ""
                 for file_name in file_names:
                     plans.append(
@@ -8929,6 +8919,9 @@ class WorkspacePage(BasePage):
                             "category": "leader_final",
                         }
                     )
+            for row in fallback_rows(entry):
+                if row["state"] != "DEFAULT":
+                    plans.append({**row, "relative_path": f"IMG/{row['name']}.png"})
         return plans
 
     def _collect_governor_direct_image_plans(self) -> list[dict[str, object]]:
@@ -9176,30 +9169,9 @@ class WorkspacePage(BasePage):
         # Independent UI textures keep their rectangular dimensions and alpha.
         plans.extend(self._collect_ui_texture_image_plans())
 
-        # 5) LeaderFallback（领袖外交前景 fallback）
+        # 5) LeaderFallback: one shared declaration for PNG/TEX/XLP/ArtDef.
         for entry in self._iter_section_entries("领袖"):
-            leader_type = str(entry.get("type") or "").strip()
-            if not leader_type:
-                continue
-            short_type = leader_type[7:] if leader_type.startswith("LEADER_") else leader_type
-            if not short_type:
-                continue
-            name = f"FALLBACK_NEUTRAL_{short_type}"
-            images = entry.get("images") if isinstance(entry.get("images"), dict) else {}
-            state = images.get("diplo_foreground") if isinstance(images.get("diplo_foreground"), dict) else {}
-            source_path = str(state.get("path") or "").strip() if isinstance(state, dict) else ""
-            if not source_path:
-                continue
-            plans.append(
-                {
-                    "name": name,
-                    "target_width": 960,
-                    "target_height": 960,
-                    "source_state": state if isinstance(state, dict) else {},
-                    "source_path": source_path,
-                    "category": "leader_fallback",
-                }
-            )
+            plans.extend(fallback_rows(entry))
 
         dedup: dict[str, dict[str, object]] = {}
         for plan in plans:
@@ -9346,6 +9318,14 @@ class WorkspacePage(BasePage):
 
         pix_w = max(1, pix_w)
         pix_h = max(1, pix_h)
+
+        # New declarative fallback images fit the canvas unless explicit slot
+        # transforms were supplied. Legacy slots keep their original layout.
+        if state.get("fit_mode") == "contain":
+            base_w, base_h = target_w, target_h
+            scale = min(target_w / pix_w, target_h / pix_h)
+            offset_x = (target_w - pix_w * scale) / 2
+            offset_y = (target_h - pix_h * scale) / 2
 
         ratio_x = target_w / base_w
         ratio_y = target_h / base_h
@@ -9966,13 +9946,18 @@ class WorkspacePage(BasePage):
                 )
             elif normalized_name:
                 files[f"XLPs/{normalized_name}"] = content
+        for filename, content in art_groups.get("AST", []):
+            files[f"Assets/{filename}"] = content
+            folders.add("Assets")
         emitted_artdefs: list[tuple[str, str]] = []
         fallback_cultures: tuple[str, str] | None = None
         for filename, content in art_groups.get("ArtDef", []):
             normalized_name = str(filename or "").strip()
             if normalized_name.lower() == "cultures.artdef":
                 fallback_cultures = (normalized_name, content)
-            if self._should_emit_artdef_file(normalized_name):
+            managed_buildings = (normalized_name.lower() == "buildings.artdef" and
+                                 bool(self._art_workspace._state.get("landmark_bundle")))
+            if self._should_emit_artdef_file(normalized_name) or managed_buildings:
                 emitted_artdefs.append((normalized_name, content))
 
         if not emitted_artdefs and fallback_cultures is not None:

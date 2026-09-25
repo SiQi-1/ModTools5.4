@@ -6,6 +6,7 @@ logs/
 # Local Mod projects are not tool source; keep their files on disk.
 *.[Cc][Ii][Vv]
 *.extensions/
+*.landmarks/
 
 # Local working data
 *.txt
@@ -24,7 +25,7 @@ outputs/
 build/
 dist/
 release/
-ModTools5.4.zip
+*.zip
 *.spec
 
 # Python

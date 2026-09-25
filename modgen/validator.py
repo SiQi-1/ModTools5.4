@@ -182,6 +182,9 @@ def check_entry(section: str, entry: dict[str, Any], *, prefix: str = "", infix:
     if images is not None and not isinstance(images, dict):
         errors.append("images 必须是对象（空 {} 或 键值对）")
 
+    if section == "领袖":
+        from ModTools_5_4.project.leader_fallbacks import validate_fallbacks
+        errors.extend(validate_fallbacks(entry))
     return errors, warnings
 
 
@@ -218,6 +221,15 @@ def validate_project(
     errors.extend(validate_ui_icon_section(workspace.get("UI图标")))
     from ModTools_5_4.project.ui_textures import texture_entries, validate_ui_textures
     errors.extend(validate_ui_textures(texture_entries(workspace.get("美术"))))
+    art = workspace.get("美术")
+    art_data = art.get("data", art) if isinstance(art, dict) else {}
+    declaration = art_data.get("landmark_bundle") if isinstance(art_data, dict) else None
+    if declaration:
+        from ModTools_5_4.project.landmarks import load_bundle
+        try:
+            load_bundle(declaration["manifest"])
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            errors.append(f"地标资源包: {exc}")
     # 修改器直接工作区
     modifier_payload = workspace.get("修改器")
     if isinstance(modifier_payload, dict):

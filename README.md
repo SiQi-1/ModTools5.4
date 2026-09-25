@@ -63,6 +63,10 @@
 
 发布包随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出。**知识查询（"某个效果怎么实现"）由 `modgen search` 与能力实现搜索提供，AI 不需要记忆游戏知识。**
 
+### HTML 转文明6 UI（各类 agent 共用）
+
+[skills/civ6-html-ui/SKILL.md](skills/civ6-html-ui/SKILL.md) 提供 HTML/CSS 设计、透明/四态纹理、原生 XML/Lua、CIV 接入和验收，附可运行脚本及示例。可直接在本仓库使用，也可整目录分享；不依赖个人 Codex 安装。工具入口为 `python -m modgen.cli texture render`、`texture import-manifest`、`texture verify`，依赖和跨平台边界见 [用法](skills/civ6-html-ui/references/portable-use.md)。
+
 ### 开局提示词（把这段给 AI）
 
 ```markdown
@@ -115,7 +119,7 @@
 | 能力 | 说明 |
 |------|------|
 | ⚠️ **Lua / 自定义 SQL/XML** | 仅经**自定义文件通道**（`custom-file` / `project_file_write`）工具化写入；主内容（.CIV 条目）不包含 Lua |
-| ❌ **图片资源** | 图标/头像/立绘需用户提供，AI 不生成图片 |
+| **图片资源** | 角色美术由用户提供或按任务另行制作；UI 背景/边框/四态皮肤可由 HTML/CSS 导出，见 civ6-html-ui 技能 |
 | ❌ **模型/动画/特效** | 3D 模型、骨骼动画、粒子特效 |
 
 > **重要方法论——"做不到"之前先搜索**：绝大多数 Mod 效果（包括相邻加成、城市产出调整等）游戏里**都有现成实现**，判断"有没有效果器"的唯一正确方法是用 `modgen search` / 能力实现搜索查原版，**而不是凭记忆断言**。确需 Lua 的情况极少（如自定义界面/事件逻辑），此时才如实告知。
@@ -307,7 +311,15 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 ---
 
+## 领袖差分与资源检查
+
+领袖编辑器可配置外交表情差分，统一生成 DDS/TEX、XLP 和 ArtDef；旧默认立绘兼容。音频、Blender / CivNexus6、纸片领袖、Cooker 与工坊流程见 [制作指南索引](skills/05-modtools-civ/INDEX.md)。
+
+新增只读命令 assets check、audio check、art compare、workshop check，支持 --json 报告错误、警告和未验证项。完整用法见 [命令契约](modgen/AGENTS.md#资源与发布产物检查)，实现与验收范围见 [整合记录](docs/COMMUNITY_SKILL_INTEGRATION.md)。
+
 ## 素材来源与版权说明
+
+社区技能、模板与工具的参考来源、作者署名和许可范围见 [第三方参考资料与致谢](THIRD_PARTY_NOTICES.md)，包括千寻瀑（千与千寻瀑）、煎包 / Jianbao233、飞花白，以及 Deliverator / Sukritact 的相关成果。
 
 本工具为文明6 Mod 制作提供参考数据与素材，其中部分文件来自游戏本体或 ModBuddy：
 
@@ -322,3 +334,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 ### AI 知识工作流
 
 制作任务先读 [规则正文](skills/RULES.md) 与 [统一工作流](skills/WORKFLOW.md)。`python -m modgen.cli skill "任务描述" --plan --json` 返回任务必读资料；规则、指南、参数参考和历史案例分层读取。检索失败时换词并查来源，不能凭记忆补结论。维护知识后运行 `python -m modgen.cli skill --check`。
+
+### 地标 AST 资源包
+
+新增 `modgen landmark catalog/compose/import/verify/cook`，支持从官方 SDK 几何组合改良和区域模型，生成 Landmarks、TileBase XLP 与建筑差分，经 CIV 导出到 ModBuddy。Assets 等美术源目录由 Cooker 自动读取，不注册进 civ6proj 发布项。制作步骤、边界及示例见 [地标技能](skills/civ6-landmarks/SKILL.md)。Cooker 只验证当前资源链，不自动部署游戏。

@@ -72,6 +72,12 @@ Copy-Item (Join-Path $root "ModTools5.4.py") $releaseDir -Force
 Copy-Item (Join-Path $root "requirements.txt") $releaseDir -Force
 Copy-Item (Join-Path $root "LICENSE") $releaseDir -Force
 Copy-Item (Join-Path $root "README.md") $releaseDir -Force
+# 社区来源、保留的上游许可证和实际采用范围随源码发行。
+Copy-Item (Join-Path $root "THIRD_PARTY_NOTICES.md") $releaseDir -Force
+Copy-Item (Join-Path $root "licenses") (Join-Path $releaseDir "licenses") -Recurse -Force
+$communityDocsDst = Join-Path $releaseDir "docs"
+New-Item -ItemType Directory -Path $communityDocsDst -Force | Out-Null
+Copy-Item (Join-Path $root "docs\COMMUNITY_SKILL_INTEGRATION.md") $communityDocsDst -Force
 Copy-Item (Join-Path $root "AGENT_SETUP.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENT.md") $releaseDir -Force
 Copy-Item (Join-Path $root "AGENTS.md") $releaseDir -Force

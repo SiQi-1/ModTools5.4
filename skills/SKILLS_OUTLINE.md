@@ -8,6 +8,14 @@
 
 [.CIV 指南](05-modtools-civ/INDEX.md) 包含实体、修改器、UI图标、独立纹理、LOC、自定义文件和交付。操作指南优先于历史案例；完整命令契约在 [modgen](../modgen/AGENTS.md)。
 
+社区制作资料已接入 [.CIV 指南](05-modtools-civ/INDEX.md)：领袖差分与纸片、音频、Blender、Cooker 和工坊发布。作者、版本和采用范围见 [来源声明](../THIRD_PARTY_NOTICES.md)。
+
+## 可分享的技能包
+
+- [HTML → 文明6原生 UI](civ6-html-ui/SKILL.md)：HTML/CSS 设计、四态纹理、XML/Lua 接入；包含独立脚本、示例和跨 agent 使用说明。整目录可复制分享，仓库提供 `texture render/import-manifest/verify`。
+
+- [地标与 AST 组合](civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；附配方示例，配套 `landmark catalog/compose/import/verify/cook`。
+
 ## 参考与案例
 
 - [核心表目录](01-core-tables/INDEX.md)：实体 SQL 结构，主内容仍经工具生成。

@@ -19,6 +19,10 @@
 
 `AGENT.md` 保留兼容入口；同会话已读且未变化的资料可复用。实现前简短注明所用文件/章节与待验证项。
 
+涉及 HTML/CSS 设计、UI 美化或网页原型转文明6控件时，读取 **[skills/civ6-html-ui/SKILL.md](skills/civ6-html-ui/SKILL.md)**；该目录包含平台中立的技能、脚本和示例，可整包分享，不依赖个人技能安装。
+
+涉及地标模型、TileBase AST 组合、Landmarks 或区域建筑差分时，读取 **[skills/civ6-landmarks/SKILL.md](skills/civ6-landmarks/SKILL.md)**，使用 `modgen landmark` 资源包通道。
+
 其余按需：`README.md`「AI 生成 .CIV」章节（开局提示词，给人/AI 的摘要）、`CIV6_MOD_TUTORIAL.md`（全流程教程，人读为主）。
 
 ## 目的 B：工具优化（改 ModTools 本身）

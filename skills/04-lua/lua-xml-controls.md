@@ -998,7 +998,7 @@ PullDown 的 `<InstanceData Name="InstanceOne">` 本质就是 Instance——Lua 
 | `ShellHeader` | 弹窗主标题（FontFlair24 + glow） |
 | `WindowHeader` | 子窗口标题（FontFlair22 + glow） |
 | `FontNormal10/12/14/16/18/20/22` | 裸字（无效果） |
-| `FontFlair14~40` | 艺术字（无效果） |
+| `FontFlair14/16/18/20/22/24/26/28/30/40` | 艺术字；不是连续序列，FontFlair32 不存在，核对目标语言 Fonts/Civ6_FontStyles 文件 |
 
 ## 输入/进度类
 

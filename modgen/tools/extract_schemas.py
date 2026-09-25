@@ -48,7 +48,7 @@ def _strip_entry(entry: dict) -> dict:
     """
     cleaned = {}
     for key, value in entry.items():
-        if key == "images":
+        if key in {"images", "fallback_images"}:
             cleaned[key] = {}
             continue
         if isinstance(value, dict):
@@ -80,6 +80,9 @@ def main() -> int:
             sections[section] = {
                 "entry_template": _strip_entry(entries[0]),
             }
+
+    # The fixture intentionally remains a legacy project; expose optional newer fields.
+    sections["领袖"]["entry_template"].setdefault("fallback_images", {})
 
     # 主表字段（含默认值 / sql_default / 必填）
     for section, builder in SCHEMA_BUILDERS.items():

@@ -29,3 +29,9 @@
     `"vanilla"`=强制视为游戏已有（仅当快照中确实存在该类型）。
   - `validate` 会对「强制新建却属原版」「强制已有却不在快照」报 **ERROR**；
     自动判定为自定义时给 WARNING（提示将补注册行）。
+
+## UnitAbilities 的可选显示文本
+
+原版 `Base/Assets/Gameplay/Data/Schema/01_GameplaySchema.sql` 中 `UnitAbilities.Name`、`Description` 都允许 NULL。原版 `ABILITY_RECEIVE_RANGE_BONUS`、`ABILITY_OLIGARCHY_MELEE_BUFF` 也省略这两项。内部状态、扣劳动力等实现用能力可将 `name_zh` / `description_zh` 省略或设为 null，并关闭获得时漂字；无需为每个辅助能力编写玩家文本。真正需要玩家理解的单位能力按需提供说明，两个字段互不强制依赖。
+
+`modgen generate-ability --abbr INTERNAL_MARKER` 可直接生成无显示文本的能力；校验不再将空名称视为问题，导出 SQL 使用 NULL、不产生空 LOC。该规则只针对 UnitAbilities，不能推广到其他实体的必填名称。

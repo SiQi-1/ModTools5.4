@@ -98,5 +98,70 @@
     "query": "扩展依赖",
     "expected": "05-modtools-civ/project-extensions.md",
     "top": 3
+  },
+  {
+    "query": "HTML 转文明6 UI",
+    "expected": "civ6-html-ui/SKILL.md",
+    "top": 3
+  },
+  {
+    "query": "HTML 精确纹理导出",
+    "expected": "civ6-html-ui/references/html-textures.md",
+    "top": 3
+  },
+  {
+    "query": "texture import-manifest 批量登记",
+    "expected": "civ6-html-ui/references/portable-use.md",
+    "top": 3
+  },
+  {
+    "query": "HTML 九宫格 XML",
+    "expected": "civ6-html-ui/references/native-ui.md",
+    "top": 3
+  },
+  {
+    "query": "领袖外交表情差分 fallback_images",
+    "expected": "05-modtools-civ/leader-art.md",
+    "top": 3
+  },
+  {
+    "query": "纸片领袖 Leader_Matte",
+    "expected": "05-modtools-civ/leader-art.md",
+    "top": 3
+  },
+  {
+    "query": "Wwise 音频 Banks.ini",
+    "expected": "05-modtools-civ/audio-pipeline.md",
+    "top": 3
+  },
+  {
+    "query": "Blender CN6 NA2",
+    "expected": "05-modtools-civ/blender-civnexus.md",
+    "top": 3
+  },
+  {
+    "query": "Cooker 产物语义差异",
+    "expected": "05-modtools-civ/art-cook-validation.md",
+    "top": 3
+  },
+  {
+    "query": "创意工坊发布上传器",
+    "expected": "05-modtools-civ/workshop-release.md",
+    "top": 3
+  },
+  {
+    "query": "LuaEvents GP 同环境",
+    "expected": "04-lua/code-style.md",
+    "top": 3
+  },
+  {
+    "query": "Landmarks.artdef AST TileBase",
+    "expected": "civ6-landmarks/SKILL.md",
+    "top": 3
+  },
+  {
+    "query": "区域模型 建筑差分 BuildingSets",
+    "expected": "civ6-landmarks/references/landmarks.md",
+    "top": 3
   }
 ]

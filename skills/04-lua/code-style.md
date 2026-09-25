@@ -4,6 +4,29 @@
 
 ---
 
+## 事件环境与运行时核验
+
+| 事件系统 | UI | GP | 环境边界 |
+|---|---|---|---|
+| LuaEvents | 可用，同环境通信 | 可用，GP → GP | 不可直接跨 UI / GP |
+| Events | 可用 | 可用 | 具体事件、触发和参数按调用点核对 |
+| GameEvents | 无原生 GP 事件表 | 可用 | UI 可使用显式桥接的 GP 引用，不能当成 UI 原生可用 |
+
+按本项目原要求及用户 2026-09-25 的确认维护。外部技能的“GP 不可用 LuaEvents”不适用于本项目；事件未触发也不能一概归因于用了 Events 或 GameEvents，应查注册时机、具体事件、参数和环境。
+
+GP-GP 和 UI-UI 的 LuaEvents 属于同环境通信；同名事件不建立跨环境通道。跨环境沿用下文 RequestPlayerOperation、Property 或明确的 ExposedMembers 桥接，不引入外部技能的全面禁用规定。桥接查询不替代需要同步的操作提交。
+
+API 核验应记录环境、对象层级、返回值和官方调用点。FireTuner 独立上下文不能直接代表 Mod 自有环境，未实测的目标版本不标作已验证。
+
+## 已核实的回合与宜居接口
+
+- 当前回合使用 `Game.GetCurrentGameTurn()`，GP/UI 两端均有官方调用；不要写 `Game.GetGameTurn()`。官方依据为 `DLC/AlexanderScenario/Scripts/AlexanderScenario.lua` 和 `DLC/Expansion2/UI/Replacements/ARXManager_Expansion2.lua`。
+- `City:GetGrowth():GetAmenitiesNeeded()` 是 UI 查询，官方 `Base/Assets/UI/CitySupport.lua` 用它读取需求；GP 不能直接调用。GP 的人口/免费宜居计算见 [非战斗 GP 函数](lua-gp-resource.md#城市宜居度计算gp-精确版)；需要 UI 完整统计时使用明确的只读桥接。
+- 运行时证据：2026-09-25 的游戏日志在产出刷新、商路统计以及 GP 宜居任务轮询中记录上述两种错误；本地回归已在移除错误接口的测试环境中复现旧代码失败、修正代码通过，修复后的实机复测须另记。
+- Lua 模拟测试不能随意补齐被测源码调用的方法。特别是 `Game` 及 GP/UI 对象，应按真实接口提供测试桩；否则拼错的方法名或环境错误也会“测试通过”。
+
+---
+
 ## 一、文件目录与分类
 
 | 目录 | 用途 | 加载 |
@@ -385,7 +408,11 @@ function GetPlotWonderType(playerID, plotID)
 end
 GameEvents.Siqi32_GetPlotWonderType.Add(GetPlotWonderType)
 
--- UI 端：调用并获取返回值
+-- GP 端先建立桥接
+ExposedMembers.GameEvents = GameEvents
+-- UI 端：显式取 GP 引用，确认初始化完成后调用
+local GameEvents = ExposedMembers.GameEvents
+if GameEvents == nil then return; end
 local wonderType = GameEvents.Siqi32_GetPlotWonderType.Call(playerID, plotID)
 ```
 
@@ -417,7 +444,9 @@ end
 GameEvents.Siqi32_StatueFormSwitch.Add(OnStatueFormSwitch)
 ExposedMembers.GameEvents = GameEvents  -- 暴露给 UI
 
--- UI 端
+-- UI 端：显式引用 GP 的事件表
+local GameEvents = ExposedMembers.GameEvents
+if GameEvents == nil then return; end
 GameEvents.Siqi32_StatueFormSwitch.Add(function(playerID, formType)
     -- 收到具体参数后处理
 end)
@@ -429,33 +458,13 @@ end)
 |------|------|------|
 | UI → GP | `RequestPlayerOperation` | 用户操作→修改游戏 |
 | GP → UI | `Game:SetProperty` + UI 监听 | **刷新面板**（首选） |
-| GP → UI（带数据） | `GameEvents` | 需要传具体参数时 |
-| UI → GP → UI | `GameEvents.Call()` | UI 向 GP 查询并等返回值 |
+| GP → UI（带数据） | 显式桥接的 `GameEvents` | 需要传具体参数时 |
+| UI → GP → UI | 显式桥接的 `GameEvents.Call()` | UI 向 GP 查询并等返回值 |
 | GP → UI → GP | `ExposedMembers` | GP 需要 UI 侧的数据 |
 
 ---
 
-```lua
--- UI 端：发出事件
-GameEvents.SiqiOblivionisButtonClicked.Add(function(playerID, params)
-    self:OnCityButtonClicked(playerID, params)
-end)
-
--- UI 端（在 UI 上下文访问 GameEvents 需通过 ExposedMembers）
-GameEvents = ExposedMembers.GameEvents
-
--- Scripts 端：接收事件
-local params = {
-    OnStart = 'SiqiUbika_SpeedDistrict',
-    iX = iX, iY = iY, iUnit = pUnit:GetID()
-}
-UI.RequestPlayerOperation(Game.GetLocalPlayer(), PlayerOperations.EXECUTE_SCRIPT, params)
-```
-
-- `UI.RequestPlayerOperation` → Scripts 端执行（GP 同步）
-- `GameEvents` 用于 Scripts↔Scripts 或 UI↔Scripts 之间广播事件
-- UI 文件中 GameEvents 通过 `ExposedMembers.GameEvents` 获取
-- 事件命名：`Siqi<功能名><动作>`
+桥接示例的 GameEvents 来自 ExposedMembers.GameEvents，不能省略 GP 暴露和 UI 取引用的初始化。改变游戏状态的 UI 操作沿用 RequestPlayerOperation → GP 处理；同环境广播可用 LuaEvents，不依靠它跨 UI/GP。
 
 ---
 

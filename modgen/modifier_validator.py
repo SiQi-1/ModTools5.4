@@ -182,9 +182,8 @@ def check_ability(ability: dict[str, Any]) -> tuple[list[str], list[str]]:
         errors.append("unit_ability_type 为空")
     elif not ability_type.startswith("ABILITY_"):
         warnings.append(f"unit_ability_type 不以 ABILITY_ 开头：{ability_type}")
-    if not str(ability.get("name_zh") or "").strip():
-        # 从游戏库导入的能力可无中文名（GUI 合法），仅提示
-        warnings.append("name_zh（中文名）为空")
+    # UnitAbilities.Name / Description are nullable in the official gameplay schema.
+    # Internal implementation abilities need not add visible text to the unit panel.
     return errors, warnings
 
 

@@ -93,6 +93,26 @@
       ]
     },
     {
+      "id": "html_ui",
+      "aliases": [
+        "HTML",
+        "CSS",
+        "网页原型",
+        "HTML转UI",
+        "界面美化",
+        "DPR",
+        "civ6-html-ui",
+        "import-manifest"
+      ],
+      "read": [
+        "civ6-html-ui/SKILL.md",
+        "05-modtools-civ/ui-assets.md",
+        "05-modtools-civ/project-extensions.md",
+        "04-lua/code-style.md",
+        "04-lua/lua-xml-controls.md"
+      ]
+    },
+    {
       "id": "custom_files",
       "aliases": [
         "自定义文件",
@@ -128,6 +148,107 @@
       ],
       "read": [
         "SOURCES.md"
+      ]
+    },
+    {
+      "id": "leader_art",
+      "aliases": [
+        "领袖差分",
+        "外交表情",
+        "纸片领袖",
+        "纸片人",
+        "LeaderFallback",
+        "fallback_images",
+        "Leader_Matte"
+      ],
+      "read": [
+        "05-modtools-civ/leader-art.md"
+      ]
+    },
+    {
+      "id": "audio",
+      "aliases": [
+        "音频",
+        "音乐",
+        "语音",
+        "Wwise",
+        "BNK",
+        "WEM",
+        "Banks.ini",
+        "UpdateAudio",
+        "soundbank"
+      ],
+      "read": [
+        "05-modtools-civ/audio-pipeline.md"
+      ]
+    },
+    {
+      "id": "blender",
+      "aliases": [
+        "Blender",
+        "CivNexus6",
+        "CN6",
+        "NA2",
+        "FGX",
+        "骨骼"
+      ],
+      "read": [
+        "05-modtools-civ/blender-civnexus.md"
+      ]
+    },
+    {
+      "id": "art_cook",
+      "aliases": [
+        "Cooker",
+        "cook",
+        "ArtDef",
+        "MissingArt",
+        "美术引用",
+        "assets check",
+        "art compare"
+      ],
+      "read": [
+        "05-modtools-civ/art-cook-validation.md"
+      ]
+    },
+    {
+      "id": "workshop",
+      "aliases": [
+        "工坊发布",
+        "创意工坊上传",
+        "上传器",
+        "workshop",
+        "mod_id.txt"
+      ],
+      "read": [
+        "05-modtools-civ/workshop-release.md"
+      ]
+    },
+    {
+      "id": "lua_events",
+      "aliases": [
+        "LuaEvents",
+        "GameEvents",
+        "事件环境"
+      ],
+      "read": [
+        "04-lua/code-style.md"
+      ]
+    },
+    {
+      "id": "landmarks",
+      "aliases": [
+        "Landmarks.artdef",
+        "TileBase",
+        "AST",
+        "tilebases.xlp",
+        "模型组合",
+        "地标模型",
+        "改良模型",
+        "区域模型"
+      ],
+      "read": [
+        "civ6-landmarks/SKILL.md"
       ]
     }
   ]

@@ -55,6 +55,21 @@ class SqlPreviewsTestCase(unittest.TestCase):
     def _preview(self, section: str, fmt: str):
         return self.page._build_group_data_preview_text(section, fmt)
 
+    def test_internal_ability_exports_null_without_empty_localization(self) -> None:
+        data = self.page._project.sections["修改器"]
+        if "data" in data:
+            data = data["data"]
+        data["unit_abilities"] = [
+            {"unit_ability_type": "ABILITY_TEST_INTERNAL", "name_zh": None, "description_zh": None},
+            {"unit_ability_type": "ABILITY_TEST_DESCRIPTION", "description_zh": "玩家可见说明"},
+        ]
+        _, abilities, texts = self.page._build_unit_sql_bundle()
+        self.assertIn("'ABILITY_TEST_INTERNAL', NULL, NULL", abilities)
+        self.assertIn("'ABILITY_TEST_DESCRIPTION', NULL, 'LOC_ABILITY_TEST_DESCRIPTION_DESCRIPTION'", abilities)
+        self.assertNotIn("LOC_ABILITY_TEST_INTERNAL", texts)
+        self.assertNotIn("LOC_ABILITY_TEST_DESCRIPTION_NAME", texts)
+        self.assertIn("玩家可见说明", texts)
+
     def test_every_group_section_produces_sql(self) -> None:
         for section in GROUP_SECTIONS:
             with self.subTest(section=section):

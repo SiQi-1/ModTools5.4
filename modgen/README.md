@@ -6,9 +6,11 @@
 
 ## 用途
 
-自定义 UI/Lua LOC 使用 `.CIV` 的 `文本.custom_entries`，由统一 Text SQL/XML 输出；字段及冲突规则见 [AI 契约](AGENTS.md#自定义-ui--lua-loc-文本)。
+自定义 UI/Lua LOC 使用 `.CIV` 的 `文本.custom_entries`，由统一 Text SQL/XML 输出；字段及冲突规则见 [美术与文本指南](../skills/05-modtools-civ/ui-assets.md#自定义-ui--lua-loc-文本)。
 
-独立纹理使用 `texture add/list/remove`；完整字段与生成约定见 [AI 契约](AGENTS.md#独立-ui-纹理背景--按钮--精灵表)。
+独立纹理使用 `texture add/list/remove`；HTML 原型提供 `texture render/import-manifest/verify`，见 [可分享 UI 技能](../skills/civ6-html-ui/SKILL.md) 和 [命令契约](AGENTS.md#html-ui-纹理工具)。
+
+地标模型提供 `landmark catalog/compose/import/verify/cook`：静态官方几何组合、托管资源包、CIV/ModBuddy 导出和隔离的官方编译；美术源目录不写入 civ6proj 发布项，verify 会检查误注册；见 [地标技能](../skills/civ6-landmarks/SKILL.md)。
 
 让 AI（或脚本）生成"编辑器能直接打开、正确导出"的 .CIV 工程与条目：
 - `new-project`：创建工程级 .CIV 骨架（基础信息/美术/修改器/文本 结构就位，无需拷贝旧工程）
@@ -19,11 +21,14 @@
 - `extension`：Core/Gameplay/UI 配套初始化、源码清单、依赖、旧文件纳管（init/write/import/list/check/remove）；纯标准库
 - `project-check` / `build`：统一检查与 ModBuddy 工程源码生成，需 PyQt；不调用 ModBuddy 编译或部署
 - `custom-file`：自定义 SQL/XML/Lua 文件通道——有扩展清单时写源码目录，旧工程写绑定的输出目录（write/list/remove；与 AI 控制接口 `project_file_write` 同语义）
+- assets check / audio check / art compare / workshop check：纯标准库只读检查资源引用、音频依赖、Cooker XML 差异及工坊包；[契约与边界](AGENTS.md#资源与发布产物检查)
 - `skill`：本地技能库（仓库根 `skills/`，随发布包分发）章节检索——中文 bigram + 英文词边界 + BM25；`--plan` 必读清单、`--file --section` 章节、`--check` 质量检查、`--json` 结构化输出
 - `search`：能力实现搜索（**BM25 检索**：中文 bigram + 领域词典 + 字段权重 + 相关性排序；支持"通往你城市的贸易路线加产出"这类自然语言；与 GUI 小工具同一实现）
 - `query`：游戏库只读查询（仅 SELECT/WITH/PRAGMA/EXPLAIN，自动限行）
 - `loc`：LOC 标签 → 简体中文（含嵌套 `{LOC_...}` 引用链展开，单一实现见 `ModTools_5_4/db/loc_text.py`）
 - `preview`：无头预览 .CIV 将导出的全部文件（SQL/XML/Icons/ArtDef/XLP…，验证闭环；需 PyQt 环境）
+
+领袖支持 fallback_images 外交表情映射，GUI 与校验/导出共享 project/leader_fallbacks.py；见 [领袖美术](../skills/05-modtools-civ/leader-art.md)。社区工作流与署名见 [来源说明](../THIRD_PARTY_NOTICES.md)。
 
 ## 安装/运行
 
@@ -35,6 +40,7 @@ python -m modgen.cli generate-modifier --effect EFFECT_DISTRICT_ADJACENCY --coll
 python -m modgen.cli generate-requirement --type REQUIREMENT_PLOT_ADJACENT_FEATURE_TYPE_MATCHES --desc ADJ_FOREST
 python -m modgen.cli generate-reqset --desc MILITARY --logic ALL
 python -m modgen.cli generate-ability --abbr DEMO_ABILITY --name "测试能力"
+python -m modgen.cli generate-ability --abbr INTERNAL_MARKER  # 内部能力允许 Name/Description 为 NULL
 python -m modgen.cli validate 工程.CIV
 python -m modgen.cli merge 工程.CIV 区域 --entry entry.json
 python -m modgen.cli merge 工程.CIV 修改器 --entry modifier.json
@@ -51,6 +57,7 @@ python -m modgen.cli preview 工程.CIV --dry-run
 
 ```
 modgen/
+├── landmark.py               # AST 资源包 CLI、隔离 Cooker；共享核心 project/landmarks.py
 ├── AGENTS.md                 # AI Agent 必读说明
 ├── cli.py                    # generate / validate / merge / search / new-project / civ6proj / custom-file / query / loc / preview 命令
 ├── rules.py                  # 命名/结构规则（与 GUI 一致）
@@ -61,10 +68,12 @@ modgen/
 ├── merger.py                 # 合并进 .CIV（自动备份）
 ├── modifier_merger.py        # 修改器条目合并进工程"修改器"节
 ├── project_scaffold.py       # new-project 工程骨架（运行时纯标准库）
+├── asset_cli.py              # 资源/音频/Cooker/工坊只读检查；核心 project/asset_checks.py
 ├── extension_cli.py          # 扩展源码管理、project-check/build；核心复用 project/extensions.py
 ├── sql_inspect.py            # SQL 词法、VALUES 多行/复合主键及 XML Row 保守检查
 ├── custom_file.py            # custom-file 自定义 SQL/XML/Lua 文件通道（写工程目录 + 注册文件动作）
-├── texture.py                # texture 原尺寸 PNG 声明增删（校验复用 project/ui_textures.py）
+├── texture.py                # PNG 声明增删、清单全批校验后一次登记
+├── html_ui.py                # HTML 渲染/像素验证适配器，复用 skills/civ6-html-ui/scripts
 ├── skill_cli.py              # 知识命令展示（路由/章节/质量检查）
 ├── skills.py                 # skill 本地技能库全文检索（仓库根 skills/，文件清单/mtime/size 缓存索引）
 ├── dbquery.py                # query（游戏库只读查询）/ loc（LOC 文本查询）

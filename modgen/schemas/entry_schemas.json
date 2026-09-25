@@ -70,6 +70,7 @@
     "icon_image_name": "",
     "foreground_image_name": "",
     "background_image_name": "",
+    "fallback_images": {},
     "diplo_foreground_image_name": "",
     "diplo_background_image_name": "",
     "select_foreground_image_name": "",

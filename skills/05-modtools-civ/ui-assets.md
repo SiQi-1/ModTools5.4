@@ -2,6 +2,8 @@
 
 涉及图标、独立UI纹理、按钮背景、精灵表、UI/Lua LOC 时必读。控件布局另读 [控件参考](../04-lua/lua-xml-controls.md)。
 
+HTML/CSS 原型落地另读 [civ6-html-ui 技能](../civ6-html-ui/SKILL.md)，批量渲染/导入/校验入口见 [通用用法](../civ6-html-ui/references/portable-use.md)。
+
 ## 通道选择
 
 实体图标随实体生成；非实体小图标使用 UI图标；按钮背景和精灵表使用独立纹理 ui_textures；自定义文本使用 custom_entries。UI XML / Lua 通过 custom-file 写入；相关命令见 [契约](../../modgen/AGENTS.md)。

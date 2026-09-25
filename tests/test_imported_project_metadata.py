@@ -46,4 +46,49 @@ class ImportedProjectMetadataTest(unittest.TestCase):
    self.assertEqual(list(ET.fromstring(rebuilt['AssociationData'])),[])
    self.assertEqual(rebuilt['ProjectGuid'],'project-guid')
 
+
+class ArtSourceRegistrationTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QApplication.instance() or QApplication([])
+        cls.page = WorkspacePage()
+
+    def test_new_and_existing_project_omit_sources_and_keep_runtime(self):
+        source_paths = ['Assets/Tile.ast', './GEOMETRIES/Sub/Shape.fgx', 'Materials/Stone.mtl',
+                        'Textures/Image.tex', 'ArtDefs/Landmarks.artdef', 'XLPs/tilebases.xlp']
+        runtime = ['Data/Game.sql', 'UI/Panel.xml', 'Platforms/Windows/BLPs/landmarks/tilebases.blp']
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / 'Test.civ6proj'
+            self.page._project = build_sample_project()
+            self.page._project.sections['基础信息'] = {'format': 'MODTOOLS54_BASIC_INFO_WORKSPACE', 'schema_version': '0.1.0', 'data': {'project_info': {'file_name': 'Test', 'civ6proj_path': str(project)}}}
+            files = dict.fromkeys(source_paths + runtime, 'fixture')
+            folders = {p.rsplit('/', 1)[0] for p in files}
+            fresh = self.page._build_civ6proj_preview(project.name, files, folders)
+            self.assert_sources_absent(fresh, runtime)
+            # The old erroneous Content plus manual source None/Folder entries
+            # must be removed without deleting the actual source or other items.
+            source = Path(temp) / 'Assets/Tile.ast'
+            source.parent.mkdir(); source.write_text('preserve-source')
+            project.write_text('<Project><PropertyGroup><Guid>keep-guid</Guid></PropertyGroup><ItemGroup>'
+                              '<Content Include="Assets\\Tile.ast"/><Folder Include="Assets\\Sub\\"/>'
+                              '<None Include="Materials/Stone.mtl"/><Content Include="XLPs/tilebases.xlp"/>'
+                              '<Content Include="ArtDefs/Landmarks.artdef"/><Content Include="manual.lua"/>'
+                              '<Content Include="Platforms/Windows/BLPs/old.blp"/>'
+                              '</ItemGroup></Project>', encoding='utf-8')
+            changed = self.page._build_civ6proj_preview(project.name, files, folders)
+            self.assert_sources_absent(changed, runtime + ['manual.lua', 'Platforms/Windows/BLPs/old.blp'])
+            self.assertIn('keep-guid', changed)
+            self.assertEqual(source.read_text(), 'preserve-source')
+            project.write_text(changed, encoding='utf-8')
+            again = self.page._build_civ6proj_preview(project.name, files, folders)
+            self.assert_sources_absent(again, runtime)
+
+    def assert_sources_absent(self, text, runtime):
+        includes = {e.get('Include').replace('\\', '/') for e in ET.fromstring(text).iter() if e.get('Include')}
+        for path in includes:
+            root = path.removeprefix('./').split('/')[0].lower()
+            self.assertNotIn(root, {'assets', 'geometries', 'materials', 'textures', 'artdefs', 'xlps'})
+        for path in runtime:
+            self.assertIn(path, includes)
+
 if __name__=='__main__':unittest.main()

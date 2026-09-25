@@ -1,5 +1,55 @@
 # Changelog
 
+## 2026-09-25 - HTML UI 独立分享包
+
+- HTML 转 UI 技能改为独立流程优先，ModTools / .CIV 为可选接入；补充无 ModTools 的 SDK 工程接入和中文快速使用说明。
+- 包含原有渲染/校验脚本、原创示例、MIT 许可证及文件散列清单，压缩包不捆绑游戏素材和运行时，不绑定 ModTools 版本。
+- ZIP 已在仓库外解压，用真实 Edge 完成三张 PNG 导出、透明像素/四态检查和原生尺寸校验；18 个包内文件与散列完整性通过，原生 UI 回归 6 项通过。
+
+## 2026-09-25 - 修正美术源文件误注册发布项
+
+- 修正此前 AST 必须登记 Content 的错误：新建与更新 civ6proj 共用标准美术源目录过滤，Assets/Geometries/Materials 等及 XLPs/ArtDefs 不写入 Content、Folder 或 None，更新时清除旧注册；磁盘源文件、XLP 内部条目和 Art.xml 引用保留。
+- landmark verify 改为检测美术源目录误注册；保留 Platforms/.../BLPs、脚本、数据等运行时文件。同步技能和契约，并加入新工程、旧工程迁移及防回归检查。
+
+## 2026-09-25 - 静态地标 AST 组合与资源包
+
+- 新增 `landmark catalog/compose/import/verify/cook`：官方 SDK 资源检索、静态 TileBase 组合、附件/骨骼/材质检查、Landmarks 与建筑差分生成；CIV 保存有散列的托管资源包引用。
+- 美术页往返保留声明并预览 AST，工程输出纳入 Assets；补充 Buildings.artdef 合并既有内容，Art.xml 保留来源 DLC ID，修复固定只写 Expansion2 的缺口。
+- 官方 Cooker 经英文临时目录隔离运行，检查返回码、日志和本次非空产物；不修改 SDK 或部署 Mod。
+- 加入地标技能、原创配方示例、任务路由与回归；忽略本地 `*.landmarks/`。12 组无 SDK 回归和 19.47 真实 Cooker 已通过；AE/游戏状态切换仍列为独立验收。
+
+## 2026-09-25 - 社区技能整合、领袖差分与产物检查
+
+- 吸收千寻瀑、煎包、飞花白及 Deliverator / Sukritact 的工作流，新增领袖、音频、Blender、Cooker、工坊五篇指南及检索路由；按项目原要求统一 LuaEvents / Events / GameEvents 环境说明。
+- 新增领袖 fallback_images 状态表与选择/清除/预览，GUI、schema、CLI 校验和资源生成共享模型；支持默认覆盖、等比透明画布、多领袖无歧义命名，旧默认 XLP / ArtDef 输出兼容。
+- 新增 assets check、audio check、art compare、workshop check，纯标准库只读检查声明与动作、美术引用、INI/BNK/WEM、XML 语义差异及工坊 workspace；结构化区分错误、警告和未验证项。
+- 建立 THIRD_PARTY_NOTICES 与文件级来源，保留上游 MIT 许可证，并加入发行脚本；没有复制第三方二进制和未明确授权模板。
+- 验证：主套件 480 项（475 通过、5 环境条件跳过），modgen 99 通过；知识库 235 篇 / 31 场景零问题，发行署名复制与 schema 再提取通过。外部工具边界见 [整合记录](../docs/COMMUNITY_SKILL_INTEGRATION.md)；未执行 Wwise、Blender、Cooker、Steam 上传或游戏验收。
+
+## 2026-09-25 - HTML UI 居中与限宽经验回流
+
+- 增加面板最大宽高、四周留白、统一父子坐标与完整视口预览建议，明确无效尺寸需推迟排版。
+- 区分用户确认无偏移的既有组合策略和未验收的新设计，不将具体项目尺寸泛化；同步仓库与个人安装技能。
+
+## 2026-09-24 - UnitAbility 内部能力可省略文本
+
+- `generate-ability` 名称和说明改为独立可选，空参数输出 null；校验不再提示内部能力缺少中文名。
+- 沿用已有导出器的 SQL NULL / 无空 LOC 行为，补充原版 Schema 与能力实例依据；同步契约、指南和生成/校验/导出回归。
+
+## 2026-09-24 - 可分享 HTML UI 技能与纹理 CLI
+
+- 将 civ6-html-ui 作为仓库正式技能包发布，包含平台中立入口、参考、原创示例和独立渲染/验证脚本；接入根 AGENTS、知识地图、分类索引、catalog 和检索回归。个人安装副本从仓库同步。
+- 新增 `texture render/import-manifest/verify`：可配置或发现 Node/Chromium；PNG 清单先全批校验再一次写入 CIV，支持 dry-run/显式替换并保留无关条目；校验 PNG/DDS/TEX/XLP/Art.xml 和可见像素。
+- CLI 与独立分享包共用脚本/清单契约，无用户盘符、Codex 私有运行时或在线服务依赖；声明导入保持标准库可用，像素校验才需 Pillow，完整生成仍走既有工具。
+- 导出先完成全部渲染再更新目标，缺图/脚本/尺寸失败不污染上次资源；加入真实浏览器、脱离仓库运行、批次失败不写入、命名/尺寸、依赖定位及资源链回归。
+- 验证：新工具 14 项、原生 UI 6 项、既有纹理 5 项与 modgen 96 项通过；知识测试 31 项中 1 项因符号链接权限跳过。知识检查 230 篇 / 24 场景零问题，独立包复制执行和 CLI 完整导出链通过；未执行游戏内验收。
+
+## 2026-09-24 - HTML 转原生 UI 技能实机反馈修正
+
+- 固定按钮示例改为等尺寸四态纹理与 Button，九宫格改为需单独验证的可变尺寸路径；补齐目标语言字体表校验，说明 FontFlair32 不存在。
+- 新增只读 check-native-ui.py，检查固定按钮帧尺寸、状态方向、直接容器热区和字体；六项回归覆盖正确布局和实机暴露的问题。
+- 保留设计、原生实现、导出、Cooker 与游戏验收的分层，不将静态检查当作实机结论。
+
 ## 2026-09-24 - Mod 本地工程与工具仓库隔离
 
 - 补齐 `*.extensions/` 忽略规则，与不区分大小写的 `.CIV` 工程规则配套；给通用 `entry_schemas.json` 增加例外，避免被临时条目规则误排除。

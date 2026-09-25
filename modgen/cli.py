@@ -522,6 +522,22 @@ def _cmd_generate_ability(args: argparse.Namespace) -> int:
 
 
 def _cmd_texture(args: argparse.Namespace) -> int:
+    if args.texture_op == "render":
+        from .html_ui import render_textures
+        result = render_textures(args.html, args.out, browser=args.browser, node=args.node, replace=args.replace)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.texture_op == "verify":
+        from .html_ui import verify_textures
+        result = verify_textures(args.manifest, png_dir=args.png_dir, project=args.project, tolerance=args.tolerance)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.texture_op == "import-manifest":
+        from .texture import import_manifest
+        result = import_manifest(args.civ, args.manifest, png_dir=args.png_dir,
+                                 replace=args.replace, dry_run=args.dry_run)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
     from .texture import edit_texture
     entries = edit_texture(args.civ, args.texture_op, name=getattr(args, "name", None),
                            source=getattr(args, "source", None), replace=getattr(args, "replace", False))
@@ -616,6 +632,9 @@ def build_parser() -> argparse.ArgumentParser:
     from .extension_cli import register as register_extensions
     register_extensions(sub)
 
+    from .asset_cli import register as register_assets
+    register_assets(sub)
+
     cf = sub.add_parser("custom-file", help="自定义 SQL/XML/Lua 文件通道：写入 .civ6proj 工程目录并注册文件动作")
     cf_sub = cf.add_subparsers(dest="sub", required=True)
 
@@ -658,7 +677,7 @@ def build_parser() -> argparse.ArgumentParser:
     prev.add_argument("--dry-run", action="store_true", help="只打印文件清单，不落盘")
     prev.set_defaults(func=_cmd_preview)
 
-    texture = sub.add_parser("texture", help="独立 UI 纹理：原尺寸 PNG → IMG/DDS/TEX/XLP（生成时输出）")
+    texture = sub.add_parser("texture", help="独立 UI 纹理：HTML 渲染、清单导入、PNG 声明与导出校验")
     texture_ops = texture.add_subparsers(dest="texture_op", required=True)
     for operation in ("add", "list", "remove"):
         tp = texture_ops.add_parser(operation)
@@ -668,6 +687,32 @@ def build_parser() -> argparse.ArgumentParser:
             tp.add_argument("--source", required=True, help="源 PNG，保留原尺寸与透明通道")
             tp.add_argument("--replace", action="store_true", help="显式更新已存在的同名纹理")
         tp.set_defaults(func=_cmd_texture)
+
+    render = texture_ops.add_parser("render", help="HTML/CSS → 原尺寸透明 PNG 与纹理清单（需要 Node.js 22+ 和 Chromium）")
+    render.add_argument("--html", required=True, help="实现 textureSpecs/renderTexture 契约的本地 HTML")
+    render.add_argument("--out", required=True, help="PNG 和 texture_manifest.json 输出目录")
+    render.add_argument("--browser", help="Edge/Chrome/Chromium 可执行路径或 PATH 命令，默认自动查找")
+    render.add_argument("--node", help="Node.js 路径或 PATH 命令，默认 node；也可设置 CIV6_UI_NODE")
+    render.add_argument("--replace", action="store_true", help="允许覆盖本次清单中的既有输出")
+    render.set_defaults(func=_cmd_texture)
+
+    batch = texture_ops.add_parser("import-manifest", help="完整校验 PNG 清单后一次登记到 CIV；不生成 DDS")
+    batch.add_argument("civ", help="已有 .CIV 工程")
+    batch.add_argument("--manifest", required=True, help="纹理名到 [宽,高] 的 JSON 清单")
+    batch.add_argument("--png-dir", help="源 PNG 目录，默认清单所在目录")
+    batch.add_argument("--replace", action="store_true", help="允许更新同名纹理；保留未在清单中的旧条目")
+    batch.add_argument("--dry-run", action="store_true", help="仅验证并报告增改计划，不保存 CIV 或备份")
+    batch.set_defaults(func=_cmd_texture)
+
+    verify = texture_ops.add_parser("verify", help="只读验证 PNG 或 PNG/DDS/TEX/XLP/Art.xml 链（需要 Pillow）")
+    verify.add_argument("--manifest", required=True, help="texture_manifest.json 路径")
+    verify.add_argument("--png-dir", help="PNG 目录，默认清单所在目录")
+    verify.add_argument("--project", help="可选：已生成的 ModBuddy 工程目录")
+    verify.add_argument("--tolerance", type=int, default=0, help="0..255 最大 alpha/可见像素差，默认精确一致")
+    verify.set_defaults(func=_cmd_texture)
+
+    from .landmark import add_parser as add_landmark_parser
+    add_landmark_parser(sub)
 
     # 修改器四类（共享 prefix/infix）
     def _add_shared(parser_: argparse.ArgumentParser) -> None:
@@ -710,8 +755,8 @@ def build_parser() -> argparse.ArgumentParser:
     ab = sub.add_parser("generate-ability", help="生成 UnitAbility")
     _add_shared(ab)
     ab.add_argument("--abbr", required=True, help="能力简称（生成 ABILITY_ Type）")
-    ab.add_argument("--name", required=True, help="中文名")
-    ab.add_argument("--desc", default="", help="中文描述")
+    ab.add_argument("--name", default=None, help="可选中文名；内部能力可省略")
+    ab.add_argument("--desc", default=None, help="可选中文描述；未填写时导出 NULL")
     ab.add_argument("--id", default="", help="完整 UnitAbilityType（不传则按 abbr 生成）")
     ab.set_defaults(func=_cmd_generate_ability)
 

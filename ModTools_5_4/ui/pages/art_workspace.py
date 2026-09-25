@@ -7,6 +7,8 @@
 """
 from __future__ import annotations
 
+from ...project.leader_fallbacks import fallback_rows
+
 from contextlib import closing
 from dataclasses import dataclass
 import json
@@ -47,6 +49,7 @@ from PyQt6.QtWidgets import (
 from ...app.settings_store import load_settings
 from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB, _resolve_data_path
+from ...project.landmarks import bundle_groups, bind_entry, merge_artdef
 from ...project.ui_textures import validate_ui_textures, source_path
 from ...project.ui_icons import (
     DEFAULT_UI_ICON_SIZES,
@@ -655,6 +658,7 @@ class ArtWorkspacePanel(QWidget):
         self._last_entity_icon_names: list[str] | None = None
         self._state: dict[str, object] = {
             "ui_textures": [],
+            "landmark_bundle": {},
             "alias_map": {},
             "source_map": {},
             "need_map": {},
@@ -1149,6 +1153,7 @@ class ArtWorkspacePanel(QWidget):
             "format": ART_SECTION_FORMAT,
             "schema_version": ART_SECTION_SCHEMA,
             "data": {
+                **({"landmark_bundle": dict(self._state["landmark_bundle"])} if self._state.get("landmark_bundle") else {}),
                 "ui_textures": [dict(e) for e in self._state.get("ui_textures", []) if isinstance(e, dict)],
                 "alias_map": dict(alias_map),
                 "source_map": dict(source_map),
@@ -2532,8 +2537,14 @@ class ArtWorkspacePanel(QWidget):
             "Icons": [("Icons.xml", self._build_icons_xml())],
             "Art.xml": art_xml_files,
         }
+        for group, entries in bundle_groups(self._state).items():
+            if group == "ArtDef":
+                previous = dict(self._preview_groups.get(group, []))
+                entries = [(name, merge_artdef(previous[name], content) if name == "Buildings.artdef" and name in previous else content) for name, content in entries]
+            managed = {name.casefold() for name, _ in entries}
+            self._preview_groups[group] = [(name, content) for name, content in self._preview_groups.get(group, []) if name.casefold() not in managed] + entries
         self._preview_summary.setText(
-            f"预览文件：XLP {len(self._preview_groups.get('XLP', []))} | "
+            f"预览文件：AST {len(self._preview_groups.get('AST', []))} | XLP {len(self._preview_groups.get('XLP', []))} | "
             f"ArtDef {len(self._preview_groups.get('ArtDef', []))} | "
             f"Icons {len(self._preview_groups.get('Icons', []))} | "
             f"Art.xml {len(self._preview_groups.get('Art.xml', []))}"
@@ -2549,6 +2560,7 @@ class ArtWorkspacePanel(QWidget):
         if not self._preview_groups:
             self._refresh_previews()
         return {
+            "AST": list(self._preview_groups.get("AST", [])),
             "XLP": list(self._preview_groups.get("XLP", [])),
             "ArtDef": list(self._preview_groups.get("ArtDef", [])),
             "Icons": list(self._preview_groups.get("Icons", [])),
@@ -3203,9 +3215,17 @@ class ArtWorkspacePanel(QWidget):
         for child in list(required_node):
             required_node.remove(child)
 
-        elem = ET.SubElement(required_node, "Element")
-        ET.SubElement(elem, "name", {"text": "Expansion2"})
-        ET.SubElement(elem, "id", {"text": "b1b63999-6b16-4dd2-a5b6-eb19794aa8ca"})
+        identities = [{"name": "Expansion2", "id": "b1b63999-6b16-4dd2-a5b6-eb19794aa8ca"}]
+        identities.extend(self._merged_art_xml_config().get("required_game_art_ids", []))
+        seen_ids: set[str] = set()
+        for identity in identities:
+            identity_id = str(identity.get("id") or "").strip()
+            if not identity_id or identity_id.lower() in seen_ids:
+                continue
+            seen_ids.add(identity_id.lower())
+            elem = ET.SubElement(required_node, "Element")
+            ET.SubElement(elem, "name", {"text": str(identity.get("name") or identity_id)})
+            ET.SubElement(elem, "id", {"text": identity_id})
 
         return self._indent_xml(root)
 
@@ -3277,14 +3297,11 @@ class ArtWorkspacePanel(QWidget):
         ET.SubElement(root, "m_ClassName", {"text": "LeaderFallback"})
         ET.SubElement(root, "m_PackageName", {"text": "LeaderFallbacks"})
         entries = ET.SubElement(root, "m_Entries")
-        for leader_type, _cn, _entry in leaders:
-            # Beta 纹理链路要求：未选择外交前景图片路径时，不应生成对应 XLP 项。
-            if not self._image_path(_entry, "diplo_foreground"):
-                continue
-            suffix = leader_type[len("LEADER_") :] if leader_type.startswith("LEADER_") else leader_type
-            elem = ET.SubElement(entries, "Element")
-            ET.SubElement(elem, "m_EntryID", {"text": f"FALLBACK_NEUTRAL_{suffix}"})
-            ET.SubElement(elem, "m_ObjectName", {"text": f"FALLBACK_NEUTRAL_{suffix}"})
+        for _leader_type, _cn, entry in leaders:
+            for row in fallback_rows(entry):
+                elem = ET.SubElement(entries, "Element")
+                ET.SubElement(elem, "m_EntryID", {"text": row["name"]})
+                ET.SubElement(elem, "m_ObjectName", {"text": row["name"]})
         allowed = ET.SubElement(root, "m_AllowedPlatforms")
         for platform in ["WINDOWS", "IOS", "LINUX", "XBONE", "PS4", "SWITCH", "STADIA", "MACOS"]:
             ET.SubElement(allowed, "Element").text = platform
@@ -3346,33 +3363,31 @@ class ArtWorkspacePanel(QWidget):
         ET.SubElement(leaders_container, "m_CollectionName", {"text": "Leaders"})
         ET.SubElement(leaders_container, "m_ReplaceMergedCollectionElements").text = "false"
 
-        for leader_type, _cn, _entry in leaders:
-            # 与 LeaderFallback.xlp 保持一致：未选择外交前景图片路径时，不生成对应 ArtDef 条目。
-            if not self._image_path(_entry, "diplo_foreground"):
+        for leader_type, _cn, leader in leaders:
+            rows = fallback_rows(leader)
+            if not rows:
                 continue
-            suffix = leader_type[len("LEADER_") :] if leader_type.startswith("LEADER_") else leader_type
             entry = ET.SubElement(leaders_container, "Element")
             fields = ET.SubElement(entry, "m_Fields")
             ET.SubElement(fields, "m_Values")
             child_cols = ET.SubElement(entry, "m_ChildCollections")
-
             animations = ET.SubElement(child_cols, "Element")
             ET.SubElement(animations, "m_CollectionName", {"text": "Animations"})
             ET.SubElement(animations, "m_ReplaceMergedCollectionElements").text = "false"
-            anim_entry = ET.SubElement(animations, "Element")
-            anim_fields = ET.SubElement(anim_entry, "m_Fields")
-            anim_values = ET.SubElement(anim_fields, "m_Values")
-            blp = ET.SubElement(anim_values, "Element", {"class": "AssetObjects..BLPEntryValue"})
-            ET.SubElement(blp, "m_EntryName", {"text": f"FALLBACK_NEUTRAL_{suffix}"})
-            ET.SubElement(blp, "m_XLPClass", {"text": "LeaderFallback"})
-            ET.SubElement(blp, "m_XLPPath", {"text": "leaderfallback.xlp"})
-            ET.SubElement(blp, "m_BLPPackage", {"text": "LeaderFallbacks"})
-            ET.SubElement(blp, "m_LibraryName", {"text": "LeaderFallback"})
-            ET.SubElement(blp, "m_ParamName", {"text": "BLP Entry"})
-            ET.SubElement(anim_entry, "m_ChildCollections")
-            ET.SubElement(anim_entry, "m_Name", {"text": "DEFAULT"})
-            ET.SubElement(anim_entry, "m_AppendMergedParameterCollections").text = "false"
-
+            for row in rows:
+                anim_entry = ET.SubElement(animations, "Element")
+                anim_fields = ET.SubElement(anim_entry, "m_Fields")
+                anim_values = ET.SubElement(anim_fields, "m_Values")
+                blp = ET.SubElement(anim_values, "Element", {"class": "AssetObjects..BLPEntryValue"})
+                ET.SubElement(blp, "m_EntryName", {"text": row["name"]})
+                ET.SubElement(blp, "m_XLPClass", {"text": "LeaderFallback"})
+                ET.SubElement(blp, "m_XLPPath", {"text": "leaderfallback.xlp"})
+                ET.SubElement(blp, "m_BLPPackage", {"text": "LeaderFallbacks"})
+                ET.SubElement(blp, "m_LibraryName", {"text": "LeaderFallback"})
+                ET.SubElement(blp, "m_ParamName", {"text": "BLP Entry"})
+                ET.SubElement(anim_entry, "m_ChildCollections")
+                ET.SubElement(anim_entry, "m_Name", {"text": row["state"]})
+                ET.SubElement(anim_entry, "m_AppendMergedParameterCollections").text = "false"
             ET.SubElement(entry, "m_Name", {"text": leader_type})
             ET.SubElement(entry, "m_AppendMergedParameterCollections").text = "false"
 
@@ -3623,7 +3638,7 @@ class ArtWorkspacePanel(QWidget):
                         name_node.set("text", target)
             else:
                 entry = self._make_empty_artdef_entry(target)
-            district_container.append(entry)
+            district_container.append(bind_entry(entry, self._state, "district", target))
 
         return self._indent_xml(root)
 
@@ -3706,7 +3721,7 @@ class ArtWorkspacePanel(QWidget):
                         name_node.set("text", target)
             else:
                 entry = self._make_empty_artdef_entry(target)
-            container.append(entry)
+            container.append(bind_entry(entry, self._state, "improvement", target))
 
         return self._indent_xml(root)
 

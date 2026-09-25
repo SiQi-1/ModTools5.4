@@ -199,8 +199,8 @@ def generate_ability(
     prefix: str,
     infix: int,
     abbr: str,
-    name_zh: str,
-    description_zh: str = "",
+    name_zh: str | None = None,
+    description_zh: str | None = None,
     unit_ability_type: str = "",
     **flags: Any,
 ) -> dict[str, Any]:
@@ -209,8 +209,8 @@ def generate_ability(
         unit_ability_type = build_ability_type(prefix, infix, abbr)
     return {
         "unit_ability_type": unit_ability_type,
-        "name_zh": name_zh,
-        "description_zh": description_zh,
+        "name_zh": str(name_zh).strip() if name_zh and str(name_zh).strip() else None,
+        "description_zh": str(description_zh).strip() if description_zh and str(description_zh).strip() else None,
         "inactive": bool(flags.get("inactive", False)),
         "show_float_text_when_earned": bool(flags.get("show_float_text_when_earned", False)),
         "permanent": bool(flags.get("permanent", True)),

@@ -8,7 +8,7 @@ from ModTools_5_4.project.asset_checks import (
 
 def run(args):
     if args.resource_command == "assets":
-        result = check_assets(args.target)
+        result = check_assets(args.target, cooker_config=args.cooker_config)
     elif args.resource_command == "audio":
         result = check_audio(args.target)
     elif args.resource_command == "art":
@@ -41,6 +41,8 @@ def register(subparsers):
             child.add_argument("--suffix", action="append", help="要比较的 XML 后缀，可重复；默认 .artdef")
         child.add_argument("target", help="工程文件、产物目录或工坊 workspace")
         child.add_argument("--json", action="store_true", help="结构化报告，含未验证项")
+        if name == "assets":
+            child.add_argument("--cooker-config", help="可选：目标 SDK 的 Civ6.cfg，只读核对 XLP/AST/GEO/TEX 类关系")
         if name == "workshop":
             child.add_argument("--modinfo", help="相对于 content 的 .modinfo 路径")
         child.set_defaults(func=run, resource_command=name)

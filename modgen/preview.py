@@ -54,7 +54,7 @@ def _build_page(civ_path: Path) -> Any:
     return page
 
 
-def build_preview_files(civ_path: Path) -> dict[str, str]:
+def build_preview_files(civ_path: Path) -> dict[str, str | bytes]:
     """构建 .CIV → 生成文件内容映射（{相对路径: 内容}），不落盘。"""
     result = build_preview_manifest(civ_path)
     if result.get("extension_errors"):
@@ -80,7 +80,7 @@ def build_preview_manifest(civ_path: Path, *, page=None) -> dict[str, Any]:
         "extension_errors": extensions.get("errors", []),
         "extension_paths": sorted(extensions.get("files", {})),
         "actions": {key: action_info.get(key, []) for key in ("front_end_actions", "in_game_actions")},
-        "files": {str(rel).replace("\\", "/"): str(content) for rel, content in files.items()},
+        "files": {str(rel).replace("\\", "/"): content if isinstance(content, bytes) else str(content) for rel, content in files.items()},
         "folders": sorted(str(folder).replace("\\", "/") for folder in folders),
         "can_generate": bool(can_generate),
         "civ6proj_path": str(civ6proj_path) if civ6proj_path else "",
@@ -119,14 +119,18 @@ def preview_section(civ_path: Path, section: str, fmt: str = "sql") -> str:
     return str(result)
 
 
-def write_preview_files(files: dict[str, str], out_dir: Path) -> tuple[int, int]:
+def write_preview_files(files: dict[str, str | bytes], out_dir: Path) -> tuple[int, int]:
     """把预览文件写入 out_dir（相对路径映射），返回 (文件数, 总字节)。"""
     total_bytes = 0
     for rel, content in files.items():
         target = out_dir / Path(rel)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
-        total_bytes += len(content.encode("utf-8"))
+        if isinstance(content, bytes):
+            target.write_bytes(content)
+            total_bytes += len(content)
+        else:
+            target.write_text(content, encoding="utf-8")
+            total_bytes += len(content.encode("utf-8"))
     return len(files), total_bytes
 
 

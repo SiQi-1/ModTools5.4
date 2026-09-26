@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from ModTools_5_4.project.civ6proj_generator import is_art_source_path
 from ModTools_5_4.artdef_parser import get_district_entry_element, get_improvement_entry_element
 from ModTools_5_4.project.landmarks import (
-    SDKIndex, compose, load_bundle, validate_assets, text_at,
+    SDKIndex, LocalResourceIndex, compose, load_bundle, validate_assets, validate_local_sources, text_at,
 )
 from .merger import load_civ, save_civ
 
@@ -18,7 +18,9 @@ from .merger import load_civ, save_civ
 def verify_bundle(manifest: Path, sdk_assets: Path | None = None, project: Path | None = None) -> dict:
     data, files = load_bundle(manifest)
     assets = {Path(name).stem: ET.fromstring(content) for name, content in files.items() if name.endswith('.ast')}
-    errors = validate_assets(assets, SDKIndex(sdk_assets) if sdk_assets else None)
+    index = LocalResourceIndex(manifest.parent, files, SDKIndex(sdk_assets) if sdk_assets else None)
+    errors = validate_assets(assets, index if sdk_assets else None)
+    errors += validate_local_sources(manifest.parent, files, index) if data['version'] == 2 else []
     xlp = ET.fromstring(files['XLPs/tilebases.xlp'])
     entries = [(text_at(e, 'm_EntryID'), text_at(e, 'm_ObjectName')) for e in xlp.findall('./m_Entries/Element')]
     if set(entries) != {(name, name) for name in assets} or len(entries) != len(assets):
@@ -55,7 +57,7 @@ def verify_bundle(manifest: Path, sdk_assets: Path | None = None, project: Path 
                         ):
                             errors.append(f'Invalid supplemental building field: {building}.{name}')
                 continue
-            if not p.exists() or p.read_text(encoding='utf-8-sig') != content:
+            if not p.exists() or (p.read_bytes() if isinstance(content, bytes) else p.read_text(encoding='utf-8-sig')) != content:
                 errors.append(f'Generated project differs from bundle: {name}')
         for binding in data['bindings']:
             path = project / 'ArtDefs' / ('Districts.artdef' if binding['kind'] == 'district' else 'Improvements.artdef')
@@ -150,7 +152,7 @@ def cook_bundle(manifest: Path, sdk_assets: Path, sdk: Path, output: Path, proje
     pantry = stage / 'pantry'; pantry.mkdir()
     for name, content in files.items():
         path = pantry / name; path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding='utf-8')
+        path.write_bytes(content) if isinstance(content, bytes) else path.write_text(content, encoding='utf-8')
     if project:
         # Include entity/Art.xml references, without copying textures or running
         # their XLPs. This validates this task's art in the real mod context.
@@ -213,7 +215,7 @@ def command(args) -> int:
 
 
 def add_parser(sub):
-    parser = sub.add_parser('landmark', help='官方几何体组合 AST、地标资源包导入、引用链校验和隔离 Cooker')
+    parser = sub.add_parser('landmark', help='静态地标 AST、官方/本地模型资源包、引用链校验和隔离 Cooker')
     ops = parser.add_subparsers(dest='landmark_operation', required=True)
     catalog = ops.add_parser('catalog', help='只读检索 SDK TileBase AST')
     catalog.add_argument('--sdk-assets', required=True)

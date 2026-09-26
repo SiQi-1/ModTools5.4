@@ -9,12 +9,12 @@ from typing import Iterable
 
 @dataclass(slots=True)
 class OutputManifest:
-    files: dict[str, str]
+    files: dict[str, str | bytes]
     folders: set[str]
     can_generate: bool
     civ6proj_path: Path | None
 
-    def as_tuple(self) -> tuple[dict[str, str], set[str], bool, Path | None]:
+    def as_tuple(self) -> tuple[dict[str, str | bytes], set[str], bool, Path | None]:
         """Return the legacy tuple consumed by the existing GUI code."""
         return self.files, self.folders, self.can_generate, self.civ6proj_path
 
@@ -30,7 +30,7 @@ class OutputManifest:
 
 
 def make_output_manifest(
-    files: dict[str, str], folders: Iterable[str], civ6proj_path: Path | None
+    files: dict[str, str | bytes], folders: Iterable[str], civ6proj_path: Path | None
 ) -> OutputManifest:
     """Create a manifest while preserving the current output contents."""
     path = civ6proj_path if isinstance(civ6proj_path, Path) else None

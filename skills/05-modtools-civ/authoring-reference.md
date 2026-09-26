@@ -11,7 +11,7 @@
 - RequirementId / RequirementSetId：`REQ_` / `REQSET_` + 前缀 + 描述；Set 与成员共享描述段。
 - LOC 键：`LOC_{CONTEXT}_{TYPE}_NAME/DESCRIPTION`，CONTEXT 与实体前缀对应（`TRAIT_CIVILIZATION_`、`CITY_NAME_`、`LOADING_INFO_`、`PEDIA_LEADERS_PAGE_` 等）。
 - 文本相同用引用链：`('zh_Hans_CN','LOC_TRAIT_xxx_NAME','{LOC_xxx_NAME}')`；不同则直写。
-- 图标嵌入：`[ICON_Science]`、`[ICON_Gold]` 等，必须带文字说明（如 `+{1_Amount}[ICON_Science]科技值`）。
+- 描述中的图标如 `[ICON_Science]`、`[ICON_Gold]` 须带文字说明（如 `+{1_Amount}[ICON_Science]科技值`）；名称和 UI 标题通常不嵌入字体图标，见[文本角色](../02-config-files/text.md#15-ui-标题与描述分工)。
 - 语言：主体只写 `zh_Hans_CN`。
 - `abbr`/简称只允许英文字母/数字/下划线。
 

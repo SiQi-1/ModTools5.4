@@ -1,7 +1,7 @@
 """Static TileBase composition from installed SDK assets; no geometry conversion.
 
 The bundle is the art source of truth. CIV stores its manifest path, never XML.
-SDK files are read-only inputs. Generated bundles contain AST/ArtDef/XLP only.
+SDK files are read-only inputs. Bundles can also carry explicitly listed local geometry/material/texture sources.
 """
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ class SDKIndex:
         if not self.root.is_dir():
             raise ValueError(f"SDK Assets directory does not exist: {root}")
         self.files: dict[str, dict[str, list[Path]]] = {}
-        for folder, suffix in (("Assets", ".ast"), ("Geometries", ".geo"), ("Materials", ".mtl")):
+        for folder, suffix in (("Assets", ".ast"), ("Geometries", ".geo"), ("Materials", ".mtl"), ("Textures", ".tex")):
             index: dict[str, list[Path]] = {}
             for directory in sorted(self.root.rglob(folder)):
                 if directory.is_dir():
@@ -84,11 +84,28 @@ class SDKIndex:
             path = _safe(self.root, name)
             if path.suffix.lower() != suffix or not path.is_file():
                 raise ValueError(f"Missing SDK {suffix} source: {name}")
-            expected = {".ast": "Assets", ".geo": "Geometries", ".mtl": "Materials"}[suffix]
+            expected = {".ast": "Assets", ".geo": "Geometries", ".mtl": "Materials", ".tex": "Textures"}[suffix]
             if expected.casefold() not in {p.name.casefold() for p in path.parents}:
                 raise ValueError(f"SDK {suffix} must be in {expected}: {name}")
             return path
         hits = self.files[suffix].get(name.casefold(), [])
+        if len(hits) > 1 and suffix in {".geo", ".mtl", ".tex"}:
+            # Shared/Expansion pantries contain byte-identical copies. Compare
+            # referenced FGX/DDS too: equal XML alone cannot establish identity.
+            signatures = []
+            try:
+                for path in hits:
+                    parts = [hashlib.sha256(path.read_bytes()).digest()]
+                    for item in sdk_xml(path).findall("./m_DataFiles/Element"):
+                        relative = text_at(item, "m_RelativePath")
+                        if relative:
+                            parts.append(hashlib.sha256(_safe(path.parent, relative).read_bytes()).digest())
+                    signatures.append(tuple(parts))
+            except (OSError, ValueError, ET.ParseError):
+                signatures = []
+            if signatures and len(set(signatures)) == 1:
+                shared = [p for p in hits if "shared" in {q.casefold() for q in p.parts}]
+                return (shared or hits)[0]
         if len(hits) != 1:
             raise ValueError(f"SDK {suffix} resource {name!r}: {len(hits)} matches; use an exact relative path")
         return hits[0]
@@ -110,6 +127,80 @@ class SDKIndex:
                                "geometries": [text_at(m, "m_GeoName") for m in root.findall(MODELS)],
                                "attachments": len(root.findall(POINTS + "/Element"))})
         return sorted(result, key=lambda x: x["source"])
+
+
+# Deliberately narrow: authored static landmarks, not arbitrary pantry imports.
+LOCAL_SOURCE_TYPES = {"Assets": {".ast"}, "Geometries": {".geo", ".fgx"},
+                      "Materials": {".mtl"}, "Textures": {".tex", ".dds"}}
+BINARY_SOURCE_TYPES = {".fgx", ".dds"}
+
+
+def is_local_source(relative: str) -> bool:
+    parts = PurePosixPath(relative).parts
+    return len(parts) >= 2 and Path(relative).suffix.lower() in LOCAL_SOURCE_TYPES.get(parts[0], set())
+
+
+class LocalResourceIndex:
+    """Resolve only declared local files, then the installed SDK; no disk scan leaks."""
+    def __init__(self, root: Path, files: dict | list, fallback: SDKIndex | None = None):
+        self.root = root.resolve()
+        self.fallback = fallback
+        self.resources = {}
+        self.declared = {_safe(self.root, name) for name in files}
+        for name in files:
+            if not is_local_source(name):
+                continue
+            path = _safe(self.root, name)
+            key = (path.suffix.lower(), PurePosixPath(name).with_suffix("").as_posix().split("/", 1)[1].casefold())
+            if key in self.resources:
+                raise ValueError(f"Duplicate local resource: {name}")
+            self.resources[key] = path
+
+    def find(self, name: str, suffix: str) -> Path:
+        local = self.resources.get((suffix, name.casefold()))
+        if local is not None:
+            return local
+        if name.lower().endswith(suffix):
+            candidate = _safe(self.root, name)
+            if candidate in self.declared and candidate.suffix.lower() == suffix:
+                return candidate
+        if self.fallback:
+            return self.fallback.find(name, suffix)
+        raise ValueError(f"Missing declared local resource: {name}{suffix}")
+
+
+def validate_local_sources(root: Path, files: dict | list, index: LocalResourceIndex) -> list[str]:
+    errors = []
+    for name in files:
+        path = _safe(root, name)
+        if not is_local_source(name) or path.suffix.lower() not in {".geo", ".mtl", ".tex"}:
+            continue
+        try:
+            xml = sdk_xml(path)
+            for item in xml.findall("./m_DataFiles/Element"):
+                rel = text_at(item, "m_RelativePath")
+                target = _safe(path.parent, rel)
+                if not rel or target not in index.declared or not target.is_file():
+                    errors.append(f"{name}: missing declared data file {rel}")
+            if path.suffix.lower() == ".mtl":
+                for item in xml.findall('.//Element[@class="AssetObjects..ObjectValue"]'):
+                    if item.findtext("m_eObjectType") == "TEXTURE" and text_at(item, "m_ObjectName"):
+                        texture = text_at(item, "m_ObjectName")
+                        # A no-SDK check cannot disprove an official texture reference.
+                        # compose and verify --sdk-assets resolve the complete chain.
+                        if index.fallback is not None or (".tex", texture.casefold()) in index.resources:
+                            index.find(texture, ".tex")
+        except (ValueError, OSError, ET.ParseError) as exc:
+            errors.append(f"{name}: {exc}")
+    return errors
+
+
+def bundle_resource_files(state: dict) -> dict[str, str | bytes]:
+    declaration = state.get("landmark_bundle") or {}
+    if not declaration:
+        return {}
+    _, files = load_bundle(declaration["manifest"])
+    return {name: data for name, data in files.items() if name.split("/", 1)[0] in {"Geometries", "Materials", "Textures"}}
 
 
 def _param(values: ET.Element, kind: str, name: str, value: object) -> ET.Element:
@@ -173,7 +264,7 @@ def _attachment(spec: dict, number: int) -> ET.Element:
     return el
 
 
-def compose_asset(spec: dict, sdk: SDKIndex) -> ET.Element:
+def compose_asset(spec: dict, sdk: SDKIndex | LocalResourceIndex) -> ET.Element:
     unknown = set(spec) - {"name", "source", "description", "attachments", "hide_geometry", "hide_states", "drop_stale_groups"}
     if unknown:
         raise ValueError(f"Unknown asset recipe fields: {sorted(unknown)}")
@@ -243,7 +334,7 @@ def compose_asset(spec: dict, sdk: SDKIndex) -> ET.Element:
     return root
 
 
-def validate_assets(assets: dict[str, ET.Element], sdk: SDKIndex | None = None) -> list[str]:
+def validate_assets(assets: dict[str, ET.Element], sdk: SDKIndex | LocalResourceIndex | None = None) -> list[str]:
     errors: list[str] = []
     graph: dict[str, list[str]] = {}
     for name, root in assets.items():
@@ -330,6 +421,71 @@ def _tags(values: ET.Element, asset: str, improvement: bool = False) -> None:
     _param(values, "Float" if improvement else "Int", "Priority", 0)
 
 
+def district_building_sets(binding: dict) -> list[tuple[str, ...]]:
+    """Use authored reachable stages; omission preserves legacy recipes."""
+    known = [b["type"] for b in binding.get("buildings", [])]
+    rows = binding.get("building_sets")
+    if rows is None:
+        return [group for count in range(len(known) + 1)
+                for group in itertools.combinations(known, count)]
+    if binding.get("kind") != "district":
+        raise ValueError("building_sets are only supported for districts")
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("building_sets must be a nonempty list of building lists")
+    seen = set()
+    used = set()
+    for row in rows:
+        if not isinstance(row, list):
+            raise ValueError("Each building_sets entry must be a building list")
+        for building in row:
+            _id(building)
+        key = frozenset(row)
+        if len(key) != len(row) or key - set(known):
+            raise ValueError("building_sets contains duplicate or unknown buildings")
+        if key in seen:
+            raise ValueError("Duplicate building_sets entry")
+        seen.add(key)
+        used.update(key)
+    if frozenset() not in seen:
+        raise ValueError("building_sets must include the empty district []")
+    if used != set(known):
+        raise ValueError("building_sets omits declared building variants")
+    # Stable names/order even when a stage is supplied in reverse order.
+    result = [tuple(b for b in known if b in key) for key in seen]
+    return sorted(result, key=lambda group: (len(group), tuple(known.index(b) for b in group)))
+
+
+def district_base_variants(binding: dict) -> dict[frozenset[str], str]:
+    """Validate exact building-set overrides; omitted sets use base_asset."""
+    rows = binding.get("base_variants", [])
+    if rows is None:
+        rows = []
+    if not isinstance(rows, list):
+        raise ValueError("base_variants must be a list")
+    if rows and binding.get("kind") != "district":
+        raise ValueError("base_variants are only supported for districts")
+    known = {b["type"] for b in binding.get("buildings", [])}
+    allowed = {frozenset(group) for group in district_building_sets(binding)}
+    result = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"buildings", "asset"}:
+            raise ValueError("Each base_variants entry requires only buildings and asset")
+        buildings = row["buildings"]
+        if not isinstance(buildings, list):
+            raise ValueError("base_variants buildings must be a list")
+        for building in buildings:
+            _id(building)
+        if len(set(buildings)) != len(buildings) or set(buildings) - known:
+            raise ValueError("base_variants contains duplicate or unknown buildings")
+        key = frozenset(buildings)
+        if key not in allowed:
+            raise ValueError("base_variants references a set excluded by building_sets")
+        if key in result:
+            raise ValueError("Duplicate base_variants building set")
+        result[key] = _id(row["asset"])
+    return result
+
+
 def build_landmarks(bindings: list[dict]) -> str:
     reference = Path(__file__).resolve().parents[1] / "From/Base/Landmarks.artdef"
     root = ET.parse(reference).getroot()
@@ -355,25 +511,23 @@ def build_landmarks(bindings: list[dict]) -> str:
             variants = _collection(children, "BuildingVariants")
             sets = _collection(children, "BuildingSets")
             buildings = binding.get("buildings", [])
-            # Every combination has an exact set; no era variants. Grants which
-            # bypass building prerequisites also keep a valid ground plate.
-            for count in range(len(buildings) + 1):
-                for combination in itertools.combinations(buildings, count):
-                    label = "__".join(b["type"] for b in combination) or "EMPTY"
-                    _, values, _ = _entry(sets, label)
-                    col = ET.SubElement(values, "Element", {"class": "AssetObjects..CollectionValue"})
-                    ET.SubElement(col, "m_eObjectType").text = "INVALID"
-                    ET.SubElement(col, "m_eValueType").text = "ARTDEF_REF"
-                    refs = ET.SubElement(col, "m_Values")
-                    for building in combination:
-                        _ref(refs, "", building["type"], "Building", "Buildings.artdef")
-                    ET.SubElement(col, "m_ParamName", {"text": "Set"})
-                    _, values, _ = _entry(bases, label)
-                    _ref(values, "Set_HeroBuildings", label, "BuildingSets", "Landmarks.artdef")
-                    # BuildingSets is a district-local collection, not a root.
-                    values[0].find("m_TemplateName").set("text", "")
-                    _tags(values, binding["base_asset"])
-                    _param(values, "String", "Placement", "INHERIT")
+            base_variants = district_base_variants(binding)
+            for combination in district_building_sets(binding):
+                label = "__".join(combination) or "EMPTY"
+                _, values, _ = _entry(sets, label)
+                col = ET.SubElement(values, "Element", {"class": "AssetObjects..CollectionValue"})
+                ET.SubElement(col, "m_eObjectType").text = "INVALID"
+                ET.SubElement(col, "m_eValueType").text = "ARTDEF_REF"
+                refs = ET.SubElement(col, "m_Values")
+                for building in combination:
+                    _ref(refs, "", building, "Building", "Buildings.artdef")
+                ET.SubElement(col, "m_ParamName", {"text": "Set"})
+                _, values, _ = _entry(bases, label)
+                _ref(values, "Set_HeroBuildings", label, "BuildingSets", "Landmarks.artdef")
+                # BuildingSets is a district-local collection, not a root.
+                values[0].find("m_TemplateName").set("text", "")
+                _tags(values, base_variants.get(frozenset(combination), binding["base_asset"]))
+                _param(values, "String", "Placement", "INHERIT")
             for building in buildings:
                 _, values, _ = _entry(variants, building["type"])
                 _ref(values, "Tag_HeroBuilding", building["type"], "Building", "Buildings.artdef")
@@ -404,7 +558,25 @@ def compose(recipe_path: Path, sdk_root: Path, output: Path) -> Path:
     recipe = _json(recipe_path)
     if recipe.get("format") != RECIPE_FORMAT:
         raise ValueError(f"Recipe format must be {RECIPE_FORMAT}")
-    sdk = SDKIndex(sdk_root)
+    official = SDKIndex(sdk_root)
+    sdk = official
+    local_files = {}
+    local_root = None
+    declared = recipe.get("local_files", [])
+    if declared:
+        if not isinstance(declared, list) or not recipe.get("local_pantry"):
+            raise ValueError("local_files requires a list and local_pantry")
+        local_root = (recipe_path.parent / recipe["local_pantry"]).resolve()
+        if local_root == output.resolve():
+            raise ValueError("Local pantry and generated bundle must differ")
+        for relative in declared:
+            if not isinstance(relative, str) or not is_local_source(relative) or relative in local_files:
+                raise ValueError(f"Unsupported or duplicate local source: {relative}")
+            local_files[relative] = _safe(local_root, relative).read_bytes()
+        sdk = LocalResourceIndex(local_root, local_files, official)
+        issues = validate_local_sources(local_root, local_files, sdk)
+        if issues:
+            raise ValueError("\n".join(issues))
     assets: dict[str, ET.Element] = {}
     for spec in recipe.get("assets", []):
         name = _id(spec["name"])
@@ -431,12 +603,15 @@ def compose(recipe_path: Path, sdk_root: Path, output: Path) -> Path:
             errors.append("Duplicate building variant")
         for building in buildings:
             _id(building["type"])
-        for asset in [binding["base_asset"]] + [b["asset"] for b in buildings]:
+        base_variants = district_base_variants(binding)
+        for asset in [binding["base_asset"]] + [b["asset"] for b in buildings] + list(base_variants.values()):
             if asset not in assets:
                 errors.append(f"Binding references missing asset {asset}")
     if errors:
         raise ValueError("\n".join(errors))
-    files = {f"Assets/{name}.ast": xml_text(root) for name, root in assets.items()}
+    files = {name: data if Path(name).suffix.lower() in BINARY_SOURCE_TYPES else data.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
+             for name, data in local_files.items() if not name.startswith("Assets/")}
+    files.update({f"Assets/{name}.ast": xml_text(root) for name, root in assets.items()})
     files["XLPs/tilebases.xlp"] = build_xlp(list(assets))
     files["ArtDefs/Landmarks.artdef"] = build_landmarks(bindings)
     building_types = sorted({b["type"] for binding in bindings for b in binding.get("buildings", [])})
@@ -461,11 +636,14 @@ def compose(recipe_path: Path, sdk_root: Path, output: Path) -> Path:
     hashes = {}
     for name, content in files.items():
         path = _safe(output, name); path.parent.mkdir(parents=True, exist_ok=True)
-        data = content.encode("utf-8"); path.write_bytes(data)
+        data = content if isinstance(content, bytes) else content.encode("utf-8"); path.write_bytes(data)
         hashes[name] = hashlib.sha256(data).hexdigest()
-    (output / "recipe.json").write_text(json.dumps(recipe, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    manifest = {"format": FORMAT, "version": 1, "bindings": bindings, "files": hashes,
-                "sources": [{"asset": spec["name"], "source": sdk.find(spec["source"], ".ast").relative_to(sdk.root).as_posix()} for spec in recipe["assets"]]}
+    saved_recipe = deepcopy(recipe)
+    if local_root:
+        saved_recipe["local_pantry"] = str(local_root)
+    (output / "recipe.json").write_text(json.dumps(saved_recipe, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest = {"format": FORMAT, "version": 2 if local_files else 1, "bindings": bindings, "files": hashes,
+                "sources": [{"asset": spec["name"], "source": str(sdk.find(spec["source"], ".ast"))} for spec in recipe["assets"]]}
     required = {}
     resource_paths = [sdk.find(spec["source"], ".ast") for spec in recipe["assets"]]
     resource_paths += [sdk.find(text_at(m, "m_GeoName"), ".geo") for root in assets.values() for m in root.findall(MODELS)]
@@ -483,20 +661,20 @@ def compose(recipe_path: Path, sdk_root: Path, output: Path) -> Path:
     return path
 
 
-def load_bundle(manifest_path: str | Path) -> tuple[dict, dict[str, str]]:
+def load_bundle(manifest_path: str | Path) -> tuple[dict, dict[str, str | bytes]]:
     path = Path(manifest_path)
     manifest = _json(path)
-    if manifest.get("format") != FORMAT or manifest.get("version") != 1:
+    if manifest.get("format") != FORMAT or manifest.get("version") not in (1, 2):
         raise ValueError(f"Unsupported landmark manifest: {path}")
     files = {}
     for relative, digest in manifest["files"].items():
         p = _safe(path.parent, relative)
-        if not ((relative.startswith("Assets/") and p.suffix == ".ast") or relative in ("ArtDefs/Landmarks.artdef", "ArtDefs/Buildings.artdef", "XLPs/tilebases.xlp")):
+        if not ((is_local_source(relative) and (manifest["version"] == 2 or p.suffix == ".ast")) or relative in ("ArtDefs/Landmarks.artdef", "ArtDefs/Buildings.artdef", "XLPs/tilebases.xlp")):
             raise ValueError(f"Unsupported landmark bundle file: {relative}")
         data = p.read_bytes()
         if hashlib.sha256(data).hexdigest() != digest:
             raise ValueError(f"Landmark source changed; recompose before import/export: {p}")
-        files[relative] = data.decode("utf-8-sig")
+        files[relative] = data if p.suffix.lower() in BINARY_SOURCE_TYPES else data.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
     if not {"ArtDefs/Landmarks.artdef", "XLPs/tilebases.xlp"}.issubset(files):
         raise ValueError("Landmark bundle is missing its ArtDef or XLP")
     return manifest, files
@@ -510,7 +688,9 @@ def bundle_groups(state: dict) -> dict[str, list[tuple[str, str]]]:
     groups: dict[str, list[tuple[str, str]]] = {"AST": [], "ArtDef": [], "XLP": []}
     for name, content in files.items():
         directory, filename = name.split("/", 1)
-        groups[{"Assets": "AST", "ArtDefs": "ArtDef", "XLPs": "XLP"}[directory]].append((filename, content))
+        group = {"Assets": "AST", "ArtDefs": "ArtDef", "XLPs": "XLP"}.get(directory)
+        if group:
+            groups[group].append((filename, content))
     return groups
 
 

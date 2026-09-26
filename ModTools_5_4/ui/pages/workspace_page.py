@@ -431,7 +431,7 @@ class ProjectRootWorkspacePanel(QWidget):
                 return
             self._preview_stack.setCurrentWidget(self._preview)
             content = self._files.get(path, "")
-            self._preview.setPlainText(content if content else "-- 空文件")
+            self._preview.setPlainText(f"二进制美术资源：{len(content):,} 字节" if isinstance(content, bytes) else content if content else "-- 空文件")
         else:
             self._preview_stack.setCurrentWidget(self._preview)
             children = sorted(
@@ -8336,16 +8336,24 @@ class WorkspacePage(BasePage):
         association_cdata = str(project_info.get("association_data") or "<Associations />")
         mod_version = str(project_info.get("mod_version") or "1")
         compatible_versions = str(project_info.get("compatible_versions") or "1.2,2.0")
-        # A separately localized teaser imported from ModBuddy must survive regeneration.
+        # Keep other languages under generated IDs as well as separately localized tags.
         raw_localization = str(project_info.get("localized_text_data") or "")
         if raw_localization:
             try:
                 existing_text = ElementTree.fromstring(raw_localization)
                 generated_text = ElementTree.fromstring(localized_text_cdata)
-                generated_ids = {node.get("id") for node in generated_text}
+                generated_by_id = {node.get("id"): node for node in generated_text}
                 for node in existing_text:
-                    if node.get("id") not in generated_ids:
+                    target = generated_by_id.get(node.get("id"))
+                    if target is None:
                         generated_text.append(node)
+                        generated_by_id[node.get("id")] = node
+                    else:
+                        languages = {child.tag for child in target}
+                        for child in node:
+                            if child.tag not in languages:
+                                target.append(child)
+                                languages.add(child.tag)
                 localized_text_cdata = ElementTree.tostring(generated_text, encoding="unicode")
             except ElementTree.ParseError:
                 LOGGER.warning("Ignoring malformed imported LocalizedTextData")
@@ -9949,6 +9957,13 @@ class WorkspacePage(BasePage):
         for filename, content in art_groups.get("AST", []):
             files[f"Assets/{filename}"] = content
             folders.add("Assets")
+        from ...project.landmarks import bundle_resource_files
+        landmark_sources = bundle_resource_files(self._art_workspace._state)
+        for relative, content in landmark_sources.items():
+            if relative in files:
+                raise ValueError(f"Landmark resource conflicts with generated file: {relative}")
+            files[relative] = content
+            folders.update(parent.as_posix() for parent in Path(relative).parents if str(parent) != ".")
         emitted_artdefs: list[tuple[str, str]] = []
         fallback_cultures: tuple[str, str] | None = None
         for filename, content in art_groups.get("ArtDef", []):
@@ -10074,14 +10089,15 @@ class WorkspacePage(BasePage):
                     managed_action_paths.add(rel_path.replace("\\", "/").strip().lower())
                     _ensure_parent_folders(rel_path)
 
+        managed_landmark_sources = set(landmark_sources)
         filtered_files: dict[str, str] = {}
         img_plan_key = self._img_plan_relative_path().lower()
         textures_plan_key = self._textures_plan_relative_path().lower()
         for rel_path, content in files.items():
             key = rel_path.replace("\\", "/").strip().lower()
-            if key not in {img_plan_key, textures_plan_key} and not self._is_allowed_project_overview_file(rel_path):
+            if key not in {img_plan_key, textures_plan_key} and not self._is_allowed_project_overview_file(rel_path) and rel_path not in managed_landmark_sources:
                 continue
-            if key.endswith(".civ6proj") or key in always_show_files or key in managed_action_paths or bool(str(content or "").strip()):
+            if key.endswith(".civ6proj") or key in always_show_files or key in managed_action_paths or (bool(content) if isinstance(content, bytes) else bool(str(content or "").strip())):
                 filtered_files[rel_path] = content
         files = filtered_files
 
@@ -10206,9 +10222,12 @@ class WorkspacePage(BasePage):
             )
         self._project_root_workspace.set_textures_plan_preview(self._textures_plan_relative_path(), textures_rows)
 
-    def _write_output_file(self, root_dir: Path, relative_path: str, content: str) -> None:
+    def _write_output_file(self, root_dir: Path, relative_path: str, content: str | bytes) -> None:
         target = root_dir / Path(relative_path)
         target.parent.mkdir(parents=True, exist_ok=True)
+        if isinstance(content, bytes):
+            target.write_bytes(content)
+            return
         # 统一换行：内容可能来自磁盘（CRLF）或生成器（LF），先归一为 LF 再经
         # write_text 输出，避免 Windows 通用换行翻译把 \n 二次转成 \r\n
         normalized = str(content or "").replace("\r\n", "\n").replace("\r", "\n")

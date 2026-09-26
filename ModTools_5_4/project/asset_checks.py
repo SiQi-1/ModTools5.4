@@ -1,7 +1,8 @@
 """Read-only asset and release checks, independent of Qt and external tools.
 
 Workflow references: 千与千寻瀑, civ6-modding-skills / audio-pipeline (S3/S4),
-and 煎包/Jianbao233, Civ6WorkshopUploader (S5). Independent implementation:
+煎包/Jianbao233, Civ6WorkshopUploader (S5), and 千川白浪, Civ6ArtUnpack
+handover (S7). Independent implementation:
 XML parsing instead of regex mutation; bounded paths; incomplete evidence is
 reported explicitly. See THIRD_PARTY_NOTICES.md and licenses/.
 """
@@ -168,7 +169,103 @@ def _project(path, result):
     return {"path": path, "root": root, "declared": declared, "actions": actions}
 
 
-def check_assets(project):
+def _check_cooker_classes(base, files, xmls, config, result):
+    """Use the user's SDK rules, never one shared namespace or a guessed class.
+
+    Inspired by 千川白浪's Civ6ArtUnpack handover (S7); implemented against the
+    installed Civ6.cfg structure. This reads declarations, not cooked BLP bytes.
+    """
+    if config is None:
+        issue(result, "unverified", "未提供 --cooker-config，未核对 SDK 类名及允许关系", base)
+        return
+    config = Path(config).resolve()
+    root = _xml(config, result)
+    if root is None:
+        return
+    package_nodes = root.findall("./m_XLPClasses/m_Classes/Element")
+    class_nodes = root.findall("./m_Classes/m_Classes/Element")
+    if not package_nodes or not class_nodes:
+        issue(result, "errors", "Civ6.cfg 缺少 XLP / 资源类注册结构", config)
+        return
+
+    def registry(nodes, label):
+        index = {}
+        for node in nodes:
+            name = _value(node, "m_Name")
+            if not name or name in index:
+                issue(result, "errors", f"配置存在空或重复 {label} 类：{name}", config)
+            else:
+                index[name] = node
+        return index
+
+    packages = registry(package_nodes, "XLP")
+    definitions = {
+        suffix: registry([e for e in class_nodes if e.get("class") == kind], kind)
+        for suffix, kind in (
+            (".ast", "AssetObjects..AssetClass"),
+            (".geo", "AssetObjects..GeometryClass"),
+            (".tex", "AssetObjects..TextureClass"),
+        )
+    }
+    for suffix, items in definitions.items():
+        if not items:
+            issue(result, "errors", f"Civ6.cfg 缺少 {suffix} 类注册表", config)
+
+    def allowed(node, field):
+        return {e.get("text", "").strip() for e in node.findall(f"./{field}/Element")}
+
+    def local_object(folder, name, suffix, owner):
+        # Object names are references, not paths authorized to escape the project.
+        relative = f"{folder}/{name}"
+        if not name.lower().endswith(suffix):
+            relative += suffix
+        resolved = _resolve(base, relative, result, required=False)
+        if resolved is None:
+            return None
+        key = _key(resolved.relative_to(base))
+        if key not in xmls:
+            issue(result, "unverified", f"对象 {name} 需在外部 pantry 确认：{relative}", owner)
+            return None
+        return xmls[key]
+
+    for key, root in xmls.items():
+        path = files[key]
+        suffix = path.suffix.lower()
+        cls = _value(root, "m_ClassName")
+        if suffix in definitions and cls not in definitions[suffix]:
+            issue(result, "errors", f"{suffix} 类 {cls!r} 不在对应 SDK 类注册表中", path)
+        if suffix == ".xlp":
+            package = packages.get(cls)
+            if package is None:
+                issue(result, "errors", f"XLP 类 {cls!r} 不在 SDK 注册表中", path)
+                continue
+            entity_type = (package.findtext("m_eInstanceEntityType") or "").strip()
+            destination = {"ASSET": ("Assets", ".ast"), "TEXTURE": ("Textures", ".tex")}.get(entity_type)
+            if destination is None:
+                issue(result, "unverified", f"尚未核对 XLP 对象类型 {entity_type} 的资源类关系", path)
+                continue
+            permitted = allowed(package, "m_AllowedClasses")
+            for entry in root.findall("./m_Entries/Element"):
+                name = _value(entry, "m_ObjectName")
+                if not name:
+                    issue(result, "errors", f"XLP 条目 {_value(entry, 'm_EntryID')} 缺少 ObjectName", path)
+                    continue
+                obj = local_object(destination[0], name, destination[1], path)
+                if obj is not None and _value(obj, "m_ClassName") not in permitted:
+                    issue(result, "errors", f"XLP {cls} 不允许对象 {name} 的类 {_value(obj, 'm_ClassName')}", path)
+        elif suffix == ".ast" and cls in definitions[".ast"]:
+            permitted = allowed(definitions[".ast"][cls], "m_AllowedGeoClasses")
+            for ref in root.iter("m_GeoName"):
+                name = (ref.get("text") or "").strip()
+                if not name:
+                    continue
+                geo = local_object("Geometries", name, ".geo", path)
+                if geo is not None and _value(geo, "m_ClassName") not in permitted:
+                    issue(result, "errors", f"AST {cls} 不允许几何 {name} 的类 {_value(geo, 'm_ClassName')}", path)
+    issue(result, "unverified", "未解析 FGX 网格/骨架、验证 pantry 同名资源优先级或解码本次 BLP；类名通过不代表复原成功", base)
+
+
+def check_assets(project, *, cooker_config=None):
     result = report("assets", project)
     data = _project(project, result)
     if data is None:
@@ -230,7 +327,7 @@ def check_assets(project):
                 issue(result, "warnings", "环境未声明方向灯；纸片领袖需核对外交场景照明", path)
     for key, root in xmls.items():
         path = files[key]
-        if path.suffix.lower() != ".artdef":
+        if path.suffix.lower() not in {".artdef", ".ast"}:
             continue
         for elem in root.iter("Element"):
             if elem.get("class") != "AssetObjects..BLPEntryValue":
@@ -238,6 +335,7 @@ def check_assets(project):
             entry, xlp, cls = (_value(elem, name) for name in ("m_EntryName", "m_XLPPath", "m_XLPClass"))
             if not entry:
                 continue
+            xlp = xlp.replace("\\", "/")
             rel = xlp if xlp.lower().startswith("xlps/") else "XLPs/" + xlp
             target = _resolve(base, rel, result, required=False) if xlp else None
             if not xlp:
@@ -260,6 +358,7 @@ def check_assets(project):
                 else:
                     for suffix in (".tex", ".dds"):
                         _resolve(base, f"Textures/{obj}{suffix}", result)
+    _check_cooker_classes(base, files, xmls, cooker_config, result)
     issue(result, "unverified", "未执行 SDK pantry 全量解析、Cooker 或游戏内显示验收", data["path"])
     return result
 

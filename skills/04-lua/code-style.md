@@ -25,6 +25,24 @@ API 核验应记录环境、对象层级、返回值和官方调用点。FireTun
 - 运行时证据：2026-09-25 的游戏日志在产出刷新、商路统计以及 GP 宜居任务轮询中记录上述两种错误；本地回归已在移除错误接口的测试环境中复现旧代码失败、修正代码通过，修复后的实机复测须另记。
 - Lua 模拟测试不能随意补齐被测源码调用的方法。特别是 `Game` 及 GP/UI 对象，应按真实接口提供测试桩；否则拼错的方法名或环境错误也会“测试通过”。
 
+## 原生属性的零返回值边界
+
+- 未设置的原生 Property 可能返回 **零个 Lua 值**。当它是参数列表末尾的函数调用时，`tonumber(object:GetProperty(key))` 实际可能变成 `tonumber()`；外层 `or 0` 来不及生效，`type(...)` 也有相同风险。
+- 先接收为局部变量，再检查或转换：`local value = object:GetProperty(key)`，随后 `tonumber(value) or 0` / `type(value)`。局部赋值会将零返回值接收为 `nil`；不要用吞错包装替代。
+- 运行时证据：2026-09-25 16:25 的 19.47 日志在 GP 地块产出刷新记录 `bad argument #1 to 'tonumber' (value expected)`。同类检查还覆盖 UI 玩家/城市属性、织梦计数和破茧单位属性；这些扩展边界经模拟回归验证，不能当作每种对象均已实机复现。
+- 测试桩须区别 `return nil` 和无 `return`：未设置时使用 `if properties[key] ~= nil then return properties[key] end`，保留已设置的 `false` / `0`。还应验证首次初始化、已有值保留、重复请求，以及常规/全量日志两种模式。
+
+## 对象层级与环境的常见误用
+
+- GP 当前生产使用 `City:GetBuildQueue():CurrentlyBuilding()`，读取类型字符串；空字符串或无有效类型表示未生产。`GetCurrentProductionTypeHash()` 是 UI 查询。存档中的旧 hash 应通过对应 `GameInfo` 行匹配，不能为兼容存档在 GP 调用 UI 接口。参见 [GP 生产力函数](lua-gp-resource.md#生产力奇观)。
+- GP 全国区域遍历使用 `Player:GetDistricts():Members()`；不要把 UI 的 `City:GetDistricts():Members()` 移到 GP。局部城市统计须额外匹配所属城市。
+- `City:GetBuildings():GetBuildingsAtLocation(plotIndex)`、`City:GetReligion():GetReligionsInCity()` 是 UI 查询，官方依据为 `Base/Assets/UI/CitySupport.lua`。UI 统计某宗教信徒时遍历返回的 `Religion` / `Followers`，不能借用 GP 的 `GetNumFollowers()`。
+- 世界文字也分环境：GP 调用 `Game.AddWorldViewText(...)`，UI 调用 `UI.AddWorldViewText(...)`；不要把 GP 包装函数直接赋给 UI 命名空间。
+- 资料表可能不完整：`Governor:GetTurnsToEstablish()` 在官方 `DLC/Expansion2/UI/Additions/GovernorSupport.lua` 中有调用，不能因表中仅列 manager 版本而认定它不存在。新增例外应附官方路径，而不是给测试桩临时补方法。
+- 地块视野的官方 GP 例子见 `DLC/WarMachineScenario/Scripts/WarMachineScenario.lua`：`PlayersVisibility[playerID]:ChangeVisibilityCount(plotIndex, delta)`。重复刷新必须记录自己的增量；移除时只扣除自己增加的视野。
+
+接口回归应从 API 资料和官方脚本建立 **GP/UI 各自的对象方法白名单**，至少核对 `Player`、`City`、各管理器和返回对象。不要使用为任意方法返回空函数的万能桩。用修复前源码验证错误能被测试捕获，再测试修改版；模拟通过与游戏引擎复测应分开记录。
+
 ---
 
 ## 一、文件目录与分类
@@ -496,8 +514,12 @@ end
 print("[模组名] 描述", param1, param2)
 ```
 
-- 修饰符触发、GP 同步、错误必须打印
-- 调试日志最终删除
+- 常规日志保留初始化、重要操作结果、拒绝原因、回退/补偿和异常；高频扫描、逐地块和逐单位明细放入默认关闭的全量模式。
+- 全量模式可保留在发布源码中，但默认关闭并提供明确开关。字段至少包含模组前缀、GP/UI 上下文、回合、模块/阶段和玩家/实体 ID；不要从任意对象反射调用未知接口来收集日志。
+- 区分 UI 提交、GP 收到、条件拒绝、调用返回和实际状态确认。UI/GP 可携带仅用于诊断的请求 ID；不能将“提交”或 modifier 挂载返回写成“已验证引擎效果”。
+- 日志只读运行状态，不调用随机数、不补发奖励、不改变去重/结算；关闭全量后不应做额外大范围扫描。重复的桥接缺失警告可去重，并记录恢复。
+- 不用空函数或吞错 pcall 让错误消失。若用进入/返回标记定位异常，保留原始 Lua 报错与堆栈。
+- 回归必须比较常规/全量开关前后的结算、随机数次数和返回值；测试错误是否仍传播，并检查序列化对 nil、循环表和过长字段有界。
 
 ---
 

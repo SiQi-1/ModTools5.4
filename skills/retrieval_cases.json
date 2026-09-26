@@ -163,5 +163,30 @@
     "query": "区域模型 建筑差分 BuildingSets",
     "expected": "civ6-landmarks/references/landmarks.md",
     "top": 3
+  },
+  {
+    "query": "BLP解包 资源复原 blpkit",
+    "expected": "05-modtools-civ/art-unpack.md",
+    "top": 3
+  },
+  {
+    "query": "pantry 同名遮蔽 假成功",
+    "expected": "05-modtools-civ/art-unpack.md",
+    "top": 3
+  },
+  {
+    "query": "预乘纹理 回打包 载荷覆盖率",
+    "expected": "05-modtools-civ/art-unpack.md",
+    "top": 3
+  },
+  {
+    "query": "二进制产出方案选择",
+    "expected": "04-lua/lua-binary.md",
+    "top": 3
+  },
+  {
+    "query": "AttachModifierByID 永久产出",
+    "expected": "04-lua/lua-binary.md",
+    "top": 3
   }
 ]

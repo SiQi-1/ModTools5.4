@@ -2,14 +2,14 @@
 
 ## 配方
 
-根：`format="MODTOOLS54_LANDMARK_RECIPE"`、`assets`、`bindings`。
+根：`format="MODTOOLS54_LANDMARK_RECIPE"`、`assets`、`bindings`。可选 `local_pantry` 和 `local_files` 用于已经转换好的自建静态资源。
 
 `assets[]`：
 
 | 字段 | 含义 |
 |---|---|
 | name | 本包唯一 ASCII 资源名，以字母开始，仅字母数字下划线 |
-| source | 官方 TileBase AST 逻辑名，或 SDK Assets 根内的精确相对路径 |
+| source | 本地已声明或官方 TileBase AST 逻辑名，或对应根内的精确相对路径 |
 | description | 可选说明 |
 | attachments | 可选本包附件；asset、instance、bone 必填；position/rotation 缺省 [0,0,0]，scale 缺省 1 |
 | hide_states | 可选；只能填五种合法状态；仅关闭对应几何组的可见性 |
@@ -18,11 +18,28 @@
 
 `bindings[]`：`kind` 是 improvement 或 district；`entity` 是现有 CIV Type；`source` 是可复用的官方实体 ArtDef 名；`landmark` 是新 Landmark 名；`base_asset` 指向本包 AST。区域还可提供 `buildings=[{"type":"BUILDING_...","asset":"AST_..."}]`。
 
-JSON 不写空字符串。模型实例内偏移、自定义材质、动画、外包附件和任意 XML 注入不在 schema 内；资产和附件的未知字段会报错，避免拼错 position 后静默落到原点。
+区域可选 `building_sets=[[],["BUILDING_A"],["BUILDING_A","BUILDING_B"]]`，显式列出经玩法前置/互斥关系确认的可达完整集合。仅生成列出的 BuildingSets 和对应 BaseVariants；顺序无关，输出按 buildings 声明顺序稳定命名。必须含空区域 `[]`，每个已声明建筑至少出现一次；拒绝重复集合、集合内重复/未知建筑、错误形状和非区域使用。省略或 null 保持旧配方全子集兼容（最多六个建筑）；新区域应明确列阶段，工具不自动推断数据库前置。
+
+区域可选 `base_variants=[{"buildings":[],"asset":"EMPTY_BASE"},{"buildings":["BUILDING_A"],"asset":"A_BASE"}]`。按完整建筑集合精确匹配，数组顺序无关；未声明的集合回退 `base_asset`。每项只接受 buildings/asset，建筑必须属于本 binding，集合与集合内建筑不能重复，资产必须在同包声明；显式 building_sets 排除的集合不能写进 base_variants。该字段不修改玩法前置；只有 A 的布局不会自动用于 A+B，需单列或使用回退。
+
+JSON 不写空字符串。模型实例内偏移编辑、动画、外包附件和任意 XML 注入不在 schema 内；已完成的自定义静态材质可走本地源清单；资产和附件的未知字段会报错，避免拼错 position 后静默落到原点。
+
+## 自建静态资源清单
+
+`local_pantry` 是相对配方文件或绝对源目录；`local_files` 是明确的 POSIX 相对路径列表，仅支持 Assets/*.ast、Geometries/*.geo/*.fgx、Materials/*.mtl、Textures/*.tex/*.dds（可有子目录）。不扫描复制整个 pantry，不允许路径越界；文件不得只放磁盘而未声明。逻辑引用优先解析已声明本地文件，其余到 SDK；使用唯一前缀避免覆盖官方名字。
+
+```json
+{
+  "local_pantry": "authored-pantry",
+  "local_files": ["Assets/MY_HALL.ast", "Geometries/MY_HALL.geo", "Geometries/MY_HALL.fgx", "Materials/MY_STONE.mtl", "Textures/MY_STONE_B.tex", "Textures/MY_STONE_B.dds"]
+}
+```
+
+这是根字段片段，完整配方仍需要 format/assets/bindings。AST 的 source 可写 MY_HALL，原有官方组合可混用。本地 GEO/TEX 的 m_DataFiles 必须在清单中，MTL→TEX、AST→GEO/MTL 用实际引用校验；FGX 的内部几何仍需外部回读与 Cooker 验证。资源包版本 2 保存这些源文件的散列，版本 1 仍可读取。生成器与 preview 按字节写出 FGX/DDS，工程总览只显示二进制大小。打包后的 recipe 保存本地源绝对路径，搬迁后更新 local_pantry 并重新 compose。
 
 ## 资源包与编辑器
 
-`landmark compose` 校验全部配方后写出 Assets、XLPs、ArtDefs、recipe.json 和 manifest.json。manifest 记录文件 SHA-256、绑定、SDK 来源与必需 Art ID。非空且不含 manifest 的输出目录被拒绝；不会递归清空用户目录。
+`landmark compose` 校验全部配方后写出 Assets、XLPs、ArtDefs、已声明本地资源、recipe.json 和 manifest.json。manifest 记录文件 SHA-256、绑定、SDK 来源与必需 Art ID。非空且不含 manifest 的输出目录被拒绝；不会递归清空用户目录。
 
 `landmark import <CIV> --bundle <manifest>` 先完整校验再保存一次 CIV，沿用 `.CIV.bak` 备份。`--dry-run` 不写 CIV；切换到其他包需 `--replace`。同包更新用重新 compose + build，依赖或绑定变更后再次 import。
 
@@ -36,7 +53,7 @@ CIV 的 `美术.data.landmark_bundle={"manifest":"绝对路径"}` 是单包声�
 
 加 `--sdk-assets`：验证官方几何、FGX、材质、真实网格/材质组、锚点实例和骨骼。加 `--project`：核对导出文件、实体 Xref、美术源目录不被错误注册进工程发布项、Art.xml 的 TileBase/consumer/DLC 声明和补充建筑。
 
-该检查不是通用引擎模拟器，不验证材质的实际视觉效果或建筑状态机。新增一般能力应同步代码、测试、modgen/AGENTS.md、README、路线图和变更日志。
+该检查不是通用引擎模拟器，不验证材质的实际视觉效果或建筑状态机。无 SDK 时无法判定外部官方贴图是否存在，完整引用验证需传 --sdk-assets。新增一般能力应同步代码、测试、modgen/AGENTS.md、README、路线图和变更日志。
 
 ## 官方 Cooker
 

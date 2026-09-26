@@ -19,6 +19,7 @@
 | [领袖差分与纸片](leader-art.md) | fallback_images、LeaderFallback、模型资源链 |
 | [音频管线](audio-pipeline.md) | Wwise、Banks.ini、UpdateAudio、流式 WEM |
 | [Blender / CivNexus6](blender-civnexus.md) | CN6 模型交换与 NA2 动画 |
+| [美术解包与复原验收](art-unpack.md) | BLP/FGX、pantry 遮蔽、SDK 类关系、预乘纹理和证据边界 |
 | [美术与 Cooker 检查](art-cook-validation.md) | 资源引用、格式差异、_MissingArt |
 | [工坊发布](workshop-release.md) | workspace、元数据、条目 ID 与包检查 |
 

@@ -78,3 +78,15 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 - 知识质量检查：235 篇、31 场景、0 问题。发布脚本通过 PowerShell 语法解析；新增复制段在临时发行目录执行，来源页、本记录和两个许可证逐文件 SHA-256 一致。没有执行整个 PyInstaller 发布构建。
 
 本轮没有运行 Wwise、Blender 插件、SDK Cooker、Steam 上传或游戏实机验收。上述外部步骤及状态触发、声音表现、照明/透明边缘仍在各指南中明确列为独立验证项。
+
+## 追加 S7：千川白浪 Civ6ArtUnpack（2026-09-25）
+
+原包 Civ6ArtUnpack_Handover.zip 标记生成于 2026-09-17，SHA-256 为 8a559b7cf44f7645be2058a466a0e08eeaa9b9c1e1c9de290f7c08d6cafe8a6b。作者署名由用户确认为千川白浪。阅读移交说明、状态与缺口文档、blpkit 入口/蒙皮提取签名及相关经验笔记；不执行原包二进制和批量脚本。
+
+已新增 [美术解包与复原指南](../skills/05-modtools-civ/art-unpack.md)，接入 INDEX、来源页、Blender/Cooker 指南、任务路由与 3 条检索用例。重点是 pantry 遮蔽、名字与记录身份、分阶段验收、预乘域与 mip、回打包真实载荷覆盖率；包内缺失脚本、参数签名、领袖完成度等冲突已明确记录。
+
+工具在原 assets check 上增量增强：可选 --cooker-config 从用户指定 SDK 配置读取 XLP/AST/GEO/TEX 注册与允许关系；按 ObjectName 查资源，EntryID 留作 BLP 引用名；检查 AST 内的 BLPEntryValue，支持 Windows XLP 相对路径。纯标准库、只读；外部 pantry 和未覆盖的实体类型、FGX/BLP 内部内容及实际编译来源仍列为未验证。
+
+本机官方 Civ6.cfg 的 SHA-256：e10dd128c50caea9b17fffe6a7b47c951e7fda7cc409708fc5819cb041b33feb。其实际注册表确认了正确 TileBase→LandmarkModel 组合，以及 LeaderFallback 拒绝 UserInterface、接受 Leader_Fallback 的关系；测试前后配置散列一致。没有把完整配置、SDK 素材、原包源码、Oodle/Granny EXE 或历史仓库纳入分发。
+
+本轮验证：新增 SDK/AST 检查 8 项通过，既有资源检查 15 项（1 项符号链接权限跳过），知识回归 31 项（1 项符号链接权限跳过），modgen 99 项通过；知识质量检查 243 篇 / 36 场景，0 问题。验证使用最小资源声明与真实 SDK 配置，没有复现全量解包、领袖动画、Cooker 或游戏显示。此前全量主套件数字属于上一轮记录，本轮按改动范围运行相关套件。

@@ -78,6 +78,14 @@ XML `Instance` 是模板，模板内 ID 通过 `instance.ControlName` 访问，�
 
 长说明使用明确的视口和 WrapWidth，为滚动条留宽。动态填入内容后对相关 Stack `CalculateSize()`，对 ScrollPanel `CalculateInternalSize()`；按实际调用点补齐 anchoring。不要为避免溢出无限缩小字号，也不要直接拉长面板覆盖确认按钮。
 
+### 滚轮、排序与卡片状态验收
+
+滑动条可拖动不代表滚轮热区正确。分别检查 ScrollPanel 的视口、`MouseWheelAreaSize`、`DisableMouseWheelScroll`，以及覆盖其上的容器/按钮是否吞掉滚轮。官方 `Base/Assets/UI/NotificationPanel.xml` 使用显式 MouseWheelAreaSize；需要拦截点击的卡片应区分 `ConsumeMouseButton` 与 `ConsumeMouseWheel`，不要把所有祖先统一改为吞掉鼠标。动态重排后重算滚动范围。属性应以本机官方 XML 为依据，HTML 滚动或 XML 解析通过不能证明 ForgeUI 实际响应；游戏内分别在卡片、卡片间隙和详情区测试滚轮。
+
+排序验收必须包含时代与战斗力顺序相反的条目，以及相同主键、无战斗力和平民条目；检查列表首尾/完整顺序，不只检查按钮文字。两个排序字段偶然得到同序时并非必然错误。若设计为再次点击反向排序，要显示方向，并验证首次选择字段和重复点击两个路径。
+
+等尺寸新闻/物品卡不能只给禁用状态增加原因行。先测量同一列表全部可见卡片的文本高度，再使用统一高度和网格步长；可用卡保留同一状态栏空间。长原因可截断并用浮动文本补全，不能覆盖奖励正文；切换筛选、城市和可用状态后重新计算。
+
 ## Lua 连接与生命周期
 
 示例所需 LOC 声明见 [texts.json](../assets/starter/texts.json)。独立使用时将 tag / text 转成目标语言的 LocalizedText，经工程 UpdateText 注册；group 仅为编辑分组，JSON 本身不由游戏加载。使用 ModTools 时合并进 .CIV 的 workspace["文本"]["custom_entries"]；已有工程按 tag 更新/去重，保留无关条目。正式使用时统一重命名 DEMO 资源、LOC 和事件前缀。
@@ -105,6 +113,20 @@ UIManager:DequeuePopup(ContextPtr)
 采用 AnimSidePanelSupport 时使用 `CreateScreenAnimation(...)` 返回对象的 Show/Hide；它与 SlideAnim 控件本身不同。退出动画要等 OnEndOut 再隐藏 Context，立即 `SetHide(true)` 会截断动画。选用动画时核对官方 helper 的当前签名和清理逻辑。
 
 顶栏入口不属于 HTML 的导航。独立 Context 可以各自注入入口，沿用已验证的 LaunchBar 支持代码；不要修改原版 XML 或照搬不完整的跨 Context InstanceManager。项目需要新入口时读对应官方/项目实现并测试初始化顺序。
+
+## 标题文字与字体图标
+
+页面/页签标题、奖励名称、卡片标题和分组名通常保持纯文字；产出、费用与效果描述按语义使用 `[ICON_XXX]` 并带文字标签。例如标题用 `住房`，正文用 `本城 +2[ICON_Housing]住房`。不能因为标题含产出关键词就套用描述装饰器。
+
+标题旁独立的实体或类别 Image 图标可按设计保留；它不是嵌入标题 LOC 的字体图标。原版特定样式或用户要求可有例外，不把这个偏好做成对所有标题的无条件过滤。文本同时承担标题和描述角色时拆分 LOC。验收还要检查 Lua 动态填充的奖励名，单看 `_TITLE` 后缀不够。
+
+## 尺寸控制与警告定位
+
+每个轴选择一种尺寸来源。XML 用 `parent` / `parent-N` 时让引擎管理该轴；若 Lua 会调用 `SetSizeX/SetSizeY/SetSizeVal` 或布局函数重写该轴，则 XML 用数值初值。两者混用会触发 `SetSize called on parent-sized control`，没有明显偏移也不等于声明正确。检查动态实例中的子背景，不只检查顶层容器。
+
+列表筛选中的“没有对应条目”可能是正常结果，使用无副作用的成员查询，不借用每次打印 WARN 的执行校验器。真正要应用奖励时仍验证修正器/目标存在。不要为降噪关闭整个日志系统。
+
+通用 Lua 解释器提供的标准库或测试桩函数不能代替目标游戏环境证据。固定参数调用直接传参；按类型动态选取官方 helper 时先确认函数存在。一行包含多个调用的 nil-function 报错应拆开定位，不能据此断言具体哪项 API 在所有版本都不可用。模拟测试覆盖缺失 helper/库函数的路径，修复后的实机状态单独记录。
 
 ## 迁移验收
 

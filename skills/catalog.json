@@ -250,6 +250,40 @@
       "read": [
         "civ6-landmarks/SKILL.md"
       ]
+    },
+    {
+      "id": "art_unpack",
+      "aliases": [
+        "BLP解包",
+        "美术解包",
+        "资源复原",
+        "blpkit",
+        "Civ6ArtUnpack",
+        "CIVBIG",
+        "SHARED_DATA",
+        "pantry遮蔽",
+        "蒙皮复原",
+        "cooker-config"
+      ],
+      "read": [
+        "05-modtools-civ/art-unpack.md",
+        "05-modtools-civ/art-cook-validation.md"
+      ]
+    },
+    {
+      "id": "binary-yields",
+      "aliases": [
+        "二进制",
+        "Property产出",
+        "固定产出",
+        "AttachModifierByID",
+        "SetPlotTwo"
+      ],
+      "read": [
+        "04-lua/lua-binary.md",
+        "05-modtools-civ/modifiers.md",
+        "04-lua/code-style.md"
+      ]
     }
   ]
 }

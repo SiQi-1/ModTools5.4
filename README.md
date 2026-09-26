@@ -319,7 +319,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 ## 素材来源与版权说明
 
-社区技能、模板与工具的参考来源、作者署名和许可范围见 [第三方参考资料与致谢](THIRD_PARTY_NOTICES.md)，包括千寻瀑（千与千寻瀑）、煎包 / Jianbao233、飞花白，以及 Deliverator / Sukritact 的相关成果。
+社区技能、模板与工具的参考来源、作者署名和许可范围见 [第三方参考资料与致谢](THIRD_PARTY_NOTICES.md)，包括千寻瀑（千与千寻瀑）、煎包 / Jianbao233、飞花白，以及 Deliverator / Sukritact 的相关成果。新增参考千川白浪的 Civ6ArtUnpack_Handover，复原方法、版本冲突和采用范围见 [美术解包指南](skills/05-modtools-civ/art-unpack.md)。
 
 本工具为文明6 Mod 制作提供参考数据与素材，其中部分文件来自游戏本体或 ModBuddy：
 
@@ -337,4 +337,4 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 ### 地标 AST 资源包
 
-新增 `modgen landmark catalog/compose/import/verify/cook`，支持从官方 SDK 几何组合改良和区域模型，生成 Landmarks、TileBase XLP 与建筑差分，经 CIV 导出到 ModBuddy。Assets 等美术源目录由 Cooker 自动读取，不注册进 civ6proj 发布项。制作步骤、边界及示例见 [地标技能](skills/civ6-landmarks/SKILL.md)。Cooker 只验证当前资源链，不自动部署游戏。
+新增 `modgen landmark catalog/compose/import/verify/cook`，支持从官方 SDK 几何组合改良和区域模型，生成 Landmarks、TileBase XLP 与建筑差分，经 CIV 导出到 ModBuddy。`local_pantry/local_files` 可纳管已转换好的自建静态 GEO/FGX/材质/纹理，支持二进制原样导出。Assets 等美术源目录由 Cooker 自动读取，不注册进 civ6proj 发布项。制作步骤、边界及示例见 [地标技能](skills/civ6-landmarks/SKILL.md)。Cooker 只验证当前资源链，不自动部署游戏。

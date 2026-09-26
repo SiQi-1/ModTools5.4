@@ -36,6 +36,8 @@ HTML/CSS 原型落地另读 [civ6-html-ui 技能](../civ6-html-ui/SKILL.md)，�
 
 ## 自定义 UI / Lua LOC 文本
 
+先按[标题与描述分工](../02-config-files/text.md#15-ui-标题与描述分工)确定显示角色：UI 奖励名、页签与标题默认纯文字，描述中的数值/效果按语义加字体图标；独立 Image 图标另行设计。不要按关键词批量装饰全部 UI LOC。
+
 实体名称、描述等仍填中文并由工具生成 LOC；不属于实体的 UI/Lua 文本可在 `workspace["文本"]["custom_entries"]` 声明：
 
 ```json

@@ -47,6 +47,48 @@ class ImportedProjectMetadataTest(unittest.TestCase):
    self.assertEqual(rebuilt['ProjectGuid'],'project-guid')
 
 
+class MultilingualProjectMetadataTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QApplication.instance() or QApplication([])
+        cls.page = WorkspacePage()
+
+    def test_generated_ids_keep_other_languages_when_chinese_changes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'Bilingual.civ6proj'
+            info = {
+                'file_name': 'Bilingual', 'civ6proj_path': str(path),
+                'name_raw': 'LOC_BILINGUAL_NAME', 'description_raw': 'LOC_BILINGUAL_DESCRIPTION',
+                'teaser_raw': 'LOC_TEASER', 'mod_name': '新名称',
+                'description': '新说明',
+                'localized_text_data': '''<LocalizedText>
+                  <Text id="LOC_BILINGUAL_NAME"><zh_Hans_CN>旧名称</zh_Hans_CN><en_US>News &amp; Stories</en_US><fr_FR gender="feminine">Nouvelles</fr_FR></Text>
+                  <Text id="LOC_BILINGUAL_DESCRIPTION"><zh_Hans_CN>旧说明</zh_Hans_CN><en_US>A &lt;new&gt; story</en_US></Text>
+                  <Text id="LOC_TEASER"><en_US>Extra!</en_US></Text>
+                </LocalizedText>''',
+            }
+            self.page._project = build_sample_project()
+            self.page._project.sections['基础信息'] = {'format': 'MODTOOLS54_BASIC_INFO_WORKSPACE', 'schema_version': '0.1.0', 'data': {'project_info': info}}
+            for _ in range(2):
+                result = self.page._build_civ6proj_preview(path.name, {}, set())
+                project = ET.fromstring(result)
+                raw = next(e.text for e in project.iter() if e.tag.split('}')[-1] == 'LocalizedTextData')
+                loc = ET.fromstring(raw)
+                name = loc.find("Text[@id='LOC_BILINGUAL_NAME']")
+                desc = loc.find("Text[@id='LOC_BILINGUAL_DESCRIPTION']")
+                self.assertEqual(name.findtext('zh_Hans_CN'), '新名称')
+                self.assertEqual(desc.findtext('zh_Hans_CN'), '新说明')
+                self.assertEqual(name.findtext('en_US'), 'News & Stories')
+                self.assertEqual(desc.findtext('en_US'), 'A <new> story')
+                self.assertEqual(name.find('fr_FR').get('gender'), 'feminine')
+                self.assertEqual(loc.findtext("Text[@id='LOC_TEASER']/en_US"), 'Extra!')
+                self.assertEqual(len(loc.findall("Text[@id='LOC_BILINGUAL_NAME']")), 1)
+                self.assertEqual(len(name.findall('en_US')), 1)
+                self.assertEqual(len(name.findall('zh_Hans_CN')), 1)
+                info['localized_text_data'] = raw
+                path.write_text(result, encoding='utf-8')
+
+
 class ArtSourceRegistrationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -4,7 +4,7 @@
 
 ```text
 CIV 资源包声明
-  -> Assets/自定义.ast（仅引用官方几何和材质）
+  -> Assets/自定义.ast（引用官方或包内自建几何和材质）
   -> XLPs/tilebases.xlp：EntryID = ObjectName = AST 的 m_Name
   -> ArtDefs/Landmarks.artdef：TileBase BLPEntryValue
   -> Improvements.artdef / Districts.artdef：Landmark/Xref
@@ -34,9 +34,29 @@ Landmarks 的区域条目位于根集合 `Districts`，不是根 `Landmarks`。�
 | BuildingVariants | Tag_HeroBuilding 对应某个游戏建筑 Type，选择其独立 AST |
 | BuildingSets | 每个集合列出已建成建筑的 ArtDef 引用 |
 
-默认空区域使用 EMPTY 集合。当前生成器为最多 6 个建筑生成全部子集，兼容直接授予高阶建筑的存档；这只定义美术选择，不修改建筑前置或互斥条件。两个互斥博物馆在正常规则下不会同时建成，若其他 Mod 强行授予两者，可能同时叠加模型，应单独验收。
+默认空区域使用 EMPTY 集合。先查目标规则集与本 Mod 的玩法数据，再为可达阶段填写 `building_sets`；不要把 N 个建筑机械展开成 2^N 个模型组合。前置与互斥关系决定建筑槽位和基底布局，不只是生成代码的裁剪条件。工具不会自动从运行缓存推断玩法关系；缺省全子集只用于旧配方兼容，不是新设计的推荐流程。
 
-一套时代模型仍要定义每种建筑出现/消失的差分。底板可相同，但必须给各个集合提供有效的 BaseVariant；建筑模型不应全部写进底板。含永久隐藏效果的内部建筑不进入 BuildingSets。
+### 先推导可达阶段，再排模型
+
+1. 核对 `BuildingPrereqs`、`MutuallyExclusiveBuildings`、替代建筑以及本 Mod 的 SQL/Lua/Modifier 授予和移除逻辑。多个前置行可能是备选，不能直接按全部同时满足处理；将结果与官方同类 Landmarks 和项目实际行为交叉核对。
+2. 按正常建造路径列出空区域及可达的完整建筑集合。只在项目确有越级授予或移除前置建筑的实现、或用户明确要求兼容时添加例外；不要为假设中的其他 Mod、作弊或异常存档穷举组合。劫掠不等于移除建筑，Worked/Pillaged 等状态与建筑集合是两层逻辑。
+3. 用 `building_sets` 限定生成的 BuildingSets/BaseVariants；`base_variants` 只负责这些阶段选择哪块底板，不能代替阶段清单。被排除阶段的 base_variants 应报错。
+4. 互斥建筑可以共用槽位与 AST；相同庭院布局复用同一基底资产。需要造型区别时替换同一个位置的附馆，不为绝不同时存在的建筑预留两个空位。
+
+例如标准剧院链：古罗马剧场为两种博物馆的前置；艺术与考古博物馆互斥；广播中心以前述任一种博物馆为前置。正常阶段只有六种：
+
+| 阶段 | 完整建筑集合 |
+|---|---|
+| 空区域 | 无 |
+| 一级 | 古罗马剧场 |
+| 艺术分支 | 古罗马剧场＋艺术博物馆 |
+| 考古分支 | 古罗马剧场＋考古博物馆 |
+| 艺术分支满级 | 古罗马剧场＋艺术博物馆＋广播中心 |
+| 考古分支满级 | 古罗马剧场＋考古博物馆＋广播中心 |
+
+同一等级两条分支可共用基底，因此六个选择阶段只需四种基底布局；不生成双博物馆、无剧场博物馆或孤立广播中心。此例以目标玩法未改写标准前置为前提，不应硬编码到所有区域。
+
+一套时代模型仍要覆盖已确认可达的建筑出现/消失差分。底板可以按建筑组合改变，通过配方 base_variants 精确选择，不必让空区域为全部未来建筑永久留白；未列出的集合使用 base_asset。各个集合都必须有有效的 BaseVariant，建筑模型仍由 BuildingVariants 触发。含永久隐藏效果的内部建筑不进入 BuildingSets。
 
 Buildings.artdef 中的 `AffectsDistrictBuildingSet=true` 是建筑参与集合切换的关键。SDK 未包含的新资料片建筑可能没有可编译的注册条目，应补充对应建筑 Type 的最小美术字段。工具生成的补充 Buildings.artdef 与当前 Mod 的建筑条目合并，不用整份文件覆盖。
 

@@ -390,7 +390,7 @@ def _cmd_preview(args: argparse.Namespace) -> int:
     if args.dry_run:
         print(f"预览清单（{len(files)} 个文件，未落盘）：")
         for rel in sorted(files):
-            size = len(files[rel].encode("utf-8"))
+            size = len(files[rel]) if isinstance(files[rel], bytes) else len(files[rel].encode("utf-8"))
             print(f"  {rel}  ({size} B)")
         return 0
     count, total = write_preview_files(files, out_dir)

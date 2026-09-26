@@ -3,14 +3,14 @@
 ## 基础规范
 
 事件环境见 [LuaEvents / Events / GameEvents 环境表](code-style.md#事件环境与运行时核验)：LuaEvents 同环境可用（含 GP-GP），Events 两端可用，GameEvents 原生位于 GP。
-- **[code-style.md](code-style.md)** — Lua 代码规范（GP/UI 环境分离、命名、通信、Support 函数索引）
+- **[code-style.md](code-style.md)** — Lua 代码规范（GP/UI 环境分离、原生属性零返回值、命名、通信、Support 函数索引）
 - **[lua-multiplayer-stable.md](lua-multiplayer-stable.md)** — 联机稳定通信写法（唯一提交者模式；⚠️仅用户要求联机稳定才用；变体A=AI无效果，变体B=主机0代AI提交）
 - **[lua-crash-bisect.md](lua-crash-bisect.md)** — 无日志开局崩溃二分排查（文件停载→挂载注释→Initialize→行级 `--` 注释；末行分号/噪音清单/虚空接口/Cache 佐证；0054 实录）
 
 ## GP 函数库（直接复制使用）
 - **[lua-gp-resource.md](lua-gp-resource.md)** — 非战斗：产出/伟人/建筑/修改器/科技/地块/计数/分期扣款
 - **[lua-gp-combat.md](lua-gp-combat.md)** — 战斗：伤害/击杀/经验/晋升/技能冷却/反伤/衰减/AOE
-- **[lua-binary.md](lua-binary.md)** — 二进制 Property 系统（NumToTwo/SetPlotTwo + SQL 批量生成）
+- **[lua-binary.md](lua-binary.md)** — 产出二进制选型（动态 Property / 永久增量 AttachModifierByID、位范围、防重与存档迁移）
 
 ## XML 参考（ForgeUI 控件系统）
 - **[lua-xml-controls.md](lua-xml-controls.md)** — 24 种控件的完整属性表+示例：容器/按钮/文本/输入/进度条/动画/结构

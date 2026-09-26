@@ -10,7 +10,7 @@
 
 独立纹理使用 `texture add/list/remove`；HTML 原型提供 `texture render/import-manifest/verify`，见 [可分享 UI 技能](../skills/civ6-html-ui/SKILL.md) 和 [命令契约](AGENTS.md#html-ui-纹理工具)。
 
-地标模型提供 `landmark catalog/compose/import/verify/cook`：静态官方几何组合、托管资源包、CIV/ModBuddy 导出和隔离的官方编译；美术源目录不写入 civ6proj 发布项，verify 会检查误注册；见 [地标技能](../skills/civ6-landmarks/SKILL.md)。
+地标模型提供 `landmark catalog/compose/import/verify/cook`：静态官方几何组合、托管资源包、CIV/ModBuddy 导出和隔离的官方编译；`local_pantry/local_files` 可纳管已转换好的自建静态 GEO/FGX/材质/纹理，支持二进制原样导出。区域 building_sets 按玩法可达阶段限制输出，base_variants 可按完整建筑组合切换基底，未列出组合回退 base_asset；同名 SDK 几何/材质/纹理仅在源与关联载荷完全相同后消歧。美术源目录不写入 civ6proj 发布项，verify 会检查误注册；见 [地标技能](../skills/civ6-landmarks/SKILL.md)。
 
 让 AI（或脚本）生成"编辑器能直接打开、正确导出"的 .CIV 工程与条目：
 - `new-project`：创建工程级 .CIV 骨架（基础信息/美术/修改器/文本 结构就位，无需拷贝旧工程）
@@ -29,6 +29,8 @@
 - `preview`：无头预览 .CIV 将导出的全部文件（SQL/XML/Icons/ArtDef/XLP…，验证闭环；需 PyQt 环境）
 
 领袖支持 fallback_images 外交表情映射，GUI 与校验/导出共享 project/leader_fallbacks.py；见 [领袖美术](../skills/05-modtools-civ/leader-art.md)。社区工作流与署名见 [来源说明](../THIRD_PARTY_NOTICES.md)。
+
+美术检查支持 assets check <工程> --cooker-config <目标SDK/Civ6.cfg>，核对 XLP/AST/GEO/TEX 的类注册与允许关系；BLP/FGX 复原及证据边界见 [美术解包指南](../skills/05-modtools-civ/art-unpack.md)。
 
 ## 安装/运行
 

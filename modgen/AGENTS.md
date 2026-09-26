@@ -181,6 +181,7 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 
 - 四个入口只读、纯标准库，核心共用 project/asset_checks.py。与针对 .CIV 的 project-check 分开，不自动构建或上传。
 - assets check：输入 .civ6proj / .modinfo；解析命名空间、内嵌动作 XML 和显式文件引用，检查资源 XML、模板残留、已知 Leader_Matte 槽及 LeaderFallback → XLP → TEX/DDS 链。IMG/Textures 不要求作为源工程 Content；外部 pantry 引用列入未验证项。
+- assets check 可选 --cooker-config <Civ6.cfg>：只读加载目标 SDK 的注册表，分别核对 XLP/AST/GEO/TEX 类；校验 ASSET/TEXTURE XLP 的 ObjectName 对应资源是否属于 m_AllowedClasses，以及 AST 模型对应 GEO 是否属于 m_AllowedGeoClasses。ArtDef 与 AST 的 BLPEntryValue 都校验 EntryID。未知配置结构报错；缺配置、未支持实体类型或外部 pantry 对象明确未验证。未检查 FGX/BLP 内部数据及 pantry 优先级，不能将类关系通过等同于解包复原成功。
 - audio check：同类工程输入；核对 UpdateAudio → INI → BNK、文件清单与可用 SoundBanksInfo 中的流式 WEM；INI 要求 ASCII 无 BOM，非 CRLF 提示。无 bank 元数据不能证明所有流式媒体完整。
 - art compare：两个目录，默认比较 .artdef；可重复 --suffix 选择支持的资源 XML 后缀。忽略缩进/换行/注释和属性顺序，保留属性值、文本与子节点顺序；缺失、_MissingArt 和结构变化报错，并输出差异位置（最多 100 项）。
 - workshop check：输入含 workshop.json、content 的 workspace；content 内需唯一 .modinfo，或 --modinfo 明确指定相对路径。检查 GUID、元数据类型、声明文件、动作引用、可选封面 PNG 头和既有条目 ID。dependencies 为 UInt64 整数列表；现有条目允许省略可选元数据。
@@ -229,7 +230,10 @@ python -m modgen.cli landmark cook --bundle MyMod.landmarks/manifest.json --sdk-
 
 - 配方 schema 与字段见[工具契约](../skills/civ6-landmarks/references/workflow.md)；根 format=`MODTOOLS54_LANDMARK_RECIPE`。主内容 Type 必须先存在于 CIV，资产名与附件字段严格校验。
 - `compose` 静态复用 SDK TileBase 的实例/材质组/可见状态，清除源附件和动画行为，再创建本地附件；不支持任意动画 AST 或单位骨骼转换。
-- 资源包含 AST、Landmarks、TileBase XLP、可选补充 Buildings、recipe 与 manifest 散列。CIV 只存 `workspace.美术.data.landmark_bundle.manifest` 绝对路径；当前一个 CIV 一个包。
+- 配方可声明 local_pantry/local_files，纳管已经转换好的 AST/GEO/FGX/MTL/TEX/DDS；只复制清单文件，验证本地数据文件与材质贴图引用，二进制原样导出。该命令不执行 Blender/CN6 转换或处理动画。
+- 区域 binding 可选 building_sets（建筑 Type 数组的数组），按已核对的前置/互斥与实际授予逻辑列可达阶段；必须含 []，无重复/未知项，每个声明建筑至少使用一次。生成器只输出这些集合；base_variants 不得引用被排除集合。顺序无关且输出稳定；省略/null 为旧配方保留全子集，新设计应显式填写。互斥建筑可共用资产与槽位，不假设异常授予来扩大模型组合。
+- 区域 binding 可选 base_variants（buildings/asset 列表）：按完整建筑集合匹配，顺序无关、空数组代表空区域；未声明集合回退 base_asset。拒绝重复/未知建筑、重复集合和缺失资产。SDK 同名 GEO/MTL/TEX 仅在源及直接数据文件逐字节相同后合并，优先 Shared；同名 AST 仍需明确路径。
+- 资源包含 AST、Landmarks、TileBase XLP、可选补充 Buildings、本地模型与材质贴图、recipe 与 manifest 散列。CIV 只存 `workspace.美术.data.landmark_bundle.manifest` 绝对路径；当前一个 CIV 一个包。
 - `import` 校验完整批次后保存一次并备份 CIV，自动设置 need/source map、Landmarks/TileBase 标记与来源 SDK Art ID；不同包切换需 `--replace`。移动源目录后重新导入，当前不自动重定位。
 - GUI 导入/导出保留声明；预览有 AST 组。工程总览允许 AST；生成 Assets 等标准美术源目录，但不登记为 civ6proj Content/Folder/None；更新既有工程时清除这些目录的旧注册，磁盘源文件保留，仍由目录扫描与 Cooker pantry 读取；补充建筑与已有 Buildings 合并。
 - 包文件散列变化会阻断导出，调整应回到配方重新 compose；依赖或绑定变化后再次 import。`validate` 同时检查资源包来源存在且散列一致。

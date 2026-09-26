@@ -1,12 +1,10 @@
-# lua-binary -- 二进制 Property 系统
+# lua-binary -- 产出二进制：Property 与 AttachModifierByID
 
 ## 核心概念
 
 ### 为什么用二进制？
 
-Civ6 的 Plot/Player Property 本质是**浮点数属性**，可以用 `GetProperty/SetProperty` 读写。问题时：**一个 Property 只能存一个值，不能自动做加法**。
-
-如果给地块加 10 点科技产出，需要的是一个 Modifier 的 Amount=10。但如果下回合城市人口变了，产出变成 7，怎么办？直接 `SetProperty` 覆盖吗？那之前由建筑加的产出也会被冲掉。
+Property 是可由 Lua 读写、保存状态的键值；修改器的固定 Amount 不会自动乘以某个 Property 的数值。二进制把数值拆为少量固定 Amount 定义，避免为每个奖励金额注册一个 Modifier。它有“覆盖目标值”和“追加奖励增量”两种不同用法，先选场景再实现。
 
 **二进制方案**：把一个大数值拆成多个二进制位，每个位对应一个独立的 Property 和 Modifier。
 
@@ -55,13 +53,55 @@ SQL 端生成两套 Modifier：
 
 ---
 
+## 二进制产出方案选择
+
+| 需求 | 推荐方案 | 运行时职责 |
+|---|---|---|
+| 根据人口、宜居等状态重算，可能降低或清零 | Property 法 | GP 写入本系统目标总值的全部二进制位，包括将旧位关闭 |
+| 少量事件给予不可撤销的永久固定产出 | AttachModifierByID 法 | 只把本次奖励增量拆位，给目标城市附加对应修改器 |
+| 大量高频永久累加，希望限制实例增长 | 按需求选择 Property | 修改器定义少不等于运行时实例少；频繁 Attach 会累积实例 |
+| 条件、期限、每人口、区域或地块产出 | 分别建模 | 不因都有 YieldType 就合并进永久城市固定产出 |
+
+### Property 法：城市集合 + 市中心地块条件
+
+文明专属城市固定产出可将 `MODIFIER_PLAYER_CITIES_ADJUST_CITY_YIELD_CHANGE` 挂到该文明/领袖 Trait，集合为 `COLLECTION_PLAYER_CITIES`、效果为 `EFFECT_ADJUST_CITY_YIELD_CHANGE`。每个位的 SubjectRequirementSet 使用 `REQUIREMENT_PLOT_PROPERTY_MATCHES` 检查该城市中心地块的位属性；Lua 仅写市中心 Property，不需要再逐城 Attach 一套控制器。确需跨所有玩家城市时才选择匹配的全局集合/挂载位置，不把玩家城市集合直接挂给 GameModifiers。
+
+例如将本系统科技加成从 10 改成 7：先前 2、8 位开启，现在写成 1、2、4 位开启并关闭 8 位；归零时全部关闭。只更新变化位，避免每回合无变化也重复写入。位属性影响的是这组修改器，不会覆盖其他建筑自身的正常产出。
+
+### AttachModifierByID 法：按本次奖励增量拆分
+
+永久固定产出可定义 `MODIFIER_SINGLE_CITY_ADJUST_YIELD_CHANGE`，集合为 `COLLECTION_OWNER`，不挂产出位条件，在 GP 中调用 `city:AttachModifierByID(id)`。例如六种产出各定义 1、2、4、8、16，共 30 个定义；奖励 +18 金币只附加金币 16 和金币 2。
+
+```lua
+-- modifiers[i] 对应 bits[i]；由已核验的奖励表提供非负整数增量。
+local bits = {1, 2, 4, 8, 16}
+assert(amount >= 0 and amount <= 31 and amount == math.floor(amount))
+for i, bit in ipairs(bits) do
+    if math.floor(amount / bit) % 2 == 1 then
+        city:AttachModifierByID(modifiers[i])
+    end
+end
+```
+
+1、2、4、8 各用一次覆盖 0～15，加上 16 才覆盖 0～31。这是**单次增量**的可表示范围，不是累计收益上限；多次合法奖励累计可超过 31。位数按实际最大单次奖励选择，超出时扩展或明确拆成多批，不能静默截掉高位。
+
+允许同一 Modifier ID 重复叠加时，不设置阻止叠加的 OwnerStackLimit/SubjectStackLimit；是否持久和叠加还需目标游戏环境验证。永久奖励不要每回合或每次打开界面重放。发奖事件依赖业务记录防重，已发放的记录随存档保留；不要每次加载根据历史总额再 Attach 一遍。增量法不方便撤回，需求若包含减值或清零，优先使用 Property。
+
+### 两种实现之间的迁移
+
+不要把已经整套 Attach 的条件修改器原 ID 直接改成无条件 Amount，否则旧存档可能同时激活全部位。改变实例语义时使用新 ID，明确停用旧控制属性/来源，只迁移目标永久效果一次；人口、免费单位等即时效果不能跟着重放。迁移须在记录新的奖励之前运行，避免把本次奖励同时算进历史补发和正常发奖。
+
+比较所有旧/新奖励的实际数值，检查零值、位边界、同 ID 多次奖励、累计超过单次表示范围、重复事件与重复读档。SQL/模拟检查证明配置和分支，不证明游戏内保存的原生实例已经正确迁移；单独记录实机验收结果。
+
+依据：原版 DynamicModifiers 中两种城市产出类型的集合/效果定义；用户确认的城市地块 Property 与重复 Attach 模式。按场景择用，不宣称某一种普遍更快。后文保留 Property helper 与历史全局模板，采用前核对当前项目的集合和加载环境。
+
 ## 核心函数
 
 ### 常量定义
 
 ```lua
 -- 二进制位列表（16 位，最大支持 65535）
-local SiqiBinaryList = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536}
+local SiqiBinaryList = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768}
 local BIT_COUNT = #SiqiBinaryList  -- = 16（也可按需只用前 12 位 = 4095）
 ```
 
@@ -178,7 +218,7 @@ end
 
 ```lua
 function SetplotNumNew(plotID, sproperty, amount, n, NEG, m)
-    if amount == 0 then return; end
+    -- 覆盖目标值为零也必须关闭旧位。
     if NEG and amount < 0 then
         SetPlotNum(plotID, sproperty, 0, n)
         SetPlotNum(plotID, NEG .. sproperty, -amount, m)
@@ -348,7 +388,7 @@ function MyMod.UI.RefreshYields(playerID)
     for _, pCity in pPlayer:GetCities():Members() do
         local amount = pCity:GetPopulation()  -- 例：1人口 → 1产出
         local pPlot = Map.GetPlot(pCity:GetX(), pCity:GetY())
-        if pPlot and amount > 0 then
+        if pPlot then
             table.insert(yields, {
                 plotID = pPlot:GetIndex(),
                 propKey = "MYMOD_Science",
@@ -390,7 +430,7 @@ function MyMod.RefreshAmenityYield(playerID)
     for _, pCity in Players[playerID]:GetCities():Members() do
         local g = pCity:GetGrowth()
         local amenity = g:GetAmenities() - g:GetAmenitiesNeeded()
-        if amenity ~= 0 then
+        do -- 零宜居差额也提交，用于清除旧加成。
             local p = Map.GetPlot(pCity:GetX(), pCity:GetY())
             UI.RequestPlayerOperation(playerID, PlayerOperations.EXECUTE_SCRIPT, {
                 OnStart = 'MyMod_ApplyAmenity', plotID = p:GetIndex(),
@@ -474,4 +514,4 @@ end
 3. **位数计算**：`math.floor(math.log(MaxValue, 2)) + 1`（MaxValue=2048 → 12位，MinValue=256 → 9位）
 4. **属性命名**：正位 = `PropertyKey + Num`，负位 = `NEG_ + PropertyKey + Num`，两端命名必须一致
 5. **GP vs UI**：`SetProperty` 仅 GP 端可用；UI 计算后须通过 `UI.RequestPlayerOperation(..., EXECUTE_SCRIPT, data)` 发送
-6. **永久值**：永久叠加用独立 `Permanent_` 前缀存储累计值，刷新时用 `累计值 + 本回合增量` 作为写入值
+6. **永久值**：先按前述场景选择方案。Property 累计值仅在新奖励发生时增加，刷新只覆盖当前总值；直接 Attach 则按业务记录只发本次增量，不能把同一回合增量重复计入。

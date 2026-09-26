@@ -40,4 +40,6 @@ python -m modgen.cli search "城市产出"
 
 [第三方来源声明](../THIRD_PARTY_NOTICES.md) 记录作者、版本、许可与采用范围。外部技能冲突按本项目原要求处理，不整包覆盖规则或数据库。
 
+BLP/FGX 复原另读 [美术解包与验收](05-modtools-civ/art-unpack.md)：参考千川白浪的移交包，区分记录定位、解码、重建、编译和实机证据。包内历史结论冲突不直接升级为规则；本地 Civ6.cfg 是类注册核对依据。
+
 Lua 事件环境以 [事件环境表](04-lua/code-style.md#事件环境与运行时核验) 为准；记录 API 所在 UI / GP 环境、对象层级、签名及游戏版本。FireTuner 的 gamecore / ingame 上下文不自动等于 Mod 自有环境；查不到 Mod 全局变量不能直接证明接口不可用。官方调用、社区实测与本项目复验分开记录。

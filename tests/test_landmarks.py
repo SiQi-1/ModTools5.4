@@ -145,6 +145,119 @@ class LandmarkTests(unittest.TestCase):
                 self.assertEqual(text_at(p, 'm_ElementName'), 'DEFAULT')
         self.assertIn('AffectsDistrictBuildingSet', files['ArtDefs/Buildings.artdef'])
 
+    def test_exact_building_set_bases_and_fallback(self):
+        self.recipe['assets'] += [{'name': 'EMPTY_BASE', 'source': 'Original'}, {'name': 'FULL_BASE', 'source': 'Original'}]
+        binding = {'kind': 'district', 'entity': 'DISTRICT_TEST', 'source': 'DISTRICT_THEATER', 'landmark': 'DISTRICT_TEST', 'base_asset': 'TEST_BASE',
+                   'buildings': [{'type': 'BUILDING_A', 'asset': 'TEST_BASE'}, {'type': 'BUILDING_B', 'asset': 'TEST_BASE'}],
+                   'base_variants': [{'buildings': [], 'asset': 'EMPTY_BASE'}, {'buildings': ['BUILDING_B', 'BUILDING_A'], 'asset': 'FULL_BASE'}]}
+        self.recipe['bindings'] = [binding]
+        manifest = self.generate()
+        _, files = load_bundle(manifest)
+        root = ET.fromstring(files['ArtDefs/Landmarks.artdef'])
+        bases = next(e for e in root.findall('.//m_ChildCollections/Element') if text_at(e, 'm_CollectionName') == 'BaseVariants')
+        actual = {text_at(e, 'm_Name'): text_at(e.find('.//Element[@class="AssetObjects..BLPEntryValue"]'), 'm_EntryName') for e in bases.findall('Element')}
+        self.assertEqual(actual, {'EMPTY': 'EMPTY_BASE', 'BUILDING_A': 'TEST_BASE', 'BUILDING_B': 'TEST_BASE', 'BUILDING_A__BUILDING_B': 'FULL_BASE'})
+        self.assertTrue(verify_bundle(manifest, self.sdk)['ok'])
+        for invalid in (
+            [{'buildings': ['BUILDING_UNKNOWN'], 'asset': 'FULL_BASE'}],
+            [{'buildings': ['BUILDING_A', 'BUILDING_A'], 'asset': 'FULL_BASE'}],
+            [{'buildings': [], 'asset': 'MISSING'}],
+            [{'buildings': [], 'asset': 'FULL_BASE', 'typo': 1}],
+            [{'buildings': 'BUILDING_A', 'asset': 'FULL_BASE'}],
+            [{'buildings': [], 'asset': 'FULL_BASE'}, {'buildings': [], 'asset': 'EMPTY_BASE'}],
+            [{'buildings': ['BUILDING_A', 'BUILDING_B'], 'asset': 'FULL_BASE'}, {'buildings': ['BUILDING_B', 'BUILDING_A'], 'asset': 'EMPTY_BASE'}],
+        ):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                binding['base_variants'] = invalid
+                self.generate()
+        binding['kind'] = 'improvement'
+        binding['base_variants'] = [{'buildings': [], 'asset': 'EMPTY_BASE'}]
+        with self.assertRaisesRegex(ValueError, 'only supported for districts'):
+            self.generate()
+
+    def test_authored_stages_exclude_unreachable_sets_and_share_a_base(self):
+        self.recipe['assets'].append({'name': 'MUSEUM_BASE', 'source': 'Original'})
+        stages = [[], ['BUILDING_A'], ['BUILDING_A', 'BUILDING_B'],
+                  ['BUILDING_A', 'BUILDING_C'], ['BUILDING_A', 'BUILDING_B', 'BUILDING_D'],
+                  ['BUILDING_A', 'BUILDING_C', 'BUILDING_D']]
+        binding = {'kind': 'district', 'entity': 'DISTRICT_TEST', 'source': 'DISTRICT_THEATER',
+                   'landmark': 'DISTRICT_TEST', 'base_asset': 'TEST_BASE',
+                   'buildings': [{'type': n, 'asset': 'TEST_BASE'} for n in
+                                 ['BUILDING_A', 'BUILDING_B', 'BUILDING_C', 'BUILDING_D']],
+                   'building_sets': stages,
+                   'base_variants': [{'buildings': group, 'asset': 'MUSEUM_BASE'}
+                                     for group in stages[2:]]}
+        self.recipe['bindings'] = [binding]
+        manifest = self.generate()
+        _, files = load_bundle(manifest)
+        root = ET.fromstring(files['ArtDefs/Landmarks.artdef'])
+        collections = {text_at(e, 'm_CollectionName'): e for e in
+                       root.findall('./m_RootCollections/Element/Element/m_ChildCollections/Element')}
+        actual = {frozenset(text_at(ref, 'm_ElementName') for ref in row.findall(
+                  './/Element[@class="AssetObjects..ArtDefReferenceValue"]'))
+                  for row in collections['BuildingSets'].findall('Element')}
+        self.assertEqual(actual, {frozenset(group) for group in stages})
+        bases = {text_at(e, 'm_Name'): text_at(e.find('.//Element[@class="AssetObjects..BLPEntryValue"]'), 'm_EntryName')
+                 for e in collections['BaseVariants'].findall('Element')}
+        self.assertEqual(len(bases), 6)
+        self.assertEqual(bases['BUILDING_A__BUILDING_B'], bases['BUILDING_A__BUILDING_C'])
+        self.assertEqual(len(collections['BuildingVariants'].findall('Element')), 4)
+        self.assertTrue(verify_bundle(manifest, self.sdk)['ok'])
+        binding['building_sets'] = [list(reversed(group)) for group in reversed(stages)]
+        self.assertEqual(load_bundle(self.generate())[1]['ArtDefs/Landmarks.artdef'], files['ArtDefs/Landmarks.artdef'])
+
+    def test_invalid_authored_stages_and_excluded_base_rejected_before_write(self):
+        binding = {'kind': 'district', 'entity': 'DISTRICT_TEST', 'source': 'DISTRICT_THEATER',
+                   'landmark': 'DISTRICT_TEST', 'base_asset': 'TEST_BASE',
+                   'buildings': [{'type': 'BUILDING_A', 'asset': 'TEST_BASE'},
+                                 {'type': 'BUILDING_B', 'asset': 'TEST_BASE'}],
+                   'building_sets': [[], ['BUILDING_A'], ['BUILDING_A', 'BUILDING_B']]}
+        self.recipe['bindings'] = [binding]
+        path = self.generate()
+        previous = path.read_bytes()
+        for invalid in ([], 'BUILDING_A', [[], 'BUILDING_A'], [[], ['BUILDING_UNKNOWN']],
+                        [[], ['BUILDING_A', 'BUILDING_A']], [['BUILDING_A', 'BUILDING_B']],
+                        [[], ['BUILDING_A']], [[], ['BUILDING_A', None]],
+                        [[], ['BUILDING_A', 'BUILDING_B'], ['BUILDING_B', 'BUILDING_A']]):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                binding['building_sets'] = invalid
+                self.generate()
+            self.assertEqual(path.read_bytes(), previous)
+        binding['building_sets'] = [[], ['BUILDING_A'], ['BUILDING_A', 'BUILDING_B']]
+        binding['base_variants'] = [{'buildings': ['BUILDING_B'], 'asset': 'TEST_BASE'}]
+        with self.assertRaisesRegex(ValueError, 'excluded by building_sets'):
+            self.generate()
+        binding.pop('base_variants')
+        binding['kind'] = 'improvement'
+        with self.assertRaisesRegex(ValueError, 'only supported for districts'):
+            self.generate()
+
+    def test_identical_pantry_geometry_requires_identical_payload(self):
+        other = self.sdk / 'Civ6/DLC/Shared/pantry/Geometries'
+        other.mkdir(parents=True)
+        (other / 'Shape.geo').write_bytes((self.pantry / 'Geometries/Shape.geo').read_bytes())
+        (other / 'Shape.fgx').write_bytes((self.pantry / 'Geometries/Shape.fgx').read_bytes())
+        self.assertEqual(SDKIndex(self.sdk).find('Shape', '.geo'), other / 'Shape.geo')
+        (other / 'Shape.fgx').write_bytes(b'different mesh')
+        with self.assertRaisesRegex(ValueError, '2 matches'):
+            SDKIndex(self.sdk).find('Shape', '.geo')
+        (other / 'Shape.fgx').unlink()
+        with self.assertRaisesRegex(ValueError, '2 matches'):
+            SDKIndex(self.sdk).find('Shape', '.geo')
+
+    def test_differing_pantry_materials_and_ast_are_not_silently_chosen(self):
+        other = self.sdk / 'Civ6/DLC/Shared/pantry'
+        (other / 'Materials').mkdir(parents=True)
+        (other / 'Assets').mkdir()
+        (other / 'Materials/Stone.mtl').write_bytes((self.pantry / 'Materials/Stone.mtl').read_bytes())
+        self.assertEqual(SDKIndex(self.sdk).find('Stone', '.mtl'), other / 'Materials/Stone.mtl')
+        (other / 'Materials/Stone.mtl').write_text('<Different/>')
+        with self.assertRaisesRegex(ValueError, '2 matches'):
+            SDKIndex(self.sdk).find('Stone', '.mtl')
+        (other / 'Assets/Original.ast').write_bytes(self.ast.read_bytes())
+        with self.assertRaisesRegex(ValueError, '2 matches'):
+            SDKIndex(self.sdk).find('Original', '.ast')
+
     def test_supplemental_buildings_do_not_erase_user_art(self):
         existing = '<AssetObjects..ArtDefSet><m_TemplateName text="Buildings"/><m_RootCollections><Element><m_CollectionName text="Building"/><Element><m_Name text="BUILDING_A"/><m_Fields><m_Values><Element class="AssetObjects..BoolValue"><m_bValue>false</m_bValue><m_ParamName text="KeepMe"/></Element></m_Values></m_Fields><m_ChildCollections/></Element></Element></m_RootCollections></AssetObjects..ArtDefSet>'
         incoming = existing.replace('KeepMe', 'AffectsDistrictBuildingSet').replace('false', 'true')
@@ -204,6 +317,107 @@ class LandmarkTests(unittest.TestCase):
         self.assertIn('LM_TEST', dict(groups['ArtDef'])['Improvements.artdef'])
         self.assertIn('7446c8fe-29eb-44f8-801f-098f681cc5c5', groups['Art.xml'][0][1])
         self.assertTrue(WorkspacePage._is_allowed_project_overview_file('Assets/TEST_BASE.ast'))
+
+
+    def local_recipe(self):
+        import shutil
+        local = self.root / 'authored'
+        shutil.copytree(self.pantry, local)
+        (local / 'Textures').mkdir()
+        (local / 'Textures/Color.dds').write_bytes(b'DDS '+bytes(range(256)))
+        (local / 'Textures/Color.tex').write_text('<AssetObjects..TextureInstance><m_DataFiles><Element><m_RelativePath text="Color.dds"/></Element></m_DataFiles></AssetObjects..TextureInstance>')
+        (local / 'Materials/Stone.mtl').write_text('<AssetObjects..MaterialInstance><m_CookParams><m_Values><Element class="AssetObjects..ObjectValue"><m_ObjectName text="Color"/><m_eObjectType>TEXTURE</m_eObjectType></Element></m_Values></m_CookParams></AssetObjects..MaterialInstance>')
+        self.recipe['local_pantry'] = 'authored'
+        self.recipe['local_files'] = [p.relative_to(local).as_posix() for p in local.rglob('*') if p.is_file()]
+        return local
+
+    def test_local_binary_bundle_export_and_preview_preserve_bytes(self):
+        from ModTools_5_4.project.landmarks import bundle_resource_files
+        from ModTools_5_4.ui.pages.workspace_page import WorkspacePage
+        from modgen.preview import write_preview_files
+        local = self.local_recipe()
+        path = self.generate()
+        data, files = load_bundle(path)
+        self.assertEqual(data['version'], 2)
+        self.assertTrue(verify_bundle(path, self.sdk)['ok'])
+        self.assertEqual(files['Textures/Color.dds'], (local/'Textures/Color.dds').read_bytes())
+        resources = bundle_resource_files({'landmark_bundle': {'manifest': str(path)}})
+        self.assertIn('Geometries/Shape.fgx', resources)
+        target = self.root/'export'
+        for name, content in resources.items():
+            WorkspacePage._write_output_file(None, target, name, content)
+        self.assertEqual((target/'Textures/Color.dds').read_bytes(), files['Textures/Color.dds'])
+        preview = self.root/'preview'
+        write_preview_files(files, preview)
+        self.assertEqual((preview/'Geometries/Shape.fgx').read_bytes(), files['Geometries/Shape.fgx'])
+        (self.bundle/'Textures/Color.dds').write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError, 'source changed'):
+            load_bundle(path)
+
+    def test_local_dds_uppercase_extension_and_saved_recipe_recompose(self):
+        local = self.local_recipe()
+        source = local / 'Textures/Color.dds'
+        data = source.read_bytes()
+        temporary = local / 'Textures/Color.tmp'
+        source.rename(temporary)
+        temporary.rename(local / 'Textures/Color.DDS')
+        self.recipe['local_files'] = [n.replace('Color.dds', 'Color.DDS') for n in self.recipe['local_files']]
+        p = local / 'Textures/Color.tex'
+        p.write_text(p.read_text().replace('Color.dds', 'Color.DDS'))
+        manifest = self.generate()
+        self.assertEqual(load_bundle(manifest)[1]['Textures/Color.DDS'], data)
+        other = self.root/'recomposed'
+        manifest2 = compose(self.bundle/'recipe.json', self.sdk, other)
+        self.assertEqual(load_bundle(manifest)[1], load_bundle(manifest2)[1])
+
+    def test_local_text_crlf_matches_generated_project(self):
+        local = self.local_recipe()
+        source = local/'Geometries/Shape.geo'
+        source.write_bytes(source.read_bytes().replace(b'><', b'>\r\n<'))
+        path = self.generate()
+        _, files = load_bundle(path)
+        self.assertNotIn('\r', files['Geometries/Shape.geo'])
+        project = self.root/'export'
+        from modgen.preview import write_preview_files
+        write_preview_files(files, project)
+        errors = verify_bundle(path, self.sdk, project)['errors']
+        self.assertFalse(any('differs from bundle' in error for error in errors), errors)
+
+    def test_local_material_may_reference_official_texture(self):
+        import shutil
+        local = self.local_recipe()
+        (self.pantry/'Textures').mkdir()
+        for suffix in ['tex', 'dds']:
+            relative = 'Textures/Color.'+suffix
+            shutil.move(str(local/relative), str(self.pantry/relative))
+            self.recipe['local_files'].remove(relative)
+        path = self.generate()
+        self.assertTrue(verify_bundle(path)['ok'])
+        self.assertTrue(verify_bundle(path, self.sdk)['ok'])
+
+    def test_local_dependencies_must_be_declared_not_just_present(self):
+        self.local_recipe()
+        self.recipe['local_files'].remove('Textures/Color.dds')
+        with self.assertRaisesRegex(ValueError, 'missing declared data file'):
+            self.generate()
+        self.assertFalse(self.bundle.exists())
+
+    def test_local_paths_cannot_escape_and_unsupported_sources_are_rejected(self):
+        self.local_recipe()
+        for name in ['Geometries/../../outside.fgx', 'Scripts/bad.lua']:
+            with self.subTest(name=name):
+                self.recipe['local_files'].append(name)
+                with self.assertRaises(ValueError):
+                    self.generate()
+                self.recipe['local_files'].pop()
+        self.assertFalse(self.bundle.exists())
+
+    def test_local_material_texture_reference_is_verified(self):
+        local = self.local_recipe()
+        p = local/'Materials/Stone.mtl'
+        p.write_text(p.read_text().replace('Color', 'MissingTexture'))
+        with self.assertRaisesRegex(ValueError, 'MissingTexture'):
+            self.generate()
 
 
 if __name__ == '__main__': unittest.main()

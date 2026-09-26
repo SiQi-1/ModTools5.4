@@ -6,7 +6,7 @@
 
 ## 快速使用
 
-解压并进入 civ6-html-ui 文件夹。准备 Node.js 22+、本机 Edge/Chrome/Chromium，以及 Python 3.10+；像素校验另需 Pillow（可用 python -m pip install Pillow 安装）。无需 npm install、Qt、ModTools、Codex 插件或账号。
+获取完整的 civ6-html-ui 文件夹并进入该目录。准备 Node.js 22+、本机 Edge/Chrome/Chromium，以及 Python 3.10+；像素校验另需 Pillow（可用 python -m pip install Pillow 安装）。无需 npm install、Qt、ModTools、Codex 插件或账号。
 
 先复制 assets/starter 到自己的设计目录再修改。以下命令直接验证随包示例，输出到当前文件夹 output：
 
@@ -34,4 +34,4 @@ python scripts/check-native-ui.py --manifest output/texture_manifest.json --xml 
 
 示例是原创几何 CSS 和演示 XML/Lua；包内没有游戏素材、字体、SDK、浏览器或运行时。文明 VI、ForgeUI、ModBuddy 及官方调用点属于 Firaxis / 2K 的产品和资料，本包不改变其权利或许可。
 
-实机呈现、字体、缩放、点击层级和玩法需在目标环境验收。Windows 独立脚本已验证；其他系统和游戏运行环境分别验证。PACKAGE.json 记录包内文件 SHA-256，便于核对分享文件完整性。
+实机呈现、字体、缩放、点击层级和玩法需在目标环境验收。Windows 独立脚本已验证；其他系统和游戏运行环境分别验证。该目录源码持续更新；分享时复制当前完整目录，无需预制 ZIP。完整工具源码分享目录另附 SOURCE_MANIFEST.json，可核对文件版本和 SHA-256。

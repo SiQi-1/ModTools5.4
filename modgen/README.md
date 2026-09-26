@@ -22,7 +22,7 @@
 - `project-check` / `build`：统一检查与 ModBuddy 工程源码生成，需 PyQt；不调用 ModBuddy 编译或部署
 - `custom-file`：自定义 SQL/XML/Lua 文件通道——有扩展清单时写源码目录，旧工程写绑定的输出目录（write/list/remove；与 AI 控制接口 `project_file_write` 同语义）
 - assets check / audio check / art compare / workshop check：纯标准库只读检查资源引用、音频依赖、Cooker XML 差异及工坊包；[契约与边界](AGENTS.md#资源与发布产物检查)
-- `skill`：本地技能库（仓库根 `skills/`，随发布包分发）章节检索——中文 bigram + 英文词边界 + BM25；`--plan` 必读清单、`--file --section` 章节、`--check` 质量检查、`--json` 结构化输出
+- `skill`：本地技能库（仓库根 `skills/`，随源码分发）章节检索——中文 bigram + 英文词边界 + BM25；`--plan` 必读清单、`--file --section` 章节、`--check` 质量检查、`--json` 结构化输出
 - `search`：能力实现搜索（**BM25 检索**：中文 bigram + 领域词典 + 字段权重 + 相关性排序；支持"通往你城市的贸易路线加产出"这类自然语言；与 GUI 小工具同一实现）
 - `query`：游戏库只读查询（仅 SELECT/WITH/PRAGMA/EXPLAIN，自动限行）
 - `loc`：LOC 标签 → 简体中文（含嵌套 `{LOC_...}` 引用链展开，单一实现见 `ModTools_5_4/db/loc_text.py`）
@@ -33,6 +33,9 @@
 美术检查支持 assets check <工程> --cooker-config <目标SDK/Civ6.cfg>，核对 XLP/AST/GEO/TEX 的类注册与允许关系；BLP/FGX 复原及证据边界见 [美术解包指南](../skills/05-modtools-civ/art-unpack.md)。
 
 ## 安装/运行
+
+以源码目录运行，不依赖 EXE 或预制 ZIP。分享时保留 `modgen/`、`ModTools_5_4/`、`skills/` 和必要资源；使用 [源码分享工具](../docs/SOURCE_SHARING.md)导出完整目录。基础数据/知识命令为标准库；完整生成和 GUI 的依赖由 `tools/setup_env.py` 初始化。
+
 
 ```bash
 # 无需安装，仓库根目录下直接运行

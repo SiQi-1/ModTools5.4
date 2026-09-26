@@ -13,6 +13,10 @@
 - **Type 永远由工具生成**，AI 不要手写 Type（详见"硬规则"）
 - 中文文本存条目（name/Description 等），LOC tag 由导出约定自动注册，条目里不写 LOC
 
+## 分发契约
+
+以 skill + tools 源码目录为准，不依赖内置 EXE/ZIP。`modgen/` 与 `ModTools_5_4/`、`skills/` 及 schemas 必须一起分发；维护者用 `python tools/share_source.py --out shares/<新目录>` 导出当前已跟踪源码。安装和可选依赖见 [初始化](../AGENT_SETUP.md)，Git/来源清单约定见 [分享说明](../docs/SOURCE_SHARING.md)。
+
 ## 用法
 
 ```bash

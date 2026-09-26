@@ -1,0 +1,33 @@
+name: Source checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Check tracked distribution files
+        run: python -S tools/share_source.py --check
+      - name: Test source sharing
+        run: python -S -m unittest discover -s tests -p test_source_distribution.py -v
+      - name: Export source directory
+        run: python -S tools/share_source.py --out shares/ci-source
+      - name: Check detached source knowledge
+        working-directory: shares/ci-source
+        run: python -S -m modgen.cli skill --check
+      - name: Smoke-test detached CLI
+        working-directory: shares/ci-source
+        run: python -S -m modgen.cli generate 区域 --name 测试 --abbr TEST --prefix CI --infix 1

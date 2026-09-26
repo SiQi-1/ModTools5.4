@@ -1,11 +1,11 @@
 """modgen → ModTools 桥（复用同一套实现，防止两份漂移）。
 
-`modgen/` 与 `ModTools_5_4/` 始终同包分发（build_release.ps1 同时复制两者），
+`modgen/` 与 `ModTools_5_4/` 始终同包分发（tools/share_source.py 同时复制两者），
 因此 modgen 直接复用 ModTools 侧的：
 - `ModTools_5_4.db.loc_text`      —— LOC 嵌套解析（单一实现）
 - `ModTools_5_4.db.search_index`  —— BM25 检索层（领域词典 + 倒排索引）
 
-若 modgen 被单独拷贝到别处运行，本模块会把仓库根加入 sys.path 再导入。
+直接脚本入口会把源码根加入 sys.path 再导入；分享时必须保留两个目录，不能单独拷贝 modgen。
 """
 from __future__ import annotations
 

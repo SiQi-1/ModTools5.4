@@ -1,20 +1,33 @@
 # ModTools 5.4
 
-基于 PyQt6 的文明6 Mod 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。**同时提供 AI 生成 .CIV 的工具链（modgen）**，并内置"能力实现搜索"作为知识获取途径——新设备无需外部知识库。
+以 **skills + tools 源码**分享的文明6 Mod 制作工具集，提供 modgen 命令行和可选的 PyQt6 可视化编辑器。用 `.CIV` 工程文件保存编辑状态，一键生成 SQL/XML/Icons/ArtDef/XLP/Textures 等输出文件到 ModBuddy 工程目录。**同时提供 AI 生成 .CIV 的工具链（modgen）**，并内置"能力实现搜索"作为知识获取途径——新设备无需外部知识库。
 
 ---
 
-## 两种运行方式（zip 内两者都有）
+## 获取与运行
 
-| | `ModTools5.4.exe` | 源码版（`.py`） |
+克隆本仓库或获取完整源码分享目录。skills、工具和文档在同一份源码中更新；不再发布内置 EXE、预制 ZIP，也不需要 PyInstaller。
+
+| 入口 | 用法 | 依赖 |
 |---|---|---|
-| 适用 | 只想点击即用 | 需要 agent 操作/修改/调试、二次开发 |
-| 需要 Python | 否 | 是（3.10+，推荐 3.13） |
-| 首次配置 | 无 | 运行一次 `python tools/setup_env.py` 自动完成 |
-| AI 工作流 | 仅 GUI | ✅ 源码可读可改 + modgen + 测试全可用 |
+| AI / CLI | 从 [AGENTS.md](AGENTS.md) 开始；`python -m modgen.cli skill "任务描述" --plan` | Python 3.10+，推荐 3.13；知识/数据命令使用标准库 |
+| 完整生成与可选 GUI | `python tools/setup_env.py`，再用 `.venv\Scripts\python ModTools5.4.py` | PyQt6 + Pillow；preview / project-check / build 也需要 PyQt |
+| HTML 转 UI 独立技能 | 分享整个 [skills/civ6-html-ui](skills/civ6-html-ui/README.md) 目录 | 依赖见该目录说明，不绑定 ModTools 版本 |
 
-> 新设备初始化（推荐让 AI agent 代做）：解压 → `python tools/setup_env.py` → 就绪。
-> 详见 `AGENT_SETUP.md`（给 agent 的初始化任务书）。
+新设备见 [AGENT_SETUP.md](AGENT_SETUP.md)。新 Mod 的工作文件放在 `modgen_work/`。
+
+## 分享当前源码
+
+在 Git 工作区中运行（新文件先加入 Git 索引）：
+
+~~~powershell
+python tools/share_source.py --check
+python tools/share_source.py --out shares/ModTools-skills-tools
+~~~
+
+得到一个可直接分享的目录，包含 skills、modgen、共享核心、可选 GUI、运行资源、测试、来源声明及许可证。只复制已跟踪文件的当前内容；生成的 `SOURCE_MANIFEST.json` 记录基准提交、是否存在本地改动和逐文件 SHA-256。目录已存在时拒绝覆盖，更新分享请使用新目录。
+
+[分享与维护约定](docs/SOURCE_SHARING.md)说明包含范围、更新方式和验证命令。Git 与自动检查会排除 EXE、压缩包、虚拟环境及个人配置。
 
 ---
 
@@ -50,7 +63,7 @@
 | 入口 | 适用 |
 |------|------|
 | `python -m modgen.cli search <效果词>` | **AI / 命令行首选**（`--object` 列出 Modifier 完整实现，照抄用） |
-| `python -m modgen.cli skill <关键词>` | **本地技能库章节检索**（仓库根 skills/，随发布包分发：SQL 模板/Lua API/.CIV 工作流/效果技巧；`--plan` 必读清单、`--file --section` 读章节、`--check` 质量检查） |
+| `python -m modgen.cli skill <关键词>` | **本地技能库章节检索**（仓库根 skills/，随源码分发：SQL 模板/Lua API/.CIV 工作流/效果技巧；`--plan` 必读清单、`--file --section` 读章节、`--check` 质量检查） |
 | 小工具窗口 → 能力实现搜索 | GUI 场景（卡片列表 + 详情树 + 图标/颜色渲染） |
 
 - 中文搜效果/描述（自动效果词映射："宣战"→WAR），英文搜 Type/参数（`WAR`、`YIELD_PRODUCTION`）
@@ -61,7 +74,7 @@
 
 ## AI 生成 .CIV（modgen）
 
-发布包随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出。**知识查询（"某个效果怎么实现"）由 `modgen search` 与能力实现搜索提供，AI 不需要记忆游戏知识。**
+源码随附 `modgen/`（纯标准库 CLI）：AI 用命令生成/校验/合并 `.CIV` 条目，**保证 GUI 能打开、能正确导出**——Type 由工具生成、EffectType/RequirementType 存在性由工具校验、参数骨架自动给出。**知识查询（"某个效果怎么实现"）由 `modgen search` 与能力实现搜索提供，AI 不需要记忆游戏知识。**
 
 ### HTML 转文明6 UI（各类 agent 共用）
 
@@ -145,31 +158,15 @@ python ModTools5.4.py 工程.CIV --headless --ai-exec '{"action":"generate_all",
 
 ## 双击 .CIV 文件直接打开
 
-程序支持启动参数传工程路径（`ModTools5.4.exe "xx.CIV"` 或 `python ModTools5.4.py "xx.CIV"`），注册 Windows 文件关联后即可双击打开：
+程序支持 `python ModTools5.4.py "xx.CIV"`。安装 GUI 依赖后，用同一虚拟环境注册 Windows 文件关联：
 
-**方式一：运行注册脚本（推荐）**
+~~~powershell
+.venv\Scripts\python tools/register_file_association.py
+.venv\Scripts\python tools/register_file_association.py --unregister
+.venv\Scripts\python tools/register_file_association.py --status
+~~~
 
-```powershell
-python tools/register_file_association.py        # 注册
-python tools/register_file_association.py --unregister  # 解除
-python tools/register_file_association.py --status      # 查看状态
-```
-
-只写当前用户注册表（`HKCU\Software\Classes`），无需管理员权限。源码运行时关联到 `python + ModTools5.4.py`；打包 exe 运行时自动关联到 exe 自身。
-
-**方式二：手动注册（.reg）**
-
-把下面内容存为 `civ_assoc.reg`（把 `C:\路径\ModTools5.4.exe` 换成你的实际路径，引号不可省），双击导入：
-
-```
-Windows Registry Editor Version 5.00
-
-[HKEY_CURRENT_USER\Software\Classes\.CIV]
-@="ModTools5.4.CIV"
-
-[HKEY_CURRENT_USER\Software\Classes\ModTools5.4.CIV\shell\open\command]
-@="\"C:\\路径\\ModTools5.4.exe\" \"%1\""
-```
+只写当前用户注册表（`HKCU\Software\Classes`），无需管理员权限。关联到当前 Python 和源码入口；移动源码目录后重新注册。
 
 > 注册后若资源管理器未立即生效，重启 explorer 或注销重登即可。
 
@@ -179,7 +176,7 @@ Windows Registry Editor Version 5.00
 
 | 步骤 | 操作 |
 |------|------|
-| 文本数据库 | 发布包自带 `local_text_New.sqlite`（已含基础游戏中文文本），设置页直接选它即可。如需 DLC 文本，点"导入 DLC"选择游戏 DLC 目录追加导入 |
+| 文本数据库 | 源码自带 `local_text_New.sqlite`（已含基础游戏中文文本），设置页直接选它即可。如需 DLC 文本，点"导入 DLC"选择游戏 DLC 目录追加导入 |
 | 游戏数据库 | 选择 `DebugGameplay.sqlite`（`%LOCALAPPDATA%/Firaxis Games/.../Cache/`），用于导入原版对象、修改器搜索与能力实现搜索 |
 
 > 没配文本库 → 中文预览大量"未知"。没配游戏库 → 导入/能力搜索不可用。

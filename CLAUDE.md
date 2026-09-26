@@ -27,21 +27,19 @@ python -m unittest discover -s tests -v
 # Regenerate README screenshots (renders the real UI briefly)
 python tools/make_screenshots.py
 
-# Build release exe (PowerShell, generates dist/ + release/ + ModTools5.4.zip)
-powershell -File build_release.ps1
-
-# Build release exe with a specific Python interpreter
-powershell -File build_release.ps1 -PythonExe python
+# Validate source-only Git distribution and export a new sharing directory
+python tools/share_source.py --check
+python tools/share_source.py --out shares/ModTools-skills-tools
 
 # AI 控制接口（外部 AI 驱动 GUI）
 python ModTools5.4.py 工程.CIV --ai-port 8765 [--ai-token X]     # localhost HTTP 服务（协议见 docs/AI_CONTROL_API.md）
 python ModTools5.4.py 工程.CIV --headless --ai-exec '<json动作>'  # 一次性执行后退出（结果写 %LOCALAPPDATA%\ModTools5.4\logs\ai_exec_result.json）
 ```
 
-- Build uses PyInstaller with `--onefile --noconsole` via `build_release.ps1` (CLI args, no spec file needed; a local `ModTools5.4.spec` exists but is gitignored and secondary).
+- Distribution is source-only: skills + modgen + shared core + optional GUI. tools/share_source.py copies tracked working-tree files and writes commit/hash provenance; it never builds an executable or archive.
 - Only dependencies: PyQt6 + Pillow (see `requirements.txt`). Tests use stdlib `unittest`, no extra deps.
-- Tests are run locally only (no CI). `release.yml` builds the exe on GitHub Actions when pushing a `v*` tag.
-- Note: git tracks `local_text_New.sqlite` (runtime data); large artifacts (zip/exe/pyc/logs) are gitignored.
+- source-check.yml checks Git artifact hygiene, knowledge and the source-sharing tool on pushes/PRs; it exports and smoke-tests a source directory without publishing binaries.
+- Note: git tracks `local_text_New.sqlite` (runtime data); executables, archives, shares, caches and local settings are gitignored and checked in CI.
 
 ## Architecture (verified against source)
 
@@ -117,7 +115,7 @@ ModTools_5_4/
 │   └── TEX_FORMAT.md           # Texture file format reference
 └── logs/                       # modtools_5_4.log (git-tracked history; prefer not adding more)
 ```
-根目录文档：`README.md`（使用教程）、`CIV6_MOD_TUTORIAL.md`（从零全流程教程，随包分发）、`AGENT_SETUP.md`（新设备初始化，给 AI agent）、`modgen/AGENTS.md`（AI 生成 .CIV 必读）、`skills/`（分层本地技能库，随发布包分发，入口 `skills/AGENTS.md`，检索 `modgen skill`）。
+根目录文档：`README.md`（使用教程）、`CIV6_MOD_TUTORIAL.md`（从零全流程教程，随包分发）、`AGENT_SETUP.md`（新设备初始化，给 AI agent）、`modgen/AGENTS.md`（AI 生成 .CIV 必读）、`skills/`（分层本地技能库，随源码分发，入口 `skills/AGENTS.md`，检索 `modgen skill`）。
 
 ## Tests
 
@@ -134,7 +132,7 @@ ModTools_5_4/
 
 **Project extensions**: Optional top-level `.CIV.extensions` (version 1) stores relative source root and role/scope/phase/feature/dependency metadata. Qt-free `project/extensions.py` owns validation, source writes and action planning; CLI `extension` and AI `extension` share it. The workspace manifest reads source copies, builds independent MTX_ actions and blocks missing sources/conflicts. Never let GUI save drop the manifest or use output files as a fallback. `project-check`/`build` still use the existing Qt generation engine. See [extension guide](skills/05-modtools-civ/project-extensions.md).
 
-**Community asset integration**: Qt-free project/leader_fallbacks.py owns optional leader fallback_images state validation and resource names; the editor, validator and image/XLP/ArtDef generators share it. Legacy images.diplo_foreground output remains compatible. project/asset_checks.py backs read-only CLI assets/audio/art/workshop checks with explicit unverified evidence; it does not invoke external build or upload tools. Keep THIRD_PARTY_NOTICES.md, licenses/ and the source sections in skills when packaging. See [integration record](docs/COMMUNITY_SKILL_INTEGRATION.md).
+**Community asset integration**: Qt-free project/leader_fallbacks.py owns optional leader fallback_images state validation and resource names; the editor, validator and image/XLP/ArtDef generators share it. Legacy images.diplo_foreground output remains compatible. project/asset_checks.py backs read-only CLI assets/audio/art/workshop checks with explicit unverified evidence; it does not invoke external build or upload tools. Keep THIRD_PARTY_NOTICES.md, licenses/ and the source sections in skills when sharing source. See [integration record](docs/COMMUNITY_SKILL_INTEGRATION.md).
 
 **Landmark bundles**: Qt-free `project/landmarks.py` composes static SDK TileBase ASTs and managed ArtDef/XLP bundles. CIV art state stores `landmark_bundle.manifest`; GUI roundtrips preserve it, preview/export includes AST, and supplemental Buildings fields merge with existing entries. `modgen/landmark.py` adds import/verify and isolated official Cooker runs with ASCII staging. Keep DLC dependencies from bundle sources; never replace them with a fixed Expansion2-only list. See [landmark skill](skills/civ6-landmarks/SKILL.md).
 

@@ -67,7 +67,7 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 - 根 THIRD_PARTY_NOTICES.md 明确千寻瀑（许可证署名千与千寻瀑）、煎包 / Jianbao233、飞花白、Deliverator / Sukritact，以及原资料注明的间接来源。
 - 五篇指南和新核心模块注明参考范围及独立实现方式。S1 / S2 / S6 未发现独立许可证，不原样分发其脚本和模板。
 - 保留 S4、S5 的原 MIT 许可证全文；不将第三方素材或游戏二进制自动归入本项目许可证。
-- build_release.ps1 同步复制来源声明、licenses 目录和本记录。发行包不依赖用户参考资料目录。
+- 2026-09-26 起由 tools/share_source.py 随源码复制来源声明、licenses 目录和本记录，替代旧打包脚本。源码分享目录不依赖用户参考资料目录。
 
 ## 验证记录
 

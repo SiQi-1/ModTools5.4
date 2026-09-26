@@ -10,14 +10,13 @@
 
 ### 0.1 安装与初始化
 
-| 方式 | 步骤 |
-|------|------|
-| exe（点击即用） | 解压 zip → 双击 `ModTools5.4.exe` |
-| 源码版（推荐给 AI/二次开发） | 解压 zip → `python tools/setup_env.py`（自动建 venv、装依赖、配数据库）→ `.venv\Scripts\python ModTools5.4.py` |
+获取完整源码目录（skills + tools）后，知识检索和数据命令可直接通过 `python -m modgen.cli` 运行。
+完整生成或可视化操作：运行 `python tools/setup_env.py` 初始化，再用 `.venv\Scripts\python ModTools5.4.py` 启动 GUI。
+仓库不再分发 EXE 或预制 ZIP；详见 [源码分享约定](docs/SOURCE_SHARING.md)。
 
 ### 0.2 配置数据库（首次必做）
 
-1. **文本数据库**：设置页选择 `local_text_New.sqlite`（zip 自带）→ 中文显示正常
+1. **文本数据库**：设置页选择 `local_text_New.sqlite`（源码自带）→ 中文显示正常
 2. **游戏数据库**：设置页选择 `DebugGameplay.sqlite`（`%LOCALAPPDATA%\Firaxis Games\Sid Meier's Civilization VI\Cache\`）→ 导入原版对象、能力搜索可用
 
 > 游戏库要求：文明6 至少运行过一次（生成 Cache 数据库）。
@@ -258,7 +257,7 @@ python -m modgen.cli skill <关键词> --file <相对路径>   # 输出命中技
 
 GUI 等效：小工具窗口 → 能力实现搜索（同一份数据，卡片 + 详情树）。
 
-**"怎么写"类知识**（SQL 模板、Lua API、.CIV 工作流）：`modgen skill <关键词>` 查仓库根 `skills/`（随发布包分发，`--file` 看全文）。
+**"怎么写"类知识**（SQL 模板、Lua API、.CIV 工作流）：`modgen skill <关键词>` 查仓库根 `skills/`（随源码分发，`--file` 看全文）。
 
 **搜不到怎么办**：换英文关键词（效果词映射只覆盖常见词）→ 换相近词 → 才考虑"可能没有现成实现"（此时多半需要 Lua——走 `custom-file` 自定义文件通道，见第 4 章 4b）。
 

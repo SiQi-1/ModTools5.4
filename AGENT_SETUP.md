@@ -10,13 +10,15 @@
 
 | 检查项 | 说明 |
 |---|---|
-| 解压 | 本 zip 已解压到目标目录（下文以 `<zip根>` 表示） |
+| 源码 | 已克隆仓库或收到完整源码目录（下文以 `<源码根>` 表示）；不需要 EXE/预制 ZIP |
 | Python | 需要 **3.10+**（3.13 最佳）。未安装：引导用户到 python.org 下载安装，勾选 "Add to PATH" |
 | 文明6 | 最好运行过一次（生成 `%LOCALAPPDATA%\...\Cache\DebugGameplay.sqlite`）；没有也不阻断安装 |
 
-## 1. 执行一键初始化（推荐）
+知识检索、条目生成和资源静态检查可直接用 Python 运行；完整预览/生成和 GUI 再执行下方初始化。源码分享方式见 [分享约定](docs/SOURCE_SHARING.md)。
 
-在 `<zip根>` 目录运行：
+## 1. 执行一键初始化（完整功能）
+
+在 `<源码根>` 目录运行：
 
 ```bash
 python tools/setup_env.py          # 全流程：检测 → venv → 依赖 → 数据库 → 验证
@@ -37,14 +39,14 @@ python -m venv .venv
 
 ### 2.2 配置数据库（settings.json）
 
-在 `<zip根>` 手动创建 `settings.json`（文本库用 zip 自带文件）：
+在 `<源码根>` 手动创建 `settings.json`（文本库用源码自带文件）：
 
 ```json
 {
   "game_db_path": "C:/Users/<用户>/AppData/Local/Firaxis Games/Sid Meier's Civilization VI/Cache/DebugGameplay.sqlite",
-  "active_text_db_path": "<zip根>/local_text_New.sqlite",
+  "active_text_db_path": "<源码根>/local_text_New.sqlite",
   "text_databases": [
-    { "name": "内置中文文本库", "path": "<zip根>/local_text_New.sqlite" }
+    { "name": "内置中文文本库", "path": "<源码根>/local_text_New.sqlite" }
   ]
 }
 ```
@@ -56,7 +58,7 @@ python -m venv .venv
 ```bash
 .venv\Scripts\python -c "import PyQt6, PIL; print('OK')"
 .venv\Scripts\python -m modgen.cli search 农场     # 应输出命中对象（能力搜索验证）
-.venv\Scripts\python -m modgen.cli skill 相邻加成   # 本地技能库检索（zip 自带 skills/）
+.venv\Scripts\python -m modgen.cli skill 相邻加成   # 本地技能库检索（源码自带 skills/）
 .venv\Scripts\python -m modgen.cli generate 区域 --name 测试 --abbr T --prefix X --infix 1
 .venv\Scripts\python -m modgen.cli new-project _smoke.CIV --prefix X --infix 1   # 工程骨架（验证后删除 _smoke.CIV）
 .venv\Scripts\python -m modgen.cli civ6proj _smoke.CIV --update-civ             # .civ6proj 生成（删除 _smoke.CIV 与工程目录）
@@ -72,7 +74,7 @@ python tools/register_file_association.py --status
 
 ## 4. 使用指引（给用户/AI 的一句话总结）
 
-- **启动编辑器**：`<zip根>\.venv\Scripts\python ModTools5.4.py`（或双击 `ModTools5.4.exe`，exe 无需 Python）
+- **启动编辑器**：`<源码根>\.venv\Scripts\python ModTools5.4.py`
 - **AI 生成 .CIV**：必读 `modgen/AGENTS.md`；工具链 = `modgen new-project`（工程骨架）→ `generate/validate/merge`（含修改器 merge）→ `preview`（无头验证导出）→ `civ6proj --update-civ`（绑定输出目录）→ `custom-file`（自定义 SQL/Lua）→ `search/skill`（知识查询）
 - **知识查询**：`modgen search <效果词>`（游戏库实现）/ `skill <关键词>`（本地技能库）/ `query "SELECT ..."`（游戏库只读）/ `loc <LOC_TAG>`，或 GUI 小工具「能力实现搜索」
 - **AI 驱动 GUI**：`python ModTools5.4.py 工程.CIV --ai-port 8765`（协议见 `ModTools_5_4/docs/AI_CONTROL_API.md`）；一次性执行 `--ai-exec '<json动作>'`
@@ -86,20 +88,20 @@ python tools/register_file_association.py --status
 | pip 安装失败（网络/镜像） | 换镜像：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple` |
 | `import PyQt6` 失败 | venv 未激活或装错解释器：确认用的是 `.venv\Scripts\python` |
 | `search 中文` 无结果 | 文本库未配置（settings.json 的 active_text_db_path）；英文关键词不受影响 |
-| 双击 .CIV 无反应 | 未注册关联或 exe 缺失；用 `register_file_association.py --status` 查看 |
+| 双击 .CIV 无反应 | 未注册关联或 Python/源码入口已移动；用 `register_file_association.py --status` 查看 |
 | 中文显示"未知" | 文本库未配置或未导入 DLC 文本 |
 
 ## 6. 目录速览
 
 ```
-<zip根>/
-├─ ModTools5.4.py / ModTools5.4.exe   入口（源码版 / 打包版）
+<源码根>/
+├─ ModTools5.4.py                     可选 GUI 源码入口
 ├─ ModTools_5_4/                      完整源码（agent 可读可改；docs/AI_CONTROL_API.md 在 ModTools_5_4/docs/）
 ├─ modgen/                            AI 生成 .CIV 工具 + AGENTS.md
-├─ skills/                            本地技能库（260+ 技能文件，modgen skill 检索）
+├─ skills/                            本地技能库（modgen skill 检索）
 ├─ tools/setup_env.py                 一键初始化（本文件配套）
 ├─ tools/register_file_association.py .CIV 文件关联
 ├─ local_text_New.sqlite              内置中文文本库
-├─ data/                              可覆盖配置（颜色预设/注释模板等）
+├─ ModTools_5_4/data/                 工具运行资源（颜色预设/注释模板等）
 └─ settings.json                      运行时配置（初始化生成）
 ```

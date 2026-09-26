@@ -4,7 +4,7 @@
 1. 检测 Python 版本（要求 >= 3.10）
 2. 创建 .venv（如不存在）并安装 requirements.txt（PyQt6 + Pillow）
 3. 探测数据库：游戏库（默认游戏 Cache 路径，找不到提示手动指定）、
-   文本库（zip 自带 local_text_New.sqlite）→ 生成便携 settings.json（zip 根目录）
+   文本库（源码自带 local_text_New.sqlite）→ 生成便携 settings.json（源码根目录）
 4. 验证：源码导入冒烟 + modgen 冒烟
 5. 输出就绪报告与后续步骤（注册 .CIV 文件关联等）
 
@@ -23,11 +23,11 @@ import sys
 from pathlib import Path
 
 MIN_PYTHON = (3, 10)
-ZIP_ROOT = Path(__file__).resolve().parent.parent
-VENV_DIR = ZIP_ROOT / ".venv"
-REQUIREMENTS = ZIP_ROOT / "requirements.txt"
-SETTINGS_FILE = ZIP_ROOT / "settings.json"
-TEXT_DB = ZIP_ROOT / "local_text_New.sqlite"
+SOURCE_ROOT = Path(__file__).resolve().parent.parent
+VENV_DIR = SOURCE_ROOT / ".venv"
+REQUIREMENTS = SOURCE_ROOT / "requirements.txt"
+SETTINGS_FILE = SOURCE_ROOT / "settings.json"
+TEXT_DB = SOURCE_ROOT / "local_text_New.sqlite"
 
 DEFAULT_GAME_DB = (
     Path.home()
@@ -109,7 +109,7 @@ def step_configure_dbs(game_db_arg: str | None) -> bool:
 
     text_db = TEXT_DB if TEXT_DB.exists() else None
     if text_db is None:
-        print("[4/5] ⚠️ 未找到 local_text_New.sqlite（zip 内应自带）")
+        print("[4/5] ⚠️ 未找到 local_text_New.sqlite（源码目录应自带）")
     else:
         print(f"[4/5] ✅ 文本库: {text_db.name}")
 
@@ -153,7 +153,7 @@ def step_verify() -> bool:
         [str(python), "-m", "modgen.cli", "generate", "区域", "--name", "测试", "--abbr", "T", "--prefix", "X", "--infix", "1"],
         capture_output=True,
         text=True,
-        cwd=str(ZIP_ROOT),
+        cwd=str(SOURCE_ROOT),
     )
     if result.returncode != 0 or "type" not in result.stdout:
         print("      ❌ modgen 冒烟失败")
@@ -168,7 +168,7 @@ def report() -> None:
     print()
     print("=" * 60)
     print("初始化就绪。使用方式：")
-    print(f"  启动编辑器 : {python} ModTools5.4.py   （或双击 ModTools5.4.exe）")
+    print(f"  启动编辑器 : {python} ModTools5.4.py")
     print(f"  AI 生成 CIV: python -m modgen.cli generate <分类> ...（见 modgen/AGENTS.md）")
     print(f"  能力查询   : python -m modgen.cli search <效果词>")
     print("  注册 .CIV 双击打开: python tools/register_file_association.py")

@@ -1,0 +1,2434 @@
+{
+  "format_version": 1,
+  "source": "Firaxis official game XML and expansion modinfo",
+  "scope": "Base + selected expansion Core; civilization-pack adjustments and game modes are not active in these profiles",
+  "profiles": {
+    "base": {
+      "source_order": [
+        "Base/Assets/Gameplay/Data/Districts.xml",
+        "Base/Assets/Gameplay/Data/Features.xml",
+        "Base/Assets/Gameplay/Data/Improvements.xml"
+      ],
+      "base_districts": {
+        "DISTRICT_AERODROME": {
+          "name": "LOC_DISTRICT_AERODROME_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_AQUEDUCT": {
+          "name": "LOC_DISTRICT_AQUEDUCT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_CAMPUS": {
+          "name": "LOC_DISTRICT_CAMPUS_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Science",
+            "GBR_Science",
+            "Jungle_Science",
+            "Mountains_Science1",
+            "Mountains_Science2",
+            "Mountains_Science3",
+            "Mountains_Science4",
+            "Mountains_Science5"
+          ]
+        },
+        "DISTRICT_CITY_CENTER": {
+          "name": "LOC_DISTRICT_CITY_CENTER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_COMMERCIAL_HUB": {
+          "name": "LOC_DISTRICT_COMMERCIAL_HUB_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Harbor_Gold",
+            "River_Gold",
+            "RoyalDock_Gold"
+          ]
+        },
+        "DISTRICT_ENCAMPMENT": {
+          "name": "LOC_DISTRICT_ENCAMPMENT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_ENTERTAINMENT_COMPLEX": {
+          "name": "LOC_DISTRICT_ENTERTAINMENT_COMPLEX_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_HARBOR": {
+          "name": "LOC_DISTRICT_HARBOR_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Harbor_City_Gold",
+            "SeaResource_Gold"
+          ]
+        },
+        "DISTRICT_HOLY_SITE": {
+          "name": "LOC_DISTRICT_HOLY_SITE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Faith",
+            "Forest_Faith",
+            "Mountain_Faith1",
+            "Mountain_Faith2",
+            "Mountain_Faith3",
+            "Mountain_Faith4",
+            "Mountain_Faith5",
+            "NaturalWonder_Faith"
+          ]
+        },
+        "DISTRICT_INDUSTRIAL_ZONE": {
+          "name": "LOC_DISTRICT_INDUSTRIAL_ZONE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Production",
+            "Mine_Production",
+            "Quarry_Production"
+          ]
+        },
+        "DISTRICT_NEIGHBORHOOD": {
+          "name": "LOC_DISTRICT_NEIGHBORHOOD_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_SPACEPORT": {
+          "name": "LOC_DISTRICT_SPACEPORT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_THEATER": {
+          "name": "LOC_DISTRICT_THEATER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Culture",
+            "Wonder_Culture"
+          ]
+        },
+        "DISTRICT_WONDER": {
+          "name": "LOC_WONDER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        }
+      },
+      "districts": {
+        "DISTRICT_ACROPOLIS": [
+          "District_Culture_City_Center",
+          "District_Culture_Standard",
+          "Wonder_Culture"
+        ],
+        "DISTRICT_CAMPUS": [
+          "District_Science",
+          "GBR_Science",
+          "Jungle_Science",
+          "Mountains_Science1",
+          "Mountains_Science2",
+          "Mountains_Science3",
+          "Mountains_Science4",
+          "Mountains_Science5"
+        ],
+        "DISTRICT_COMMERCIAL_HUB": [
+          "District_Gold",
+          "Harbor_Gold",
+          "River_Gold",
+          "RoyalDock_Gold"
+        ],
+        "DISTRICT_HANSA": [
+          "Commerical_Hub_Production",
+          "District_Production",
+          "Resource_Production"
+        ],
+        "DISTRICT_HARBOR": [
+          "District_Gold",
+          "Harbor_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_HOLY_SITE": [
+          "District_Faith",
+          "Forest_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith"
+        ],
+        "DISTRICT_INDUSTRIAL_ZONE": [
+          "District_Production",
+          "Mine_Production",
+          "Quarry_Production"
+        ],
+        "DISTRICT_LAVRA": [
+          "District_Faith",
+          "Forest_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith"
+        ],
+        "DISTRICT_ROYAL_NAVY_DOCKYARD": [
+          "District_Gold",
+          "RoyalDock_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_THEATER": [
+          "District_Culture",
+          "Wonder_Culture"
+        ]
+      },
+      "improvements": {
+        "IMPROVEMENT_CHATEAU": [
+          "Chateau_River",
+          "Chateau_WonderEarly",
+          "Chateau_WonderLate"
+        ],
+        "IMPROVEMENT_COLOSSAL_HEAD": [
+          "ColossalHead_FaithForest",
+          "ColossalHead_FaithJungle"
+        ],
+        "IMPROVEMENT_FARM": [
+          "Farms_MechanizedAdjacency",
+          "Farms_MedievalAdjacency"
+        ],
+        "IMPROVEMENT_GREAT_WALL": [
+          "GreatWall_Culture",
+          "GreatWall_Gold"
+        ],
+        "IMPROVEMENT_KURGAN": [
+          "Kurgan_Faith",
+          "Kurgan_Faith_Stirrups"
+        ],
+        "IMPROVEMENT_MISSION": [
+          "Mission_Science_Campus",
+          "Mission_Science_HolySite"
+        ]
+      },
+      "definitions": {
+        "Chateau_River": {
+          "ID": "Chateau_River",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderEarly": {
+          "ID": "Chateau_WonderEarly",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "ObsoleteTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderLate": {
+          "ID": "Chateau_WonderLate",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "PrereqTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "ColossalHead_FaithForest": {
+          "ID": "ColossalHead_FaithForest",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "ColossalHead_FaithJungle": {
+          "ID": "ColossalHead_FaithJungle",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Commerical_Hub_Production": {
+          "ID": "Commerical_Hub_Production",
+          "Description": "LOC_DISTRICT_COMMERCIAL_HUB_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_COMMERCIAL_HUB",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture": {
+          "ID": "District_Culture",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_City_Center": {
+          "ID": "District_Culture_City_Center",
+          "Description": "LOC_DISTRICT_CULTURE_CITY_CENTER",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_Standard": {
+          "ID": "District_Culture_Standard",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE_STANDARD",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Faith": {
+          "ID": "District_Faith",
+          "Description": "LOC_DISTRICT_DISTRICT_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Gold": {
+          "ID": "District_Gold",
+          "Description": "LOC_DISTRICT_DISTRICT_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Production": {
+          "ID": "District_Production",
+          "Description": "LOC_DISTRICT_DISTRICT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Science": {
+          "ID": "District_Science",
+          "Description": "LOC_DISTRICT_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Farms_MechanizedAdjacency": {
+          "ID": "Farms_MechanizedAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Farms_MedievalAdjacency": {
+          "ID": "Farms_MedievalAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqCivic": "CIVIC_FEUDALISM",
+          "ObsoleteTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Forest_Faith": {
+          "ID": "Forest_Faith",
+          "Description": "LOC_DISTRICT_FOREST_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "GBR_Science": {
+          "ID": "GBR_Science",
+          "Description": "LOC_FEATURE_BARRIER_REEF_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_BARRIER_REEF",
+          "_source": "Base/Assets/Gameplay/Data/Features.xml"
+        },
+        "GreatWall_Culture": {
+          "ID": "GreatWall_Culture",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_CASTLES",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "GreatWall_Gold": {
+          "ID": "GreatWall_Gold",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_MASONRY",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Harbor_City_Gold": {
+          "ID": "Harbor_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Harbor_Gold": {
+          "ID": "Harbor_Gold",
+          "Description": "LOC_DISTRICT_HARBOR_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HARBOR",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Jungle_Science": {
+          "ID": "Jungle_Science",
+          "Description": "LOC_DISTRICT_JUNGLE_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Kurgan_Faith": {
+          "ID": "Kurgan_Faith",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "ObsoleteTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Kurgan_Faith_Stirrups": {
+          "ID": "Kurgan_Faith_Stirrups",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "PrereqTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mine_Production": {
+          "ID": "Mine_Production",
+          "Description": "LOC_DISTRICT_MINE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_MINE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mission_Science_Campus": {
+          "ID": "Mission_Science_Campus",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CAMPUS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mission_Science_HolySite": {
+          "ID": "Mission_Science_HolySite",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HOLY_SITE",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mountain_Faith1": {
+          "ID": "Mountain_Faith1",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH1",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith2": {
+          "ID": "Mountain_Faith2",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH2",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith3": {
+          "ID": "Mountain_Faith3",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH3",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith4": {
+          "ID": "Mountain_Faith4",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH4",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith5": {
+          "ID": "Mountain_Faith5",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH5",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science1": {
+          "ID": "Mountains_Science1",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE1",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science2": {
+          "ID": "Mountains_Science2",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE2",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science3": {
+          "ID": "Mountains_Science3",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE3",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science4": {
+          "ID": "Mountains_Science4",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE4",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science5": {
+          "ID": "Mountains_Science5",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE5",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "NaturalWonder_Faith": {
+          "ID": "NaturalWonder_Faith",
+          "Description": "LOC_DISTRICT_NATURALWONDER_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentNaturalWonder": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Quarry_Production": {
+          "ID": "Quarry_Production",
+          "Description": "LOC_DISTRICT_QUARRY_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_QUARRY",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Resource_Production": {
+          "ID": "Resource_Production",
+          "Description": "LOC_DISTRICT_RESOURCE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "River_Gold": {
+          "ID": "River_Gold",
+          "Description": "LOC_DISTRICT_RIVER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_City_Gold": {
+          "ID": "RoyalDock_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_Gold": {
+          "ID": "RoyalDock_Gold",
+          "Description": "LOC_DISTRICT_ROYAL_NAVY_DOCKYARD_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_ROYAL_NAVY_DOCKYARD",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "SeaResource_Gold": {
+          "ID": "SeaResource_Gold",
+          "Description": "LOC_DISTRICT_SEARESOURCE_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentSeaResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Wonder_Culture": {
+          "ID": "Wonder_Culture",
+          "Description": "LOC_DISTRICT_WONDER_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        }
+      }
+    },
+    "expansion1": {
+      "source_order": [
+        "Base/Assets/Gameplay/Data/Districts.xml",
+        "Base/Assets/Gameplay/Data/Features.xml",
+        "Base/Assets/Gameplay/Data/Improvements.xml",
+        "DLC/Expansion1/Data/Expansion1_Districts.xml",
+        "DLC/Expansion1/Data/Expansion1_Improvements.xml"
+      ],
+      "base_districts": {
+        "DISTRICT_AERODROME": {
+          "name": "LOC_DISTRICT_AERODROME_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_AQUEDUCT": {
+          "name": "LOC_DISTRICT_AQUEDUCT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_CAMPUS": {
+          "name": "LOC_DISTRICT_CAMPUS_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Science",
+            "GBR_Science",
+            "Government_Science",
+            "Jungle_Science",
+            "Mountains_Science1",
+            "Mountains_Science2",
+            "Mountains_Science3",
+            "Mountains_Science4",
+            "Mountains_Science5"
+          ]
+        },
+        "DISTRICT_CITY_CENTER": {
+          "name": "LOC_DISTRICT_CITY_CENTER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_COMMERCIAL_HUB": {
+          "name": "LOC_DISTRICT_COMMERCIAL_HUB_NAME",
+          "source": "DLC/Expansion1/Data/Expansion1_Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Government_Gold",
+            "Harbor_Gold",
+            "River_Gold",
+            "RoyalDock_Gold"
+          ]
+        },
+        "DISTRICT_ENCAMPMENT": {
+          "name": "LOC_DISTRICT_ENCAMPMENT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_ENTERTAINMENT_COMPLEX": {
+          "name": "LOC_DISTRICT_ENTERTAINMENT_COMPLEX_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_GOVERNMENT": {
+          "name": "LOC_DISTRICT_GOVERNMENT_NAME",
+          "source": "DLC/Expansion1/Data/Expansion1_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_HARBOR": {
+          "name": "LOC_DISTRICT_HARBOR_NAME",
+          "source": "DLC/Expansion1/Data/Expansion1_Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Government_Gold",
+            "Harbor_City_Gold",
+            "SeaResource_Gold"
+          ]
+        },
+        "DISTRICT_HOLY_SITE": {
+          "name": "LOC_DISTRICT_HOLY_SITE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Faith",
+            "Forest_Faith",
+            "Government_Faith",
+            "Mountain_Faith1",
+            "Mountain_Faith2",
+            "Mountain_Faith3",
+            "Mountain_Faith4",
+            "Mountain_Faith5",
+            "NaturalWonder_Faith"
+          ]
+        },
+        "DISTRICT_INDUSTRIAL_ZONE": {
+          "name": "LOC_DISTRICT_INDUSTRIAL_ZONE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Production",
+            "Government_Production",
+            "Mine_Production",
+            "Quarry_Production"
+          ]
+        },
+        "DISTRICT_NEIGHBORHOOD": {
+          "name": "LOC_DISTRICT_NEIGHBORHOOD_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_SPACEPORT": {
+          "name": "LOC_DISTRICT_SPACEPORT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_THEATER": {
+          "name": "LOC_DISTRICT_THEATER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Culture",
+            "Government_Culture",
+            "Wonder_Culture"
+          ]
+        },
+        "DISTRICT_WATER_ENTERTAINMENT_COMPLEX": {
+          "name": "LOC_DISTRICT_WATER_ENTERTAINMENT_COMPLEX_NAME",
+          "source": "DLC/Expansion1/Data/Expansion1_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_WONDER": {
+          "name": "LOC_WONDER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        }
+      },
+      "districts": {
+        "DISTRICT_ACROPOLIS": [
+          "District_Culture_City_Center",
+          "District_Culture_Standard",
+          "Government_Culture",
+          "Wonder_Culture"
+        ],
+        "DISTRICT_CAMPUS": [
+          "District_Science",
+          "GBR_Science",
+          "Government_Science",
+          "Jungle_Science",
+          "Mountains_Science1",
+          "Mountains_Science2",
+          "Mountains_Science3",
+          "Mountains_Science4",
+          "Mountains_Science5"
+        ],
+        "DISTRICT_COMMERCIAL_HUB": [
+          "District_Gold",
+          "Government_Gold",
+          "Harbor_Gold",
+          "River_Gold",
+          "RoyalDock_Gold"
+        ],
+        "DISTRICT_HANSA": [
+          "Commerical_Hub_Production",
+          "District_Production",
+          "Government_Production",
+          "Resource_Production"
+        ],
+        "DISTRICT_HARBOR": [
+          "District_Gold",
+          "Government_Gold",
+          "Harbor_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_HOLY_SITE": [
+          "District_Faith",
+          "Forest_Faith",
+          "Government_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith"
+        ],
+        "DISTRICT_INDUSTRIAL_ZONE": [
+          "District_Production",
+          "Government_Production",
+          "Mine_Production",
+          "Quarry_Production"
+        ],
+        "DISTRICT_LAVRA": [
+          "District_Faith",
+          "Forest_Faith",
+          "Government_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith"
+        ],
+        "DISTRICT_ROYAL_NAVY_DOCKYARD": [
+          "District_Gold",
+          "Government_Gold",
+          "RoyalDock_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_THEATER": [
+          "District_Culture",
+          "Government_Culture",
+          "Wonder_Culture"
+        ]
+      },
+      "improvements": {
+        "IMPROVEMENT_CHATEAU": [
+          "Chateau_River",
+          "Chateau_WonderEarly",
+          "Chateau_WonderLate"
+        ],
+        "IMPROVEMENT_COLOSSAL_HEAD": [
+          "ColossalHead_FaithForest",
+          "ColossalHead_FaithJungle"
+        ],
+        "IMPROVEMENT_FARM": [
+          "Farms_MechanizedAdjacency",
+          "Farms_MedievalAdjacency"
+        ],
+        "IMPROVEMENT_FISHERY": [
+          "Fishery_SeaResourceAdjacency"
+        ],
+        "IMPROVEMENT_GREAT_WALL": [
+          "GreatWall_Culture",
+          "GreatWall_Gold"
+        ],
+        "IMPROVEMENT_KURGAN": [
+          "Kurgan_Faith",
+          "Kurgan_Faith_Stirrups"
+        ],
+        "IMPROVEMENT_MISSION": [
+          "Mission_Science_Campus",
+          "Mission_Science_HolySite"
+        ]
+      },
+      "definitions": {
+        "BaseDistrict_Science": {
+          "ID": "BaseDistrict_Science",
+          "Description": "LOC_DISTRICT_BASE_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 4,
+          "Self": true,
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Chateau_River": {
+          "ID": "Chateau_River",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderEarly": {
+          "ID": "Chateau_WonderEarly",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "ObsoleteTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderLate": {
+          "ID": "Chateau_WonderLate",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "PrereqTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "ColossalHead_FaithForest": {
+          "ID": "ColossalHead_FaithForest",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "ColossalHead_FaithJungle": {
+          "ID": "ColossalHead_FaithJungle",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Commerical_Hub_Production": {
+          "ID": "Commerical_Hub_Production",
+          "Description": "LOC_DISTRICT_COMMERCIAL_HUB_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_COMMERCIAL_HUB",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture": {
+          "ID": "District_Culture",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_City_Center": {
+          "ID": "District_Culture_City_Center",
+          "Description": "LOC_DISTRICT_CULTURE_CITY_CENTER",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_Standard": {
+          "ID": "District_Culture_Standard",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE_STANDARD",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Faith": {
+          "ID": "District_Faith",
+          "Description": "LOC_DISTRICT_DISTRICT_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Gold": {
+          "ID": "District_Gold",
+          "Description": "LOC_DISTRICT_DISTRICT_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Production": {
+          "ID": "District_Production",
+          "Description": "LOC_DISTRICT_DISTRICT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Science": {
+          "ID": "District_Science",
+          "Description": "LOC_DISTRICT_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Farms_MechanizedAdjacency": {
+          "ID": "Farms_MechanizedAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Farms_MedievalAdjacency": {
+          "ID": "Farms_MedievalAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqCivic": "CIVIC_FEUDALISM",
+          "ObsoleteTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Fishery_SeaResourceAdjacency": {
+          "ID": "Fishery_SeaResourceAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentSeaResource": true,
+          "_source": "DLC/Expansion1/Data/Expansion1_Improvements.xml"
+        },
+        "Forest_Faith": {
+          "ID": "Forest_Faith",
+          "Description": "LOC_DISTRICT_FOREST_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "GBR_Science": {
+          "ID": "GBR_Science",
+          "Description": "LOC_FEATURE_BARRIER_REEF_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_BARRIER_REEF",
+          "_source": "Base/Assets/Gameplay/Data/Features.xml"
+        },
+        "Government_Culture": {
+          "ID": "Government_Culture",
+          "Description": "LOC_DISTRICT_GOVERNMENT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Government_Faith": {
+          "ID": "Government_Faith",
+          "Description": "LOC_DISTRICT_GOVERNMENT_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Government_Gold": {
+          "ID": "Government_Gold",
+          "Description": "LOC_DISTRICT_GOVERNMENT_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Government_Production": {
+          "ID": "Government_Production",
+          "Description": "LOC_DISTRICT_GOVERNMENT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Government_Science": {
+          "ID": "Government_Science",
+          "Description": "LOC_DISTRICT_GOVERNMENT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "GreatWall_Culture": {
+          "ID": "GreatWall_Culture",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_CASTLES",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "GreatWall_Gold": {
+          "ID": "GreatWall_Gold",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_MASONRY",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Harbor_City_Gold": {
+          "ID": "Harbor_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Harbor_Gold": {
+          "ID": "Harbor_Gold",
+          "Description": "LOC_DISTRICT_HARBOR_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HARBOR",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Jungle_Science": {
+          "ID": "Jungle_Science",
+          "Description": "LOC_DISTRICT_JUNGLE_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Kurgan_Faith": {
+          "ID": "Kurgan_Faith",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "ObsoleteTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Kurgan_Faith_Stirrups": {
+          "ID": "Kurgan_Faith_Stirrups",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "PrereqTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mine_Production": {
+          "ID": "Mine_Production",
+          "Description": "LOC_DISTRICT_MINE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_MINE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mission_Science_Campus": {
+          "ID": "Mission_Science_Campus",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CAMPUS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mission_Science_HolySite": {
+          "ID": "Mission_Science_HolySite",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HOLY_SITE",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mountain_Faith1": {
+          "ID": "Mountain_Faith1",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH1",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith2": {
+          "ID": "Mountain_Faith2",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH2",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith3": {
+          "ID": "Mountain_Faith3",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH3",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith4": {
+          "ID": "Mountain_Faith4",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH4",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith5": {
+          "ID": "Mountain_Faith5",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH5",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science1": {
+          "ID": "Mountains_Science1",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE1",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science2": {
+          "ID": "Mountains_Science2",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE2",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science3": {
+          "ID": "Mountains_Science3",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE3",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science4": {
+          "ID": "Mountains_Science4",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE4",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science5": {
+          "ID": "Mountains_Science5",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE5",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "NaturalWonder_Faith": {
+          "ID": "NaturalWonder_Faith",
+          "Description": "LOC_DISTRICT_NATURALWONDER_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentNaturalWonder": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "NegativeDistrict_Science": {
+          "ID": "NegativeDistrict_Science",
+          "Description": "LOC_DISTRICT_NEGATIVE_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": -1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        },
+        "Quarry_Production": {
+          "ID": "Quarry_Production",
+          "Description": "LOC_DISTRICT_QUARRY_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_QUARRY",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Resource_Production": {
+          "ID": "Resource_Production",
+          "Description": "LOC_DISTRICT_RESOURCE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "River_Gold": {
+          "ID": "River_Gold",
+          "Description": "LOC_DISTRICT_RIVER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_City_Gold": {
+          "ID": "RoyalDock_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_Gold": {
+          "ID": "RoyalDock_Gold",
+          "Description": "LOC_DISTRICT_ROYAL_NAVY_DOCKYARD_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_ROYAL_NAVY_DOCKYARD",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "SeaResource_Gold": {
+          "ID": "SeaResource_Gold",
+          "Description": "LOC_DISTRICT_SEARESOURCE_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentSeaResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Wonder_Culture": {
+          "ID": "Wonder_Culture",
+          "Description": "LOC_DISTRICT_WONDER_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "_source": "DLC/Expansion1/Data/Expansion1_Districts.xml"
+        }
+      }
+    },
+    "expansion2": {
+      "source_order": [
+        "Base/Assets/Gameplay/Data/Districts.xml",
+        "Base/Assets/Gameplay/Data/Features.xml",
+        "Base/Assets/Gameplay/Data/Improvements.xml",
+        "DLC/Expansion2/Data/Expansion2_RemoveData.xml",
+        "DLC/Expansion2/Data/Expansion1_Districts.xml",
+        "DLC/Expansion2/Data/Expansion1_Improvements.xml",
+        "DLC/Expansion2/Data/Expansion2_Districts.xml",
+        "DLC/Expansion2/Data/Expansion2_Features.xml",
+        "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+      ],
+      "base_districts": {
+        "DISTRICT_AERODROME": {
+          "name": "LOC_DISTRICT_AERODROME_NAME",
+          "source": "DLC/Expansion2/Data/Expansion2_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_AQUEDUCT": {
+          "name": "LOC_DISTRICT_AQUEDUCT_NAME",
+          "source": "DLC/Expansion2/Data/Expansion2_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_CAMPUS": {
+          "name": "LOC_DISTRICT_CAMPUS_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Science",
+            "GBR_Science",
+            "Geothermal_Science",
+            "Government_Science",
+            "Jungle_Science",
+            "Mountains_Science1",
+            "Mountains_Science2",
+            "Mountains_Science3",
+            "Mountains_Science4",
+            "Mountains_Science5",
+            "Pamukkale_Science",
+            "Reef_Science"
+          ]
+        },
+        "DISTRICT_CANAL": {
+          "name": "LOC_DISTRICT_CANAL_NAME",
+          "source": "DLC/Expansion2/Data/Expansion2_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_CITY_CENTER": {
+          "name": "LOC_DISTRICT_CITY_CENTER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_COMMERCIAL_HUB": {
+          "name": "LOC_DISTRICT_COMMERCIAL_HUB_NAME",
+          "source": "DLC/Expansion2/Data/Expansion1_Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Government_Gold",
+            "Harbor_Gold",
+            "Pamukkale_Gold",
+            "River_Gold",
+            "RoyalDock_Gold"
+          ]
+        },
+        "DISTRICT_DAM": {
+          "name": "LOC_DISTRICT_DAM_NAME",
+          "source": "DLC/Expansion2/Data/Expansion2_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_ENCAMPMENT": {
+          "name": "LOC_DISTRICT_ENCAMPMENT_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_ENTERTAINMENT_COMPLEX": {
+          "name": "LOC_DISTRICT_ENTERTAINMENT_COMPLEX_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_GOVERNMENT": {
+          "name": "LOC_DISTRICT_GOVERNMENT_NAME",
+          "source": "DLC/Expansion2/Data/Expansion1_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_HARBOR": {
+          "name": "LOC_DISTRICT_HARBOR_NAME",
+          "source": "DLC/Expansion2/Data/Expansion1_Districts.xml",
+          "adjacencies": [
+            "District_Gold",
+            "Government_Gold",
+            "Harbor_City_Gold",
+            "SeaResource_Gold"
+          ]
+        },
+        "DISTRICT_HOLY_SITE": {
+          "name": "LOC_DISTRICT_HOLY_SITE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "District_Faith",
+            "Forest_Faith",
+            "Government_Faith",
+            "Mountain_Faith1",
+            "Mountain_Faith2",
+            "Mountain_Faith3",
+            "Mountain_Faith4",
+            "Mountain_Faith5",
+            "NaturalWonder_Faith",
+            "Pamukkale_Faith"
+          ]
+        },
+        "DISTRICT_INDUSTRIAL_ZONE": {
+          "name": "LOC_DISTRICT_INDUSTRIAL_ZONE_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "Aqueduct_Production",
+            "Bath_Production",
+            "Canal_Production",
+            "Dam_Production",
+            "District_Production",
+            "Government_Production",
+            "LumberMill_HalfProduction",
+            "Minel_HalfProduction",
+            "Quarry_Production",
+            "Strategic_Production"
+          ]
+        },
+        "DISTRICT_NEIGHBORHOOD": {
+          "name": "LOC_DISTRICT_NEIGHBORHOOD_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_SPACEPORT": {
+          "name": "LOC_DISTRICT_SPACEPORT_NAME",
+          "source": "DLC/Expansion2/Data/Expansion2_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_THEATER": {
+          "name": "LOC_DISTRICT_THEATER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": [
+            "Copacabana_Culture",
+            "District_Culture",
+            "EntertainmentComplex_Culture",
+            "Government_Culture",
+            "Pamukkale_Culture",
+            "StreetCarnival_Culture",
+            "WaterPark_Culture",
+            "Wonder_Culture"
+          ]
+        },
+        "DISTRICT_WATER_ENTERTAINMENT_COMPLEX": {
+          "name": "LOC_DISTRICT_WATER_ENTERTAINMENT_COMPLEX_NAME",
+          "source": "DLC/Expansion2/Data/Expansion1_Districts.xml",
+          "adjacencies": []
+        },
+        "DISTRICT_WONDER": {
+          "name": "LOC_WONDER_NAME",
+          "source": "Base/Assets/Gameplay/Data/Districts.xml",
+          "adjacencies": []
+        }
+      },
+      "districts": {
+        "DISTRICT_ACROPOLIS": [
+          "District_Culture_City_Center",
+          "District_Culture_Standard",
+          "EntertainmentComplex_Culture",
+          "Government_Culture",
+          "Pamukkale_Culture",
+          "WaterPark_Culture",
+          "Wonder_Culture"
+        ],
+        "DISTRICT_CAMPUS": [
+          "District_Science",
+          "GBR_Science",
+          "Geothermal_Science",
+          "Government_Science",
+          "Jungle_Science",
+          "Mountains_Science1",
+          "Mountains_Science2",
+          "Mountains_Science3",
+          "Mountains_Science4",
+          "Mountains_Science5",
+          "Pamukkale_Science",
+          "Reef_Science"
+        ],
+        "DISTRICT_COMMERCIAL_HUB": [
+          "District_Gold",
+          "Government_Gold",
+          "Harbor_Gold",
+          "Pamukkale_Gold",
+          "River_Gold",
+          "RoyalDock_Gold"
+        ],
+        "DISTRICT_HANSA": [
+          "Aqueduct_Production",
+          "Canal_Production",
+          "Commerical_Hub_Production",
+          "Dam_Production",
+          "District_Production",
+          "Government_Production",
+          "Resource_Production"
+        ],
+        "DISTRICT_HARBOR": [
+          "District_Gold",
+          "Government_Gold",
+          "Harbor_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_HOLY_SITE": [
+          "District_Faith",
+          "Forest_Faith",
+          "Government_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith",
+          "Pamukkale_Faith"
+        ],
+        "DISTRICT_INDUSTRIAL_ZONE": [
+          "Aqueduct_Production",
+          "Bath_Production",
+          "Canal_Production",
+          "Dam_Production",
+          "District_Production",
+          "Government_Production",
+          "LumberMill_HalfProduction",
+          "Minel_HalfProduction",
+          "Quarry_Production",
+          "Strategic_Production"
+        ],
+        "DISTRICT_LAVRA": [
+          "District_Faith",
+          "Forest_Faith",
+          "Government_Faith",
+          "Mountain_Faith1",
+          "Mountain_Faith2",
+          "Mountain_Faith3",
+          "Mountain_Faith4",
+          "Mountain_Faith5",
+          "NaturalWonder_Faith",
+          "Pamukkale_Faith"
+        ],
+        "DISTRICT_ROYAL_NAVY_DOCKYARD": [
+          "District_Gold",
+          "Government_Gold",
+          "RoyalDock_City_Gold",
+          "SeaResource_Gold"
+        ],
+        "DISTRICT_SUGUBA": [
+          "Pamukkale_Gold"
+        ],
+        "DISTRICT_THEATER": [
+          "Copacabana_Culture",
+          "District_Culture",
+          "EntertainmentComplex_Culture",
+          "Government_Culture",
+          "Pamukkale_Culture",
+          "StreetCarnival_Culture",
+          "WaterPark_Culture",
+          "Wonder_Culture"
+        ]
+      },
+      "improvements": {
+        "IMPROVEMENT_CHATEAU": [
+          "Chateau_River",
+          "Chateau_WonderEarly",
+          "Chateau_WonderLate"
+        ],
+        "IMPROVEMENT_COLOSSAL_HEAD": [
+          "ColossalHead_FaithForestEarly",
+          "ColossalHead_FaithForestLate",
+          "ColossalHead_FaithJungleEarly",
+          "ColossalHead_FaithJungleLate"
+        ],
+        "IMPROVEMENT_FARM": [
+          "Farms_MechanizedAdjacency",
+          "Farms_MedievalAdjacency"
+        ],
+        "IMPROVEMENT_FISHERY": [
+          "Fishery_SeaResourceAdjacency"
+        ],
+        "IMPROVEMENT_FISHING_BOATS": [
+          "Fishingboats_Seastead_Production"
+        ],
+        "IMPROVEMENT_GREAT_WALL": [
+          "GreatWall_Culture",
+          "GreatWall_Gold"
+        ],
+        "IMPROVEMENT_KURGAN": [
+          "Kurgan_Faith",
+          "Kurgan_Faith_Stirrups"
+        ],
+        "IMPROVEMENT_MISSION": [
+          "Mission_Science_Campus",
+          "Mission_Science_HolySite"
+        ],
+        "IMPROVEMENT_MOAI": [
+          "Moai_FirstBonusAdjacency",
+          "Moai_SecondBonusAdjacency"
+        ],
+        "IMPROVEMENT_MOUND": [
+          "Mound_MechanizedAdjacency",
+          "Mound_MedievalAdjacency"
+        ],
+        "IMPROVEMENT_SEASTEAD": [
+          "Seastead_Fishingboats_Production",
+          "Seastead_Reef_Culture"
+        ]
+      },
+      "definitions": {
+        "Aqueduct_Production": {
+          "ID": "Aqueduct_Production",
+          "Description": "LOC_DISTRICT_AQUEDUCT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_AQUEDUCT",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "BaseDistrict_Science": {
+          "ID": "BaseDistrict_Science",
+          "Description": "LOC_DISTRICT_BASE_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 4,
+          "Self": true,
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Bath_Production": {
+          "ID": "Bath_Production",
+          "Description": "LOC_DISTRICT_BATH_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_BATH",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Canal_Production": {
+          "ID": "Canal_Production",
+          "Description": "LOC_DISTRICT_CANAL_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CANAL",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Chateau_Luxury": {
+          "ID": "Chateau_Luxury",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentResourceClass": "RESOURCECLASS_LUXURY",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Chateau_River": {
+          "ID": "Chateau_River",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderEarly": {
+          "ID": "Chateau_WonderEarly",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "ObsoleteTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Chateau_WonderLate": {
+          "ID": "Chateau_WonderLate",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "PrereqTech": "TECH_FLIGHT",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "ColossalHead_FaithForestEarly": {
+          "ID": "ColossalHead_FaithForestEarly",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "ObsoleteCivic": "CIVIC_HUMANISM",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "ColossalHead_FaithForestLate": {
+          "ID": "ColossalHead_FaithForestLate",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "PrereqCivic": "CIVIC_HUMANISM",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "ColossalHead_FaithJungleEarly": {
+          "ID": "ColossalHead_FaithJungleEarly",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "ObsoleteCivic": "CIVIC_HUMANISM",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "ColossalHead_FaithJungleLate": {
+          "ID": "ColossalHead_FaithJungleLate",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "PrereqCivic": "CIVIC_HUMANISM",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Commerical_Hub_Production": {
+          "ID": "Commerical_Hub_Production",
+          "Description": "LOC_DISTRICT_COMMERCIAL_HUB_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_COMMERCIAL_HUB",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Copacabana_Culture": {
+          "ID": "Copacabana_Culture",
+          "Description": "LOC_DISTRICT_COPACABANA_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_WATER_STREET_CARNIVAL",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Dam_Production": {
+          "ID": "Dam_Production",
+          "Description": "LOC_DISTRICT_DAM_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_DAM",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "District_Culture": {
+          "ID": "District_Culture",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_City_Center": {
+          "ID": "District_Culture_City_Center",
+          "Description": "LOC_DISTRICT_CULTURE_CITY_CENTER",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Culture_Standard": {
+          "ID": "District_Culture_Standard",
+          "Description": "LOC_DISTRICT_DISTRICT_CULTURE_STANDARD",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Faith": {
+          "ID": "District_Faith",
+          "Description": "LOC_DISTRICT_DISTRICT_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Gold": {
+          "ID": "District_Gold",
+          "Description": "LOC_DISTRICT_DISTRICT_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Production": {
+          "ID": "District_Production",
+          "Description": "LOC_DISTRICT_DISTRICT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "District_Science": {
+          "ID": "District_Science",
+          "Description": "LOC_DISTRICT_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "EntertainmentComplex_Culture": {
+          "ID": "EntertainmentComplex_Culture",
+          "Description": "LOC_DISTRICT_ENTERTAINMENT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_ENTERTAINMENT_COMPLEX",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Farms_MechanizedAdjacency": {
+          "ID": "Farms_MechanizedAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Farms_MedievalAdjacency": {
+          "ID": "Farms_MedievalAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_FARM",
+          "PrereqCivic": "CIVIC_FEUDALISM",
+          "ObsoleteTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Fishery_SeaResourceAdjacency": {
+          "ID": "Fishery_SeaResourceAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentSeaResource": true,
+          "_source": "DLC/Expansion2/Data/Expansion1_Improvements.xml"
+        },
+        "Fishingboats_Seastead_Production": {
+          "ID": "Fishingboats_Seastead_Production",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_SEASTEAD",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Forest_Faith": {
+          "ID": "Forest_Faith",
+          "Description": "LOC_DISTRICT_FOREST_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_FOREST",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "GBR_Science": {
+          "ID": "GBR_Science",
+          "Description": "LOC_FEATURE_BARRIER_REEF_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_BARRIER_REEF",
+          "_source": "Base/Assets/Gameplay/Data/Features.xml"
+        },
+        "Geothermal_Science": {
+          "ID": "Geothermal_Science",
+          "Description": "LOC_DISTRICT_GEOTHERMAL_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_GEOTHERMAL_FISSURE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Government_Culture": {
+          "ID": "Government_Culture",
+          "Description": "LOC_DISTRICT_GOVERNMENT_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Government_Faith": {
+          "ID": "Government_Faith",
+          "Description": "LOC_DISTRICT_GOVERNMENT_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Government_Gold": {
+          "ID": "Government_Gold",
+          "Description": "LOC_DISTRICT_GOVERNMENT_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Government_Production": {
+          "ID": "Government_Production",
+          "Description": "LOC_DISTRICT_GOVERNMENT_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Government_Science": {
+          "ID": "Government_Science",
+          "Description": "LOC_DISTRICT_GOVERNMENT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_GOVERNMENT",
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "GreatWall_Culture": {
+          "ID": "GreatWall_Culture",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_CASTLES",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "GreatWall_Gold": {
+          "ID": "GreatWall_Gold",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_GREAT_WALL",
+          "PrereqTech": "TECH_MASONRY",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Harbor_City_Gold": {
+          "ID": "Harbor_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Harbor_Gold": {
+          "ID": "Harbor_Gold",
+          "Description": "LOC_DISTRICT_HARBOR_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HARBOR",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Jungle_Science": {
+          "ID": "Jungle_Science",
+          "Description": "LOC_DISTRICT_JUNGLE_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentFeature": "FEATURE_JUNGLE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Kurgan_Faith": {
+          "ID": "Kurgan_Faith",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "ObsoleteTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Kurgan_Faith_Stirrups": {
+          "ID": "Kurgan_Faith_Stirrups",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_PASTURE",
+          "PrereqTech": "TECH_STIRRUPS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "LumberMill_HalfProduction": {
+          "ID": "LumberMill_HalfProduction",
+          "Description": "LOC_DISTRICT_LUMBER_MILL_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_LUMBER_MILL",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Mine_Production": {
+          "ID": "Mine_Production",
+          "Description": "LOC_DISTRICT_MINE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_MINE",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Minel_HalfProduction": {
+          "ID": "Minel_HalfProduction",
+          "Description": "LOC_DISTRICT_MINES_HALF_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_MINE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Mission_Science_Campus": {
+          "ID": "Mission_Science_Campus",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CAMPUS",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Mission_Science_HolySite": {
+          "ID": "Mission_Science_HolySite",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_HOLY_SITE",
+          "_source": "Base/Assets/Gameplay/Data/Improvements.xml"
+        },
+        "Moai_FirstBonusAdjacency": {
+          "ID": "Moai_FirstBonusAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "AdjacentImprovement": "IMPROVEMENT_MOAI",
+          "ObsoleteCivic": "CIVIC_MEDIEVAL_FAIRES",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Moai_SecondBonusAdjacency": {
+          "ID": "Moai_SecondBonusAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_MOAI",
+          "PrereqCivic": "CIVIC_MEDIEVAL_FAIRES",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Mound_MechanizedAdjacency": {
+          "ID": "Mound_MechanizedAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "PrereqTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Mound_MedievalAdjacency": {
+          "ID": "Mound_MedievalAdjacency",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_FOOD",
+          "YieldChange": 1,
+          "TilesRequired": 2,
+          "OtherDistrictAdjacent": true,
+          "PrereqCivic": "CIVIC_FEUDALISM",
+          "ObsoleteTech": "TECH_REPLACEABLE_PARTS",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Mountain_Faith1": {
+          "ID": "Mountain_Faith1",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH1",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith2": {
+          "ID": "Mountain_Faith2",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH2",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith3": {
+          "ID": "Mountain_Faith3",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH3",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith4": {
+          "ID": "Mountain_Faith4",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH4",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountain_Faith5": {
+          "ID": "Mountain_Faith5",
+          "Description": "LOC_DISTRICT_MOUNTAIN_FAITH5",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science1": {
+          "ID": "Mountains_Science1",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE1",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_GRASS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science2": {
+          "ID": "Mountains_Science2",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE2",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_PLAINS_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science3": {
+          "ID": "Mountains_Science3",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE3",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_DESERT_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science4": {
+          "ID": "Mountains_Science4",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE4",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_TUNDRA_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Mountains_Science5": {
+          "ID": "Mountains_Science5",
+          "Description": "LOC_DISTRICT_MOUNTAINS_SCIENCE5",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentTerrain": "TERRAIN_SNOW_MOUNTAIN",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "NaturalWonder_Faith": {
+          "ID": "NaturalWonder_Faith",
+          "Description": "LOC_DISTRICT_NATURALWONDER_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentNaturalWonder": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "NegativeDistrict_Science": {
+          "ID": "NegativeDistrict_Science",
+          "Description": "LOC_DISTRICT_NEGATIVE_DISTRICT_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": -1,
+          "TilesRequired": 1,
+          "OtherDistrictAdjacent": true,
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        },
+        "Pamukkale_Culture": {
+          "ID": "Pamukkale_Culture",
+          "Description": "LOC_DISTRICT_PAMUKKALE_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_PAMUKKALE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Features.xml"
+        },
+        "Pamukkale_Faith": {
+          "ID": "Pamukkale_Faith",
+          "Description": "LOC_DISTRICT_PAMUKKALE_FAITH",
+          "YieldType": "YIELD_FAITH",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_PAMUKKALE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Features.xml"
+        },
+        "Pamukkale_Gold": {
+          "ID": "Pamukkale_Gold",
+          "Description": "LOC_DISTRICT_PAMUKKALE_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_PAMUKKALE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Features.xml"
+        },
+        "Pamukkale_Science": {
+          "ID": "Pamukkale_Science",
+          "Description": "LOC_DISTRICT_PAMUKKALE_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_PAMUKKALE",
+          "_source": "DLC/Expansion2/Data/Expansion2_Features.xml"
+        },
+        "Quarry_Production": {
+          "ID": "Quarry_Production",
+          "Description": "LOC_DISTRICT_QUARRY_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_QUARRY",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Reef_Science": {
+          "ID": "Reef_Science",
+          "Description": "LOC_DISTRICT_REEF_SCIENCE",
+          "YieldType": "YIELD_SCIENCE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_REEF",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Resource_Production": {
+          "ID": "Resource_Production",
+          "Description": "LOC_DISTRICT_RESOURCE_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "River_Gold": {
+          "ID": "River_Gold",
+          "Description": "LOC_DISTRICT_RIVER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentRiver": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_City_Gold": {
+          "ID": "RoyalDock_City_Gold",
+          "Description": "LOC_DISTRICT_CITY_CENTER_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_CITY_CENTER",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "RoyalDock_Gold": {
+          "ID": "RoyalDock_Gold",
+          "Description": "LOC_DISTRICT_ROYAL_NAVY_DOCKYARD_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_ROYAL_NAVY_DOCKYARD",
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "SeaResource_Gold": {
+          "ID": "SeaResource_Gold",
+          "Description": "LOC_DISTRICT_SEARESOURCE_GOLD",
+          "YieldType": "YIELD_GOLD",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentSeaResource": true,
+          "_source": "Base/Assets/Gameplay/Data/Districts.xml"
+        },
+        "Seastead_Fishingboats_Production": {
+          "ID": "Seastead_Fishingboats_Production",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentImprovement": "IMPROVEMENT_FISHING_BOATS",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Seastead_Reef_Culture": {
+          "ID": "Seastead_Reef_Culture",
+          "Description": "Placeholder",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentFeature": "FEATURE_REEF",
+          "_source": "DLC/Expansion2/Data/Expansion2_Improvements.xml"
+        },
+        "Strategic_Production": {
+          "ID": "Strategic_Production",
+          "Description": "LOC_DISTRICT_STRATEGIC_PRODUCTION",
+          "YieldType": "YIELD_PRODUCTION",
+          "YieldChange": 1,
+          "TilesRequired": 1,
+          "AdjacentResourceClass": "RESOURCECLASS_STRATEGIC",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "StreetCarnival_Culture": {
+          "ID": "StreetCarnival_Culture",
+          "Description": "LOC_DISTRICT_STREET_CARNIVAL_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_STREET_CARNIVAL",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "WaterPark_Culture": {
+          "ID": "WaterPark_Culture",
+          "Description": "LOC_DISTRICT_WATER_PARK_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentDistrict": "DISTRICT_WATER_ENTERTAINMENT_COMPLEX",
+          "_source": "DLC/Expansion2/Data/Expansion2_Districts.xml"
+        },
+        "Wonder_Culture": {
+          "ID": "Wonder_Culture",
+          "Description": "LOC_DISTRICT_WONDER_CULTURE",
+          "YieldType": "YIELD_CULTURE",
+          "YieldChange": 2,
+          "TilesRequired": 1,
+          "AdjacentWonder": true,
+          "_source": "DLC/Expansion2/Data/Expansion1_Districts.xml"
+        }
+      }
+    }
+  },
+  "optional_base_districts": {
+    "DISTRICT_DIPLOMATIC_QUARTER": {
+      "source": "DLC/Ethiopia/Data/Ethiopia_Districts.xml",
+      "adjacencies": [],
+      "requires_pack": "Ethiopia"
+    },
+    "DISTRICT_PRESERVE": {
+      "source": "DLC/KublaiKhan_Vietnam/Data/KublaiKhan_Vietnam_Districts.xml",
+      "adjacencies": [],
+      "requires_pack": "KublaiKhan_Vietnam"
+    }
+  },
+  "source_sha256": {
+    "Base/Assets/Gameplay/Data/Districts.xml": "e74d21ebd8f9479de646518dc79448fbf3d436367889a2faa23d5248c52c31d3",
+    "Base/Assets/Gameplay/Data/Features.xml": "5aa83d0bc1771cb3c343aed518bdf8d9123557a07c5758892bbc2008a0a9e2af",
+    "Base/Assets/Gameplay/Data/Improvements.xml": "23312be5bfaf582e68c00df7b6974f035bccd6cccf06d3beecafb15013378800",
+    "DLC/Ethiopia/Data/Ethiopia_Districts.xml": "a1f65b0947215b3d114480b678f71432a6d1857dd99a35f1b06d48ea815ab9fb",
+    "DLC/Expansion1/Data/Expansion1_Districts.xml": "65c995d091b9ede94a70cc2259d10a13cfe1969ed3213cd7b14254375b4be87f",
+    "DLC/Expansion1/Data/Expansion1_Improvements.xml": "86be22d27160480ea19e675f185557a5eb903128b8d34fe6f87487e950b6a4d7",
+    "DLC/Expansion1/Expansion1.modinfo": "ed8e3ef9276d694f91e76fe8237361b457a0a6ee653cd506ca8dc4089e56db7d",
+    "DLC/Expansion2/Data/Expansion1_Districts.xml": "6426b9930ec5a293d46ecb23f17fb3838b7b58e73a2cf7c8e8d9ea0ce70f95ba",
+    "DLC/Expansion2/Data/Expansion1_Improvements.xml": "c8de06d4a22fa5cc88ed2a8abc25bf83df2e9710628f4d5dc3073e1beb0b9586",
+    "DLC/Expansion2/Data/Expansion2_Districts.xml": "8ea8907715726e2b29bb17885858b6e415808de08e1b63c2a9b59ea20032b7cd",
+    "DLC/Expansion2/Data/Expansion2_Features.xml": "ac2abf883112c83d4a767fcfd15c1350806dc0c6c6f84590769ce8ec4ab44319",
+    "DLC/Expansion2/Data/Expansion2_Improvements.xml": "2951b5ee0fd3b35213be15d3bfe82cdd9dc0de8e00a029e5a75086f08ae63118",
+    "DLC/Expansion2/Data/Expansion2_RemoveData.xml": "86a9e0e335e8dc70c937f4441b1e1eaba09b6055cd2b49b73776e60d0178417f",
+    "DLC/Expansion2/Expansion2.modinfo": "b528a7c25f5977aed1ace8a54a0828025e061d880685d347c8bcf5ccd1473d87",
+    "DLC/KublaiKhan_Vietnam/Data/KublaiKhan_Vietnam_Districts.xml": "7262a31975f651c758e59a84028b107cdabdd10b289283e66123e5bdb4d345fd"
+  }
+}

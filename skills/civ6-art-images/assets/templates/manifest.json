@@ -1,0 +1,176 @@
+{
+  "source": "用户提供的文明6社区通用模板",
+  "sharing_basis": "用户于 2026-09-28 确认这些模板公开共享、可纳入 Git 和分发",
+  "author": "待考；未据个人路径推断作者",
+  "license": "具体上游许可证未附，不将模板重新标为本仓库 MIT 或原创",
+  "files": [
+    {
+      "path": "district.psd",
+      "original_name": "区域图标模板.psd",
+      "bytes": 2547996,
+      "sha256": "2bf6da961058a27af60783addffead3ad938be2ae5dc47b4319125260487deef"
+    },
+    {
+      "path": "leader.psd",
+      "original_name": "领袖头像模板.psd",
+      "bytes": 20559447,
+      "sha256": "ac40fc3e0892a7800ccbdb20f5b4af4c481e996333bb87704ab3ae92a87cfe8e"
+    },
+    {
+      "path": "moments/1.psd",
+      "original_name": "1.psd",
+      "bytes": 410287,
+      "sha256": "802b914cdada7643ad30f0b126a7eb4baf38aaef552fcb6a1452e55f3ac3ca65"
+    },
+    {
+      "path": "moments/10.psd",
+      "original_name": "10.psd",
+      "bytes": 802996,
+      "sha256": "195a07296c59896d869f2aedfc08b3f54a3ac9eda1b0d167296d0d825e693379"
+    },
+    {
+      "path": "moments/11.psd",
+      "original_name": "11.psd",
+      "bytes": 873266,
+      "sha256": "7aa4f4bdc312c491786fcdab14c34a2f8484bd2b7162e7ac597ee86f77f69282"
+    },
+    {
+      "path": "moments/12.psd",
+      "original_name": "12.psd",
+      "bytes": 861596,
+      "sha256": "76e34ec32e3d7546500598d1a8836778fea6896c730a8049ba2b0e8f071ccaaa"
+    },
+    {
+      "path": "moments/13.psd",
+      "original_name": "13.psd",
+      "bytes": 845515,
+      "sha256": "388444d83391d0aec570b1fe674ac9b1403963c91a832158a5a4514ae1629850"
+    },
+    {
+      "path": "moments/14.psd",
+      "original_name": "14.psd",
+      "bytes": 626052,
+      "sha256": "34228c6915ec88e323b0394a125eeeac12ad8b86e03bc0a6e6e0e622f6a0f719"
+    },
+    {
+      "path": "moments/15.psd",
+      "original_name": "15.psd",
+      "bytes": 752748,
+      "sha256": "65b21bda55aa20131a19ee753e4d14ca8100dbb9b21dad136d8fbf562ab1b200"
+    },
+    {
+      "path": "moments/16.psd",
+      "original_name": "16.psd",
+      "bytes": 784127,
+      "sha256": "75d4a0b5fde4d3268c035835a384b9844cb3618a8e3943c6c5f116b2e918d9bb"
+    },
+    {
+      "path": "moments/17.psd",
+      "original_name": "17.psd",
+      "bytes": 663545,
+      "sha256": "d9e06a3fbf1224fde7f7d32fd1e1c032c09fed4930132644695eb3aa076687f4"
+    },
+    {
+      "path": "moments/18.psd",
+      "original_name": "18.psd",
+      "bytes": 485559,
+      "sha256": "4cf40f9446b128f4e364e754f9bf0dbbef29cb9586cd54bdd856e79cba0f4a80"
+    },
+    {
+      "path": "moments/2.psd",
+      "original_name": "2.psd",
+      "bytes": 689333,
+      "sha256": "9c0e147e5dc63e6ea9d6243b74b9c69594d31c994cf96ad4c53c8da779446987"
+    },
+    {
+      "path": "moments/3.psd",
+      "original_name": "3.psd",
+      "bytes": 583736,
+      "sha256": "0558bacbc3fd1f0a72c8b176c0d5806722f4c2120800c5573a272b683f0b81cf"
+    },
+    {
+      "path": "moments/4.psd",
+      "original_name": "4.psd",
+      "bytes": 545355,
+      "sha256": "13dfc95836b8610147c5bc4e7afefc274fd7623efc3f94ea2182ab38aebe4d00"
+    },
+    {
+      "path": "moments/5.psd",
+      "original_name": "5.psd",
+      "bytes": 744049,
+      "sha256": "2f27e46ac94c0291c7b31b1dbaa2a77cca3092f0f2eb98c8660bd0c5d9263bb9"
+    },
+    {
+      "path": "moments/6.psd",
+      "original_name": "6.psd",
+      "bytes": 694803,
+      "sha256": "e0f584990fda929f1e94e40e501311e48f46f152422155dddaa9399a0ab53239"
+    },
+    {
+      "path": "moments/7.psd",
+      "original_name": "7.psd",
+      "bytes": 724143,
+      "sha256": "e2098e90a99cc04d025a68f9c9e099d00b4e6b5ca846b94b56a2ca05c21204b7"
+    },
+    {
+      "path": "moments/8.psd",
+      "original_name": "8.psd",
+      "bytes": 832677,
+      "sha256": "7bd28db5296ea4fb794575f5d16c08636427451dda22930837b8c4e648aaf938"
+    },
+    {
+      "path": "moments/9.psd",
+      "original_name": "9.psd",
+      "bytes": 751383,
+      "sha256": "b7ea4a46467e1f87e1232f65c9164f1b4c06e1f0368ff894f1f99a42fa9ca782"
+    },
+    {
+      "path": "moments/如何使用.docx",
+      "original_name": "如何使用.docx",
+      "bytes": 45621258,
+      "sha256": "bc3cf9aa5f316ae5077199d7ede38f36101b5de98c7b0028b27d36eb778ff601"
+    },
+    {
+      "path": "moments/模板-2.psd",
+      "original_name": "模板-2.psd",
+      "bytes": 254126,
+      "sha256": "bceeb630990083ed23a2d5253beabc2fc1e5db600aa002303a2d69670fdca40b"
+    },
+    {
+      "path": "moments/模板-3.psd",
+      "original_name": "模板-3.psd",
+      "bytes": 345963,
+      "sha256": "52db055c06724a7a4b7b58c879b99844622292fed1573f350085b46e1c51d7b4"
+    },
+    {
+      "path": "moments/模板-4.psd",
+      "original_name": "模板-4.psd",
+      "bytes": 348704,
+      "sha256": "adc374f8ef4dd08ce7d6e0f4f253434a5cb3065ed7caf94c3d0f8423e545fca1"
+    },
+    {
+      "path": "moments/模板-5.psd",
+      "original_name": "模板-5.psd",
+      "bytes": 329428,
+      "sha256": "dc8c35b6928a182eb4b732a5a85f99dcdbf435e6d81ccc3bc5efdfc3cc24e543"
+    },
+    {
+      "path": "moments/模板-6.psd",
+      "original_name": "模板-6.psd",
+      "bytes": 281508,
+      "sha256": "45c1418c60de8b9b1f40035cb9d2453c3afc672960b2c5e9d7a59e261930cf7d"
+    },
+    {
+      "path": "moments/模板-7.psd",
+      "original_name": "模板-7.psd",
+      "bytes": 325042,
+      "sha256": "f2268161536e1d4011873c396eebc294d9883536260946cbf54ab5049c113780"
+    },
+    {
+      "path": "moments/模板1.psd",
+      "original_name": "模板1.psd",
+      "bytes": 300248,
+      "sha256": "b645a66e7e896d6b7c4623c39099bc480fbc84178a2f890663c31b0542e932ed"
+    }
+  ]
+}

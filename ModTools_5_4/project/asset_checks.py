@@ -159,6 +159,13 @@ def _project(path, result):
                 issue(result, "errors", f"重复动作：{container.tag}/{ident}", path)
             ids.add(ident)
             refs = [(f.text or "").strip() for f in action.findall("./File")]
+            if action.tag == "ReplaceUIScript":
+                replacement = (action.findtext("./Properties/LuaReplace") or "").strip()
+                context = (action.findtext("./Properties/LuaContext") or "").strip()
+                if not replacement or not context:
+                    issue(result, "errors", "ReplaceUIScript 缺少 LuaContext / LuaReplace", path)
+                elif replacement not in refs:
+                    refs.append(replacement)
             actions.append((action.tag, action.get("id"), refs))
             for rel in refs:
                 if source and rel == "(Mod Art Dependency File)":

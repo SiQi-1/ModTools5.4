@@ -50,6 +50,16 @@
 
 ## 二、图标嵌入
 
+这是设计稿进入游戏的固定步骤：用户只提供纯文字 Name/Description 时，由制作流程在 Description 的产出、费用和属性处补齐图标，保留原数值与措辞，不要求用户先写代码。Name、外交对白与叙事文字不做关键词批量装饰。
+
+```powershell
+python -m modgen.cli text-icons format --role description --text "+2食物、+3金币"
+python -m modgen.cli text-icons format --role name --text "文化中心"
+python -m modgen.cli text-icons check 工程.CIV
+```
+
+format 返回候选 JSON，不写工程；结果需要按语义复核后通过 `.CIV` 合并。已有图标、占位符、LOC 引用与 NEWLINE 保留，重复运行不会叠加图标；name/title 原样返回。check 和 project-check/build 检查描述字段与 `_DESCRIPTION` 自定义文本，提示缺失图标和未在随包字体注册表找到的图标，不自动修改标题或外交对白。自定义字体图标另核对其注册来源。
+
 ### 2.1 产出图标
 
 | 代码 | 显示 |

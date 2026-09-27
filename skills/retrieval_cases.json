@@ -1,5 +1,30 @@
 [
   {
+    "query": "Culture.artdef 文明文化映射 UnitCulture",
+    "expected": "05-modtools-civ/civilization-art.md",
+    "top": 3
+  },
+  {
+    "query": "新增文明 城市建筑文化 Cultures.artdef",
+    "expected": "05-modtools-civ/civilization-art.md",
+    "top": 3
+  },
+  {
+    "query": "领袖头像 PSD 模板 多模态",
+    "expected": "civ6-art-images/SKILL.md",
+    "top": 3
+  },
+  {
+    "query": "历史时刻 黑色背景 蒙版",
+    "expected": "civ6-art-images/references/templates.md",
+    "top": 3
+  },
+  {
+    "query": "文明图标 纯白 透明 区域核心",
+    "expected": "civ6-art-images/SKILL.md",
+    "top": 3
+  },
+  {
     "query": "独立UI纹理",
     "expected": "05-modtools-civ/ui-assets.md",
     "top": 1
@@ -187,6 +212,51 @@
   {
     "query": "AttachModifierByID 永久产出",
     "expected": "04-lua/lua-binary.md",
+    "top": 3
+  },
+  {
+    "query": "改良设施原生相邻 Improvement_Adjacencies",
+    "expected": "district-adjacency.md",
+    "top": 3
+  },
+  {
+    "query": "学院替代区域相邻继承快照",
+    "expected": "district-adjacency.md",
+    "top": 3
+  },
+  {
+    "query": "纯文本能力描述补充图标 text-icons",
+    "expected": "02-config-files/text.md",
+    "top": 3
+  },
+  {
+    "query": "范围挂载 每个来源对象 计数",
+    "expected": "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
+    "top": 3
+  },
+  {
+    "query": "二进制上限 最高位1024 2047",
+    "expected": "04-lua/lua-binary.md",
+    "top": 3
+  },
+  {
+    "query": "Property滥用 区域距离 attach modifier",
+    "expected": "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
+    "top": 3
+  },
+  {
+    "query": "Self 区域固定产出 放置预览",
+    "expected": "district-adjacency.md",
+    "top": 3
+  },
+  {
+    "query": "CityPanel ViewMain 城市产出来源拆分 文化转生产力",
+    "expected": "04-lua/lua-0035-ui-file-replacement.md",
+    "top": 3
+  },
+  {
+    "query": "ui_replace lua_context ReplaceUIScript 扩展",
+    "expected": "05-modtools-civ/project-extensions.md",
     "top": 3
   }
 ]

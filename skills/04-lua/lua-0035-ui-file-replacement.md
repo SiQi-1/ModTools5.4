@@ -23,19 +23,20 @@
 
 ### 文件替换配置
 
-在 ModBuddy 工程文件中配置 InGameActions：
-```xml
-<InGameActions>
-    <ReplaceUIScript id="BoostUnlockedPopup" 
-        file="UI/Replacement/BoostUnlockedPopup_Core.lua" />
-</InGameActions>
+ModTools 使用受管扩展，由工具生成动作，避免手改产物在重建时丢失：
+
+```powershell
+python -m modgen.cli extension write 工程.CIV --path UI/Replacement/BoostUnlockedPopup_Core.lua --role ui_replace --lua-context BoostUnlockedPopup --content-file modgen_work/BoostUnlockedPopup_Core.lua
 ```
 
-或通过 `.modinfo`：
+实际 `.civ6proj` ActionData / `.modinfo` 中的属性格式：
 ```xml
-<ReplaceUIScript>
-    <LuaContext>BoostUnlockedPopup</LuaContext>
-    <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+<ReplaceUIScript id="CustomPopup">
+    <Properties>
+        <LoadOrder>20001</LoadOrder>
+        <LuaContext>BoostUnlockedPopup</LuaContext>
+        <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+    </Properties>
 </ReplaceUIScript>
 ```
 
@@ -165,8 +166,11 @@ end
         <File>Arknights_Cute_Leaders_18_Configs.sql</File>
     </UpdateDatabase>
     <ReplaceUIScript id="BoostUnlockedPopup">
-        <LuaContext>BoostUnlockedPopup</LuaContext>
-        <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+        <Properties>
+            <LoadOrder>20001</LoadOrder>
+            <LuaContext>BoostUnlockedPopup</LuaContext>
+            <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+        </Properties>
     </ReplaceUIScript>
 </InGameActions>
 ```
@@ -213,8 +217,8 @@ UI/Replacement/BoostUnlockedPopup_Core.lua
 ### 注意事项
 
 1. **不需要提供 XML 文件**：被替换的是游戏原生的 BoostUnlockedPopup.xml，Mod 只替换 .lua
-2. **Include 必须在替换文件中**：`include("BoostUnlockedPopup")` 负责加载原生的所有 UI 控件，所以原生的 XML 控件可直接使用
-3. **InGameActions 注册顺序**：`ReplaceUIScript` 必须在 `<UpdateDatabase>` 之后，确保 SQL 定义的 Property 已存在
+2. **Include 必须在替换文件中**：它加载原有 Lua 函数；控件由既有上下文 XML 提供。使用目标规则集的原版脚本，例如《风云变幻》的 CityPanel_Expansion2，避免丢失资料片行为。
+3. **区分加载阶段**：ReplaceUIScript 的 LoadOrder 排序不等同于 GP 状态初始化顺序；UI 读取 Property 仍处理尚未设置的情况。
 4. **多 Mod 冲突**：如果多个 Mod 替换同一 UI 文件，最后加载的胜出。建议检查兼容性
 
 ## 设计要点
@@ -223,5 +227,19 @@ UI/Replacement/BoostUnlockedPopup_Core.lua
 2. **BASE_ 命名约定**：原始函数引用使用 `BASE_` 前缀，清晰区分
 3. **双条件守卫**：玩家检查 + 来源检查，两层过滤
 4. **GP 交互通过 EXECUTE_SCRIPT**：弹窗关闭后需要通知 GP 端清理标记
-5. **文件必须包含完整实现**：不能依赖"部分覆盖"，必须完整复制原版逻辑结构
+5. **只包装必要函数**：include 原脚本后保留原函数引用，修改必要输入再调用原函数；不为改一个提示而复制整个城市面板。
 6. **注意全局变量污染**：原文件的全局变量会保留，注意命名冲突
+
+## 城市产出来源拆分（CityPanel / ViewMain）
+
+适用：Lua 通过 Property 二进制实现文化转生产力等动态换算，实际产出已由 Modifier 给出，但城市提示只显示“来自修正值”。这属于 UI 来源说明，不能再次增加产出。
+
+用户示范“宜居度转科技产出”的 CityPanel_Siqi_Mod2.lua 在 ViewMain 调用前修改 SciencePerTurnToolTip；同理可处理 ProductionPerTurnToolTip。官方 Base/Assets/UI/Panels/CityPanel.lua 的 Refresh 顺序是 GetCityData → ViewMain → CityPanel_LiveCityDataChanged，因此对同一个 data 的修改也可传给城市详情页。实际原生控件显示及 UI Mod 兼容性仍需游戏验证。
+
+- 从市中心现有二进制 Property 还原已经生效的量，位数/最高位与 GP 一致；不在 UI 用当前文化重新估算、不新增 Property、不写游戏状态。原生 GetProperty 可能零返回，先赋给局部变量再转数值。
+- 使用原版 `LOC_CITY_YIELD_FROM_GAMEEFFECTS_TOOLTIP` 的本地化格式识别**固定值**修正行，减去转化量后单独追加“来自文化值转化”；不要误改同名的百分比修正行。
+- 验证剩余为零、负数、小数及源行位于开头/末尾；不能只用匹配正整数的正则。用 Locale.Lookup 对候选数值做整行往返匹配，可避免硬编码中英文后缀。
+- data 可能重复传入，需保存本模块修改前后的文本，只在仍等于本模块上次结果时恢复原文再处理，防止重复扣减或追加。其他 Mod 更新过文本时不恢复过期快照。
+- 非目标领袖、没有城市、转化量为零时保持原生显示。未知/多重匹配格式不盲目扣数，可保留原文并用“其中…”说明已含的转化量，避免看成额外奖励。
+
+依据：用户提供的宜居度转科技示范；官方 CityPanel.lua、CitySupport.lua 和 InGameText.xml。2026-09-28 已验证导出动作和 Lua 提示文本的测试桩；未以测试桩替代真实 UI、联机或第三方面板兼容性。

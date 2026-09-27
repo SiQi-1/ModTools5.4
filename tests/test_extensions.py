@@ -107,6 +107,30 @@ class ExtensionsTest(unittest.TestCase):
         self.assertEqual(entry["feature"], "events")
         self.assertFalse(ext.plan_extensions(self.payload, self.civ)["errors"])
 
+    def test_ui_replacement_is_one_script_with_required_context(self):
+        self.init()
+        path = "UI/CityPanel_Demo.lua"
+        with self.assertRaises(ext.ExtensionError):
+            ext.write_extension(self.payload, self.civ, path, "-- replacement", role="ui_replace")
+        self.assertFalse((ext.source_root(self.payload, self.civ) / path).exists())
+        for context in ("CityPanel.lua", "../CityPanel", ""):
+            with self.subTest(context=context), self.assertRaises(ext.ExtensionError):
+                ext.write_extension(self.payload, self.civ, path, "-- replacement", role="ui_replace", lua_context=context)
+        ext.write_extension(self.payload, self.civ, path, "-- replacement", role="ui_replace", lua_context="CityPanel", id="panel")
+        ext.write_extension(self.payload, self.civ, path, "-- update")
+        plan = ext.plan_extensions(self.payload, self.civ)
+        self.assertFalse(plan['errors'], plan)
+        actions = [a for a in plan['in_game_actions'] if a['type'] == 'ReplaceUIScript']
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(actions[0]['lua_context'], 'CityPanel')
+        self.assertEqual(actions[0]['lua_replace'], path)
+        self.assertGreaterEqual(actions[0]['load_order'], 20000)
+        self.assertFalse(any(a['type']=='AddUserInterfaces' for a in plan['in_game_actions']))
+        with self.assertRaises(ext.ExtensionError):
+            ext.write_extension(self.payload, self.civ, path, '-- invalid', scope='front')
+        with self.assertRaises(ext.ExtensionError):
+            ext.write_extension(self.payload, self.civ, 'Import/Library.lua', '-- invalid', role='import', lua_context='CityPanel')
+
     def test_generated_name_collision_and_case_duplicate(self):
         self.init()
         self.assertTrue(ext.plan_extensions(self.payload, self.civ, generated_paths=["DATA/TESTMOD_CORE.SQL"])["errors"])
@@ -205,6 +229,33 @@ class ExtensionsTest(unittest.TestCase):
 class ExtensionGuiTest(unittest.TestCase):
     setUp = ExtensionsTest.setUp
     init = ExtensionsTest.init
+    def test_ui_replacement_cli_and_gui_generation_roundtrip(self):
+        import xml.etree.ElementTree as ET
+        os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
+        self.init()
+        save_civ(self.civ, self.payload)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(['extension', 'write', str(self.civ), '--path', 'UI/CityPanel_Demo.lua',
+                                  '--role', 'ui_replace', '--lua-context', 'CityPanel', '--id', 'panel',
+                                  '--content', 'include("CityPanel_Expansion2");']), 0)
+            self.assertEqual(main(['civ6proj', str(self.civ), '--out', str(self.root/'output'), '--update-civ']), 0)
+            for _ in range(2):
+                self.assertEqual(main(['build', str(self.civ), '--overwrite', 'all', '--json']), 0)
+        payload = load_civ(self.civ)
+        self.assertEqual(next(e for e in payload['extensions']['files'] if e['id']=='panel')['lua_context'], 'CityPanel')
+        project = Path(ext.basic_data(payload)['project_info']['civ6proj_path'])
+        tree = ET.parse(project)
+        ns = {'m':'http://schemas.microsoft.com/developer/msbuild/2003'}
+        actions = ET.fromstring(tree.find('.//m:InGameActionData',ns).text)
+        replacements = actions.findall('ReplaceUIScript')
+        self.assertEqual(len(replacements), 1)
+        self.assertEqual(replacements[0].findtext('Properties/LuaContext'), 'CityPanel')
+        self.assertEqual(replacements[0].findtext('Properties/LuaReplace'), 'UI/CityPanel_Demo.lua')
+        self.assertEqual(replacements[0].findall('File'), [])
+        self.assertIn('UI/CityPanel_Demo.lua', [e.get('Include').replace('\\','/') for e in tree.findall('.//m:Content',ns)])
+        self.assertTrue((project.parent/'UI/CityPanel_Demo.lua').is_file())
+        from ModTools_5_4.project.asset_checks import check_assets
+        self.assertTrue(check_assets(project)['ok'])
     # Integration cases deliberately use real preview/generation and persisted files.
     def test_preview_build_relocation_and_source_wins_over_output(self):
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")

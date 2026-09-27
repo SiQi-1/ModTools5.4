@@ -40,7 +40,7 @@
 - **[lua-0032-prop-dual-economy.md](lua-0032-prop-dual-economy.md)** — 属性双资源经济（星辉/星数）
 - **[lua-0033-citypanel-resource-spending.md](lua-0033-citypanel-resource-spending.md)** — 城市面板资源消费
 - **[lua-0034-lens-plot-purchase.md](lua-0034-lens-plot-purchase.md)** — UILens 透镜地块购买
-- **[lua-0035-ui-file-replacement.md](lua-0035-ui-file-replacement.md)** — UI 文件替换技术（include 劫持）
+- **[lua-0035-ui-file-replacement.md](lua-0035-ui-file-replacement.md)** — UI 文件替换（ui_replace / ReplaceUIScript、CityPanel ViewMain 产出来源拆分）
 - **[lua-0036-productivity-stockpile.md](lua-0036-productivity-stockpile.md)** — 生产力蓄力与自动投资
 - **[lua-0037-plot-pillage-system.md](lua-0037-plot-pillage-system.md)** — 单元格掠夺与产出修改
 - **[lua-19-fever-system.md](lua-19-fever-system.md)** — Fever 进度累计与模式切换

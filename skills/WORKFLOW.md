@@ -18,6 +18,12 @@ python -m modgen.cli skill --file 05-modtools-civ/ui-assets.md --section "独立
 
 ## 3 一次规划并实现完整功能
 
+涉及替代区域，先运行 `modgen adjacency show 原区域 --ruleset base|expansion1|expansion2`，保留完整原规则清单并标明每项复用/改写/移除；涉及改良相邻，先检查 `improvement_adjacencies`。原生表不能表达的距离、动态条件才进入 Modifier/Lua 设计。
+
+新增文明时同时完成[文明文化美术配置](05-modtools-civ/civilization-art.md)：在美术页为每个文明填写城市/建筑文化及单位文化。`ethnicity`、音乐和立绘不替代该配置；已有工程先核对已填写内容。
+
+需要计数时先画出来源对象→目标对象的挂载链，核对每一层 owner、subject、距离与受益玩家；线性计数用逐来源效果叠加，类型/存在性使用原生条件。进入 Property 前写明缺少的原生表达能力；确需二进制时登记最高位、总上限、取整和超限方式，再同步 Lua/条件/Modifier/挂载四处。
+
 | 内容 | 路径 |
 |---|---|
 | 工程/实体 | `new-project` → `generate` → 填字段 → `validate` → `merge` |
@@ -31,6 +37,8 @@ python -m modgen.cli skill --file 05-modtools-civ/ui-assets.md --section "独立
 
 ## 4 校验与预览
 
+设计稿导入后，先用 `modgen text-icons format --role description --text "描述"` 生成候选，再按语义复核、写入工程描述字段；名称不加产出图标。已有标记不得重复，用户原稿可以保持纯文字。`text-icons check` 可单独复查整个工程。
+
 ```powershell
 python -m modgen.cli validate 工程.CIV
 python -m modgen.cli preview 工程.CIV --dry-run
@@ -42,6 +50,8 @@ python -m modgen.cli project-check 工程.CIV --json
 
 ## 5 生成与部署
 
+`project-check` / `build` 还会报告替代区域的原生相邻缺项、等价 custom 重复定义，以及描述缺失/未知字体图标。原规则不同的设计必须逐项解释，不自动补回或删除。快照规则集按声明的资料片依赖推断，未声明时为本体；可用 `adjacency check 工程.CIV --ruleset expansion2` 明确复核。最后核对实际生成的 District_Adjacencies / Improvement_Adjacencies，不能只检查 Adjacency_YieldChanges 有无定义。
+
 先绑定独立的 ModBuddy 输出目录，再统一生成：
 
 ```powershell
@@ -50,6 +60,8 @@ python -m modgen.cli build 工程.CIV --overwrite all --json
 ```
 
 也可用 GUI 或 [AI 控制接口](../ModTools_5_4/docs/AI_CONTROL_API.md) `generate_all`。扩展以源码目录为准同步，工具从清单生成独立动作；缺失源码、冲突与无效依赖会阻断生成。build 默认 none 保留已有输出，使用 all 才将新源码覆盖到旧输出。ModBuddy 构建与美术 Cooker、部署到游戏 Mods 目录是后续步骤，不能把预览、源文件生成、构建与实机验证混为一谈。
+
+按[文化美术出口检查](05-modtools-civ/civilization-art.md#生成后检查实际成员关系)核对 `ArtDefs/Cultures.artdef` 中的文明成员、`Civilizations.artdef` 目标及 Art.xml 的 consumer 引用；空文件或仅存在文件不算完成。
 
 ## 6 交付与知识回流
 

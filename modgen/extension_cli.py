@@ -30,6 +30,7 @@ def register(sub) -> None:
             p.add_argument("--feature")
             p.add_argument("--scope", choices=["front", "in_game", "both"])
             p.add_argument("--phase", choices=["before_generated", "after_generated"])
+            p.add_argument("--lua-context", help="ui_replace 的原生 UI 上下文，例如 CityPanel")
             p.add_argument("--depends-on", action="append", help="依赖的扩展 id，可重复；省略保留旧值")
             p.add_argument("--clear-dependencies", action="store_true")
         if name == "write":
@@ -94,6 +95,7 @@ def run(args: argparse.Namespace) -> int:
                 result = ext.write_extension(
                     payload, civ, path, content, role=args.role, id=args.entry_id,
                     feature=args.feature, scope=args.scope, phase=args.phase,
+                    lua_context=args.lua_context,
                     depends_on=[] if args.clear_dependencies else args.depends_on,
                 )
         if operation not in {"list", "check"}:
@@ -118,6 +120,13 @@ def check_project(civ: Path, *, payload: dict | None = None, page=None) -> dict:
               "extensions": plan["entries"], "checks": ["civ", "extensions"]}
     if errors:
         return result
+    from ModTools_5_4.project.adjacency_reference import audit_project as audit_adjacency
+    from ModTools_5_4.project.text_icons import audit_project as audit_text
+    for stage, audit in [('adjacency_inheritance', audit_adjacency), ('description_icons', audit_text)]:
+        report = audit(payload)
+        result[stage] = report
+        result['checks'].append(stage)
+        result['warnings'].extend({'stage': stage, 'message': warning} for warning in report['warnings'])
     try:
         preview = build_preview_manifest(civ, page=page)
         errors.extend(preview.get("extension_errors", []))

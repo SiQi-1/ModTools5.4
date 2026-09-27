@@ -16,7 +16,7 @@ Property 是可由 Lua 读写、保存状态的键值；修改器的固定 Amoun
 ```
 
 **核心优势**：
-- **16 个位 → 16 层 Modifier**，最大值 = 1+2+4+...+32768 = 65535
+- **11 个位 → 11 层 Modifier**，最高位 1024，可表示总值 0～2047；仍应按实际效果选更小范围
 - **循环利用**：每回合用 `SetPlotTwo` 把新值直接写入，旧值自动被覆盖
 - **避免无限叠加**：不依赖 `ChangeProperty`（会累加），而是用 `SetProperty`（精确设值）
 - **SQL 端自动匹配**：`REQUIREMENT_PLOT_PROPERTY_MATCHES` 检查每个位是否为 1，为 1 则激活对应 Modifier
@@ -25,7 +25,7 @@ Property 是可由 Lua 读写、保存状态的键值；修改器的固定 Amoun
 
 ```
 Lua 端（写 Property）:
-  数值 10 → NumToTwo(10, 12) → {0,1,0,1,0,0,0,0,0,0,0,0}
+  数值 10 → NumToTwo(10, 11) → {0,1,0,1,0,0,0,0,0,0,0}
   → SetProperty("MYKEY2", 1)
   → SetProperty("MYKEY8", 1)
 
@@ -55,9 +55,11 @@ SQL 端生成两套 Modifier：
 
 ## 二进制产出方案选择
 
+先排除原生可表达的线性计数：每个来源贡献固定效果时，采用 [范围挂载计数](../07-techniques/modifiers/patterns/pattern-spatial-attach-count.md)，不进入二进制方案。
+
 | 需求 | 推荐方案 | 运行时职责 |
 |---|---|---|
-| 根据人口、宜居等状态重算，可能降低或清零 | Property 法 | GP 写入本系统目标总值的全部二进制位，包括将旧位关闭 |
+| 原生表/条件/逐对象挂载无法表达的换算，需要重算并降低或清零 | Property 法 | GP 写入本系统目标总值的全部二进制位，包括将旧位关闭 |
 | 少量事件给予不可撤销的永久固定产出 | AttachModifierByID 法 | 只把本次奖励增量拆位，给目标城市附加对应修改器 |
 | 大量高频永久累加，希望限制实例增长 | 按需求选择 Property | 修改器定义少不等于运行时实例少；频繁 Attach 会累积实例 |
 | 条件、期限、每人口、区域或地块产出 | 分别建模 | 不因都有 YieldType 就合并进永久城市固定产出 |
@@ -95,21 +97,41 @@ end
 
 依据：原版 DynamicModifiers 中两种城市产出类型的集合/效果定义；用户确认的城市地块 Property 与重复 Attach 模式。按场景择用，不宣称某一种普遍更快。后文保留 Property helper 与历史全局模板，采用前核对当前项目的集合和加载环境。
 
+## 上限按效果设定，不按机器整数位数设定
+
+常规城市/区域产出的最高位以 **1024（11 位，总上限 2047）** 为默认上界；实际只需 0～7 就用 1、2、4。禁止为了“保险”默认铺到 16 位、31 位或机器整数上限。更高数值必须有明确玩法依据，不能因为类型装得下就生成。百分比、固定产出、负数、地块产出分别设上限。
+
+用户基建系统 Core Mod 的已核对档位（2026-09-28，Gameplay.sql 的 Modifiers / ModifierArguments / RequirementSets）：
+
+| 效果 | 正数最高位 / 总上限 | 负数最高位 / 总幅度 |
+|---|---|---|
+| 城市固定产出、城市百分比 | 1024 / 2047 | 64 / 127 |
+| 区域基础产出、区域百分比 | 1024 / 2047 | 64 / 127 |
+| 地块固定产出 | 64 / 127 | 8 / 15 |
+
+这是项目经验上限，不是已验证的引擎数值极限。Core 源码样本的城市固定产出 GameModifiers 入口包含 2048，但实际 Modifier、Amount 和条件只到 1024；引用时要核对整条链的一致交集，不能照抄孤立入口行。源码不作为分发依赖，本文保留核验结果。
+
+每个二进制系统记录：效果、符号、最高位、总上限、取整方式、超限处理。动态城市换算可明确饱和截断，例如 `min(2047, max(0, floor(culture / 4)))`；超过上限时保持 2047，不许只取低位后回绕成零。奖励增量则按最大单次奖励选择位数，不能擅自截断已经承诺的奖励。
+
+Lua 写入、Modifier Amount、Requirement 和挂载引用必须使用同一组档位。缩小位数时删除旧定义、条件和两类绑定（bound_modifier_ids / owner_bindings），检查加载后旧实例；不以清除仍在引用的 property 冒充迁移。
+
+`modgen validate` / `project-check` / `build` 会对可识别的 Property 产出二进制家族给出过高档位提示，按上述效果与正负号区分，不把单个大常量误判成二进制。它是保守审计，无法识别所有自定义命名和动态 SQL；仍须人工核对。它不会改写上限或拒绝有依据的特殊设计。
+
 ## 核心函数
 
 ### 常量定义
 
 ```lua
--- 二进制位列表（16 位，最大支持 65535）
-local SiqiBinaryList = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768}
-local BIT_COUNT = #SiqiBinaryList  -- = 16（也可按需只用前 12 位 = 4095）
+-- 城市产出示例：11 位，最高位 1024，总上限 2047
+local SiqiBinaryList = {1,2,4,8,16,32,64,128,256,512,1024}
+local BIT_COUNT = #SiqiBinaryList  -- = 11；更小效果只使用所需位数
 ```
 
 ```sql
 -- SQL 端同步的表（用于批量生成 Modifier）
 CREATE TABLE Siqi_BinaryList (Num INTEGER PRIMARY KEY);
 INSERT INTO Siqi_BinaryList (Num) VALUES
-(1),(2),(4),(8),(16),(32),(64),(128),(256),(512),(1024),(2048);
+(1),(2),(4),(8),(16),(32),(64),(128),(256),(512),(1024);
 ```
 
 ### NumToTwo(num, n) — 数字 → 二进制表
@@ -118,6 +140,8 @@ INSERT INTO Siqi_BinaryList (Num) VALUES
 
 ```lua
 function NumToTwo(num, n)
+    assert(n >= 1 and n <= #SiqiBinaryList and n == math.floor(n))
+    assert(num >= 0 and num <= 2^n - 1 and num == math.floor(num))
     local t = {}
     for i = n, 1, -1 do  -- 从高位到低位
         if num >= SiqiBinaryList[i] then
@@ -149,7 +173,7 @@ end
 ### GetPlotTwo / GetPlotNum — 读取地块二进制属性
 
 ```lua
--- 返回完整 16 位二进制表（读取 sproperty.."1", sproperty.."2", sproperty.."4", ...）
+-- 返回本配置的 11 位二进制表（读取 sproperty.."1", sproperty.."2", sproperty.."4", ...）
 function GetPlotTwo(plotID, sproperty)
     local plot = Map.GetPlotByIndex(plotID)
     if not plot then return NumToTwo(0, #SiqiBinaryList); end
@@ -175,8 +199,9 @@ function SetPlotTwo(plotID, sproperty, t)
     local plot = Map.GetPlotByIndex(plotID)
     if not plot then return; end
     local oldt = GetPlotTwo(plotID, sproperty)
-    for i = 1, #t do
-        if t[i] ~= oldt[i] then plot:SetProperty(sproperty .. SiqiBinaryList[i], t[i]) end
+    for i = 1, #SiqiBinaryList do
+        local value = t[i] or 0
+        if value ~= oldt[i] then plot:SetProperty(sproperty .. SiqiBinaryList[i], value) end
     end
 end
 ```
@@ -249,7 +274,7 @@ end
 ```sql
 CREATE TABLE IF NOT EXISTS Siqi_BinaryList (Num INTEGER PRIMARY KEY);
 INSERT OR IGNORE INTO Siqi_BinaryList (Num) VALUES
-(1),(2),(4),(8),(16),(32),(64),(128),(256),(512),(1024),(2048);
+(1),(2),(4),(8),(16),(32),(64),(128),(256),(512),(1024);
 ```
 
 ### 2. 定义 YieldPropertyKey 映射表
@@ -264,15 +289,15 @@ CREATE TABLE IF NOT EXISTS Siqi_YieldPropertyKey (
     ArgName1     TEXT,                   -- 额外 ModifierArgument 参数名（如 "YieldType"）
     ArgValue1    TEXT,                   -- 对应值
     HasNegative  INTEGER NOT NULL DEFAULT 1,  -- 是否生成负数 Modifier
-    MaxValue     INTEGER NOT NULL DEFAULT 2048,  -- 正数最大位值（如 2048 = 12 位）
-    MinValue     INTEGER NOT NULL DEFAULT 256    -- 负数最大位值（如 256 = 9 位）
+    MaxValue     INTEGER NOT NULL DEFAULT 1024,  -- 正数最高位（11 位，总上限 2047）
+    MinValue     INTEGER NOT NULL DEFAULT 64     -- 负数最高位（7 位，总幅度 127）
 );
 
 -- 示例数据
 INSERT OR IGNORE INTO Siqi_YieldPropertyKey
 (YieldType, PropertyKey, ModifierType, ArgName1, ArgValue1, HasNegative, MaxValue, MinValue) VALUES
-('YIELD_FOOD',    'SIQIMJ_Food',    'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE', 'YieldType', 'YIELD_FOOD',    1, 2048, 256),
-('YIELD_SCIENCE', 'SIQIMJ_Science', 'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE', 'YieldType', 'YIELD_SCIENCE', 1, 2048, 256);
+('YIELD_FOOD',    'SIQIMJ_Food',    'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE', 'YieldType', 'YIELD_FOOD',    1, 1024, 64),
+('YIELD_SCIENCE', 'SIQIMJ_Science', 'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE', 'YieldType', 'YIELD_SCIENCE', 1, 1024, 64);
 ```
 
 ### 3. 批量生成 Modifier + Requirement + RequirementSet
@@ -406,7 +431,7 @@ end
 function MyMod.GP.ApplyYields(playerID, params)
     if not params or not params.Yields then return end
     for _, e in ipairs(params.Yields) do
-        SiqiGP.SetPlotTwo(e.plotID, e.propKey, SiqiGP.NumToTwo(e.amount, 12))
+        SiqiGP.SetPlotTwo(e.plotID, e.propKey, SiqiGP.NumToTwo(math.min(2047, math.max(0, math.floor(e.amount))), 11))
     end
 end
 ```
@@ -417,7 +442,7 @@ SQL 端：创建 BinaryList + YieldPropertyKey 表，然后按上文"批量生�
 INSERT OR IGNORE INTO MyMod_YieldPropertyKey
 (YieldType, PropertyKey, ModifierType, ArgName1, ArgValue1, HasNegative, MaxValue) VALUES
 ('YIELD_SCIENCE', 'MYMOD_Science', 'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE',
- 'YieldType', 'YIELD_SCIENCE', 0, 2048);
+ 'YieldType', 'YIELD_SCIENCE', 0, 1024);
 ```
 
 ### 模版二：宜居度转产出（支持正负数）
@@ -435,7 +460,7 @@ function MyMod.RefreshAmenityYield(playerID)
             UI.RequestPlayerOperation(playerID, PlayerOperations.EXECUTE_SCRIPT, {
                 OnStart = 'MyMod_ApplyAmenity', plotID = p:GetIndex(),
                 propKey = 'MYMOD_Amenity_Science', amount = amenity,
-                maxBits = 12, minBits = 8
+                maxBits = 11, minBits = 7
             })
         end
     end
@@ -443,17 +468,18 @@ end
 
 -- GP 端
 function MyMod.GP.ApplyAmenity(playerID, p)
-    SiqiGP.SetplotNumNew(p.plotID, p.propKey, p.amount, p.maxBits, 'NEG_', p.minBits)
+    local amount = math.min(2047, math.max(-127, math.floor(p.amount)))
+    SiqiGP.SetplotNumNew(p.plotID, p.propKey, amount, p.maxBits, 'NEG_', p.minBits)
 end
 ```
 
-SQL: `HasNegative = 1`，正数最大 2048(12位)，负数最大 256(8位)。
+SQL: `HasNegative = 1`，正数最高位 1024（11 位，总上限 2047），负数最高位 64（7 位，总幅度 127）。
 
 ```sql
 INSERT OR IGNORE INTO MyMod_YieldPropertyKey
 (YieldType, PropertyKey, ModifierType, ArgName1, ArgValue1, HasNegative, MaxValue, MinValue) VALUES
 ('YIELD_SCIENCE', 'MYMOD_Amenity_Science', 'MODIFIER_ALL_CITIES_ADJUST_CITY_YIELD_CHANGE',
- 'YieldType', 'YIELD_SCIENCE', 1, 2048, 256);
+ 'YieldType', 'YIELD_SCIENCE', 1, 1024, 64);
 ```
 
 ### 模版三：击杀数转战斗力 / 城市属性转加成（永久叠加）
@@ -466,8 +492,9 @@ function MyMod.OnUnitKilled(ownerPlayerID, unitID)
     local pCapital = Players[ownerPlayerID]:GetCities():GetCapitalCity()
     if not pCapital then return end
     local plotID = Map.GetPlot(pCapital:GetX(), pCapital:GetY()):GetIndex()
-    SiqiGP.ChangeplotNum(plotID, 'MYMOD_CombatBonus', 1, 12, nil, nil)
-    -- ↑ NEG=nil 表示只增不减
+    local old = SiqiGP.GetPlotNum(plotID, 'MYMOD_CombatBonus')
+    SiqiGP.SetPlotNum(plotID, 'MYMOD_CombatBonus', math.min(63, old + 1), 6)
+    -- 本示例仅需 6 位，最多累计 +63；实际战斗力上限按玩法另定
 end
 ```
 
@@ -490,8 +517,9 @@ function SetPlayerTwo(playerID, sproperty, t)
     local p = Players[playerID]
     if not p then return end
     local oldt = GetPlayerTwo(playerID, sproperty)
-    for i = 1, #t do
-        if t[i] ~= oldt[i] then p:SetProperty(sproperty .. SiqiBinaryList[i], t[i]) end
+    for i = 1, BIT_COUNT do
+        local value = t[i] or 0
+        if value ~= oldt[i] then p:SetProperty(sproperty .. SiqiBinaryList[i], value) end
     end
 end
 ```
@@ -511,7 +539,7 @@ end
 
 1. **Lua + SQL 两端的 BinaryList 位数必须一致**，否则位序错乱
 2. **SetPlotTwo 只写变化位**是性能关键，不要在循环里全量 SetProperty
-3. **位数计算**：`math.floor(math.log(MaxValue, 2)) + 1`（MaxValue=2048 → 12位，MinValue=256 → 9位）
+3. **位数计算**：`math.floor(math.log(MaxValue, 2)) + 1`（MaxValue=1024 → 11位，MinValue=64 → 7位）
 4. **属性命名**：正位 = `PropertyKey + Num`，负位 = `NEG_ + PropertyKey + Num`，两端命名必须一致
 5. **GP vs UI**：`SetProperty` 仅 GP 端可用；UI 计算后须通过 `UI.RequestPlayerOperation(..., EXECUTE_SCRIPT, data)` 发送
 6. **永久值**：先按前述场景选择方案。Property 累计值仅在新奖励发生时增加，刷新只覆盖当前总值；直接 Attach 则按业务记录只发本次增量，不能把同一回合增量重复计入。

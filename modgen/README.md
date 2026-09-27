@@ -1,12 +1,18 @@
 # modgen
 
+原生相邻提供 `adjacency list/show/check` 与官方离线快照；`text-icons format/check` 按角色处理描述图标。两项审计接入 project-check/build，PSD 社区模板随技能分发，详见 [契约](AGENTS.md)。
+
 文明6 Mod 工程(.CIV) 生成与校验工具。规则与 ModTools 5.4 编辑器一致。数据和扩展源码命令为纯标准库；完整预览、检查与生成需要 PyQt。
 
 > AI Agent 请阅读 [AGENTS.md](AGENTS.md)（必读）。
 
 ## 用途
 
+头像、历史时刻和实体图标提供 `image inspect-psd/extract-psd/render/check`：从用户 PSD 提取底板/透明蒙版，用 JSON 配方套框、裁切、处理白标/灰度，输出多背景与小尺寸预览。区域白色核心插入 PSD 的 Alpha 组，读取渐变、描边和发光，同时保存可编辑 PSD；旧的底板叠白图配方被拒绝。核心不依赖 Qt 或 AI SDK；区域渲染需要 psd-tools[composite]>=1.20，PNG 与 Photoshop 的近似差异写入报告。构图与识别仍需多模态模型/人工验收。见 [图像模板技能](../skills/civ6-art-images/SKILL.md)。
+
 自定义 UI/Lua LOC 使用 `.CIV` 的 `文本.custom_entries`，由统一 Text SQL/XML 输出；字段及冲突规则见 [美术与文本指南](../skills/05-modtools-civ/ui-assets.md#自定义-ui--lua-loc-文本)。
+
+原生面板的 Lua 替换使用 `extension write --role ui_replace --lua-context CityPanel`；单个 UI/ Lua 自动生成 ReplaceUIScript 属性，无需 XML 配对，参见 [项目扩展](../skills/05-modtools-civ/project-extensions.md)。
 
 独立纹理使用 `texture add/list/remove`；HTML 原型提供 `texture render/import-manifest/verify`，见 [可分享 UI 技能](../skills/civ6-html-ui/SKILL.md) 和 [命令契约](AGENTS.md#html-ui-纹理工具)。
 
@@ -31,6 +37,8 @@
 领袖支持 fallback_images 外交表情映射，GUI 与校验/导出共享 project/leader_fallbacks.py；见 [领袖美术](../skills/05-modtools-civ/leader-art.md)。社区工作流与署名见 [来源说明](../THIRD_PARTY_NOTICES.md)。
 
 美术检查支持 assets check <工程> --cooker-config <目标SDK/Civ6.cfg>，核对 XLP/AST/GEO/TEX 的类注册与允许关系；BLP/FGX 复原及证据边界见 [美术解包指南](../skills/05-modtools-civ/art-unpack.md)。
+
+修改器校验包含 Property 产出二进制家族档位提示，按具体效果区分最高档，详细边界见 [AI 契约](AGENTS.md#二进制产出档位检查)；线性范围计数优先 [逐来源挂载](../skills/07-techniques/modifiers/patterns/pattern-spatial-attach-count.md)。
 
 ## 安装/运行
 

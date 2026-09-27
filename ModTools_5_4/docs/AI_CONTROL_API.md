@@ -58,7 +58,7 @@ python ModTools5.4.py 我的工程.CIV --ai-exec '{"action":"civ6proj_create"}' 
 | `civ6proj_create` | `directory?`, `file_name?`, `fields?`, `create_art_xml?` | 新建 ModBuddy 兼容 .civ6proj + 空白 Art.xml 并绑定到当前工程（无需 ModBuddy 新建工程）。默认目录 `文档\Firaxis ModBuddy\Civilization VI\<文件名>\` |
 | `quick_config` | — | 一键配置：扫描工程目录，自动追加 UpdateDatabase/UpdateText/UpdateIcons 等文件动作 |
 | `import_from_db` | `section`, `type`, `replace?` | 从游戏库导入条目。section=区域/建筑/单位/改良设施/伟人/政策卡；type=原版 Type（如 `DISTRICT_CAMPUS`）；replace=true 时填 Replaces（仅区域/建筑/单位） |
-| `extension` | `operation: init/write/list/check/remove`, `relative_path?`, `content?`, `gameplay?`, `ui?`, `id?`, `role?`, `scope?`, `phase?`, `feature?`, `depends_on?`, `keep_file?` | 管理 .CIV 扩展源码；init 默认 Core，可附 GP/UI；修改自动保存 .CIV，需先保存工程；完整字段见 [项目级扩展](../../skills/05-modtools-civ/project-extensions.md) |
+| `extension` | `operation: init/write/list/check/remove`, `relative_path?`, `content?`, `gameplay?`, `ui?`, `id?`, `role?`, `scope?`, `phase?`, `feature?`, `depends_on?`, `lua_context?`, `keep_file?` | 管理 .CIV 扩展源码；init 默认 Core，可附 GP/UI；修改自动保存 .CIV，需先保存工程；完整字段见 [项目级扩展](../../skills/05-modtools-civ/project-extensions.md) |
 | `project_check` | — | 当前编辑状态的统一数据、源码/依赖、预览、动作与 SQL 冲突检查，需要 modgen 同包模块 |
 | `project_file_write` | `relative_path`, `content`, `register_action?`, `action_type?` | **自定义文件通道**：有 extensions 清单时写源码并自动保存，不能 register_action=false；旧工程写绑定输出目录；默认自动按路径注册文件动作（Scripts/*.lua→AddGameplayScripts、UI/*.xml+lua→AddUserInterfaces、Import/*.lua→ImportFiles、Data/*.sql|xml→UpdateDatabase、Icons/→UpdateIcons、Text/→UpdateText；`action_type` 显式指定）；一键生成**原样透传** |
 | `project_file_read` | `relative_path` | 受管文件读源码；其他旧文件读输出目录（UTF-8） |
@@ -75,7 +75,7 @@ python ModTools5.4.py 我的工程.CIV --ai-exec '{"action":"civ6proj_create"}' 
 
 `generate_all(overwrite="all")` 会覆盖现有 DDS/TEX；`none` 保留现有纹理。交互覆盖列表包含虚拟纹理计划（若已有纹理），勾选它覆盖纹理组；虚拟计划本身不落盘。
 
-`get_state.extensions` 返回源清单；`get_manifest.extension_paths/extension_errors` 返回当前扩展路径与错误。受管 UI 只注册 XML 入口，Lua 同名配对作为 Content；独立 MTX_ 动作由清单编译，旧 add_file_action 对同一路径的声明不覆盖受管元数据。
+`get_state.extensions` 返回源清单；`get_manifest.extension_paths/extension_errors` 返回当前扩展路径与错误。受管 ui 只注册 XML 入口，Lua 同名配对作为 Content；ui_replace 使用单个 UI Lua 和 lua_context，生成 ReplaceUIScript 属性；独立 MTX_ 动作由清单编译，旧 add_file_action 对同一路径的声明不覆盖受管元数据。
 
 `generate_all` / `generate_file` 对扩展源码、依赖、重名及已知主键冲突返回 `extensions_invalid` 并阻断写入。完整数据检查仍通过 project_check；CLI build 先自动配置和 project-check，再生成源码，不等于 ModBuddy 编译或游戏部署。
 

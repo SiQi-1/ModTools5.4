@@ -24,5 +24,6 @@
 
 ## 出口检查
 
+- `Improvement_Adjacencies` 是原生表；能用 `improvement_adjacencies` 的静态相邻不要绕到 Modifier/Lua。existing 引用旧 ID，custom 定义新效果；详见 [相邻规则](../../district-adjacency.md)。
 - [ ] 地形/特征/资源/单位条件全部 DB 验证
 - [ ] 相邻加成单条件规则 + Description 格式正确

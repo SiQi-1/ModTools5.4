@@ -19,7 +19,7 @@ from .custom_files import DEFAULT_LOAD_ORDER, sanitize_relative_path
 ROLES = {
     "database": "UpdateDatabase", "text": "UpdateText", "icons": "UpdateIcons",
     "colors": "UpdateColors", "gameplay": "AddGameplayScripts",
-    "ui": "AddUserInterfaces", "import": "ImportFiles",
+    "ui": "AddUserInterfaces", "ui_replace": "ReplaceUIScript", "import": "ImportFiles",
 }
 TEXT_ROLES = {"database", "text", "icons", "colors"}
 
@@ -158,11 +158,17 @@ def plan_extensions(payload: dict, civ_path: Path | None, *, generated_paths=(),
                 error("文件后缀与 role 不符", entry)
             if entry.get("scope") not in {"front", "in_game", "both"}:
                 error("scope 需为 front / in_game / both", entry)
-            elif role in {"gameplay", "ui", "import"} and entry["scope"] != "in_game":
+            elif role in {"gameplay", "ui", "ui_replace", "import"} and entry["scope"] != "in_game":
                 error("脚本/UI 角色目前仅支持 in_game", entry)
-            expected_top = {"gameplay": "Scripts", "ui": "UI", "import": "Import"}.get(role)
+            expected_top = {"gameplay": "Scripts", "ui": "UI", "ui_replace": "UI", "import": "Import"}.get(role)
             if expected_top and not path.startswith(expected_top + "/"):
                 error(f"{role} 文件必须位于 {expected_top}/", entry)
+            if role == "ui_replace":
+                context = entry.get("lua_context")
+                if not isinstance(context, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", context):
+                    error("ui_replace.lua_context 需为原生 UI 上下文名，不含路径或扩展名", entry)
+            elif "lua_context" in entry:
+                error("lua_context 仅用于 ui_replace", entry)
             if not isinstance(entry.get("feature"), str) or not entry["feature"].strip():
                 error("feature 需为非空功能名称", entry)
             deps = entry.get("depends_on", [])
@@ -277,6 +283,8 @@ def plan_extensions(payload: dict, civ_path: Path | None, *, generated_paths=(),
                 counters[counter] = n + 1
                 action = {"type": action_type, "id": action_id, "load_order": load,
                           "files": [entry["path"]], "file_origins": {entry["path"]: "extension"}}
+                if role == "ui_replace":
+                    action.update(lua_context=entry["lua_context"], lua_replace=entry["path"])
                 groups[action_id] = action
             result[key] = clean + list(groups.values())
         return result

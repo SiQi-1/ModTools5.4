@@ -635,6 +635,12 @@ def build_parser() -> argparse.ArgumentParser:
     from .asset_cli import register as register_assets
     register_assets(sub)
 
+    from .image_cli import register as register_images
+    register_images(sub)
+
+    from .authoring_cli import register as register_authoring
+    register_authoring(sub)
+
     cf = sub.add_parser("custom-file", help="自定义 SQL/XML/Lua 文件通道：写入 .civ6proj 工程目录并注册文件动作")
     cf_sub = cf.add_subparsers(dest="sub", required=True)
 

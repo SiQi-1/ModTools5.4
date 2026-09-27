@@ -17,6 +17,8 @@
 *.dds binary
 *.sqlite binary
 *.png binary
+*.psd binary
+*.docx binary
 *.jpg binary
 *.jpeg binary
 *.ico binary

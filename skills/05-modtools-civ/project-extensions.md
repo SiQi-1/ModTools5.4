@@ -56,13 +56,22 @@ python -m modgen.cli extension list 工程.CIV --json
 |---|---|
 | id | 稳定英文标识，供 depends_on 引用；初始化使用 core/gameplay/ui_xml/ui_lua |
 | path | 输出相对路径；实际源码位于 source_root/path，禁止穿越、盘符和越界链接 |
-| role | database / text / icons / colors / gameplay / ui / import |
+| role | database / text / icons / colors / gameplay / ui / ui_replace / import |
+| lua_context | 仅 ui_replace 必填：原生 UI 上下文名，例如 CityPanel；不含路径或扩展名 |
 | scope | front / in_game / both；脚本和 UI 当前仅支持 in_game |
 | phase | 仅 database 使用 before_generated / after_generated，默认后者 |
 | feature | 文件所属功能，用于定位问题；共享 Core 可命名为 core |
 | depends_on | 依赖的扩展 id 数组，检查存在性和循环；空数组表示无依赖 |
 
 `extension write` 未指定的元数据保留旧值；新文件按路径推断 role。使用 `--id`、`--feature`、`--scope`、`--phase`、重复 `--depends-on` 设置元数据，`--clear-dependencies` 清空依赖。UI 使用 UI/ 下同名 XML/Lua，XML 根必须是 Context，动作只引用 XML，二者都进入 Content。依赖 UI 时引用 XML 入口 id。
+
+替换已有游戏 UI 脚本时显式选 `ui_replace`，文件为 `UI/` 下单独 `.lua`、scope 固定 `in_game`，无需新增 XML。例如：
+
+```powershell
+python -m modgen.cli extension write 工程.CIV --path UI/CityPanel_Custom.lua --role ui_replace --lua-context CityPanel --feature yield_tooltip --content-file modgen_work/CityPanel_Custom.lua
+```
+
+工具生成 `ReplaceUIScript/Properties` 下的 `LoadOrder`、`LuaContext`、`LuaReplace`；Lua 文件登记为 Content，`files` 在内部计划中仍用于引用校验，最终动作不输出 File 子节点。加载顺序从 20001 起，相同动作类型按既有顺序及依赖排序；此数值不代表相对于所有外部 Mod 最后加载。脚本应 include 对应规则集的原版并只包装所需函数，见 [UI 文件替换](../04-lua/lua-0035-ui-file-replacement.md)。重建和另存保留 manifest 中的 lua_context。
 
 ## 加载顺序与边界
 

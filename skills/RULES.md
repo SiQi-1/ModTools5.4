@@ -18,9 +18,14 @@
 
 ## R3 类型与参数
 
+- 先检查实体原生表能否直接表达效果，再考虑 Modifier，最后才是 Lua。区域与改良相邻都使用原生桥接表；不能因为熟悉 Modifier 就绕过已支持的实体字段。具体字段及继承检查见 [相邻加成](district-adjacency.md)。
+- 特色替代实体从原对象完整子表出发，逐项区分“复用、改写、移除、新增”。只复制主表不等于继承；改写一项不代表清空其余项。未改变的相邻规则优先引用原 ID，不重定义等价规则。
+- 区域自身固定产出用 `Self` 原生相邻，让放置预览读到；`Self` 不是同类相邻。比较实现时同时核对实际效果和玩家可见预览，不能只以结算数值相同判定等价。
 - ModifierType 优先复用符合语义的原版类型。EffectType、RequirementType、CollectionType 必须有真实定义，不能按名字猜。
 - 确需自定义 ModifierType 时使用项目命名，填写合法 CollectionType/EffectType，由工具生成 Types 与 DynamicModifiers 注册。外部 Mod 用过不等于原版存在。
 - 确认 owner/subject、挂载对象、参数和条件链；字段存在不代表语义成立。读 [修改器操作指南](05-modtools-civ/modifiers.md) 与 [通用技巧](07-techniques/modifier-techniques.md)。
+- “每个合格来源贡献固定效果”先用 [逐对象范围挂载](07-techniques/modifiers/patterns/pattern-spatial-attach-count.md) 自然叠加；原生类型、距离、存在性条件不先转成 req property。只有原生表/条件/挂载确实不能表达的动态换算才使用 Property。
+- 二进制按具体效果设最高位和总上限，不默认铺 16/31 位。常规城市/区域最高位不超过 1024（总值 2047），地块和负数通常更低；参考 [Core 档位与超限处理](04-lua/lua-binary.md#上限按效果设定不按机器整数位数设定)，特殊更高需求须说明依据。
 - `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 必须填写 `preview_text`；不可把该规则推广到所有 EffectType。
 
 ## R4 数据与写入边界
@@ -45,9 +50,11 @@
 
 ## R6 验证与交付
 
+- 用户给出的纯文本设计稿进入游戏前，按文本角色补齐产出/属性图标；Name 保持名称，Description 按语义加图标，保留用户措辞与数值。不能把用户未写代码标记视为不需要图标；方法与检查见 [文本规范](02-config-files/text.md)。
 - 保存/合并前 `validate`；ERROR 必须修复，WARNING 逐项说明处理依据。
 - 扩展工程执行 `project-check` 统一检查数据、源码、依赖、预览、动作及 SQL 冲突；用 `preview` 核对具体内容。旧自定义 SQL 流程继续使用 `check-conflicts`。完整检查/预览需 PyQt，`extension check` 等纯数据命令不需要。
 - 检查引用、挂载链、文本、动作注册及输出目录。构建、部署、游戏内测试分别记录；校验通过不能宣称实机效果已验证。
+- 所有新增文明的 Mod 必须显式配置城市/建筑文化与单位文化，并验证生成的 `Cultures.artdef` 文明成员及 Art.xml 引用；此要求不限定题材。已有有效配置保留并核对，无新增或重映射文明的工程检查后可标不适用。步骤见[文明文化美术配置](05-modtools-civ/civilization-art.md)。
 - 无法执行某项验证时说明原因和剩余步骤，继续完成可执行的检查。交付包括变更、依据、验证结果及尚未确认的边界。
 
 ## R7 知识维护

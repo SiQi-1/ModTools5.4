@@ -22,6 +22,8 @@ python -m modgen.cli search "城市产出"
 
 ## 文本与图标
 
+原版相邻离线快照：[vanilla_adjacencies.json](../ModTools_5_4/data/vanilla_adjacencies.json)。查询用 `modgen adjacency list/show`；重提取用 `python -m modgen.tools.extract_vanilla_adjacencies --game-dir "游戏目录"`，默认输出随包数据。数据来自官方 XML，按本体/资料片核心规则集分开，不含可选模式和其他 Mod 的动态追加；详情见 [相邻指南](district-adjacency.md)。
+
 - LOC：`python -m modgen.cli loc LOC_UNIT_WARRIOR_NAME`，读取已配置文本库，解析引用链。
 - 字体图标：[注册表](../ModTools_5_4/data/font_icons_registry.json)；配色：[标准色](../ModTools_5_4/data/standard_colors.json)。图标不靠猜数据库表。
 - 自定义 LOC、UI图标、背景纹理见 [美术与文本指南](05-modtools-civ/ui-assets.md)。

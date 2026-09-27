@@ -11,6 +11,8 @@
 
 ## 2 建立链路
 
+- [ ] 原生表、布尔条件和逐来源 ATTACH 已先检查；线性计数没有无故改成 Lua 扫描 + req property。
+- [ ] 二进制每种效果分别登记最高位、总上限与超限处理，不套 16/31 位万能列表；定义、条件、Lua 和所有者绑定范围一致。
 - [ ] 列出外层/内层 Modifier、条件集、Ability 及挂载表；ATTACH 的 ModifierId 和 GrantAbility 的 AbilityType 指向真实条目。
 - [ ] 分别说明 owner / subject 指向哪个游戏对象，玩家、城市、地块条件使用正确上下文。
 - [ ] 事件类 Requirement 按真实语义填写 Triggered；不把 Inverse 与 Triggered 当作可互换的列。

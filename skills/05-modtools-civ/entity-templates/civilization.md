@@ -33,10 +33,12 @@
 
 - **配色**：`data/standard_colors.json` 选主/次色（工具「自定义颜色仅支持十进制 RGB」），对应 `02-config-files/colors.md`
 - **Players/PlayerItems**：工具按文明条目自动生成 → 验证时对照 `02-config-files/configs.md`（`PLAYER_COLOR_`/`CIVILIZATION_` 注册）
+- **文化美术**：在美术页配置城市/建筑文化与单位文化，并核对生成的 `Cultures.artdef`、文明引用及 Art.xml；字段与操作见[文明文化美术配置](../civilization-art.md)。
 
 ## 出口检查
 
 - [ ] type 前缀 = 基础信息 prefix；abbr 无中文
 - [ ] city_info/citizen_info 已显式填写（非空）
+- [ ] 新增文明已完成文化美术配置与生成后的成员关系检查
 - [ ] 颜色为十进制 RGB 预设（`standard_colors.json` 内）
 - [ ] 图标字段非虚构路径；无图时 `images` 留 `{}`

@@ -42,6 +42,7 @@ python -m modgen.cli civ6proj 工程.CIV [--out 目录] [--update-civ]
 python -m modgen.cli extension init 工程.CIV --gameplay --ui
 python -m modgen.cli extension write 工程.CIV --core --content-file modgen_work/Core.sql
 python -m modgen.cli extension write 工程.CIV --path Scripts/My.lua --role gameplay --feature events --depends-on core --content-file modgen_work/My.lua
+python -m modgen.cli extension write 工程.CIV --path UI/CityPanel_Custom.lua --role ui_replace --lua-context CityPanel --content-file modgen_work/CityPanel_Custom.lua
 python -m modgen.cli extension list 工程.CIV --json
 python -m modgen.cli extension check 工程.CIV --json
 python -m modgen.cli extension import 工程.CIV --path Scripts/Old.lua --role gameplay
@@ -120,6 +121,12 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - **统一检查与生成**：project-check 组合数据、源码/依赖、预览、动作和 SQL 冲突；build 自动配置后检查、生成并保存动作，默认 overwrite=none，all 才覆盖已有输出。build 不调用 ModBuddy Build/Cooker，不部署。
 - **兼容**：未启用 extensions 的旧 .CIV 不变。启用后 custom-file write 自动写源码；无动作文件不适用，Lua 库声明 import。CLI 修改备份 .CIV.bak；AI extension 修改自动保存。GUI/CLI/AI 共用 project/extensions.py。
 
+`extension write/import --role ui_replace --lua-context CityPanel` 管理原生 UI 替换：只接受 UI/ 下 Lua 与 in_game，lua_context 为无路径/扩展名的上下文。自动生成 ReplaceUIScript 的 Properties（LuaContext/LuaReplace/LoadOrder，从 20001 起）；文件仍进 Content，无 XML 配对，也不再注册 AddUserInterfaces 或 ImportFiles。GUI 与 CLI 同源生成，AI extension 同名参数为 lua_context。`assets check` 同时检查 LuaReplace 的文件引用。
+
+## 二进制产出档位检查
+
+修改器校验会提示可识别的 Property 产出二进制家族档位过高：城市/区域正数最高档通常不超过 1024、负数 64，地块正数 64、负数 8。这是制作经验提示，不是引擎极限；不阻断有依据的特殊设计，也不改写工程。识别依赖多个幂次后缀 Property 与实际 Modifier 条件链，动态 SQL 等未覆盖内容需人工核对。完整选型、Core 样本与超限处理见 [二进制指南](../skills/04-lua/lua-binary.md)。
+
 ## UnitAbility 显示文本
 
 `generate-ability` 的 `--name` / `--desc` 均可省略，分别输出 `name_zh: null` / `description_zh: null`。原版 UnitAbilities 两列允许 NULL；内部标记、劳动力扣减等辅助能力无需显示名和说明。仅有玩家需要了解的独立效果才填写，内部能力同时关闭 `show_float_text_when_earned`。导出器保留 SQL NULL，且不生成对应空 LOC；名称或说明也可以只填其中一项。
@@ -148,6 +155,25 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
 - [项目级扩展](../skills/05-modtools-civ/project-extensions.md)：清单完整字段、Core、GP/UI 配套、迁移、依赖和静态检查边界。
 - [UI 美术与文本](../skills/05-modtools-civ/ui-assets.md)：UI图标、ui_textures、custom_entries 的完整字段与命令；包含 texture add/list/remove、覆盖策略、尺寸与动作要求。
 - [修改器与类型来源](../skills/05-modtools-civ/modifiers.md)：生成器参数、原版快照、modifier_type_source、preview_text 与引用验证。
+
+## 头像、图标与历史时刻模板
+
+完整方法见 [图像模板技能](../skills/civ6-art-images/SKILL.md)。普通实体图像使用 image，不必引入 HTML。
+
+```powershell
+python -m modgen.cli image inspect-psd "模板.psd" --out modgen_work/template-inspect
+python -m modgen.cli image extract-psd "模板.psd" --layer 1 --channel alpha --out modgen_work/template-mask.png
+python -m modgen.cli image render recipe.json --out modgen_work/result.png
+python -m modgen.cli image check modgen_work/result.png --kind moment
+```
+
+- 四个子命令都返回 JSON。渲染支持 white/grayscale/leader/district/moment 配方；相对素材路径按配方所在目录解析。
+- 读取 PSD 需要可选依赖 psd-tools；区域 Alpha 组渲染需要 psd-tools[composite]>=1.20；普通 PNG 合成/检查只需 Pillow。不要求多模态 SDK。
+- inspect 输出层级编号、边界、效果和 PSD 保存的合成预览；extract pixels 读取单层缓存像素，composite 重算所选分支；不保证所有 Photoshop 特效复现。
+- 原始素材不得覆盖；已有输出需 --replace。render 同时输出成品、JSON 散列/检查报告和多背景、多尺寸预览。
+- leader 强制提供 crop；district 拒绝非白色透明核心。check 的 ok 仅为像素检查，不证明脸部居中、图形可辨或游戏显示正确；所有报告保留视觉复核项。
+- district 强制 template_psd、alpha_layer、background_layer；将白色核心放入 Alpha 组、隐藏样例并读取渐变/描边/发光，额外输出保留原样式的 .psd。拒绝旧 background/stroke 平涂配方与不支持的样式。PNG 为参数化渲染，报告记录发光、渐变与原生 Photoshop 的差异，不能声称像素级一致。
+- image 不写 .CIV 或最终游戏资源。通过已有图片槽登记成品，再由 build 生成 DDS/TEX/XLP。预制头像应关闭二次裁圆/黑边。
 
 ## HTML UI 纹理工具
 
@@ -195,6 +221,23 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 来源、版本及许可见 [第三方说明](../THIRD_PARTY_NOTICES.md)。
 
 ## 知识与证据查询
+
+### 原生相邻与文本检查
+
+```powershell
+python -m modgen.cli adjacency list --ruleset expansion2
+python -m modgen.cli adjacency show DISTRICT_CAMPUS --ruleset expansion2
+python -m modgen.cli adjacency check 工程.CIV --ruleset expansion2
+python -m modgen.cli text-icons format --role description --text "+2食物、+3金币"
+python -m modgen.cli text-icons check 工程.CIV
+python -m modgen.tools.extract_vanilla_adjacencies --game-dir "游戏目录"
+```
+
+这些命令输出 JSON，不写工程。adjacency 的 base/expansion1/expansion2 核心规则集来自随包官方 XML 快照；show 返回原规则详情和可复用的 existing 行，list 含无相邻的基础区域及可选包基础区域。check 对比替代关系及真实导出优先级，列出缺项、改写和等价 custom；有需复核项退出 1。可选模式和其他 Mod 的追加规则需另查目标环境。
+
+text-icons format 接受 --text 或 --file，角色为 description/name/title；名称原样返回，描述返回幂等候选，保留已有标签及 LOC 占位符，不自动写回。check 只检查效果描述字段与自定义 `_DESCRIPTION` 文本；缺失或未知字体图标需语义复核，不自动改标题、对白。project-check/build 自动包含 adjacency_inheritance 和 description_icons 两项，提示作为 warning，不阻断有意重设计；相邻规则集从 Expansion1/2 依赖推断，未声明时按本体检查。
+
+`.CIV` 的 `adjacencies` / `improvement_adjacencies` 都使用原生桥接表。未改变的原规则填写 `{ "mode": "existing", "id": "Jungle_Science" }`；只有效果变化才 custom，不把普通改良相邻转成 Lua 计数。完整流程见 [相邻指南](../skills/district-adjacency.md) 与 [文本规范](../skills/02-config-files/text.md)。
 
 ```powershell
 python -m modgen.cli skill "任务描述" --plan --json

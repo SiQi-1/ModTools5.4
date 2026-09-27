@@ -43,11 +43,7 @@ ATTACH 系列最基础的 EffectType。将指定的 Modifier 挂载到 Collectio
 >
 > **内层 Modifier 挂载位置**：内层 Modifier 的 Owner 自动指向外层 Collection 的每个成员。例如 `MODIFIER_PLAYER_UNITS_ATTACH_MODIFIER` 将内层 Modifier 挂到每个单位上，内层做 `MODIFIER_UNIT_ADJUST_COMBAT_STRENGTH` 时作用对象就是那个单位。
 >
-> **⚠️ 劫掠/修复 Bug**：被 ATTACH 的 Modifier 在以下情况会永久失效：
-> - 区域/建筑/改良被**劫掠**后修复 → ATTACH 的 Modifier **不会恢复**（对比：DistrictModifiers/BuildingModifiers 直接挂的会恢复）
-> - 总督**换城市** → 过程本身令 ATTACH 的 Modifier 暂时失效，换完后**不会恢复**
->
-> 给这些实体 ATTACH Modifier 时必须考虑此 Bug。该 Bug 对 Unit 类作用者无影响。
+> **生命周期验证**：历史资料报告过劫掠修复或总督换城后附加效果不恢复，但本页未附可复现的版本、完整链和 flags，不能推成所有 ATTACH 链的普遍结论。动态链必须核对 RunOnce/NewOnly/Permanent、叠加限制和条件变化，并在目标环境测试修复、换城与读档；不能因此提前把所有范围效果改为 Property。见 [范围挂载模式](patterns/pattern-spatial-attach-count.md)。
 
 ---
 
@@ -123,7 +119,7 @@ ATTACH 系列最基础的 EffectType。将指定的 Modifier 挂载到 Collectio
 
 ## 注意事项
 
-1. **ATTACH MODIFIER 劫掠/修复 Bug**：被 ATTACH 的 Modifier 在区域/建筑/改良被劫掠修复后，或总督换城市后，**不会恢复**。必须考虑此 Bug。
+1. **生命周期**：对具体链验证劫掠、修复、捕获和读档；旧报告不等于全部 ATTACH 都失效。线性计数优先逐来源挂载，有复现证据后再修对应链。
 
 2. **单位效果优先用 Ability**：给单位批量加效果时，优先使用 `EFFECT_GRANT_ABILITY` 授予 `UnitAbility`，而非用 `EFFECT_ATTACH_MODIFIER` 直接把效果挂到单位上。原因：① 官方 155 个实例均采用此模式；② Ability 在单位面板有 UI 显示；③ Tag 过滤机制比 RequirementSet 更简洁可靠；④ Ability 生命周期由引擎管理，存档/升级更安全。详见 `unit.md` 第二部分。
 

@@ -82,14 +82,18 @@ def build_action_data_xml(root_tag: str, entries: list[dict[str, object]]) -> st
 
         lines.append(f'  <{action_type} id="{_xml_text(action_id, attribute=True)}">')
         needs_context = action_type == "AddUserInterfaces"
-        if load_order > 0 or needs_context:
+        replaces_ui = action_type == "ReplaceUIScript"
+        if load_order > 0 or needs_context or replaces_ui:
             lines.append("    <Properties>")
             if load_order > 0:
                 lines.append(f"      <LoadOrder>{load_order}</LoadOrder>")
             if needs_context:
                 lines.append("      <Context>InGame</Context>")
+            if replaces_ui:
+                lines.append(f"      <LuaContext>{_xml_text(entry.get('lua_context'))}</LuaContext>")
+                lines.append(f"      <LuaReplace>{_xml_text(entry.get('lua_replace'))}</LuaReplace>")
             lines.append("    </Properties>")
-        for file_path in files:
+        for file_path in ([] if replaces_ui else files):
             normalized_file = file_path
             if action_type == "UpdateIcons":
                 normalized_lower = file_path.lower()

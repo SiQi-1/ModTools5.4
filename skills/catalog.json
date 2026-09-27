@@ -6,6 +6,82 @@
   ],
   "routes": [
     {
+      "id": "civilization_art",
+      "aliases": [
+        "文明美术",
+        "文化美术",
+        "文化映射",
+        "城市建筑文化",
+        "单位文化",
+        "Cultures.artdef",
+        "Culture.artdef",
+        "UnitCulture"
+      ],
+      "read": [
+        "05-modtools-civ/civilization-art.md",
+        "05-modtools-civ/entity-templates/civilization.md",
+        "05-modtools-civ/art-cook-validation.md"
+      ]
+    },
+    {
+      "id": "ui_replacement",
+      "aliases": [
+        "ui_replace",
+        "lua_context",
+        "ReplaceUIScript",
+        "CityPanel",
+        "ViewMain",
+        "产出来源拆分"
+      ],
+      "read": [
+        "05-modtools-civ/project-extensions.md",
+        "04-lua/lua-0035-ui-file-replacement.md",
+        "05-modtools-civ/ui-assets.md",
+        "04-lua/code-style.md"
+      ]
+    },
+    {
+      "id": "art_images",
+      "aliases": [
+        "领袖头像",
+        "文明图标",
+        "区域图标",
+        "改良图标",
+        "历史时刻",
+        "PSD",
+        "白色透明",
+        "image render",
+        "civ6-art-images"
+      ],
+      "read": [
+        "civ6-art-images/SKILL.md",
+        "civ6-art-images/references/templates.md",
+        "05-modtools-civ/ui-assets.md"
+      ]
+    },
+    {
+      "id": "native_adjacency",
+      "aliases": [
+        "相邻加成",
+        "区域相邻",
+        "改良相邻",
+        "改良设施相邻",
+        "相邻继承",
+        "adjacency",
+        "Adjacency_YieldChanges",
+        "District_Adjacencies",
+        "Improvement_Adjacencies",
+        "Self",
+        "固定产出",
+        "放置预览"
+      ],
+      "read": [
+        "district-adjacency.md",
+        "05-modtools-civ/entity-templates/district.md",
+        "05-modtools-civ/entity-templates/improvement.md"
+      ]
+    },
+    {
       "id": "civ",
       "aliases": [
         ".CIV",
@@ -37,7 +113,6 @@
         "条件",
         "战斗力",
         "奇观",
-        "相邻加成",
         "原版类型",
         "EFFECT_",
         "MODIFIER_",
@@ -89,7 +164,8 @@
         "05-modtools-civ/project-extensions.md",
         "05-modtools-civ/ui-assets.md",
         "04-lua/code-style.md",
-        "04-lua/lua-xml-controls.md"
+        "04-lua/lua-xml-controls.md",
+        "02-config-files/text.md"
       ]
     },
     {
@@ -277,12 +353,34 @@
         "Property产出",
         "固定产出",
         "AttachModifierByID",
-        "SetPlotTwo"
+        "SetPlotTwo",
+        "二进制上限",
+        "最高位",
+        "2047",
+        "1024"
       ],
       "read": [
         "04-lua/lua-binary.md",
         "05-modtools-civ/modifiers.md",
         "04-lua/code-style.md"
+      ]
+    },
+    {
+      "id": "spatial-attach",
+      "aliases": [
+        "范围计数",
+        "距离计数",
+        "逐对象挂载",
+        "每个来源",
+        "attach modifier",
+        "EFFECT_ATTACH_MODIFIER",
+        "req property",
+        "Property滥用"
+      ],
+      "read": [
+        "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
+        "07-techniques/modifiers/modifier-attach.md",
+        "07-techniques/modifiers/patterns/pre-code-checklist.md"
       ]
     }
   ]

@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 from typing import Any
+import re
 
 from .schema_store import (
     collection_type_exists,
@@ -187,6 +188,69 @@ def check_ability(ability: dict[str, Any]) -> tuple[list[str], list[str]]:
     return errors, warnings
 
 
+def check_binary_yield_limits(data: dict[str, Any]) -> list[str]:
+    """Conservative warnings for recognizable property-controlled yield bit families.
+
+    These are authoring budgets, not claims about the engine's numeric limits.
+    Only linked families with multiple power-of-two property suffixes are audited.
+    """
+    limits = {
+        'EFFECT_ADJUST_CITY_YIELD_CHANGE': (1024, 64),
+        'EFFECT_ADJUST_CITY_YIELD_MODIFIER': (1024, 64),
+        'EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE': (1024, 64),
+        'EFFECT_ADJUST_DISTRICT_YIELD_CHANGE': (1024, 64),
+        'EFFECT_ADJUST_DISTRICT_YIELD_MODIFIER': (1024, 64),
+        'EFFECT_ADJUST_PLOT_YIELD': (64, 8),
+    }
+    requirements = {r.get('requirement_id'): r for r in (data.get('requirements') or []) if isinstance(r, dict)}
+    sets = {r.get('requirement_set_id'): r for r in (data.get('requirement_sets') or []) if isinstance(r, dict)}
+
+    def bits(set_id: Any, visited: set[str]) -> list[tuple[str, int]]:
+        if not isinstance(set_id, str) or set_id in visited:
+            return []
+        visited = visited | {set_id}
+        found = []
+        for rid in (sets.get(set_id, {}).get('bound_requirements') or []):
+            r = requirements.get(rid, {})
+            params = _params_to_dict(r.get('parameters'))
+            kind = r.get('requirement_type', '')
+            if kind == 'REQUIREMENT_REQUIREMENTSET_IS_MET':
+                found.extend(bits(params.get('RequirementSetId'), visited))
+            elif kind in {'REQUIREMENT_PLOT_PROPERTY_MATCHES', 'REQUIREMENT_PLAYER_PROPERTY_MATCHES', 'REQUIREMENT_CITY_PROPERTY_MATCHES'}:
+                match = re.fullmatch(r'(.*\D)([0-9]+)', str(params.get('PropertyName') or ''))
+                if match:
+                    bit = int(match[2])
+                    if bit > 0 and bit & (bit - 1) == 0:
+                        found.append((match[1], bit))
+        return found
+
+    families: dict[tuple, list] = {}
+    for m in (data.get('modifiers') or []):
+        if not isinstance(m, dict) or m.get('effect_type') not in limits:
+            continue
+        params = _params_to_dict(m.get('parameters'))
+        try:
+            amount = float(params.get('Amount'))
+        except (ValueError, TypeError, OverflowError):
+            continue
+        for prefix, bit in bits(m.get('subject_reqset'), set()) + bits(m.get('owner_reqset'), set()):
+            key = (prefix, m['effect_type'], str(params.get('YieldType') or ''), amount < 0)
+            families.setdefault(key, []).append((bit, abs(amount)))
+    warnings = []
+    for (prefix, effect, yield_type, negative), rows in sorted(families.items()):
+        if len({bit for bit, _ in rows}) < 2:
+            continue
+        limit = limits[effect][int(negative)]
+        highest = max(amount for _, amount in rows)
+        if highest > limit:
+            warnings.append(
+                f'二进制产出上限过高：{prefix} ({effect}, {yield_type}) 最高档 Amount={highest:.15g}，'
+                f'常规建议不超过 {limit}；按实际效果单独限位并明确超限处理，'
+                '不要默认铺到 16/31 位。特殊更高需求须说明数值依据（见 skills/04-lua/lua-binary.md）。'
+            )
+    return warnings
+
+
 def check_modifier_data(data: dict[str, Any]) -> tuple[list[str], list[str]]:
     """校验整个修改器工作区 data（含跨对象引用检查）。"""
     errors: list[str] = []
@@ -232,4 +296,5 @@ def check_modifier_data(data: dict[str, Any]) -> tuple[list[str], list[str]]:
         errors += [f"unit_abilities[{index}]: {e}" for e in sub_errors]
         warnings += [f"unit_abilities[{index}]: {w}" for w in sub_warnings]
 
+    warnings += check_binary_yield_limits(data)
     return errors, warnings

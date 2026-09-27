@@ -29,6 +29,7 @@ SOURCE_MANIFEST.json 包含基准提交号、导出时是否有本地改动、UT
 ## 包含范围
 
 - skills、modgen 及 schemas、ModTools_5_4 源码/运行数据/资源、可选 GUI 入口。
+- civ6-art-images 内置的社区 PSD 模板、原使用说明和来源/散列清单；原件以二进制纳入 Git，不包含单个 Mod 的角色立绘和成品。原版相邻快照与提取脚本也随源码分发。
 - 初始化与维护工具、通用测试、开发与使用文档。
 - local_text_New.sqlite 参考文本库；它是工具运行数据，不是旧应用安装包。
 - LICENSE、THIRD_PARTY_NOTICES.md、licenses/ 和社区整合记录，保留所有已采用来源的署名。

@@ -6,6 +6,8 @@
 
 ## 直接参考来源
 
+2026-09-28 新增共享资源：用户提供的区域、领袖头像及历史时刻 PSD 模板现随 `skills/civ6-art-images/assets/templates/` 分发。用户明确说明它们是公开共享的开源社区模板，可加入 Git 和分享；作者暂未确认，文件未附具体许可证，保留原文件而不虚构署名或重新标记 MIT。原始名称、文件大小、SHA-256 与分享依据见 [模板清单](skills/civ6-art-images/assets/templates/manifest.json)。原《如何使用.docx》随包保留。
+
 | 编号 | 资料 | 作者 / 署名 | 本轮参考内容 | 许可核对 |
 |---|---|---|---|---|
 | S1 | [Nexus-Buddy-2-Blender-Scripts](https://github.com/Sukritact/Nexus-Buddy-2-Blender-Scripts) | Sukritact；脚本作者 Deliverator，部分脚本共同署名 Deliverator、Sukritact；仓库派生自 [deliverator23/Civilization-Blender-Scripts](https://github.com/deliverator23/Civilization-Blender-Scripts) | Blender ↔ CN6、NA2 动画导入与 CivNexus6 的职责划分 | 核对的提交未包含 LICENSE/COPYING，三个脚本未发现授权声明；本项目仅引用，不分发这些脚本 |

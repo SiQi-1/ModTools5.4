@@ -35,6 +35,7 @@ DEFAULT_LOAD_ORDER: dict[str, int] = {
     "AddUserInterfaces": 9600,
     "ImportFiles": 9700,
     "UpdateDatabase": 10000,
+    "ReplaceUIScript": 20000,
 }
 
 

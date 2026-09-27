@@ -9,9 +9,29 @@
 | 表 | 说明 |
 |------|------|
 | District_Adjacencies | 区域→规则的桥接表 |
+| Improvement_Adjacencies | 改良设施→规则的原生桥接表 |
 | Adjacency_YieldChanges | 核心定义表（20 列） |
 
-> 改良的桥接表为用户自定义（`Siqi_Core_Improvement_Adjacency` 等），不在此 skill 范围。
+两种桥接表均为游戏原生表；历史项目的自定义相邻表只是特定 Lua 方案，不能当作改良相邻的默认入口。`.CIV` 区域用 `adjacencies`，改良用 `improvement_adjacencies`，共用 existing/custom 格式。
+
+## 离线快照、继承与实现选择
+
+```powershell
+python -m modgen.cli adjacency list --ruleset expansion2
+python -m modgen.cli adjacency show DISTRICT_CAMPUS --ruleset expansion2
+python -m modgen.cli adjacency show IMPROVEMENT_FARM --ruleset base
+python -m modgen.cli adjacency check 工程.CIV --ruleset expansion2
+```
+
+随包 [vanilla_adjacencies.json](../ModTools_5_4/data/vanilla_adjacencies.json) 来自官方 XML 与资料片 modinfo 加载顺序，包含本体、迭起兴衰、风云变幻三个核心规则集，以及外交区、保护区的可选包记录。保存定义、桥接关系、源文件与 SHA-256；不从混入 Mod 的 DebugGameplay 缓存提取。可选文明包追加规则、秘密结社等模式及其他 Mod 的动态改动不包含在核心规则集中，启用时需另核对目标环境。
+
+`show` 的 `civ_rows` 可直接作为起点。没有改动的规则使用 `{"mode":"existing","id":"Jungle_Science"}`，仅输出桥接行。修改山脉为 +2 时，只把五个 Mountains_Science 引用换成自己的 custom 规则，保留雨林、普通区域、大堡礁、礁石、地热裂隙、政府区、棉花堡等其余来源；不得修改所有文明共用的原 ID。
+
+每个替代区域交付“复用、改写、移除、新增”的差异表。`check` 列出 missing、overridden、reused、equivalent_custom；只有条件匹配并不证明数值符合设计，overridden 仍须对照。`subtables` 若有同名桥接列表，它优先于顶层列表，修改时须同步，避免顶层修了但导出仍读旧表。
+
+普通改良的“每相邻一个区域 +2 科技、+3 金币”只需两条 custom 规则，分别 YieldType=YIELD_SCIENCE/YIELD_GOLD，YieldChange=2/3、TilesRequired=1、source_type=OtherDistrictAdjacent，绑定到 `improvement_adjacencies`。负相邻也可用负数 YieldChange。不要另建邻区计数 Property、位拆分 Modifier 或每回合 Lua；两格距离、特殊所有权/完成状态等原生字段无法表达的条件再考虑扩展。
+
+失败原因检查：复制主表却丢桥接表；只记得常见山脉而没列完整来源；先选 Modifier 再找表达方式；只测 SQL 能加载却没比对语义。修复这些问题靠来源清单和产物审计，不靠增加更多脚本。
 
 ---
 
@@ -62,7 +82,7 @@ INSERT INTO District_Adjacencies (DistrictType, YieldChangeId) VALUES
 | 17 | ObsoleteTech | TEXT | 可空 | 可选 | 某科技后失效（一般不用） |
 | 18 | AdjacentResource | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接任意资源 |
 | 19 | AdjacentResourceClass | TEXT | NOT NULL, default="NO_RESOURCECLASS" | 条件 | 按资源分类筛选。`NO_RESOURCECLASS`(默认)/`RESOURCECLASS_BONUS`/`RESOURCECLASS_LUXURY`/`RESOURCECLASS_STRATEGIC` |
-| — | Self | BOOLEAN | NOT NULL, default=0 | 条件 | 邻接同类型区域/改良（如学院邻接学院） |
+| — | Self | BOOLEAN | NOT NULL, default=0 | 条件 | 自身固定产出，无需相邻对象；不是“同类型相邻” |
 
 ### 核心规则
 
@@ -82,8 +102,14 @@ INSERT INTO District_Adjacencies (DistrictType, YieldChangeId) VALUES
 | 河流 +2 | AdjacentRiver = 1, YieldChange = 2 |
 | 自然奇观 +2 | AdjacentNaturalWonder = 1 |
 | 海洋资源 +1 | AdjacentSeaResource = 1 |
-| 同类相邻 | Self = 1 |
+| 自身固定产出（计入区域放置预览） | Self = 1 |
 | 战略资源 +1 | AdjacentResourceClass = RESOURCECLASS_STRATEGIC |
+
+### 固定产出与区域放置预览
+
+区域自带固定产出应使用 `Self=1` 的相邻规则，并绑定 `District_Adjacencies`。`.CIV` 写 `source_type: "Self"`、`yield_change`、`yield_type`、`tiles_required: 1`，不需要 `source_detail`；Description 写“来自区域自身”，不写“来自相邻同类区域”。真正的同类相邻使用 `AdjacentDistrict` 或 `AdjacentImprovement` 指定类型。
+
+官方《迭起兴衰》`Expansion1_Districts.xml` 的 `BaseDistrict_Science` 使用 `YieldChange=4, Self=true`，提供书院的固定科技。区域放置 UI 读取相邻规则；用基础产出 Modifier 替代这条原生规则，即使建成后的数值相同，也不能据此声称放置预览正确。迁移时删除旧 Modifier 及挂载，避免双重给予，再检查实际导出的 Self 行、桥接关系、LOC 和游戏放置预览。依据：官方书院数据与用户对放置预览的实测反馈（2026-09-28）。
 
 ---
 
@@ -165,6 +191,9 @@ INSERT INTO District_Adjacencies (DistrictType, YieldChangeId) VALUES
 ```sql
 INSERT INTO Adjacency_YieldChanges (ID, Description, YieldType, YieldChange, TilesRequired, AdjacentDistrict) VALUES
 ('Siqi_{SHORT}_Imp_Gold_District', 'Placeholder', 'YIELD_GOLD', 2, 1, 'DISTRICT_COMMERCIAL_HUB');
+
+INSERT INTO Improvement_Adjacencies (ImprovementType, YieldChangeId) VALUES
+('IMPROVEMENT_SIQI_{SHORT}', 'Siqi_{SHORT}_Imp_Gold_District');
 ```
 
 ### 反向相邻加成 — 为相邻区域提供加成

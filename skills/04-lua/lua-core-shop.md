@@ -239,7 +239,7 @@ CREATE TABLE Siqi_Core_GoldShop (
 | `UI/Arknights_Cute_Leaders_Core_Mod_ShopPanel.xml` | 双 Tab 商店主面板 + Item Instance 模板 + LaunchBar 按钮 |
 | `UI/Arknights_Cute_Leaders_Core_Mod_UI.xml` | 通用 UI Context（空骨架，预留扩展） |
 | `Arknights_Cute_Leaders_Core_Mod_Table.sql` | 核心自定义表：`Siqi_Core_GoldShop`（商品定义）、`Siqi_CoreBinaryList`、`Siqi_Core_Improvement_Adjacency` 等 |
-| `Arknights_Cute_Leaders_Core_Mod_Gameplay.sql` | 二进制产出 Modifier 链（6 Yield x 2048 层级）+ Core Mod 全局 Modifier/Property |
+| `Arknights_Cute_Leaders_Core_Mod_Gameplay.sql` | 二进制产出 Modifier 链（6 Yield，各效果按最高位 1024/64/8 分档，见 [位上限](lua-binary.md#上限按效果设定不按机器整数位数设定)）+ Core Mod 全局 Modifier/Property |
 | `Arknights_Cute_Leaders_Core_Mod_Shop.sql` | 商品数据填充（金币商店 + 费用商店全部商品的 INSERT） |
 
 ### 控件 ID 与 Lua Controls.xxx 对照

@@ -8271,14 +8271,18 @@ class WorkspacePage(BasePage):
 
             lines.append(f"  <{action_type} id=\"{self._xml_text(action_id)}\">")
             needs_context = action_type == "AddUserInterfaces"
-            if load_order > 0 or needs_context:
+            replaces_ui = action_type == "ReplaceUIScript"
+            if load_order > 0 or needs_context or replaces_ui:
                 lines.append("    <Properties>")
                 if load_order > 0:
                     lines.append(f"      <LoadOrder>{load_order}</LoadOrder>")
                 if needs_context:
                     lines.append("      <Context>InGame</Context>")
+                if replaces_ui:
+                    lines.append(f"      <LuaContext>{self._xml_text(entry.get('lua_context'))}</LuaContext>")
+                    lines.append(f"      <LuaReplace>{self._xml_text(entry.get('lua_replace'))}</LuaReplace>")
                 lines.append("    </Properties>")
-            for file_path in files:
+            for file_path in ([] if replaces_ui else files):
                 normalized_file = file_path
                 if action_type == "UpdateIcons":
                     normalized_lower = file_path.lower()
@@ -11025,7 +11029,7 @@ class WorkspacePage(BasePage):
                     raise ext.ExtensionError("content 必须为字符串")
                 result = ext.write_extension(
                     payload, civ, params.get("relative_path"), params["content"],
-                    **{k: params[k] for k in ("role", "id", "feature", "scope", "phase", "depends_on") if k in params},
+                    **{k: params[k] for k in ("role", "id", "feature", "scope", "phase", "depends_on", "lua_context") if k in params},
                 )
             elif operation == "remove":
                 result = ext.remove_extension(payload, civ, params.get("relative_path"), keep_file=bool(params.get("keep_file")))

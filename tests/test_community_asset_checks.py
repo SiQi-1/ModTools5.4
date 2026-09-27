@@ -88,6 +88,18 @@ class AssetChecksTest(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertTrue(any("非法文件引用" in i["message"] for i in result["errors"]))
 
+    def test_ui_replacement_property_reference_is_checked(self):
+        self.write('UI/CityPanel_Demo.lua', 'include("CityPanel");')
+        action = '<ReplaceUIScript id="Panel"><Properties><LuaContext>CityPanel</LuaContext><LuaReplace>UI/CityPanel_Demo.lua</LuaReplace></Properties></ReplaceUIScript>'
+        project = self.modinfo(['UI/CityPanel_Demo.lua'], action)
+        self.assertTrue(check_assets(project)['ok'])
+        project = self.modinfo([], action)
+        self.assertFalse(check_assets(project)['ok'])
+        project = self.modinfo(['UI/CityPanel_Demo.lua'], action.replace('<LuaContext>CityPanel</LuaContext>', ''))
+        self.assertFalse(check_assets(project)['ok'])
+        project = self.modinfo(['UI/CityPanel_Demo.lua'], action.replace('UI/CityPanel_Demo.lua', '../outside.lua'))
+        self.assertFalse(check_assets(project)['ok'])
+
     def test_audio_ini_cannot_escape_its_folder(self):
         project, ini = self.audio()
         ini.write_bytes(b"[InGame]\r\n../elsewhere.bnk\r\n")

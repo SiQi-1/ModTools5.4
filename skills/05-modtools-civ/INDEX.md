@@ -8,15 +8,17 @@
 |---|---|
 | [工程格式](civ-project-format.md) | workspace / 18 分节 / 字段形态 |
 | [实体模板目录](entity-templates/INDEX.md) | 按涉及的实体选模板 |
+| [文明文化美术](civilization-art.md) | Culture / UnitCulture 配置、Cultures.artdef 文明成员与 Art.xml 引用 |
 | [修改器指南](modifiers.md) | 原版/自定义类型、参数、预览文本 |
 | [HTML 转原生 UI 技能](../civ6-html-ui/SKILL.md) | 可分享技能包，设计/渲染/批量导入/像素校验与 XML/Lua |
 | [地标与 AST 组合技能](../civ6-landmarks/SKILL.md) | 官方几何复用、Landmarks、建筑差分、资源包导入和 Cooker |
 | [UI 美术与文本](ui-assets.md) | UI图标、独立纹理、按钮背景、自定义 LOC |
+| [头像、图标与历史时刻模板](../civ6-art-images/SKILL.md) | PSD 图层提取、PNG 配方处理、多模态边界与像素检查 |
 | [常见陷阱](civ-pitfalls.md) | 数据、挂载、语义与生成后的自检 |
 | [制作参考](authoring-reference.md) | 命名、相邻加成、TypeProperties |
 | [项目级扩展](project-extensions.md) | Core.sql、Lua/UI、源码清单、依赖、project-check/build |
 | [自定义文件与交付](pipeline.md) | SQL/XML/Lua 通道、动作、加载顺序、部署 |
-| [领袖差分与纸片](leader-art.md) | fallback_images、LeaderFallback、模型资源链 |
+| [领袖美术](leader-art.md) | 选人皮肤背景＋空白前景、fallback_images、LeaderFallback、模型资源链 |
 | [音频管线](audio-pipeline.md) | Wwise、Banks.ini、UpdateAudio、流式 WEM |
 | [Blender / CivNexus6](blender-civnexus.md) | CN6 模型交换与 NA2 动画 |
 | [美术解包与复原验收](art-unpack.md) | BLP/FGX、pantry 遮蔽、SDK 类关系、预乘纹理和证据边界 |

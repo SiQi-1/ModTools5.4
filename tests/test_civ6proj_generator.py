@@ -166,6 +166,14 @@ class BuildCiv6ProjXmlTestCase(unittest.TestCase):
 
 
 class BuildActionDataXmlTestCase(unittest.TestCase):
+    def test_ui_replacement_uses_properties_and_escapes_path(self):
+        text = build_action_data_xml('InGameActions', [{'type':'ReplaceUIScript', 'id':'Panel',
+            'files':['UI/A&B.lua'], 'lua_context':'CityPanel', 'lua_replace':'UI/A&B.lua', 'load_order':20001}])
+        action = ET.fromstring(text).find('ReplaceUIScript')
+        self.assertEqual(action.findtext('Properties/LuaContext'), 'CityPanel')
+        self.assertEqual(action.findtext('Properties/LuaReplace'), 'UI/A&B.lua')
+        self.assertEqual(action.findall('File'), [])
+
     def test_update_icons_path_normalization(self) -> None:
         text = build_action_data_xml(
             "InGameActions",

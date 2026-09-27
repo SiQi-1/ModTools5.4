@@ -23,8 +23,10 @@
 
 ## 相邻加成要点（详情 district-adjacency.md）
 
+- 替代区域先用 `modgen adjacency show 原区域 --ruleset ...` 取得完整规则；未改项用 existing 原 ID，改项才 custom。完整流程见 [原生相邻与继承](../../district-adjacency.md)，复制 Districts 主表不会自动继承 District_Adjacencies。
 - 一条规则只设一个条件（AdjacentTerrain/Feature/District/River/Wonder/NaturalWonder/Resource/ResourceClass/SeaResource/OtherDistrictAdjacent/Self）；多条件 = 多条规则
 - 山脉加成标准写法：5 种地形各一条（GRASS/PLAINS/DESERT/TUNDRA/SNOW）
+- 自带固定产出用 `source_type: "Self"`，无需相邻条件，参与区域放置预览；不是同类相邻，不用基础产出 Modifier 替代。见相邻指南的“固定产出与区域放置预览”。
 - Description 格式：`{解锁条件}+{1_Amount}[ICON_X]产出 来自相邻的{条件}。`
 - 产出图标映射：YIELD_SCIENCE→`[ICON_Science]`、PRODUCTION→`[ICON_Production]`、GOLD→`[ICON_Gold]`、FOOD→`[ICON_Food]`、CULTURE→`[ICON_Culture]`、FAITH→`[ICON_Faith]`
 

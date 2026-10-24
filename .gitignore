@@ -53,6 +53,15 @@ shares/
 /ModTools_5_4/settings.json
 /ModTools_5_4/data/settings.json
 
+# Native compiler byproducts must never appear in the repo root (local builds;
+# real DLL/plugin project work lives outside this checkout). These root-anchored
+# rules are only a safety net in case an external build command is run from here.
+/*.obj
+/*.lib
+/*.exp
+/*.pdb
+/*.ilk
+
 # Python
 __pycache__/
 *.pyc

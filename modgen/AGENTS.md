@@ -110,6 +110,8 @@ python -m modgen.tools.extract_vanilla_modifier_types [--game-dir 目录] [--out
   生成器按简称自动生成，AI 手写 type 会被 validate 警告/报错。
 - **必填字段**：条目必须有 `name`（中文名）+ 分类标识（多数分类 `abbr`，总督用 `code`）。
   主表必填字段见 `schemas/entry_schemas.json` 中 `required` 字段；无默认值的必填字段（如单位 `FormationClass`）必须由 AI 填写。
+- **主表 SQL 稀疏输出**：导出器只写主键/Type、Name、Description 和确有值的字段；可选空字符串、`None`/`NULL` 哨兵从列清单中省略。多行记录按实际列集合分组生成 INSERT，禁止为了复用一套列清单填充无意义的连续 `NULL`。必填字段缺失由 validate/project-check 报错，不能用 NULL 占位绕过校验。
+- **DynamicModifiers 注册完整性**：需要新建的 ModifierType 必须同时提供 `effect_type` 与 `collection_type`；缺失时 validate/project-check 报错，导出器不生成 NULL 占位行。
 - **LOC**：文本字段存中文，不写 `LOC_` 前缀 tag；导出时自动注册。
 - **图片**：项目图标有图片槽（目标 **256×256**，`images.icon` 已预填尺寸骨架，AI 只需填 `path`）；信仰 `has_images=False`（GUI 无图片槽，图标经美术页别名/数据库处理，无需导入图片）；其余分类一律空 `images: {}`，路径由用户提供。
 - **图标名**：约定 `ICON_{Type}`，由生成器自动填（如 `ICON_PROJECT_SIQI_P0035_TEST`）。

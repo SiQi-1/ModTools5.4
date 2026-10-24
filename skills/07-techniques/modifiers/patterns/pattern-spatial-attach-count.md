@@ -35,8 +35,10 @@
 
 ## 拥有者与重复叠加
 
+- 默认语境中的“区域/城市/单位”按能力玩家自己的对象处理。未明确要求外国来源时，优先从玩家 Trait 挂 `COLLECTION_PLAYER_*`，不要自行扩大到全图后再补文明/领袖条件。
+- 区域两格加成的默认链：A 从 Trait 向 `COLLECTION_PLAYER_DISTRICTS` 挂 B，来源排除 `DISTRICT_WONDER`；B 仍选 `COLLECTION_PLAYER_DISTRICTS`，用来源到目标的距离与目标区域类型条件挂 C；C 以 `COLLECTION_OWNER` 给目标 `EFFECT_ADJUST_DISTRICT_BASE_YIELD_CHANGE`。两层集合已限定同一玩家，不再添加文明/领袖判断，也不需要 GameModifiers 全局入口。同文明不同玩家不等于同一玩家。
 - ATTACH 后，内层 owner 变为选中的来源对象。若该来源属于外国玩家，内层 `COLLECTION_PLAYER_*` 会跟随来源拥有者；不能把它当成最初特质的玩家。
-- 需要统计外国来源时，可用全体目标集合，并在 subject 明确限制受益文明/领袖。多个同文明玩家存在时，逐玩家重复创建同一全局来源链会翻倍；可用单一 GameModifiers 入口，或设计具有明确玩家身份约束的链。
+- 只有明确要求统计外国来源时，才考虑全体集合及跨玩家受益条件。全局入口加文明判断不是通用默认解法；须核实 Requirement 对象上下文，并在实机验证。同文明特质判断不能替代玩家身份判断。
 - “来源拥有者满足条件”和“受益目标拥有者满足条件”是两回事。为来源写 owner 条件，不能代替目标玩家筛选。
 - 动态范围链通常 `RunOnce=false`、`NewOnly=false`、`Permanent=false`。不要套永久奖励模板；也不要设置阻止不同来源累加的 stack limit。
 - 目标集合成员数量与定义条目数量不同。避免为了少写几条定义而全地图重复铺大量无关实例，能从来源类型提前筛选就提前筛选。
@@ -57,3 +59,5 @@
 4. 单独实机测试劫掠修复、未完工对象、读档；数据库和关系模型测试不能代替引擎生命周期。
 
 依据：官方 `Base/Assets/Gameplay/Data/Modifiers.xml` 的 ATTACH/Collection 定义；纳斯卡线与伟人距离条件（见 [通用技巧](../../modifier-techniques.md)）；用户确认的对象逐份挂载设计。2026-09-28 回流，原生实机表现须针对具体链记录。
+
+2026-09-29 用户报告全局集合加文明条件的区域链失效，并指定上述双层 PLAYER_DISTRICTS 链。这里据此修正默认设计范围；未将失效原因归结为单一 Requirement，也不宣称关系模型通过即可证明引擎效果恢复。

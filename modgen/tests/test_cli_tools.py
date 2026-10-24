@@ -212,12 +212,14 @@ class MergeModifierTestCase(unittest.TestCase):
 
     def test_merge_dedup_by_id(self) -> None:
         entry = generate_modifier(
-            prefix="SIQI", infix=40, effect_type="EFFECT_ADJUST_PLOT_YIELD", desc="SAME",
+            prefix="SIQI", infix=40, effect_type="EFFECT_ADJUST_PLOT_YIELD",
+            collection_type="COLLECTION_OWNER", desc="SAME",
             parameters=[{"name": "Amount", "value": 1}],
         )
         merge_modifier_entry(self.payload, entry)
         entry2 = generate_modifier(
-            prefix="SIQI", infix=40, effect_type="EFFECT_ADJUST_PLOT_YIELD", desc="SAME",
+            prefix="SIQI", infix=40, effect_type="EFFECT_ADJUST_PLOT_YIELD",
+            collection_type="COLLECTION_OWNER", desc="SAME",
             parameters=[{"name": "Amount", "value": 2}],
         )
         merge_modifier_entry(self.payload, entry2)

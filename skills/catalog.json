@@ -6,6 +6,11 @@
   ],
   "routes": [
     {
+      "id": "arknights_series",
+      "aliases": ["明日方舟", "Arknights", "civ6-arknights-series"],
+      "read": ["civ6-arknights-series/SKILL.md", "civ6-arknights-series/references/release-preparation.md"]
+    },
+    {
       "id": "civilization_art",
       "aliases": [
         "文明美术",

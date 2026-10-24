@@ -59,6 +59,7 @@ from ...db.interface import resolve_chinese_text_or_unknown
 from ...db.paths import DEFAULT_GAME_DB
 from ...project.entity_defaults import POLICY_FIELD_DEFAULTS
 from ...project.entity_defaults import BELIEF_FIELD_DEFAULTS
+from ...project.sql_utils import sparse_row, sql_literal
 
 
 BASIC_WITH_ICON_ROWS_LIMIT = 8
@@ -1925,8 +1926,13 @@ class MainTableEditor(QWidget):
     def build_main_table_insert_sql(self) -> str:
         """导出当前主表的单行 INSERT SQL。"""
         row = self.export_main_table_row()
-        columns = [self._schema.type_key, *self._field_specs.keys()]
-        values_sql = ", ".join(_sql_literal(row.get(col)) for col in columns)
+        column_order = [self._schema.type_key, *self._field_specs.keys()]
+        columns, values = sparse_row(
+            row,
+            column_order,
+            keep_columns=(self._schema.type_key, "Name", "Description"),
+        )
+        values_sql = ", ".join(sql_literal(value, _sql_escape) for value in values)
         return (
             f"INSERT INTO {self._schema.table_name} ({', '.join(columns)}) VALUES\n"
             f"({values_sql});"

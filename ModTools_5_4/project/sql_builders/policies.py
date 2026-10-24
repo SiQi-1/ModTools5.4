@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 
 from ..entity_defaults import POLICY_FIELD_DEFAULTS
-from ..sql_utils import build_insert_block, deduplicate_rows, sql_escape, sql_literal
+from ..sql_utils import build_insert_block, build_sparse_insert_blocks, deduplicate_rows, sql_escape
 
 
 def build_policy_sql_pair(entries: object) -> tuple[str, str]:
@@ -20,8 +20,8 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
     field_defaults = POLICY_FIELD_DEFAULTS
 
     types_rows: list[str] = []
-    policies_rows: list[str] = []
-    policies_xp1_rows: list[str] = []
+    policies_rows: list[dict[str, object]] = []
+    policies_xp1_rows: list[dict[str, object]] = []
     policy_exclusive_rows: list[str] = []
     text_rows: list[str] = []
 
@@ -67,18 +67,18 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
         text_rows.append(f"('zh_Hans_CN','LOC_{policy_type}_NAME','{sql_escape(policy_name)}')")
         text_rows.append(f"('zh_Hans_CN','LOC_{policy_type}_DESCRIPTION','{sql_escape(policy_desc)}')")
 
-        policy_values: list[object | None] = [
-            policy_type,
-            f"LOC_{policy_type}_NAME",
-            f"LOC_{policy_type}_DESCRIPTION",
-            prereq_civic or None,
-            prereq_tech or None,
-            slot_type,
-            requires_unlock,
-            explicit_unlock,
-        ]
-
-        policies_rows.append("(" + ", ".join(sql_literal(item) for item in policy_values) + ")")
+        policies_rows.append(
+            {
+                "PolicyType": policy_type,
+                "Name": f"LOC_{policy_type}_NAME",
+                "Description": f"LOC_{policy_type}_DESCRIPTION",
+                "PrereqCivic": prereq_civic or None,
+                "PrereqTech": prereq_tech or None,
+                "GovernmentSlotType": slot_type,
+                "RequiresGovernmentUnlock": requires_unlock,
+                "ExplicitUnlock": explicit_unlock,
+            }
+        )
 
         subtables = entry.get("subtables") if isinstance(entry.get("subtables"), dict) else {}
         xp1_payload = subtables.get("Policies_XP1") if isinstance(subtables.get("Policies_XP1"), dict) else entry.get("policies_xp1") if isinstance(entry.get("policies_xp1"), dict) else {}
@@ -88,10 +88,13 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
         requires_golden_age = int(xp1_payload.get("RequiresGoldenAge", 0) or 0)
         if min_era or max_era or requires_dark_age or requires_golden_age:
             policies_xp1_rows.append(
-                "(" + ", ".join(
-                    sql_literal(item)
-                    for item in [policy_type, min_era or None, max_era or None, requires_dark_age, requires_golden_age]
-                ) + ")"
+                {
+                    "PolicyType": policy_type,
+                    "MinimumGameEra": min_era or None,
+                    "MaximumGameEra": max_era or None,
+                    "RequiresDarkAge": requires_dark_age,
+                    "RequiresGoldenAge": requires_golden_age,
+                }
             )
 
         exclusive_payload = subtables.get("Policy_GovernmentExclusives_XP2") if isinstance(subtables.get("Policy_GovernmentExclusives_XP2"), dict) else entry.get("policy_government_exclusive") if isinstance(entry.get("policy_government_exclusive"), dict) else {}
@@ -100,8 +103,19 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
             policy_exclusive_rows.append(f"('{sql_escape(policy_type)}', '{sql_escape(government_type)}')")
 
     types_rows = deduplicate_rows(types_rows)
-    policies_rows = deduplicate_rows(policies_rows)
-    policies_xp1_rows = deduplicate_rows(policies_xp1_rows)
+    def _deduplicate_dict_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+        seen: set[tuple[tuple[str, object], ...]] = set()
+        result: list[dict[str, object]] = []
+        for row in rows:
+            key = tuple((name, row.get(name)) for name in row)
+            if key in seen:
+                continue
+            seen.add(key)
+            result.append(row)
+        return result
+
+    policies_rows = _deduplicate_dict_rows(policies_rows)
+    policies_xp1_rows = _deduplicate_dict_rows(policies_xp1_rows)
     policy_exclusive_rows = deduplicate_rows(policy_exclusive_rows)
     text_rows = deduplicate_rows(text_rows)
 
@@ -109,9 +123,10 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
     sql_blocks.append(build_insert_block("Types", "Types", ["Type", "Kind"], types_rows))
     if policies_rows:
         sql_blocks.append(
-            build_insert_block(
+            build_sparse_insert_blocks(
                 "Policies",
                 "Policies",
+                policies_rows,
                 [
                     "PolicyType",
                     "Name",
@@ -122,16 +137,17 @@ def build_policy_sql_pair(entries: object) -> tuple[str, str]:
                     "RequiresGovernmentUnlock",
                     "ExplicitUnlock",
                 ],
-                policies_rows,
+                keep_columns=("PolicyType", "Name", "Description"),
             )
         )
     if policies_xp1_rows:
         sql_blocks.append(
-            build_insert_block(
+            build_sparse_insert_blocks(
                 "Policies_XP1",
                 "Policies_XP1",
-                ["PolicyType", "MinimumGameEra", "MaximumGameEra", "RequiresDarkAge", "RequiresGoldenAge"],
                 policies_xp1_rows,
+                ["PolicyType", "MinimumGameEra", "MaximumGameEra", "RequiresDarkAge", "RequiresGoldenAge"],
+                keep_columns=("PolicyType",),
             )
         )
     if policy_exclusive_rows:

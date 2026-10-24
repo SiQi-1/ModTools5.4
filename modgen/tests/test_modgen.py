@@ -480,6 +480,13 @@ class CustomModifierTypeRegistrationTestCase(unittest.TestCase):
         self.assertTrue(any("Types + DynamicModifiers" in w for w in warnings),
                         "自定义类型应提示将补注册行")
 
+    def test_custom_type_missing_registration_metadata_is_error(self) -> None:
+        modifier = self._modifier("MODIFIER_SIQI0055_PLAYER_UNITS_ADJUST_PROPERTY")
+        modifier["collection_type"] = None
+        data = {"modifiers": [modifier], "requirement_sets": [], "requirements": [], "unit_abilities": []}
+        errors, _warnings = check_modifier_data(data)
+        self.assertTrue(any("CollectionType NULL" in error for error in errors), errors)
+
     def test_force_new_on_vanilla_type_is_error(self) -> None:
         data = {"modifiers": [self._modifier("MODIFIER_PLAYER_CITIES_EXTRA_DISTRICT", "new")],
                 "requirement_sets": [], "requirements": [], "unit_abilities": []}

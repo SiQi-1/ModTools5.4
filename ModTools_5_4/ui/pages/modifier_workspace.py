@@ -70,6 +70,7 @@ from ..ui_widget_kit import (
 )
 from ...db.interface import get_chinese_text_for_tag, get_chinese_text_for_tag_or_unknown, resolve_chinese_text_or_unknown
 from ...db.paths import DATA_DIR, DEFAULT_GAME_DB, _resolve_data_path
+from ...project.sql_utils import build_sparse_insert_blocks
 from .base_page import BasePage
 
 
@@ -6203,27 +6204,36 @@ class HomePage(BasePage):
             type_column = str(bucket.get("type_column") or "") if isinstance(bucket, dict) else ""
             if not type_column:
                 continue
+            sparse_rows = [
+                {
+                    type_column: row_tuple[0],
+                    "ModifierId": row_tuple[1],
+                    "AttachmentTargetType": row_tuple[2],
+                }
+                for row_tuple in rows
+            ]
+            column_order = [type_column, "ModifierId"]
             if table_name == OWNER_TABLE_WITH_ATTACHMENT_TARGET:
-                lines = [f"INSERT INTO {table_name} ({type_column}, ModifierId, AttachmentTargetType) VALUES"]
-            else:
-                lines = [f"INSERT INTO {table_name} ({type_column}, ModifierId) VALUES"]
-            for idx, row_tuple in enumerate(rows):
-                type_name, modifier_id, attachment_target_type = row_tuple
-                line_end = ";" if idx == len(rows) - 1 else ","
-                if table_name == OWNER_TABLE_WITH_ATTACHMENT_TARGET:
-                    attachment_sql = self._sql_text_or_null(attachment_target_type)
-                    lines.append(
-                        f"('{self._sql_escape(type_name)}', '{self._sql_escape(modifier_id)}', {attachment_sql}){line_end}"
-                    )
-                else:
-                    lines.append(
-                        f"('{self._sql_escape(type_name)}', '{self._sql_escape(modifier_id)}'){line_end}"
-                    )
-            sections.append("\n".join(lines))
+                column_order.append("AttachmentTargetType")
+            block = build_sparse_insert_blocks(
+                table_name,
+                table_name,
+                sparse_rows,
+                column_order,
+                keep_columns=(type_column, "ModifierId"),
+                escape=self._sql_escape,
+            )
+            if block:
+                sections.append(block.rstrip())
 
         # Custom ModifierType definitions (Types / DynamicModifiers)
         # 判据单一来源：_custom_modifier_type_map()（override > 原版快照 > 旧启发式回退）
-        custom_modifier_types = self._custom_modifier_type_map()
+        custom_modifier_types = {
+            modifier_type: meta
+            for modifier_type, meta in self._custom_modifier_type_map().items()
+            if str(meta.get("effect_type") or "").strip()
+            and str(meta.get("collection_type") or "").strip()
+        }
 
         if custom_modifier_types:
             type_lines = ["INSERT INTO Types (Type, Kind) VALUES"]
@@ -6238,8 +6248,8 @@ class HomePage(BasePage):
             dyn_lines = ["INSERT INTO DynamicModifiers (ModifierType, EffectType, CollectionType) VALUES"]
             for idx, modifier_type in enumerate(type_keys):
                 meta = custom_modifier_types.get(modifier_type, {})
-                effect_text = self._sql_text_or_null(meta.get("effect_type"))
-                collection_text = self._sql_text_or_null(meta.get("collection_type"))
+                effect_text = f"'{self._sql_escape(str(meta['effect_type']).strip())}'"
+                collection_text = f"'{self._sql_escape(str(meta['collection_type']).strip())}'"
                 line_end = ";" if idx == len(type_keys) - 1 else ","
                 dyn_lines.append(
                     f"('{self._sql_escape(modifier_type)}', {effect_text}, {collection_text}){line_end}"
@@ -6248,54 +6258,47 @@ class HomePage(BasePage):
 
         # Modifiers
         if self._modifiers:
-            columns: List[tuple[str, str]] = [("ModifierId", "text"), ("ModifierType", "text")]
-            if any(m.owner_reqset for m in self._modifiers):
-                columns.append(("OwnerRequirementSetId", "text"))
-            if any(m.subject_reqset for m in self._modifiers):
-                columns.append(("SubjectRequirementSetId", "text"))
-            if any(m.run_once for m in self._modifiers):
-                columns.append(("RunOnce", "bool"))
-            if any(m.new_only for m in self._modifiers):
-                columns.append(("NewOnly", "bool"))
-            if any(m.permanent for m in self._modifiers):
-                columns.append(("Permanent", "bool"))
-            if any(m.owner_stack_limit for m in self._modifiers):
-                columns.append(("OwnerStackLimit", "int"))
-            if any(m.subject_stack_limit for m in self._modifiers):
-                columns.append(("SubjectStackLimit", "int"))
-
-            col_names = ", ".join(col for col, _ in columns)
-            lines = [f"INSERT INTO Modifiers({col_names}) VALUES"]
-            for idx, record in enumerate(self._modifiers):
-                values: List[str] = []
-                for col, col_type in columns:
-                    if col == "ModifierId":
-                        values.append(self._sql_text_or_null(record.modifier_id))
-                    elif col == "ModifierType":
-                        values.append(self._sql_text_or_null(record.modifier_type))
-                    elif col == "OwnerRequirementSetId":
-                        values.append(self._sql_text_or_null(record.owner_reqset))
-                    elif col == "SubjectRequirementSetId":
-                        values.append(self._sql_text_or_null(record.subject_reqset))
-                    elif col == "RunOnce":
-                        values.append("1" if record.run_once else "0")
-                    elif col == "NewOnly":
-                        values.append("1" if record.new_only else "0")
-                    elif col == "Permanent":
-                        values.append("1" if record.permanent else "0")
-                    elif col == "OwnerStackLimit":
-                        values.append(str(record.owner_stack_limit or 0))
-                    elif col == "SubjectStackLimit":
-                        values.append(str(record.subject_stack_limit or 0))
-                    else:
-                        values.append("NULL")
-
-                line_end = ";" if idx == len(self._modifiers) - 1 else ","
-                line = f"({', '.join(values)}){line_end}"
-                if record.comment:
-                    line += f" -- {record.comment}"
-                lines.append(line)
-            sections.append("\n".join(lines))
+            modifier_rows: list[dict[str, object]] = []
+            for record in self._modifiers:
+                row: dict[str, object] = {
+                    "ModifierId": record.modifier_id,
+                    "ModifierType": record.modifier_type,
+                }
+                if record.owner_reqset:
+                    row["OwnerRequirementSetId"] = record.owner_reqset
+                if record.subject_reqset:
+                    row["SubjectRequirementSetId"] = record.subject_reqset
+                if record.run_once:
+                    row["RunOnce"] = 1
+                if record.new_only:
+                    row["NewOnly"] = 1
+                if record.permanent:
+                    row["Permanent"] = 1
+                if record.owner_stack_limit:
+                    row["OwnerStackLimit"] = record.owner_stack_limit
+                if record.subject_stack_limit:
+                    row["SubjectStackLimit"] = record.subject_stack_limit
+                modifier_rows.append(row)
+            block = build_sparse_insert_blocks(
+                "Modifiers",
+                "Modifiers",
+                modifier_rows,
+                [
+                    "ModifierId",
+                    "ModifierType",
+                    "OwnerRequirementSetId",
+                    "SubjectRequirementSetId",
+                    "RunOnce",
+                    "NewOnly",
+                    "Permanent",
+                    "OwnerStackLimit",
+                    "SubjectStackLimit",
+                ],
+                keep_columns=("ModifierId", "ModifierType"),
+                escape=self._sql_escape,
+            )
+            if block:
+                sections.append(block.rstrip())
 
         # ModifierArguments
         arg_lines: List[str] = []
@@ -6408,54 +6411,47 @@ class HomePage(BasePage):
 
         # Requirements
         if self._requirements:
-            columns: List[tuple[str, str]] = [("RequirementId", "text"), ("RequirementType", "text")]
-            if any(r.inverse for r in self._requirements):
-                columns.append(("Inverse", "bool"))
-            if any(r.reverse for r in self._requirements):
-                columns.append(("Reverse", "bool"))
-            if any(r.persistent for r in self._requirements):
-                columns.append(("Persistent", "bool"))
-            if any(r.triggered for r in self._requirements):
-                columns.append(("Triggered", "bool"))
-            if any(r.likeliness for r in self._requirements):
-                columns.append(("Likeliness", "int"))
-            if any(r.impact for r in self._requirements):
-                columns.append(("Impact", "int"))
-            if any(r.progress_weight != 1 for r in self._requirements):
-                columns.append(("ProgressWeight", "int"))
-
-            col_names = ", ".join(col for col, _ in columns)
-            lines = [f"INSERT INTO Requirements ({col_names}) VALUES"]
-            for idx, record in enumerate(self._requirements):
-                values: List[str] = []
-                for col, col_type in columns:
-                    if col == "RequirementId":
-                        values.append(self._sql_text_or_null(record.requirement_id))
-                    elif col == "RequirementType":
-                        values.append(self._sql_text_or_null(record.requirement_type))
-                    elif col == "Inverse":
-                        values.append("1" if record.inverse else "0")
-                    elif col == "Reverse":
-                        values.append("1" if record.reverse else "0")
-                    elif col == "Persistent":
-                        values.append("1" if record.persistent else "0")
-                    elif col == "Triggered":
-                        values.append("1" if record.triggered else "0")
-                    elif col == "Likeliness":
-                        values.append(str(record.likeliness or 0))
-                    elif col == "Impact":
-                        values.append(str(record.impact or 0))
-                    elif col == "ProgressWeight":
-                        values.append(str(record.progress_weight or 1))
-                    else:
-                        values.append("NULL")
-
-                line_end = ";" if idx == len(self._requirements) - 1 else ","
-                line = f"({', '.join(values)}){line_end}"
-                if record.comment:
-                    line += f" -- {record.comment}"
-                lines.append(line)
-            sections.append("\n".join(lines))
+            requirement_rows: list[dict[str, object]] = []
+            for record in self._requirements:
+                row: dict[str, object] = {
+                    "RequirementId": record.requirement_id,
+                    "RequirementType": record.requirement_type,
+                }
+                if record.inverse:
+                    row["Inverse"] = 1
+                if record.reverse:
+                    row["Reverse"] = 1
+                if record.persistent:
+                    row["Persistent"] = 1
+                if record.triggered:
+                    row["Triggered"] = 1
+                if record.likeliness:
+                    row["Likeliness"] = record.likeliness
+                if record.impact:
+                    row["Impact"] = record.impact
+                if record.progress_weight != 1:
+                    row["ProgressWeight"] = record.progress_weight
+                requirement_rows.append(row)
+            block = build_sparse_insert_blocks(
+                "Requirements",
+                "Requirements",
+                requirement_rows,
+                [
+                    "RequirementId",
+                    "RequirementType",
+                    "Inverse",
+                    "Reverse",
+                    "Persistent",
+                    "Triggered",
+                    "Likeliness",
+                    "Impact",
+                    "ProgressWeight",
+                ],
+                keep_columns=("RequirementId", "RequirementType"),
+                escape=self._sql_escape,
+            )
+            if block:
+                sections.append(block.rstrip())
 
         # RequirementArguments
         req_arg_lines: List[str] = []
@@ -6570,7 +6566,12 @@ class HomePage(BasePage):
                     ElementTree.SubElement(row_el, "AttachmentTargetType").text = _text(attachment_target_type)
 
         # Types / DynamicModifiers (custom) —— 与 SQL 侧共用同一判据
-        custom_modifier_types = self._custom_modifier_type_map()
+        custom_modifier_types = {
+            modifier_type: meta
+            for modifier_type, meta in self._custom_modifier_type_map().items()
+            if str(meta.get("effect_type") or "").strip()
+            and str(meta.get("collection_type") or "").strip()
+        }
         if custom_modifier_types:
             types_el = ElementTree.SubElement(root, "Types")
             dyn_el = ElementTree.SubElement(root, "DynamicModifiers")

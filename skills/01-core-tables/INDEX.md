@@ -27,6 +27,7 @@
 - 相邻加成（区域/改良共用）见 [../district-adjacency.md](../district-adjacency.md)
 - 实体间公共列：`{实体}Type` 必写、`TraitType` 独立特质（建筑/区域/改良不可复用文明特质）
 - 文本 LOC_ 命名格式见 `../02-config-files/text.md`
+- 主表导出遵循稀疏 INSERT：主键/Type、Name、Description 与实际有值字段保留；可选空值不写成 `NULL`，不同记录按列集合拆分 INSERT。文中完整列模板用于查字段含义，不要求每次导出把整张表铺开。
 
 ## 登记纪律
 

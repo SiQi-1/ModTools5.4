@@ -81,11 +81,13 @@ INSERT INTO RequirementArguments (RequirementId, Name, Value) VALUES
 
 | Context | 作用 | 何时必须写 | 实例 |
 |---|---|---|---|
-| `Preview` | 战斗预览面板的加成行 | EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` | `LOC_ABILITY_STRONG_WHEN_ATTACKING_DESCRIPTION` = `进攻时+{1_Amount} [ICON_Strength] 战斗力` |
+| `Preview` | 战斗预览面板的加成来源 | EffectType = `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` | 条件型：`对战相邻单位`；晋升型：`来自 齐射` |
 | `Summary` | 伟人面板的效果摘要 | 伟人「诞生时」类 modifier（`GreatPersonIndividualBirthModifiers`） | `01-core-tables/greatperson.md` |
 | `Sample` | 外交面板的简短原因 | 议程 modifier | `01-core-tables/agenda.md` |
 
-### 写什么（占位符）
+### 写什么（简短来源与按需占位符）
+
+默认只写简短来源，条件型写生效条件，晋升型写 `来自 晋升名字`。不重复技能名、单位名和整段能力，不默认附加数值或战斗力图标。统一文案规则见[战斗预览文本](../02-config-files/text.md#16-战斗预览文本modifierstrings--preview)。下表仅用于用户明确要求数值的情况，不是默认模板。
 
 | 参数形态 | 模板 | 例 |
 |---|---|---|
@@ -95,7 +97,7 @@ INSERT INTO RequirementArguments (RequirementId, Name, Value) VALUES
 
 - 占位符**统一用 `{1_Amount}`**：工具模版（`_handle_gen_modifier_preview_text`）与绝大多数原版能力文本都是 `{1_Amount}`。
   （`{Amount}` 也能被引擎解析——原版仅个别文本如 `LOC_COMBAT_DIFFICULTY_SCALING` 用它——但**同一工程里混用两种写法没有好处**，且老 skill 模板里的 `{Amount}` 已统一改为 `{1_Amount}`。）
-- 预览行要**短**：只讲"加多少 + 来源"。整段能力描述不要塞进来（会被战斗面板截断且难读）。
+- 预览行要**短**：默认只讲来源；仅在明确需要时附加数值。整段能力描述不要塞进来（会被战斗面板截断且难读）。
 
 ### 在 .CIV / 生成器里的落地
 

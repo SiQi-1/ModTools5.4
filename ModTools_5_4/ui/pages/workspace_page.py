@@ -75,7 +75,7 @@ from ...project.civ6proj_generator import (
     sanitize_file_name,
 )
 from ...project.output_manifest import OutputManifest, make_output_manifest, safe_relative_path
-from ...project.sql_utils import build_insert_block, deduplicate_rows, sql_escape, sql_literal
+from ...project.sql_utils import build_insert_block, build_sparse_insert_blocks, deduplicate_rows, sql_escape, sql_literal, sql_value_present
 from ...project.sql_builders import build_belief_sql_pair, build_policy_sql_pair
 from ...project.custom_text import validate_custom_text, custom_text_groups
 from ...project.ui_textures import texture_entries, validate_ui_textures, build_ui_texture_plans
@@ -2157,7 +2157,7 @@ class WorkspacePage(BasePage):
             self._build_insert_block("Types", "Types", ["Type", "Kind"], types_rows),
             self._build_insert_block(
                 "UnitPromotionClasses", "UnitPromotionClasses",
-                ["PromotionClassType", "Name", "Description", "DefaultUnitType", "ChoiceThreshold"],
+                ["PromotionClassType", "Name", "Description", "ChoiceThreshold"],
                 promotion_class_rows,
             ),
         ]
@@ -2235,7 +2235,7 @@ class WorkspacePage(BasePage):
 
             types_rows.append(f"('{class_type}', 'KIND_PROMOTION_CLASS')")
             promotion_class_rows.append(
-                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', NULL, 0)"
+                f"('{class_type}', 'LOC_{class_type}_NAME', 'LOC_{class_type}_DESC', 0)"
             )
             text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
             text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_DESC','{self._sql_escape(class_name)}')")
@@ -2412,6 +2412,8 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType", "Cost"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
+                if not sql_value_present(current):
+                    continue
                 sql_default = field.sql_default
                 if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
@@ -2837,6 +2839,8 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType", "Cost", "Quote"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
+                if not sql_value_present(current):
+                    continue
                 if key == "ObsoleteEra":
                     current_text = str(current or "").strip().upper()
                     if current_text in {"", "NO_ERA"}:
@@ -3405,6 +3409,8 @@ class WorkspacePage(BasePage):
                     values.append(f"LOC_{unit_type}_DESCRIPTION")
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
+                if not sql_value_present(current):
+                    continue
                 sql_default = field.sql_default
                 if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
@@ -3847,6 +3853,8 @@ class WorkspacePage(BasePage):
                 if key in {"Name", "Description", "TraitType"}:
                     continue
                 current = _normalized(key, _value_or_default(table_data, key))
+                if not sql_value_present(current):
+                    continue
                 sql_default = field.sql_default
                 if sql_default is not _NO_SQL_DEFAULT and current == sql_default:
                     continue
@@ -4627,8 +4635,8 @@ class WorkspacePage(BasePage):
         historical_rows: list[str] = []
         exclusive_rows: list[str] = []
         ai_lists_rows: list[str] = []
-        ai_favored_items_rows: list[str] = []
-        modifier_rows: list[str] = []
+        ai_favored_items_rows: list[dict[str, object]] = []
+        modifier_rows: list[dict[str, object]] = []
         modifier_args_rows: list[str] = []
         modifier_strings_rows: list[str] = []
         trait_modifiers_rows: list[str] = []
@@ -4742,10 +4750,6 @@ class WorkspacePage(BasePage):
                             f"'{self._sql_escape(agenda_type)}', '{self._sql_escape(system)}')"
                         )
                         # AiFavoredItems under this ListType
-                        def _opt_str(val: object | None) -> str:
-                            v = str(val or "").strip()
-                            return f"'{self._sql_escape(v)}'" if v else "NULL"
-
                         fav_items = al.get("AiFavoredItems")
                         fav_list = list(fav_items) if isinstance(fav_items, list) else []
                         for fi in fav_list:
@@ -4762,12 +4766,17 @@ class WorkspacePage(BasePage):
                                 value = int(fi.get("Value", 0))
                             except (TypeError, ValueError):
                                 value = 0
-                            sv = _opt_str(fi.get("StringVal"))
-                            md_min = _opt_str(fi.get("MinDifficulty"))
-                            md_max = _opt_str(fi.get("MaxDifficulty"))
-                            tt = _opt_str(fi.get("TooltipString"))
-                            cols = f"'{self._sql_escape(list_type)}', '{self._sql_escape(item)}', {favored}, {value}, {sv}, {md_min}, {md_max}, {tt}"
-                            ai_favored_items_rows.append(f"({cols})")
+                            favored_row: dict[str, object] = {
+                                "ListType": list_type,
+                                "Item": item,
+                                "Favored": favored,
+                                "Value": value,
+                            }
+                            for key in ("StringVal", "MinDifficulty", "MaxDifficulty", "TooltipString"):
+                                text_value = str(fi.get(key) or "").strip()
+                                if text_value:
+                                    favored_row[key] = text_value
+                            ai_favored_items_rows.append(favored_row)
 
             # AgendaModifiers
             modifiers_payload = subtables.get("AgendaModifiers") if isinstance(subtables.get("AgendaModifiers"), list) else []
@@ -4782,15 +4791,13 @@ class WorkspacePage(BasePage):
 
                 types_rows.append(f"('{self._sql_escape(mod_id)}', 'KIND_MODIFIER')")
 
+                modifier_row: dict[str, object] = {
+                    "ModifierId": mod_id,
+                    "ModifierType": mod_type,
+                }
                 if subj_reqset:
-                    modifier_rows.append(
-                        f"('{self._sql_escape(mod_id)}', '{self._sql_escape(mod_type)}', "
-                        f"'{self._sql_escape(subj_reqset)}')"
-                    )
-                else:
-                    modifier_rows.append(
-                        f"('{self._sql_escape(mod_id)}', '{self._sql_escape(mod_type)}')"
-                    )
+                    modifier_row["SubjectRequirementSetId"] = subj_reqset
+                modifier_rows.append(modifier_row)
 
                 trait_modifiers_rows.append(
                     f"('{self._sql_escape(trait_type)}', '{self._sql_escape(mod_id)}')"
@@ -4832,8 +4839,19 @@ class WorkspacePage(BasePage):
         historical_rows = self._deduplicate_rows(historical_rows)
         exclusive_rows = self._deduplicate_rows(exclusive_rows)
         ai_lists_rows = self._deduplicate_rows(ai_lists_rows)
-        ai_favored_items_rows = self._deduplicate_rows(ai_favored_items_rows)
-        modifier_rows = self._deduplicate_rows(modifier_rows)
+        def _deduplicate_mapping_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+            seen: set[tuple[tuple[str, object], ...]] = set()
+            result: list[dict[str, object]] = []
+            for row in rows:
+                key = tuple((name, row.get(name)) for name in row)
+                if key in seen:
+                    continue
+                seen.add(key)
+                result.append(row)
+            return result
+
+        ai_favored_items_rows = _deduplicate_mapping_rows(ai_favored_items_rows)
+        modifier_rows = _deduplicate_mapping_rows(modifier_rows)
         modifier_args_rows = self._deduplicate_rows(modifier_args_rows)
         modifier_strings_rows = self._deduplicate_rows(modifier_strings_rows)
         trait_modifiers_rows = self._deduplicate_rows(trait_modifiers_rows)
@@ -4854,10 +4872,27 @@ class WorkspacePage(BasePage):
         if ai_lists_rows:
             sql_blocks.append(self._build_insert_block("AiLists", "AiLists", ["ListType", "LeaderType", "AgendaType", "System"], ai_lists_rows))
         if ai_favored_items_rows:
-            ai_fav_cols = ["ListType", "Item", "Favored", "Value", "StringVal", "MinDifficulty", "MaxDifficulty", "TooltipString"]
-            sql_blocks.append(self._build_insert_block("AiFavoredItems", "AiFavoredItems", ai_fav_cols, ai_favored_items_rows))
+            sql_blocks.append(
+                build_sparse_insert_blocks(
+                    "AiFavoredItems",
+                    "AiFavoredItems",
+                    ai_favored_items_rows,
+                    ["ListType", "Item", "Favored", "Value", "StringVal", "MinDifficulty", "MaxDifficulty", "TooltipString"],
+                    keep_columns=("ListType", "Item"),
+                    escape=self._sql_escape,
+                )
+            )
         if modifier_rows:
-            sql_blocks.append(self._build_insert_block("Modifiers", "Modifiers", ["ModifierId", "ModifierType", "SubjectRequirementSetId"], modifier_rows))
+            sql_blocks.append(
+                build_sparse_insert_blocks(
+                    "Modifiers",
+                    "Modifiers",
+                    modifier_rows,
+                    ["ModifierId", "ModifierType", "SubjectRequirementSetId"],
+                    keep_columns=("ModifierId", "ModifierType"),
+                    escape=self._sql_escape,
+                )
+            )
         if modifier_args_rows:
             sql_blocks.append(self._build_insert_block("ModifierArguments", "ModifierArguments", ["ModifierId", "Name", "Value"], modifier_args_rows))
         if modifier_strings_rows:
@@ -4885,7 +4920,7 @@ class WorkspacePage(BasePage):
 
         types_rows: list[str] = []
         traits_rows: list[str] = []
-        governors_rows: list[str] = []
+        governors_rows: list[dict[str, object]] = []
         governors_xp2_rows: list[str] = []
         governors_cannot_assign_rows: list[str] = []
         promotion_sets_rows: list[str] = []
@@ -4937,27 +4972,23 @@ class WorkspacePage(BasePage):
             image_name = f"{governor_type}_NORMAL"
             portrait_name = f"{governor_type}_NORMAL"
             portrait_selected_name = f"{governor_type}_SELECTED"
-            trait_sql = f"'{self._sql_escape(trait_type)}'" if trait_type else "NULL"
-
             types_rows.append(f"('{governor_type}', 'KIND_GOVERNOR')")
-            governors_rows.append(
-                "(" + ", ".join(
-                    [
-                        f"'{governor_type}'",
-                        f"'LOC_{governor_type}_NAME'",
-                        f"'LOC_{governor_type}_DESCRIPTION'",
-                        str(identity_pressure),
-                        f"'LOC_{governor_type}_TITLE'",
-                        f"'LOC_{governor_type}_SHORT_TITLE'",
-                        str(transition_strength),
-                        str(assign_city_state),
-                        f"'{image_name}'",
-                        f"'{portrait_name}'",
-                        f"'{portrait_selected_name}'",
-                        trait_sql,
-                    ]
-                ) + ")"
-            )
+            governor_row: dict[str, object] = {
+                "GovernorType": governor_type,
+                "Name": f"LOC_{governor_type}_NAME",
+                "Description": f"LOC_{governor_type}_DESCRIPTION",
+                "IdentityPressure": identity_pressure,
+                "Title": f"LOC_{governor_type}_TITLE",
+                "ShortTitle": f"LOC_{governor_type}_SHORT_TITLE",
+                "TransitionStrength": transition_strength,
+                "AssignCityState": assign_city_state,
+                "Image": image_name,
+                "PortraitImage": portrait_name,
+                "PortraitImageSelected": portrait_selected_name,
+            }
+            if trait_type:
+                governor_row["TraitType"] = trait_type
+            governors_rows.append(governor_row)
 
             text_rows.append(f"('zh_Hans_CN','LOC_{governor_type}_NAME','{self._sql_escape(name_text)}')")
             text_rows.append(f"('zh_Hans_CN','LOC_{governor_type}_DESCRIPTION','{self._sql_escape(desc_text)}')")
@@ -5028,7 +5059,15 @@ class WorkspacePage(BasePage):
 
         types_rows = self._deduplicate_rows(types_rows)
         traits_rows = self._deduplicate_rows(traits_rows)
-        governors_rows = self._deduplicate_rows(governors_rows)
+        seen_governor_rows: set[tuple[tuple[str, object], ...]] = set()
+        unique_governors_rows: list[dict[str, object]] = []
+        for row in governors_rows:
+            key = tuple((name, row.get(name)) for name in row)
+            if key in seen_governor_rows:
+                continue
+            seen_governor_rows.add(key)
+            unique_governors_rows.append(row)
+        governors_rows = unique_governors_rows
         governors_xp2_rows = self._deduplicate_rows(governors_xp2_rows)
         governors_cannot_assign_rows = self._deduplicate_rows(governors_cannot_assign_rows)
         promotion_sets_rows = self._deduplicate_rows(promotion_sets_rows)
@@ -5043,9 +5082,10 @@ class WorkspacePage(BasePage):
             sql_blocks.append(self._build_insert_block("Traits", "Traits", ["TraitType", "Name", "Description"], traits_rows))
         if governors_rows:
             sql_blocks.append(
-                self._build_insert_block(
+                build_sparse_insert_blocks(
                     "Governors",
                     "Governors",
+                    governors_rows,
                     [
                         "GovernorType",
                         "Name",
@@ -5060,7 +5100,8 @@ class WorkspacePage(BasePage):
                         "PortraitImageSelected",
                         "TraitType",
                     ],
-                    governors_rows,
+                    keep_columns=("GovernorType", "Name", "Description"),
+                    escape=self._sql_escape,
                 )
             )
         if governors_xp2_rows:
@@ -5138,8 +5179,8 @@ class WorkspacePage(BasePage):
 
         gp_types_rows: list[str] = []
         greatwork_types_rows: list[str] = []
-        classes_rows: list[str] = []
-        greatworks_rows: list[str] = []
+        classes_rows: list[dict[str, object]] = []
+        greatworks_rows: list[dict[str, object]] = []
         greatwork_yield_rows: list[str] = []
         individual_sql_blocks: list[str] = []
         text_rows: list[str] = []
@@ -5204,20 +5245,18 @@ class WorkspacePage(BasePage):
                 gp_types_rows.append(f"('{class_type}', 'KIND_GREAT_PERSON_CLASS')")
 
                 classes_rows.append(
-                    "(" + ", ".join(
-                        [
-                            f"'{self._sql_escape(class_type)}'",
-                            f"'LOC_{class_type}_NAME'",
-                            f"'{self._sql_escape(unit_type)}'",
-                            f"'{self._sql_escape(district_type)}'",
-                            str(max_player_instances),
-                            f"'{self._sql_escape(pseudo_yield)}'" if pseudo_yield else "NULL",
-                            f"'{self._sql_escape(icon_string)}'",
-                            f"'{self._sql_escape(action_icon)}'",
-                            str(timeline),
-                            str(duplicate),
-                        ]
-                    ) + ")"
+                    {
+                        "GreatPersonClassType": class_type,
+                        "Name": f"LOC_{class_type}_NAME",
+                        "UnitType": unit_type,
+                        "DistrictType": district_type or None,
+                        "MaxPlayerInstances": max_player_instances,
+                        "PseudoYieldType": pseudo_yield or None,
+                        "IconString": icon_string or None,
+                        "ActionIcon": action_icon or None,
+                        "AvailableInTimeline": timeline,
+                        "GenerateDuplicateIndividuals": duplicate,
+                    }
                 )
 
                 text_rows.append(f"('zh_Hans_CN','LOC_{class_type}_NAME','{self._sql_escape(class_name)}')")
@@ -5321,21 +5360,21 @@ class WorkspacePage(BasePage):
                         name_tag = f"LOC_{greatwork_type}_NAME"
                         quote_tag = f"LOC_{greatwork_type}_QUOTE"
 
-                        greatworks_rows.append(
-                            "(" + ", ".join(
-                                [
-                                    f"'{self._sql_escape(greatwork_type)}'",
-                                    f"'{self._sql_escape(greatwork_object_type)}'",
-                                    f"'{self._sql_escape(individual_type)}'",
-                                    f"'{self._sql_escape(name_tag)}'",
-                                    f"'{self._sql_escape(audio_value)}'" if audio_value else "NULL",
-                                    f"'{self._sql_escape(image_value)}'" if image_value else "NULL",
-                                    f"'{self._sql_escape(quote_tag)}'",
-                                    str(tourism_value),
-                                    f"'{self._sql_escape(era_value)}'" if era_value else "NULL",
-                                ]
-                            ) + ")"
-                        )
+                        greatwork_row: dict[str, object] = {
+                            "GreatWorkType": greatwork_type,
+                            "GreatWorkObjectType": greatwork_object_type,
+                            "GreatPersonIndividualType": individual_type,
+                            "Name": name_tag,
+                            "Quote": quote_tag,
+                            "Tourism": tourism_value,
+                        }
+                        if audio_value:
+                            greatwork_row["Audio"] = audio_value
+                        if image_value:
+                            greatwork_row["Image"] = image_value
+                        if era_value:
+                            greatwork_row["EraType"] = era_value
+                        greatworks_rows.append(greatwork_row)
                         text_rows.append(f"('zh_Hans_CN','{name_tag}','{self._sql_escape(name_text)}')")
                         text_rows.append(f"('zh_Hans_CN','{quote_tag}','{self._sql_escape(quote_text)}')")
 
@@ -5376,8 +5415,6 @@ class WorkspacePage(BasePage):
 
         gp_types_rows = self._deduplicate_rows(gp_types_rows)
         greatwork_types_rows = self._deduplicate_rows(greatwork_types_rows)
-        classes_rows = self._deduplicate_rows(classes_rows)
-        greatworks_rows = self._deduplicate_rows(greatworks_rows)
         greatwork_yield_rows = self._deduplicate_rows(greatwork_yield_rows)
         text_rows = self._deduplicate_rows(text_rows)
 
@@ -5386,9 +5423,10 @@ class WorkspacePage(BasePage):
             sql_blocks.append(self._build_insert_block("Types", "Types", ["Type", "Kind"], gp_types_rows))
         if classes_rows:
             sql_blocks.append(
-                self._build_insert_block(
+                build_sparse_insert_blocks(
                     "GreatPersonClasses",
                     "GreatPersonClasses",
+                    classes_rows,
                     [
                         "GreatPersonClassType",
                         "Name",
@@ -5401,7 +5439,8 @@ class WorkspacePage(BasePage):
                         "AvailableInTimeline",
                         "GenerateDuplicateIndividuals",
                     ],
-                    classes_rows,
+                    keep_columns=("GreatPersonClassType", "Name", "UnitType"),
+                    escape=self._sql_escape,
                 )
             )
         sql_blocks.extend(individual_sql_blocks)
@@ -5413,9 +5452,10 @@ class WorkspacePage(BasePage):
             )
         if greatworks_rows:
             greatwork_sql_blocks.append(
-                self._build_insert_block(
+                build_sparse_insert_blocks(
                     "GreatWorks",
                     "GreatWorks",
+                    greatworks_rows,
                     [
                         "GreatWorkType",
                         "GreatWorkObjectType",
@@ -5427,7 +5467,8 @@ class WorkspacePage(BasePage):
                         "Tourism",
                         "EraType",
                     ],
-                    greatworks_rows,
+                    keep_columns=("GreatWorkType", "GreatWorkObjectType", "GreatPersonIndividualType", "Name"),
+                    escape=self._sql_escape,
                 )
             )
         if greatwork_yield_rows:

@@ -238,8 +238,11 @@ UI/Replacement/BoostUnlockedPopup_Core.lua
 
 - 从市中心现有二进制 Property 还原已经生效的量，位数/最高位与 GP 一致；不在 UI 用当前文化重新估算、不新增 Property、不写游戏状态。原生 GetProperty 可能零返回，先赋给局部变量再转数值。
 - 使用原版 `LOC_CITY_YIELD_FROM_GAMEEFFECTS_TOOLTIP` 的本地化格式识别**固定值**修正行，减去转化量后单独追加“来自文化值转化”；不要误改同名的百分比修正行。
+- 该原版文本的参数是命名参数 `{Value : number +#.#;-#.#}`。Lua 必须使用 `Locale.Lookup(tag, {Name="Value", Value=amount})`，识别原行和格式化剩余数值两处都如此。普通 `Locale.Lookup(tag, amount)` 是位置参数，不能当作等价调用。官方命名参数用法见 `DLC/Expansion1/UI/Replacements/ActionPanel_Expansion1.lua` 第 63 行等；先读实际 LOC 格式再决定参数形式。
 - 验证剩余为零、负数、小数及源行位于开头/末尾；不能只用匹配正整数的正则。用 Locale.Lookup 对候选数值做整行往返匹配，可避免硬编码中英文后缀。
 - data 可能重复传入，需保存本模块修改前后的文本，只在仍等于本模块上次结果时恢复原文再处理，防止重复扣减或追加。其他 Mod 更新过文本时不恢复过期快照。
 - 非目标领袖、没有城市、转化量为零时保持原生显示。未知/多重匹配格式不盲目扣数，可保留原文并用“其中…”说明已含的转化量，避免看成额外奖励。
 
 依据：用户提供的宜居度转科技示范；官方 CityPanel.lua、CitySupport.lua 和 InGameText.xml。2026-09-28 已验证导出动作和 Lua 提示文本的测试桩；未以测试桩替代真实 UI、联机或第三方面板兼容性。
+
+2026-09-29 用户反馈整段说明消失后发现上述命名/位置参数混用。旧测试桩将任意数字直接格式化，掩盖了错误；回归必须使用真实 LOC 的参数名，分别检查命名参数和位置参数，先证明旧代码失败。日志中的替换动作注册成功不代表 ViewMain 文本匹配成功。

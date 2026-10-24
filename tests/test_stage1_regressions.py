@@ -33,7 +33,7 @@ from sample_project import build_sample_project  # noqa: E402
 
 
 class SqlNullSemanticsTestCase(unittest.TestCase):
-    """#1：空 Prereq 等无 SQL 默认值列输出 NULL 而非 ''（fixture 自带 PrereqTech: ""）。"""
+    """#1：空 Prereq 等可选字段不再写入占位列（fixture 自带 PrereqTech: ""）。"""
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -48,12 +48,12 @@ class SqlNullSemanticsTestCase(unittest.TestCase):
     def test_district_sql_has_no_empty_string_literal(self) -> None:
         sql = self.page._build_district_sql_pair()[0]
         self.assertNotIn("''", sql, "区域 SQL 不应出现空串字面量")
-        self.assertIn("PrereqTech", sql)
+        self.assertNotIn("PrereqTech", sql, "空的可选字段不应写入 SQL 列")
 
     def test_unit_sql_has_no_empty_string_literal(self) -> None:
         sql = self.page._build_unit_sql_bundle()[0]
         self.assertNotIn("''", sql, "单位 SQL 不应出现空串字面量")
-        self.assertIn("PrereqTech", sql)
+        self.assertNotIn("PrereqTech", sql, "空的可选字段不应写入 SQL 列")
 
     def test_improvement_sql_has_no_empty_string_literal(self) -> None:
         sql = self.page._build_improvement_sql_pair()[0]

@@ -48,6 +48,8 @@ python -m modgen.cli project-check 工程.CIV --json
 
 最后一项统一检查完整工程；旧自定义 SQL 可继续使用 check-conflicts。preview 写预览目录，不等于导出到 ModBuddy。修 ERROR，解释 WARNING，检查引用、挂载和语义；数据库可执行不保证游戏内条件生效。
 
+预览主表 SQL 时检查列和值是否稀疏：可选空字段应从 `INSERT` 列清单移除，Name/Description 与必填主键保留；多条记录列集合不同属于正常情况，工具应拆成多个 INSERT 块，不能用连续 `NULL` 补齐。
+
 ## 5 生成与部署
 
 `project-check` / `build` 还会报告替代区域的原生相邻缺项、等价 custom 重复定义，以及描述缺失/未知字体图标。原规则不同的设计必须逐项解释，不自动补回或删除。快照规则集按声明的资料片依赖推断，未声明时为本体；可用 `adjacency check 工程.CIV --ruleset expansion2` 明确复核。最后核对实际生成的 District_Adjacencies / Improvement_Adjacencies，不能只检查 Adjacency_YieldChanges 有无定义。

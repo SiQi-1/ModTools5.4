@@ -15,6 +15,7 @@
 - [HTML → 文明6原生 UI](civ6-html-ui/SKILL.md)：HTML/CSS 设计、四态纹理、XML/Lua 接入；包含独立脚本、示例和跨 agent 使用说明。整目录可复制分享，仓库提供 `texture render/import-manifest/verify`。
 
 - [地标与 AST 组合](civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；附配方示例，配套 `landmark catalog/compose/import/verify/cook`。
+- [明日方舟系列](civ6-arknights-series/SKILL.md)：仅该题材的系列命名、地名和发布准备；附封面 PSD 与排版脚本，玩法定稿后补英文并生成中英文工坊描述，不执行上传。
 
 ## 参考与案例
 

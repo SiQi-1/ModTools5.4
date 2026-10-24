@@ -10,14 +10,16 @@
   validate 也会对未知类型报错（参数集合来自 `schemas/modifier_schemas.json`，源自游戏库权威数据）。
 - **参数名必须属于该 Effect/Requirement 的参数集合**（多写/拼错报 error，标准参数缺失给 warning）。
 - **引用**：`owner_reqset` / `subject_reqset` / `bound_requirements` 必须指向工程内存在的 ReqSet/Requirement。
+- **先定能力归属再选挂载点**：按 [R3 实体能力归属规则](../RULES.md#r3-类型与参数) 区分文明/领袖能力与实体自身能力；后者检查对应的 DistrictModifiers、BuildingModifiers、ImprovementModifiers 或 UnitAbility 挂载，不把解锁 Trait 自动转换成 owner_reqset。
 - 生成的 Modifier 参数骨架 value 为 null，AI 需填入实际值（数值/Type/文本）。
 - 注意：`generate-modifier` 产物是"自定义 ModifierType"（modifier_type = modifier_id），
-  若要用游戏内置 ModifierType，需另行指定。
+  生成后必须查原版快照，优先另行指定语义匹配的游戏内置 ModifierType，不能直接把每个 ModifierId 都保留为新类型。
+- **ModifierId 与 ModifierType 分开复用**：Amount、YieldType、条件集或档位不同，只需不同 ModifierId；同一 CollectionType + EffectType 的自定义类型也只定义一次，多条 Modifier 共用。优先原版类型；必要时用原版 ATTACH 把 owner 调整到城市，再复用单城类型。不能为减少类型而扩大到全部城市，也不能只改类型名却保留不匹配的集合/效果。官方情景模式中的类型须核对是否会在本工程规则集加载。
 - **ModifierStrings 预览文本**：`effect_type = EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 的 modifier **必须填 `preview_text`**
   （原版 226 个实例里 221 个都写了；不写不报错，但战斗预览面板不显示该加成来源）。
   工具会生成两行：`ModifierStrings(ModifierId,'Preview','LOC_{ModifierId}_PREVIEW')` + 对应 `LocalizedText`
   （前者在 `modifier_workspace`，后者在 `workspace_page._modifier_strength_preview_text_rows()`），**都要求 `preview_text` 非空**。
-  写法：数值型 `+{1_Amount} [ICON_Strength] 战斗力（来源）`；`Key`（属性）型 `+{Property} [ICON_Strength] 战斗力（来源）`。
+  文本只写简短的战斗力来源：条件型如 `对战相邻单位`、`位于己方领土`，晋升型如 `来自 齐射`。不要重复技能名、单位名或整段效果描述，也不默认加“+数值 战斗力”前缀。详细约定见[战斗预览文本](../02-config-files/text.md#16-战斗预览文本modifierstrings--preview)。
 - **自定义 ModifierType 必须注册**：`.CIV` 里 `modifier_type` 不属于**原版快照**
   （`ModTools_5_4/data/vanilla_modifier_types.json`，989 条，由
   `python -m modgen.tools.extract_vanilla_modifier_types` 从游戏自带 XML 提取）时，

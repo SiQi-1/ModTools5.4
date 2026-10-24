@@ -24,6 +24,7 @@
 - ModifierType 优先复用符合语义的原版类型。EffectType、RequirementType、CollectionType 必须有真实定义，不能按名字猜。
 - 确需自定义 ModifierType 时使用项目命名，填写合法 CollectionType/EffectType，由工具生成 Types 与 DynamicModifiers 注册。外部 Mod 用过不等于原版存在。
 - 确认 owner/subject、挂载对象、参数和条件链；字段存在不代表语义成立。读 [修改器操作指南](05-modtools-civ/modifiers.md) 与 [通用技巧](07-techniques/modifier-techniques.md)。
+- 区域、建筑、改良、单位自身的能力挂在实体上，通常随实体归属生效，不额外绑定文明或领袖；特色实体的解锁归属不等于其能力的生效条件。只有效果属于文明/领袖能力，或设计明确限定使用者时，才添加相应条件。不能仅因实体是某文明特色内容就添加文明/领袖检查。
 - “每个合格来源贡献固定效果”先用 [逐对象范围挂载](07-techniques/modifiers/patterns/pattern-spatial-attach-count.md) 自然叠加；原生类型、距离、存在性条件不先转成 req property。只有原生表/条件/挂载确实不能表达的动态换算才使用 Property。
 - 二进制按具体效果设最高位和总上限，不默认铺 16/31 位。常规城市/区域最高位不超过 1024（总值 2047），地块和负数通常更低；参考 [Core 档位与超限处理](04-lua/lua-binary.md#上限按效果设定不按机器整数位数设定)，特殊更高需求须说明依据。
 - `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 必须填写 `preview_text`；不可把该规则推广到所有 EffectType。
@@ -32,6 +33,8 @@
 
 - 主内容通过 `new-project`、`generate`、`generate-*` 建骨架，Type 由工具生成，再按 schema 填入意图；不靠复制旧工程搭新骨架。
 - AI 编写的 JSON 值禁止空字符串：省略字段或写 `null`，不要写字符串 `"null"`、通用占位 `"NONE"`。参数名和枚举需查证，图片路径必须真实。
+- 主表 SQL 使用稀疏列清单：Type/主键、Name、Description 和确有值的字段才进入 `INSERT`；空的可选文本、`None`/`NULL` 哨兵不以 `NULL` 占位。多行记录按实际列集合分组，避免为其他记录补无意义的 `NULL`。Name/Description 若在主表 schema 中是语义必需列，保留其列位并由必填校验报告缺失值。
+- 新建 `ModifierType` 注册必须同时有 `EffectType` 与 `CollectionType`；缺失时应由 validate/project-check 报错，不得用 `NULL` 补齐 `DynamicModifiers`。
 - 主内容不手写 SQL/XML，不把 Lua 塞进条目。确需特殊 SQL、UI XML 或 Lua，内容临时文件放 `modgen_work/`，先启用 [项目级扩展](05-modtools-civ/project-extensions.md)，通过 `extension write` / `custom-file write` / AI `extension` 写入源码并按清单注册；工具是工程文件的唯一写入者。
 - 默认将未被 .CIV 支持的 Gameplay SQL 集中到 Core.sql；不同数据库作用域或前后阶段有明确需求时再分文件。一次规划完整功能的数据、GP、UI、文本与资源，登记功能归属和依赖。源码和 ModBuddy 输出分离，缺失源码不得用输出副本替代。
 - 修改生成内容应回到 .CIV；自定义 SQL 不得与生成数据同主键双写，不得为消除告警随意改成 REPLACE。

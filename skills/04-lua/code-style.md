@@ -34,6 +34,7 @@ API 核验应记录环境、对象层级、返回值和官方调用点。FireTun
 
 ## 对象层级与环境的常见误用
 
+- 城市、单位等原生集合的 `:Members()` 迭代器返回 `(数字索引, 对象)`，使用 `for _, city in cities:Members() do` / `for _, unit in units:Members() do`。单变量循环拿到的是数字，调用对象方法会报 `attempt to index a number value`。这不等于 `GameInfo.Table()` 的单行迭代契约，测试桩需分别模拟。官方实例：`Base/Assets/UI/Panels/UnitPanel.lua` 的 `originCities:Members()`、`Base/Assets/UI/PartialScreens/EspionageOverview.lua` 的 `localPlayerUnits:Members()`。2026-10-01 实机日志确认错误；回归应先用双返回值桩复现旧版失败，再验证修正版，不以跳过数字或吞错作为修复。
 - GP 当前生产使用 `City:GetBuildQueue():CurrentlyBuilding()`，读取类型字符串；空字符串或无有效类型表示未生产。`GetCurrentProductionTypeHash()` 是 UI 查询。存档中的旧 hash 应通过对应 `GameInfo` 行匹配，不能为兼容存档在 GP 调用 UI 接口。参见 [GP 生产力函数](lua-gp-resource.md#生产力奇观)。
 - GP 全国区域遍历使用 `Player:GetDistricts():Members()`；不要把 UI 的 `City:GetDistricts():Members()` 移到 GP。局部城市统计须额外匹配所属城市。
 - `City:GetBuildings():GetBuildingsAtLocation(plotIndex)`、`City:GetReligion():GetReligionsInCity()` 是 UI 查询，官方依据为 `Base/Assets/UI/CitySupport.lua`。UI 统计某宗教信徒时遍历返回的 `Religion` / `Followers`，不能借用 GP 的 `GetNumFollowers()`。
@@ -42,6 +43,16 @@ API 核验应记录环境、对象层级、返回值和官方调用点。FireTun
 - 地块视野的官方 GP 例子见 `DLC/WarMachineScenario/Scripts/WarMachineScenario.lua`：`PlayersVisibility[playerID]:ChangeVisibilityCount(plotIndex, delta)`。重复刷新必须记录自己的增量；移除时只扣除自己增加的视野。
 
 接口回归应从 API 资料和官方脚本建立 **GP/UI 各自的对象方法白名单**，至少核对 `Player`、`City`、各管理器和返回对象。不要使用为任意方法返回空函数的万能桩。用修复前源码验证错误能被测试捕获，再测试修改版；模拟通过与游戏引擎复测应分开记录。
+
+## 刷新事件与差异写入
+
+- 先读取并计算目标值，再比较旧值；仅在不同时修改数据。读取与写入分开，优先减少会触发引擎重算的写入；二进制按 [只写变化位](lua-binary.md) 执行。若缺失值在需求判断中等价于零，不为零值初始化整组 Property。
+- 差异写入不等于可以堆叠事件。先列每个事件覆盖的变化；已由 Changed 覆盖的 Add/Remove 不重复注册，同一建成行为可由城市生产完成统一覆盖时，不再逐项注册区域进度、区域新增和建筑新增。
+- 按事件参数限定受影响玩家/城市；不要每个玩家的回合或一座城建成后都扫描所有文明。回合激活按首次激活过滤，初始化防止重复挂载处理函数。
+- 需要实时更新哪些变化、哪些可在下一次刷新时更新，应明确记录；不以无依据的密集监听换取表面覆盖，也不静默承诺即时更新。
+- 验收统计真实写入次数：无变化为零；取整后相同为零；数值变化只写不同位。另查事件数量、重复初始化、非目标玩家及回合二次激活；测试桩不得从被测代码自动生成全部事件。
+
+依据：既有二进制差异写入规范与用户 2026-09-29 对重叠事件的纠正。事件可用性及实际触发时序仍以目标 GP/UI 环境为准。
 
 ---
 

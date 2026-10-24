@@ -32,7 +32,7 @@
           "table_data": []
         }
       ],
-      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_CUSTOM_1', 'KIND_POLICY'),\n('POLICY_DEFAULTS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_CUSTOM_1', 'LOC_POLICY_CUSTOM_1_NAME', 'LOC_POLICY_CUSTOM_1_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0),\n('POLICY_DEFAULTS', 'LOC_POLICY_DEFAULTS_NAME', 'LOC_POLICY_DEFAULTS_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_CUSTOM_1', 'KIND_POLICY'),\n('POLICY_DEFAULTS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_CUSTOM_1', 'LOC_POLICY_CUSTOM_1_NAME', 'LOC_POLICY_CUSTOM_1_DESCRIPTION', 'SLOT_WILDCARD', 0, 0),\n('POLICY_DEFAULTS', 'LOC_POLICY_DEFAULTS_NAME', 'LOC_POLICY_DEFAULTS_DESCRIPTION', 'SLOT_WILDCARD', 0, 0);",
       "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_CUSTOM_1_NAME',''),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_1_DESCRIPTION',''),\n('zh_Hans_CN','LOC_POLICY_DEFAULTS_NAME',''),\n('zh_Hans_CN','LOC_POLICY_DEFAULTS_DESCRIPTION','');"
     },
     {
@@ -82,7 +82,7 @@
           }
         }
       ],
-      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_LEGACY', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_LEGACY', 'LOC_POLICY_LEGACY_NAME', 'LOC_POLICY_LEGACY_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);\n\n-- Policies_XP1\nINSERT INTO Policies_XP1 (PolicyType, MinimumGameEra, MaximumGameEra, RequiresDarkAge, RequiresGoldenAge) VALUES\n('POLICY_LEGACY', NULL, 'ERA_RENAISSANCE', 0, 1);\n\n-- Policy_GovernmentExclusives_XP2\nINSERT INTO Policy_GovernmentExclusives_XP2 (PolicyType, GovernmentType) VALUES\n('POLICY_LEGACY', 'GOVERNMENT_MONARCHY');",
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_LEGACY', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_LEGACY', 'LOC_POLICY_LEGACY_NAME', 'LOC_POLICY_LEGACY_DESCRIPTION', 'SLOT_WILDCARD', 0, 0);\n\n-- Policies_XP1\nINSERT INTO Policies_XP1 (PolicyType, MaximumGameEra, RequiresDarkAge, RequiresGoldenAge) VALUES\n('POLICY_LEGACY', 'ERA_RENAISSANCE', 0, 1);\n\n-- Policy_GovernmentExclusives_XP2\nINSERT INTO Policy_GovernmentExclusives_XP2 (PolicyType, GovernmentType) VALUES\n('POLICY_LEGACY', 'GOVERNMENT_MONARCHY');",
       "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_LEGACY_NAME','旧工程'),\n('zh_Hans_CN','LOC_POLICY_LEGACY_DESCRIPTION','');"
     },
     {
@@ -102,7 +102,7 @@
           }
         }
       ],
-      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_MODERN', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_MODERN', 'LOC_POLICY_MODERN_NAME', 'LOC_POLICY_MODERN_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_MODERN', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_MODERN', 'LOC_POLICY_MODERN_NAME', 'LOC_POLICY_MODERN_DESCRIPTION', 'SLOT_WILDCARD', 0, 0);",
       "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_MODERN_NAME',''),\n('zh_Hans_CN','LOC_POLICY_MODERN_DESCRIPTION','');"
     },
     {
@@ -126,7 +126,7 @@
           }
         }
       ],
-      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_DUP', 'KIND_POLICY'),\n('POLICY_CUSTOM_3', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_DUP', 'LOC_POLICY_DUP_NAME', 'LOC_POLICY_DUP_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0),\n('POLICY_CUSTOM_3', 'LOC_POLICY_CUSTOM_3_NAME', 'LOC_POLICY_CUSTOM_3_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_DUP', 'KIND_POLICY'),\n('POLICY_CUSTOM_3', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_DUP', 'LOC_POLICY_DUP_NAME', 'LOC_POLICY_DUP_DESCRIPTION', 'SLOT_WILDCARD', 0, 0),\n('POLICY_CUSTOM_3', 'LOC_POLICY_CUSTOM_3_NAME', 'LOC_POLICY_CUSTOM_3_DESCRIPTION', 'SLOT_WILDCARD', 0, 0);",
       "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_DUP_NAME','首条'),\n('zh_Hans_CN','LOC_POLICY_DUP_DESCRIPTION',''),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_3_NAME','自动 Type'),\n('zh_Hans_CN','LOC_POLICY_CUSTOM_3_DESCRIPTION','');"
     },
     {
@@ -145,7 +145,7 @@
           }
         }
       ],
-      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_NULLS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, PrereqCivic, PrereqTech, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_NULLS', 'LOC_POLICY_NULLS_NAME', 'LOC_POLICY_NULLS_DESCRIPTION', NULL, NULL, 'SLOT_WILDCARD', 0, 0);",
+      "data_sql": "-- Types\nINSERT INTO Types (Type, Kind) VALUES\n('POLICY_NULLS', 'KIND_POLICY');\n\n-- Policies\nINSERT INTO Policies (PolicyType, Name, Description, GovernmentSlotType, RequiresGovernmentUnlock, ExplicitUnlock) VALUES\n('POLICY_NULLS', 'LOC_POLICY_NULLS_NAME', 'LOC_POLICY_NULLS_DESCRIPTION', 'SLOT_WILDCARD', 0, 0);",
       "text_sql": "-- Text.sql\n\n-- LocalizedText\nINSERT INTO LocalizedText (Language, Tag, Text) VALUES\n('zh_Hans_CN','LOC_POLICY_NULLS_NAME',''),\n('zh_Hans_CN','LOC_POLICY_NULLS_DESCRIPTION','');"
     }
   ]

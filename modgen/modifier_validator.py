@@ -102,6 +102,30 @@ def check_modifier(
                 f"自定义 ModifierType（{modifier_type}）将在生成时补 Types + DynamicModifiers 行"
             )
 
+        if needs_registration(modifier_type, source, snapshot=snapshot):
+            if not str(modifier.get("effect_type") or "").strip():
+                errors.append(
+                    f"自定义 ModifierType（{modifier_type}）缺少 effect_type；"
+                    "不能生成 DynamicModifiers 的 EffectType NULL 占位"
+                )
+            if not str(modifier.get("collection_type") or "").strip():
+                errors.append(
+                    f"自定义 ModifierType（{modifier_type}）缺少 collection_type；"
+                    "不能生成 DynamicModifiers 的 CollectionType NULL 占位"
+                )
+    elif modifier_type and needs_registration(modifier_type, source, snapshot={}):
+        # 快照缺失时仍不能让明确要求注册的新类型带着 NULL 元数据导出。
+        if not str(modifier.get("effect_type") or "").strip():
+            errors.append(
+                f"自定义 ModifierType（{modifier_type}）缺少 effect_type；"
+                "不能生成 DynamicModifiers 的 EffectType NULL 占位"
+            )
+        if not str(modifier.get("collection_type") or "").strip():
+            errors.append(
+                f"自定义 ModifierType（{modifier_type}）缺少 collection_type；"
+                "不能生成 DynamicModifiers 的 CollectionType NULL 占位"
+            )
+
     if requirement_set_ids is not None:
         for key in ("owner_reqset", "subject_reqset"):
             value = str(modifier.get(key) or "").strip()

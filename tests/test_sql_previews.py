@@ -17,7 +17,7 @@ from PyQt6.QtWidgets import QApplication  # noqa: E402
 
 from ModTools_5_4.app.config import load_config  # noqa: E402
 from ModTools_5_4.app.logging_setup import configure_logging  # noqa: E402
-from ModTools_5_4.ui.pages.modifier_workspace import ModifierWorkspacePanel  # noqa: E402
+from ModTools_5_4.ui.pages.modifier_workspace import ModifierRecord, ModifierWorkspacePanel  # noqa: E402
 from ModTools_5_4.ui.pages.workspace_page import WorkspacePage  # noqa: E402
 
 from sample_project import build_sample_project  # noqa: E402
@@ -234,6 +234,16 @@ class SqlPreviewsTestCase(unittest.TestCase):
         improvement_sql = self._preview("改良设施", "sql")
         self.assertNotIn("Workable", improvement_sql)  # DEFAULT 1
 
+    def test_optional_empty_main_fields_are_omitted_instead_of_null(self) -> None:
+        unit_result = self._preview("单位", "sql")
+        unit_sql = unit_result["Units.sql"] if isinstance(unit_result, dict) else str(unit_result)
+        improvement_sql = self._preview("改良设施", "sql")
+        self.assertNotIn("NULL", unit_sql)
+        self.assertNotIn("NULL", improvement_sql)
+        self.assertIn("UnitType", unit_sql)
+        self.assertIn("Name", unit_sql)
+        self.assertIn("Description", unit_sql)
+
     def test_district_requires_placement_unchecked_still_emitted(self) -> None:
         project = build_sample_project()
         project.sections["区域"][0]["table_data"]["RequiresPlacement"] = 0
@@ -354,6 +364,32 @@ class EmptyParamHandlingTestCase(unittest.TestCase):
         sql = panel.generate_sql_preview_text()
         self.assertNotIn("'REQ_TEST_X', 'Flag'", sql)
         self.assertIn("'REQ_TEST_X', 'Real', 1", sql)
+
+    def test_modifier_optional_columns_are_grouped_without_null_padding(self) -> None:
+        panel = ModifierWorkspacePanel()
+        panel._modifiers.clear()
+        panel._modifier_editor_index = -1
+        panel._current_modifier_index = -1
+        panel._modifiers.extend(
+            [
+                ModifierRecord(
+                    modifier_id="MODIFIER_A",
+                    modifier_type="MODIFIER_PLAYER_UNITS_ADJUST_SIGHT",
+                    modifier_type_source="vanilla",
+                ),
+                ModifierRecord(
+                    modifier_id="MODIFIER_B",
+                    modifier_type="MODIFIER_PLAYER_UNITS_ADJUST_SIGHT",
+                    subject_reqset="REQSET_B",
+                    modifier_type_source="vanilla",
+                ),
+            ]
+        )
+        sql = panel.generate_sql_preview_text()
+        self.assertEqual(sql.count("INSERT INTO Modifiers"), 2)
+        self.assertNotIn("NULL", sql)
+        self.assertIn("(ModifierId, ModifierType)", sql)
+        self.assertIn("(ModifierId, ModifierType, SubjectRequirementSetId)", sql)
 
 
 if __name__ == "__main__":

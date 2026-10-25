@@ -13,6 +13,7 @@
 | 源码 | 已克隆仓库或收到完整源码目录（下文以 `<源码根>` 表示）；不需要 EXE/预制 ZIP |
 | Python | 需要 **3.10+**（3.13 最佳）。未安装：引导用户到 python.org 下载安装，勾选 "Add to PATH" |
 | 文明6 | 最好运行过一次（生成 `%LOCALAPPDATA%\...\Cache\DebugGameplay.sqlite`）；没有也不阻断安装 |
+| 外部制作工具（可选） | 做 FGX/模型/贴图时需要 CivNexus6、AssetEditor、Blender；重装系统后按第 7 节重配 |
 
 知识检索、条目生成和资源静态检查可直接用 Python 运行；完整预览/生成和 GUI 再执行下方初始化。源码分享方式见 [分享约定](docs/SOURCE_SHARING.md)。
 
@@ -79,6 +80,7 @@ python tools/register_file_association.py --status
 - **知识查询**：`modgen search <效果词>`（游戏库实现）/ `skill <关键词>`（本地技能库）/ `query "SELECT ..."`（游戏库只读）/ `loc <LOC_TAG>`，或 GUI 小工具「能力实现搜索」
 - **AI 驱动 GUI**：`python ModTools5.4.py 工程.CIV --ai-port 8765`（协议见 `ModTools_5_4/docs/AI_CONTROL_API.md`）；一次性执行 `--ai-exec '<json动作>'`
 - **方法论**：判断"某效果有没有现成实现" = `search` 查原版，不要凭记忆断言
+- **模型/贴图制作**：先读 `skills/05-modtools-civ/blender-civnexus.md`；本机外部工具链配置（CivNexus6 注册表、AssetEditor DLL、Blender 插件）见第 7 节
 
 ## 5. 排障速查
 
@@ -105,3 +107,51 @@ python tools/register_file_association.py --status
 ├─ ModTools_5_4/data/                 工具运行资源（颜色预设/注释模板等）
 └─ settings.json                      运行时配置（初始化生成）
 ```
+
+## 7. 可选：外部建模/贴图工具链（重装系统后需重做）
+
+以下**不是** ModTools 运行时依赖；只有做 FGX/GEO 模型、或用 Blender 转换 CN6 时才需要。2026-10-26 在本机实际配置并验证到“插件可加载/注册表可读/DLL 可解析”这一层；AssetEditor 首次启动和实际模型导入仍需人工验收。
+
+### 7.1 CivNexus6 注册表（Blender ↔ CN6 ↔ FGX）
+
+CivNexus6 启动时读取 `HKCU\Software\Firaxis\Tools` 的 `ToolAssetPath`；该目录必须同时有 `Assets` 和 `Resource` 两个子目录（可为空，位置任意）。缺失时 CN6 的 FGX 导入/导出会失败。
+
+```powershell
+$dummy = 'D:\文明6mod用文件夹\CivNexus6_1.3.3\CivNexus6\Dummy'   # 本机已有，内含 Assets/Resource
+New-Item -Path 'HKCU:\Software\Firaxis\Tools' -Force | Out-Null
+Set-ItemProperty -Path 'HKCU:\Software\Firaxis\Tools' -Name 'ToolAssetPath' -Value $dummy -Type String
+Get-ItemProperty 'HKCU:\Software\Firaxis\Tools'
+```
+
+### 7.2 AssetEditor 的 FbxImporter.dll 名称修正（官方命名错误）
+
+SDK 的 AssetEditor 程序集 `Firaxis.CivTech.Impl.dll` 在 P/Invoke 中引用 `FbxImporter.dll`；但 SDK 实际发布的是 `FbxImporter_Release.dll`（其它工具 DLL 也带 `_Release`），导致 AE 的 FBX/模型导入找不到 DLL。**复制一份**即可，不要覆盖或删除官方原件：
+
+```powershell
+$ae = "D:\steam\steamapps\common\Sid Meier's Civilization VI SDK\AssetModTools\AssetEditor"
+Copy-Item -LiteralPath (Join-Path $ae 'FbxImporter_Release.dll') -Destination (Join-Path $ae 'FbxImporter.dll') -Force
+(Get-FileHash (Join-Path $ae 'FbxImporter_Release.dll')).Hash -eq (Get-FileHash (Join-Path $ae 'FbxImporter.dll')).Hash
+```
+
+验证输出应为 `True`。Steam 校验/更新 SDK 可能清掉副本，更新后重做。
+
+### 7.3 Blender 4.5 的 CivNexus6 导入/导出插件
+
+插件来源 S1（Nexus-Buddy-2-Blender-Scripts 的 `Blender-2.8-Addons/`；2.8 版脚本可用于 Blender 3.x/4.x）。复制到用户 legacy addons 目录并启用：
+
+```powershell
+$src = '<Nexus-Buddy-2-Blender-Scripts>\Blender-2.8-Addons'
+$dst = Join-Path $env:APPDATA 'Blender Foundation\Blender\4.5\scripts\addons'
+New-Item -ItemType Directory -Force -Path $dst | Out-Null
+Copy-Item "$src\io_import_cn6.py","$src\io_export_cn6.py","$src\io_import_na2.py" $dst -Force
+& 'C:\Program Files\Blender Foundation\Blender 4.5\blender.exe' -b --python-exit-code 1 --python-expr "import bpy; [bpy.ops.preferences.addon_enable(module=m) for m in ('io_import_cn6','io_export_cn6','io_import_na2')]; bpy.ops.wm.save_userpref(); print('ADDONS_OK')"
+```
+
+验证：Blender 的 File > Import 出现 `CivNexus6 (.cn6)` 与 `Civilization Animation (.na2)`，File > Export 出现 `CivNexus6 (.cn6)`；后台可用 `import_shape.cn6` / `export_shape.cn6` / `import_shape.na2` 操作符确认。
+
+### 7.4 本机状态（2026-10-26）
+
+- 已配置：`ToolAssetPath` 指向 `D:\文明6mod用文件夹\CivNexus6_1.3.3\CivNexus6\Dummy`；AE 目录已生成 `FbxImporter.dll` 副本（与 `_Release` 同 SHA-256）；Blender 4.5 三个插件已安装并启用、用户设置已保存。
+- 未验证：CivNexus6 GUI 启动、AssetEditor 首次启动/实际 FBX 或模型导入、游戏内模型显示。
+- 本机路径仅作示例；换设备时按 7.1–7.3 重新配置。
+

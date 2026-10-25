@@ -318,6 +318,8 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 社区技能、模板与工具的参考来源、作者署名和许可范围见 [第三方参考资料与致谢](THIRD_PARTY_NOTICES.md)，包括千寻瀑（千与千寻瀑）、煎包 / Jianbao233、飞花白，以及 Deliverator / Sukritact 的相关成果。新增参考千川白浪的 Civ6ArtUnpack_Handover，复原方法、版本冲突和采用范围见 [美术解包指南](skills/05-modtools-civ/art-unpack.md)。
 
+用户确认的社区 PSD 模板随 [civ6-art-images](skills/civ6-art-images/SKILL.md) 分享；从他人 Steam 工坊 Mod 提炼的 Lua/UI 资料自 2026-10-26 起仅维护者本机保留，不随仓库或源码分享；压缩包类原件不内置，需要时请自行向作者或分享者获取。新设备做模型/贴图时，CivNexus6 注册表、AssetEditor DLL 修正与 Blender 插件配置见 [AGENT_SETUP](AGENT_SETUP.md) 第 7 节。
+
 本工具为文明6 Mod 制作提供参考数据与素材，其中部分文件来自游戏本体或 ModBuddy：
 
 - `ModTools_5_4/From/{Base,DLC}/`：官方 ModBuddy 附带的 artdef 参考文件（仅用于解析艺术层条目名称与结构）。

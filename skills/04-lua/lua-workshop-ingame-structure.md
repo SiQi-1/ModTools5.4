@@ -82,7 +82,7 @@ end
 ```xml
 <LuaContext ID="PartialScreenHooks" FileName="PartialScreenHooks" />
 ```
-用于劫持/替换 PartialScreens 层内的面板。见 `lua-workshop-partial-screen-hooks.md`。
+用于劫持/替换 PartialScreens 层内的面板。具体工坊提炼示例已移出仓库，仅维护者本机保留。
 
 ### ActionStack（城市/单位面板按钮注入）
 

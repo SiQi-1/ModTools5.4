@@ -30,6 +30,6 @@ description: 用 modgen image 和 PSD/PNG 模板制作文明6领袖头像、历�
 
 ## 资源边界
 
-用户已确认这套社区 PSD 可纳入 Git 和分享，原件现位于 [assets/templates](assets/templates/manifest.json)：`district.psd`、`leader.psd`、`moments/*.psd` 和原使用说明。manifest 记录原名、大小、SHA-256 与用户提供的分享依据；作者暂未确认，不虚构署名或将模板改称本项目原创。源码分享工具会携带这些资源，无需用户再次提供本机绝对路径。
+用户已确认这套社区 PSD 可纳入 Git 和分享（2026-09-28；2026-10-26 再次确认作为来源分享），原件现位于 [assets/templates](assets/templates/manifest.json)：`district.psd`、`leader.psd`、`moments/*.psd` 和原使用说明。manifest 记录原名、大小、SHA-256 与用户提供的分享依据；作者暂未确认，不虚构署名或将模板改称本项目原创。源码分享工具会携带这些资源，无需用户再次提供本机绝对路径。
 
 单个 Mod 的立绘、裁切稿、成品、构建包仍保存在自己的资源目录或 `modgen_work/`。迁移时携带已获授权的源图和相对路径配方，保留来源记录。

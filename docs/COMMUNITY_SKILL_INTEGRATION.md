@@ -89,4 +89,13 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 
 本机官方 Civ6.cfg 的 SHA-256：e10dd128c50caea9b17fffe6a7b47c951e7fda7cc409708fc5819cb041b33feb。其实际注册表确认了正确 TileBase→LandmarkModel 组合，以及 LeaderFallback 拒绝 UserInterface、接受 Leader_Fallback 的关系；测试前后配置散列一致。没有把完整配置、SDK 素材、原包源码、Oodle/Granny EXE 或历史仓库纳入分发。
 
-本轮验证：新增 SDK/AST 检查 8 项通过，既有资源检查 15 项（1 项符号链接权限跳过），知识回归 31 项（1 项符号链接权限跳过），modgen 99 项通过；知识质量检查 243 篇 / 36 场景，0 问题。验证使用最小资源声明与真实 SDK 配置，没有复现全量解包、领袖动画、Cooker 或游戏显示。此前全量主套件数字属于上一轮记录，本轮按改动范围运行相关套件。
+本轮验证：新增 SDK/AST 检查 8 项通过，既有资源检查 15 项（1 项符号链接权限跳过），知识回归 31 项（1 项符号链接权限跳过），modgen 99 项通过；知识质量检查 243 篇 / 36 场景，0 问题。
+## 2026-10-26 来源治理调整
+
+- PSD 模板：用户再次确认区域/领袖/历史时刻 PSD 可作为来源分享，继续随 `skills/civ6-art-images/assets/templates/` 分发。
+- 04-lua：从他人 Steam 工坊 Mod 提炼的 92 篇 Lua/UI 资料移出 Git 与源码分享，维护者本机保留在 `local_notes/04-lua-workshop/`（含本地索引，可用 `modgen skill --skills-dir` 检索）；自有 Mod 子系统与 17 篇官方游戏 UI 文件分析继续随仓库。
+- 外部 skill/知识仓库：只记录参考链接，不内置、不提供拉取工具、不炼化；S4 线上仓库现行许可为 PolyForm Noncommercial 1.0.0，本项目仅按旧 zip 的 MIT 版本采用已炼化部分并署名。
+- 压缩包类原件不内置：S2/S3/S6/S7 等原始包与 S5 上传器二进制不随包分发；需要时由用户向作者或分享者获取。
+- 新设备工具链：CivNexus6 注册表、AssetEditor `FbxImporter.dll` 名称修正、Blender 4.5 插件安装/启用写入 [AGENT_SETUP](../AGENT_SETUP.md) 第 7 节，并在 [Blender/CivNexus6 指南](../skills/05-modtools-civ/blender-civnexus.md) 补充环境前置。
+- 验证：`python -m modgen.cli skill --check` 通过；`python tools/share_source.py --check` 通过；modgen 测试通过。主测试套件在本机有 4 项失败/1 项错误（PSD 断言文案、Windows 临时路径短名等环境因素），与本次文档与文件移出无关。
+验证使用最小资源声明与真实 SDK 配置，没有复现全量解包、领袖动画、Cooker 或游戏显示。此前全量主套件数字属于上一轮记录，本轮按改动范围运行相关套件。

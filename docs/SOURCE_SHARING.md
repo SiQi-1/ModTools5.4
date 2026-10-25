@@ -29,12 +29,12 @@ SOURCE_MANIFEST.json 包含基准提交号、导出时是否有本地改动、UT
 ## 包含范围
 
 - skills、modgen 及 schemas、ModTools_5_4 源码/运行数据/资源、可选 GUI 入口。
-- civ6-art-images 内置的社区 PSD 模板、原使用说明和来源/散列清单；原件以二进制纳入 Git，不包含单个 Mod 的角色立绘和成品。原版相邻快照与提取脚本也随源码分发。
+- civ6-art-images 的社区 PSD 模板（用户确认可分享）、原使用说明和来源/散列清单；不包含单个 Mod 的角色立绘和成品，也不包含从他人 Steam 工坊 Mod 提炼的 Lua/UI 资料（仅本机 `local_notes/04-lua-workshop/` 保留）。原版相邻快照与提取脚本也随源码分发。
 - 初始化与维护工具、通用测试、开发与使用文档。
 - local_text_New.sqlite 参考文本库；它是工具运行数据，不是旧应用安装包。
 - LICENSE、THIRD_PARTY_NOTICES.md、licenses/ 和社区整合记录，保留所有已采用来源的署名。
 
-不包含 .git、历史 EXE/ZIP、构建输出、虚拟环境、缓存、日志、Mod 专用工作文件、个人 settings.json。tools/legacy_skill_builders 只分享停用说明，不分发旧维护脚本。工具不会复制未知的根目录文件。
+不包含 .git、历史 EXE/ZIP、构建输出、虚拟环境、缓存、日志、Mod 专用工作文件、个人 settings.json、他人创意工坊 Mod 提炼资料（本机 `local_notes/04-lua-workshop/`）。tools/legacy_skill_builders 只分享停用说明，不分发旧维护脚本。工具不会复制未知的根目录文件。
 
 导出在新目录完成后可以直接分享整个文件夹。若传输渠道要求临时压缩，可由发送者在仓库外处理；压缩文件不成为项目依赖或 Git 维护对象。
 

@@ -12,6 +12,8 @@
 
 ## 本机已验证的窄路径
 
+环境前置：CivNexus6 注册表（`ToolAssetPath` 目录含 `Assets`/`Resource`）、AssetEditor 的 `FbxImporter.dll` 名称修正、Blender 的 CN6 插件安装启用；配置与验证见 [Blender / CivNexus6 指南](../../05-modtools-civ/blender-civnexus.md) 和 [AGENT_SETUP 第 7 节](../../../AGENT_SETUP.md)。这些是工具环境，不替代下方的制作与验收步骤。
+
 1. Blender 4.5.2 后台 `--factory-startup --disable-autoexec` 生成原创静态几何；应用位置/旋转/缩放与需要的修改器，三角化。
 2. 一个网格、一套 atlas 材质、一个静态根骨骼，全部顶点权重归根；每个面有有效 UV、法线和切线。使用用户本机已有的 CN6 导出插件，不要求安装旧 Blender。
 3. 调用已安装 CivNexus6 1.3.3 的解析与包装库做 CN6 → FGX；使用它自带的 3UV 模板并生成 GEO/GeometrySet。专用助手只覆盖上述单网格静态样板，不能推广为单位/动画导入器；不改安装目录、不分发 Firaxis DLL。

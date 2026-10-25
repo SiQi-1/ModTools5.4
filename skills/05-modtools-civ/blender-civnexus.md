@@ -10,6 +10,16 @@ Sukritact 的 Nexus-Buddy-2-Blender-Scripts 提供 CN6 导入、CN6 导出和 NA
 - 上游标称 Blender 2.8+，README 说明 3.x / 4.x 可用；通用动画兼容性未验证；2026-09-25 在 Blender 4.5.2 用本机现有插件完成了单网格静态 CN6 样板导出。
 - 动画导入前先加载模型/骨架，确认所选对象和骨架匹配。NA2 不替代模型接线。
 
+## 环境前置（新设备 / 重装系统）
+
+以下三项不属于 ModTools 运行时，但缺一项 CN6→FGX 链路就跑不通；配置命令与验证见 [AGENT_SETUP 第 7 节](../../AGENT_SETUP.md)。
+
+- **CivNexus6 注册表**：`HKCU\Software\Firaxis\Tools` 的 `ToolAssetPath` 必须指向同时含 `Assets` 与 `Resource` 的目录（可为空）。缺失时 FGX 导入/导出失败。
+- **AssetEditor 的 FbxImporter.dll**：官方 SDK 实际发布 `FbxImporter_Release.dll`，但 `Firaxis.CivTech.Impl.dll` 在 P/Invoke 里引用 `FbxImporter.dll`（官方命名错误）。复制一份 `FbxImporter.dll` 才能导入 FBX/模型；不要覆盖官方原件。Steam 校验/更新 SDK 可能清掉副本，更新后复查。
+- **Blender 插件**：Nexus-Buddy-2 的 `Blender-2.8-Addons/` 可用于 Blender 3.x/4.x；安装 `io_import_cn6.py`、`io_export_cn6.py`、`io_import_na2.py` 后在 Preferences > Add-ons 启用（对应 File > Import / Export 菜单）。
+
+2026-10-26 本机已完成上述注册表、DLL 副本和 Blender 4.5 插件启用；验证到“注册表可读、DLL 散列一致、插件注册成功”为止。AssetEditor 首次启动、实际 FBX/模型导入和游戏内显示仍需人工验收，不能因配置完成就宣称模型链路通过。
+
 ## 交换与排错
 
 1. 明确目标对象、原模型来源、修改范围、Blender 版本，保留原文件。

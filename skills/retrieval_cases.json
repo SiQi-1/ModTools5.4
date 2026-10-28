@@ -258,5 +258,55 @@
     "query": "ui_replace lua_context ReplaceUIScript 扩展",
     "expected": "05-modtools-civ/project-extensions.md",
     "top": 3
+  },
+  {
+    "query": "FireTuner 控制文明6 单位移动 建城",
+    "expected": "civ6-ai-play/SKILL.md",
+    "top": 3
+  },
+  {
+    "query": "文明6 窗口化启动 分辨率 全屏",
+    "expected": "civ6-ai-play/references/environment.md",
+    "top": 3
+  },
+  {
+    "query": "Mods.sqlite 启用 Mod 备份",
+    "expected": "civ6-ai-play/references/environment.md",
+    "top": 3
+  },
+  {
+    "query": "Tuner 连不上 4318 排障",
+    "expected": "civ6-ai-play/references/troubleshooting.md",
+    "top": 3
+  },
+  {
+    "query": "FireTuner 新建对局 PlayerConfigurations HostGame",
+    "expected": "civ6-ai-play/references/lua-api.md",
+    "top": 3
+  },
+  {
+    "query": "DLL Mod 测试 loader 注入 插件 OnLoad",
+    "expected": "civ6-ai-play/references/mod-testing.md",
+    "top": 3
+  },
+  {
+    "query": "自定义 UI mod 按钮 Controls 测试",
+    "expected": "civ6-ai-play/references/mod-testing.md",
+    "top": 3
+  },
+  {
+    "query": "地块产出 ChangeYield 建城 测试",
+    "expected": "civ6-ai-play/references/mod-testing.md",
+    "top": 3
+  },
+  {
+    "query": "civ6-model-import 模型导入",
+    "expected": "EXTERNAL_SKILLS.md",
+    "top": 3
+  },
+  {
+    "query": "领袖3D模型 psk ueanim 导入",
+    "expected": "EXTERNAL_SKILLS.md",
+    "top": 3
   }
 ]

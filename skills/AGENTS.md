@@ -24,4 +24,6 @@ python -m modgen.cli skill --check
 
 任务映射由 [catalog.json](catalog.json) 维护；新增/移动资料登记到相应 INDEX，叶子资料可从目录链接到达。通用规则不复制到每篇案例，允许在回答中简短注明依据。
 
+外置技能包不在本目录内置：只在 [外置技能名单](EXTERNAL_SKILLS.md) 登记名单、署名与本机安装/检索方法；包体不入 Git、不随源码分享，不代替作者发布。
+
 修改后运行 `python -m modgen.cli skill --check` 与 `python -m unittest tests.test_skills_search tests.test_knowledge_quality -v`。质量检查包括断链/锚点、入口覆盖、过时工作流引用、重复文档及检索场景。

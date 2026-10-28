@@ -13,6 +13,8 @@ logs/
 !requirements.txt
 local_db_queries/
 local_notes/
+# User-installed external skill packages; roster only in skills/EXTERNAL_SKILLS.md.
+local_skills/
 project_reports/
 outputs/
 
@@ -76,6 +78,10 @@ entry_*.json
 _work/
 *.tmp
 ~$*
+
+# 本地审计记录与工作产物（仅本机保留，不随仓库/源码分享）
+/review_notes/
+/work/
 
 # Old ad-hoc patterns (kept for legacy)
 ai_*

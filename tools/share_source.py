@@ -20,7 +20,7 @@ ARTIFACT_SUFFIXES = {
     ".gz", ".tgz", ".bz2", ".xz", ".whl", ".pyd", ".so", ".dylib",
     ".pyc", ".pyo", ".spec",
 }
-LOCAL_DIRS = {".git", ".venv", "__pycache__", "node_modules", "logs"}
+LOCAL_DIRS = {".git", ".venv", "__pycache__", "node_modules", "logs", "local_skills"}
 OUTPUT_DIRS = {"build", "dist", "release", "shares", "modgen_work", "_work"}
 ROOT_FILES = {
     ".gitignore", ".gitattributes", "AGENT.md", "AGENTS.md", "AGENT_SETUP.md",

@@ -13,6 +13,7 @@
 | AI / CLI | 从 [AGENTS.md](AGENTS.md) 开始；`python -m modgen.cli skill "任务描述" --plan` | Python 3.10+，推荐 3.13；知识/数据命令使用标准库 |
 | 完整生成与可选 GUI | `python tools/setup_env.py`，再用 `.venv\Scripts\python ModTools5.4.py` | PyQt6 + Pillow；preview / project-check / build 也需要 PyQt |
 | HTML 转 UI 独立技能 | 分享整个 [skills/civ6-html-ui](skills/civ6-html-ui/README.md) 目录 | 依赖见该目录说明，不绑定 ModTools 版本 |
+| AI 实机测试文明6 | 读 [skills/civ6-ai-play/SKILL.md](skills/civ6-ai-play/SKILL.md)：窗口化启动、FireTuner、Mod 启停、选文明领袖开局、截图与日志取证 | Windows + 已安装文明6；脚本只用 Python 标准库 |
 
 新设备见 [AGENT_SETUP.md](AGENT_SETUP.md)。新 Mod 的工作文件放在 `modgen_work/`。
 
@@ -318,7 +319,7 @@ Modifier / RequirementSet / Requirement / UnitAbility 的完整编辑器。
 
 社区技能、模板与工具的参考来源、作者署名和许可范围见 [第三方参考资料与致谢](THIRD_PARTY_NOTICES.md)，包括千寻瀑（千与千寻瀑）、煎包 / Jianbao233、飞花白，以及 Deliverator / Sukritact 的相关成果。新增参考千川白浪的 Civ6ArtUnpack_Handover，复原方法、版本冲突和采用范围见 [美术解包指南](skills/05-modtools-civ/art-unpack.md)。
 
-用户确认的社区 PSD 模板随 [civ6-art-images](skills/civ6-art-images/SKILL.md) 分享；从他人 Steam 工坊 Mod 提炼的 Lua/UI 资料自 2026-10-26 起仅维护者本机保留，不随仓库或源码分享；压缩包类原件不内置，需要时请自行向作者或分享者获取。新设备做模型/贴图时，CivNexus6 注册表、AssetEditor DLL 修正与 Blender 插件配置见 [AGENT_SETUP](AGENT_SETUP.md) 第 7 节。
+用户确认的社区 PSD 模板随 [civ6-art-images](skills/civ6-art-images/SKILL.md) 分享；从他人 Steam 工坊 Mod 提炼的 Lua/UI 资料自 2026-10-26 起仅维护者本机保留，不随仓库或源码分享；压缩包类原件不内置，需要时请自行向作者或分享者获取。UE psk/ueanim 模型导入领袖 3D 所需的 civ6-model-import 外置技能包只在 [外置技能名单](skills/EXTERNAL_SKILLS.md) 登记，需向作者千寻瀑索取后安装到本机 `local_skills/`，本项目不代替作者发布。新设备做模型/贴图时，CivNexus6 注册表、AssetEditor DLL 修正与 Blender 插件配置见 [AGENT_SETUP](AGENT_SETUP.md) 第 7 节。
 
 本工具为文明6 Mod 制作提供参考数据与素材，其中部分文件来自游戏本体或 ModBuddy：
 

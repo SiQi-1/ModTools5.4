@@ -387,6 +387,62 @@
         "07-techniques/modifiers/modifier-attach.md",
         "07-techniques/modifiers/patterns/pre-code-checklist.md"
       ]
+    },
+    {
+      "id": "civ6_ai_play",
+      "aliases": [
+        "AI玩文明6",
+        "AI 控制文明6",
+        "控制文明6",
+        "文明6自动化",
+        "文明6自动测试",
+        "自动测试mod",
+        "自动测试 Mod",
+        "启动文明6",
+        "FireTuner",
+        "Tuner",
+        "4318",
+        "Mods.sqlite",
+        "启用Mod",
+        "Mod 启停",
+        "窗口化",
+        "DLL Mod 测试",
+        "自定义 UI 测试",
+        "全自动测试",
+        "自动测试工作流",
+        "auto_harness",
+        "测试报告",
+        "UI 截图",
+        "civ6-ai-play"
+      ],
+      "read": [
+        "civ6-ai-play/SKILL.md",
+        "civ6-ai-play/references/environment.md",
+        "civ6-ai-play/references/troubleshooting.md",
+        "civ6-ai-play/references/lua-api.md",
+        "civ6-ai-play/references/official-automation.md",
+        "civ6-ai-play/references/mod-testing.md",
+        "civ6-ai-play/references/mod-test-workflow.md",
+        "civ6-ai-play/references/mod-runtime-testing.md",
+        "civ6-ai-play/references/auto-mod-test-workflow.md"
+      ]
+    },
+    {
+      "id": "external_model_import",
+      "aliases": [
+        "civ6-model-import",
+        "模型导入",
+        "领袖3D模型",
+        "psk",
+        "ueanim",
+        "NexusBatch",
+        "cn6",
+        "BLP部署",
+        "外置技能",
+        "千寻瀑",
+        "local_skills"
+      ],
+      "read": ["EXTERNAL_SKILLS.md"]
     }
   ]
 }

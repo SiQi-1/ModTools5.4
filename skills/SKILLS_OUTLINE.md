@@ -16,6 +16,11 @@
 
 - [地标与 AST 组合](civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；附配方示例，配套 `landmark catalog/compose/import/verify/cook`。
 - [明日方舟系列](civ6-arknights-series/SKILL.md)：仅该题材的系列命名、地名和发布准备；附封面 PSD 与排版脚本，玩法定稿后补英文并生成中英文工坊描述，不执行上传。
+- [AI 控制文明6](civ6-ai-play/SKILL.md)：窗口化启动、FireTuner Lua、Mod 启停、选文明领袖开局、单位移动/建城、截图与日志取证；附环境与排障参考及 Windows 脚本。测试后关闭游戏并还原选项与 Mods.sqlite。
+
+## 外置技能（仅名单，不随仓库分发）
+
+- [外置技能名单](EXTERNAL_SKILLS.md)：登记 civ6-model-import 等外部技能包的作者署名、包指纹与本机安装/检索方法；包体不随仓库分发，需向作者索取后自行安装到 `local_skills/`，本仓库不代替作者发布。
 
 ## 参考与案例
 

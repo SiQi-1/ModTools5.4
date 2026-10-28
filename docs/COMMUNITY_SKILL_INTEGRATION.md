@@ -99,3 +99,17 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 - 新设备工具链：CivNexus6 注册表、AssetEditor `FbxImporter.dll` 名称修正、Blender 4.5 插件安装/启用写入 [AGENT_SETUP](../AGENT_SETUP.md) 第 7 节，并在 [Blender/CivNexus6 指南](../skills/05-modtools-civ/blender-civnexus.md) 补充环境前置。
 - 验证：`python -m modgen.cli skill --check` 通过；`python tools/share_source.py --check` 通过；modgen 测试通过。主测试套件在本机有 4 项失败/1 项错误（PSD 断言文案、Windows 临时路径短名等环境因素），与本次文档与文件移出无关。
 验证使用最小资源声明与真实 SDK 配置，没有复现全量解包、领袖动画、Cooker 或游戏显示。此前全量主套件数字属于上一轮记录，本轮按改动范围运行相关套件。
+
+## 追加 S8：千寻瀑 civ6-model-import（外置技能，2026-10-29）
+
+用户提供 `D:\Backup\Downloads\civ6-model-import.zip`（完整分发版，包内版本 2026-10-27；12,594,811 字节；SHA-256 `2d9f3727303fa71c651658e356bc3128dad655317d9a9c66d9387e99c7c7026f`），要求作为“外置技能”接入：不参与 Git、不提交，但保留名单，其他人可向作者千寻瀑索取后自行安装，本项目不代替作者发布。作者署名按用户确认记为千寻瀑。
+
+处理方式：
+
+- 名单登记：[外置技能名单](../skills/EXTERNAL_SKILLS.md) 记录技能名、作者、包指纹、内容范围、适用/不适用、本机安装路径与取得方式；不复制包内文档、脚本或二进制进仓库，也不把其流程炼化为本项目规则。
+- 本机安装：解压到 Git 忽略的 `local_skills/civ6-model-import/`；默认 `skills/` 索引与源码分享不包含该包，检索用 `python -m modgen.cli skill ... --skills-dir local_skills/civ6-model-import`。
+- 隔离：根 `.gitignore` 新增 `local_skills/`；`tools/share_source.py` 的 `LOCAL_DIRS` 加入 `local_skills`，误跟踪时 `--check` 会失败；任务目录新增 `external_model_import` 路由，检索命中名单页。
+- 分布边界：包内 `tools/CivNexus6/` 的 Firaxis/Granny/FBX 程序集与未签名 exe 属作者的 CivNexus6 构建产物，许可以上游为准；包内未发现独立 LICENSE 文件。本项目只做本机安装与名单登记，不分发原件，不执行包内 exe/dll/脚本。
+- 包内文档的本机绝对路径、工程常量与实测结论不回流到 `skills/`。
+
+验证记录：zip 306 条目（10 目录 + 296 文件）无绝对路径、盘符或 `..` 越界；按包内 `MANIFEST.sha256` 逐文件复核 295 条全部一致（缺失 0、不一致 0，唯一清单外文件为清单自身）；本机安装 296 文件、34.86 MiB；`git check-ignore` 命中 `.gitignore` 的 `local_skills/`，`git status --untracked-files=all` 不含该目录；本地检索 8 条命中（top 为 `SKILL.md`），`--file SKILL.md` 读取非空（5,921 字符）。知识检查 `python -m modgen.cli skill --check` 通过（167 篇、62 个检索用例、0 个问题）；`python -m unittest tests.test_knowledge_quality tests.test_skills_search tests.test_external_skills tests.test_source_distribution` 48 项通过；`python tools/share_source.py --check` 通过。未运行包内 exe/dll/脚本，未做游戏内实机验收。

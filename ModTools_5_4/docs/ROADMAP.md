@@ -1,5 +1,36 @@
 # ModTools 5.4 路线图（2026-08 更新）
 
+### 2026-10-29 civ6-ai-play 技能去本机化与可移植性维护（已实现，已入库）
+- 按用户要求移除技能内的本机专属数据（GPU/温度/分辨率/绝对路径/DPI/Mods.sqlite 快照/验收流水），改为按机器探测与用户约定阈值；本机细节与项目案例分别归档到 Git 忽略的 `local_notes/civ6_ai_play-本机记录.md`、`local_notes/civ6_ai_play-项目记录-19.47.md`。
+- 泛化 `mod-test-workflow.md`/`auto-mod-test-workflow.md`/`mod-runtime-testing.md` 的项目流水与未随包脚本引用；脚本复用 `find_game_dir()` 并新增 `CIV6_GAME_DIR` 等覆盖，清理脚本内本机文案与内部名；同步环境文档、README 与 CI 知识门禁。
+- 检查全绿（`skill --check` 0 问题、31 项知识单测 OK、`share_source --check` 通过、脚本 `--help` 全通）。
+- **入库**：技能目录（22 文件）与 `catalog.json`/`retrieval_cases.json`/`SKILLS_OUTLINE.md`/根 `AGENTS.md` 等登记文件同批提交；`share_source.py` 导出验证通过（导出目录内 detached `skill --check` 0 问题）。脚本路径改动尚未实机启动游戏复跑（需真实对局）。
+
+### 2026-10-29 外置技能 civ6-model-import 名单与本机安装（已实现）
+- 用户提供的 `civ6-model-import.zip`（作者千寻瀑，UE psk/ueanim → 文明6 领袖 3D 模型导入技能包）作为外置技能接入：压缩包与解压内容不入 Git、不提交，名单保留，其他人可向作者索取后自行安装。
+- 新增 `skills/EXTERNAL_SKILLS.md` 登记署名、包指纹、取得方式与本机安装/检索方法；任务目录增加 `external_model_import` 路由，未安装时指向名单页。
+- 本机安装到 Git 忽略的 `local_skills/civ6-model-import/`（296 文件、34.86 MiB，包内 MANIFEST 295/295 一致），默认 `skills/` 索引与源码分享不含该包；`.gitignore` 与 `tools/share_source.py` 同步拦截。
+- 未执行包内 exe/dll/脚本，未做游戏内实机验收；原件由用户向作者索取，本项目不代替发布。
+
+### 2026-10-26 DLL version.dll 兼容性修复（已实现，实机验收）
+- 定位 Windows 兼容性库 sysMerge.sdb 的文明6 DXGICompat 条目抢占 system32 VERSION.dll；新增 civ6_sdb_fix.py（status/apply/restore/verify，备份与 ACL 回滚）。
+- 修复后标准安装的 Civ6DllLoader 可用：标准启动加载 exe 目录 VERSION.dll，PlotYieldAPI 插件 OnLoad 且 ChangeYield 生效；文档同步，Windows 更新后重新 apply。
+
+### 2026-10-26 第三方来源治理与本机工具链恢复（已实现）
+- PSD 模板按用户确认继续随技能分享；04-lua 他人工坊 Mod 提炼的 92 篇资料退出 Git/分享，仅本机保留并可独立检索；自有 Mod 与官方 UI 分析保留。
+- 外部 skill/知识仓库只记录参考链接，不内置、不拉取、不炼化；压缩包原件缺失自备；S4 上游许可变化单独记录。
+- 新设备：CivNexus6 注册表、AssetEditor FbxImporter.dll 修正、Blender 4.5 插件配置写入 AGENT_SETUP 第 7 节；AE 首次启动与实际导入待人工验收。
+
+### 2026-10-26 AI 控制文明6技能（已实现，实机验收分层）
+- 新增 `skills/civ6-ai-play/` 可分享技能：窗口化启动/还原、FireTuner Lua 执行、Mods.sqlite 启停、开局与单位/城市操作、截图与日志验收；环境与排障参考以及 `scripts/` 脚本入口随技能提供。
+- FireTuner 单连接：加载/领袖介绍期间 4318 暂不可用，加载完成 + Esc 跳过介绍后可重连；`civ6_ops.py` 串联开局-加载-跳过介绍-重连，常驻桥（HTTP 8770）留给长会话。已实机验收窗口化启动 → 选 `LEADER_QIN`+`CIVILIZATION_CHINA` → HostGame → 进入对局 → 建城（首都 LOC_CITY_NAME_XIAN）→ 移动勇士 → 结束回合（1→2）→ 截图 → 退出还原；Mod 启停与日志扫描亦实测（温度等本机记录仅存 `local_notes/`，不随包）。
+- 技能只负责把已部署 Mod 放进真实对局跑通；Mod 制作仍走 modgen 生成器。游戏启动/关闭、实机对局与画面验收由使用者在本机执行，静态检查与模拟结果不替代实机结论。
+- 已接入任务路由、知识地图、检索用例、根 AGENTS、变更日志与知识质量检查；官方 Lua API/自动化脚本分析文档在技能 references 下维护。
+
+### 2026-10-26 追加：Mod 测试方法与 DLL Mod 实测（已实现）
+- 新增 references/mod-testing.md（玩法 Lua / DLL Loader 插件 / 自定义 UI 三类 Mod 的取证与判定）与 scripts/civ6_inject.py 测试注入助手。
+- 实测 PlotYieldAPI DLL Mod 的 Lua API 与建城效果；记录 loader 标准 version.dll 安装未生效的实证，以及注入 workaround、独立主菜单 UI 的 tuner/Controls 测试方法。
+
 ### 2026-10-13 SQL 稀疏列导出（已实现）
 - 主表、修改器、需求与 owner 关系按实际有值字段生成列清单；空的可选值不再用连续 `NULL` 填充，多行记录按列签名拆分 INSERT。
 - 必填字段继续由工程校验负责，规则、modgen 契约和回归测试已同步。

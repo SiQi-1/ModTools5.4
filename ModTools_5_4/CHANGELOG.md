@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-10-29 - civ6-ai-play 技能去本机化与可移植性维护
+
+- 按用户要求「本机问题是本机问题，不应写入 skill」，移除技能 Markdown 中的作者本机专属数据（GPU 机型与温度阈值、原始分辨率与设备 ID、本机绝对路径、DPI 缩放、Mods.sqlite 快照、单次 Tuner 状态编号、端到端验收流水等）。改为「按机器探测、按用户/机器约定阈值、通用占位符」；本机细节归档到 Git 忽略的 `local_notes/civ6_ai_play-本机记录.md`。
+- 泛化项目案例型参考：`mod-test-workflow.md`、`auto-mod-test-workflow.md`、`mod-runtime-testing.md` 去掉 19.47/Ave Mujica/Siqi/Morpheus/Fever 等项目标识、F-02/F-15/F-17/F-19/F-21 编号、`modgen_work\19.47\...` 等本机路径与未随包脚本引用（约 33 处）；保留四层/六层取证、判定四态、断言模板、夹具 Cookbook 等通用方法论与【实测】证据。项目记录归档到 `local_notes/civ6_ai_play-项目记录-19.47.md`。
+- 脚本可移植性（B2）：`civ6_inject.py`、`civ6_sdb_fix.py`、`civ6_tuner_gui.py` 复用 `civ6_game.find_game_dir()`，移除写死本机路径（改为自动探测 + 显式覆盖）；新增 `--exe-dir`/`--game-exe`/`--exe`/`--game-dir` 与 `CIV6_GAME_DIR`/`CIV6_GAME_EXE`/`CIV6_FIRETUNER_EXE` 覆盖；sysMerge.sdb 路径改用 `%SystemRoot%`；`tuner_eval.py` 支持 `--url/--port` 对齐桥端口。清理脚本 docstring/注释中的本机实测数据与内部名「Lead」；`civ6ctl mods --force` 帮助文案改为「兼容参数，实际不生效」。
+- 文档与脚本一致性：`environment.md` 明确脚本默认 DX12（`--exe dx11` 备选）、`launch` 工作目录、`LOCALAPPDATA` 缺失时用 `--db/--dir`、自动探测仅覆盖 Steam 版并可用 `CIV6_GAME_DIR` 覆盖；`SKILL.md` 修正 `civ6_ops.py` 无 CLI 的误导示例、整包复制前清理缓存、验收分层引用；README 增加实机测试入口；CI `source-check.yml` 增加知识检索/质量门禁单测。
+- 清理 `scripts/__pycache__`（约 400 KB，`.pyc` 内含本机绝对路径）。
+- 检查：`python -m modgen.cli skill --check`（167 篇 / 62 用例 / 0 问题）；`python -m unittest tests.test_skills_search tests.test_knowledge_quality`（31 项 OK）；`python tools/share_source.py --check` 通过；技能脚本 `--help` 全部 exit 0；路径覆盖解析用临时目录验证通过（未启动游戏做端到端复测）。
+
+## 2026-10-29 - 外置技能 civ6-model-import 名单与本机安装（不随仓库分发）
+
+- 按用户要求，把用户提供的 `civ6-model-import.zip`（作者千寻瀑，UE psk/ueanim → 文明6 领袖 3D 模型导入技能包，包内版本 2026-10-27）作为外置技能接入：压缩包与解压内容不入 Git、不提交，名单保留，其他人可向作者索取后自行安装；本项目不代替作者发布。
+- 新增 `skills/EXTERNAL_SKILLS.md`：登记作者署名、包大小与 SHA-256、内容范围、适用/不适用、本机安装路径、取得方式与分发边界；不复制包内文档、脚本或二进制。
+- 本机安装到 Git 忽略的 `local_skills/civ6-model-import/`（296 文件、34.86 MiB；包内 `MANIFEST.sha256` 逐文件复核 295/295 一致）。默认 `skills/` 索引与源码分享不含该包；检索用 `python -m modgen.cli skill ... --skills-dir local_skills/civ6-model-import`。
+- 隔离与路由：`.gitignore` 新增 `local_skills/`；`tools/share_source.py` 的 `LOCAL_DIRS` 加入 `local_skills`，误跟踪时 `--check` 失败；`skills/catalog.json` 新增 `external_model_import` 路由，知识地图与检索用例指向名单页，新增 `tests/test_external_skills.py` 回归。
+- 第三方来源页登记 S8 与包指纹，来源治理表新增“外置技能包（仅名单）”类别；未执行包内 exe/dll/脚本，未做游戏内实机验收。
+- 检查：`python -m modgen.cli skill --check`（167 篇 / 62 用例 / 0 问题）；`python -m unittest tests.test_knowledge_quality tests.test_skills_search tests.test_external_skills tests.test_source_distribution`（48 项 OK）；`python tools/share_source.py --check` 通过。
+
+## 2026-10-26 - 文明6标准 version.dll 被 Windows 兼容性库抢占：定位并修复
+
+- 根因：Windows 兼容性数据库 C:\Windows\apppatch\MergeSdbFilesSource\sysMerge.sdb 含文明6 DX12 匹配条目，命中后施加 DXGICompat 修复并在 exe 导入前加载 AcGenral，AcGenral 从 system32 抢先加载 VERSION.dll，导致 Civ6DllLoader 的 app-local 代理永远不加载。
+- 新增 skills/civ6-ai-play/scripts/civ6_sdb_fix.py：status/apply/restore/verify；把 sysMerge.sdb 中文明6匹配名替换为同长度占位名，先备份原文件与 ACL、可回滚；不改游戏文件，只改 Windows 兼容性库（Windows 更新后需重跑 apply）。
+- 实机验收（2026-10-26）：标准启动不注入时进程加载 exe 目录 VERSION.dll、AcGenral 消失；PlotYieldAPI 开局日志出现 Loaded plugin / OnLoad / active: ChangeYield installed；tuner 调 ChangeYield(0,5) 前后 Food 1 -> 6，游戏正常入局。mod-testing/troubleshooting/environment/SKILL 已同步，旧“标准安装不工作”结论作废。
+- 检查：python -m modgen.cli skill --check 与 python -m unittest tests.test_skills_search tests.test_knowledge_quality -v 通过。
+
+## 2026-10-26 - 第三方来源治理与本机工具链恢复
+
+- PSD 模板：用户再次确认允许作为来源分享，继续随 `skills/civ6-art-images/assets/templates/` 分发；清单补充确认依据。
+- 04-lua：从他人 Steam 工坊 Mod 提炼的 92 篇 Lua/UI 资料移出 Git 与源码分享，维护者本机保留在 `local_notes/04-lua-workshop/`（含本地索引，可用 `modgen skill --skills-dir` 检索）；自有 Mod 子系统与官方游戏 UI 文件分析保留。
+- 第三方来源规则：外部 skill/知识仓库只记录参考链接，不内置、不提供拉取、不炼化；压缩包类原件不内置，缺失项由用户向作者或分享者获取。S4 线上仓库现行许可为 PolyForm Noncommercial 1.0.0，本项目仅按旧 zip 的 MIT 版本采用已炼化部分并署名。
+- 新设备工具链：`AGENT_SETUP.md` 第 7 节记录 CivNexus6 注册表（`HKCU\Software\Firaxis\Tools\ToolAssetPath`）、AssetEditor `FbxImporter.dll` 名称修正（官方 P/Invoke 引用名与发布文件名不一致）、Blender 4.5 插件安装/启用；`blender-civnexus.md` 与地标自建模型参考补环境前置。
+- 验证：`python -m modgen.cli skill --check` 157 篇/52 用例/0 问题；`python tools/share_source.py --check` 通过；modgen 测试通过。主套件 556 项中 3 失败/1 错误（区域 PSD 渐变断言文案、Windows 临时路径 8.3 短名），均为本机环境因素，与本次文档与文件移出无关。
+
+## 2026-10-26 - AI 控制文明6技能（civ6-ai-play）
+
+- 新增可分享技能 `skills/civ6-ai-play/`：窗口化启动与还原、FireTuner（`127.0.0.1:4318`）Lua 执行、Mods.sqlite 启用集启停、选文明领袖开局、单位移动/建城/结束回合、截图与日志取证；附 `scripts/` 脚本入口（`civ6ctl`、`civ6_game`、`civ6_bridge`、`civ6_tuner`、`civ6_win`、`civ6_mods`、`civ6_logs`）。
+- FireTuner 为单连接；实测加载中/领袖介绍未跳过时 4318 暂不可用，但**加载完成并用 Esc 跳过介绍后可重连**（对局稳定后反复 connect/close 3 轮成功）。`civ6_ops.py` 的 `start_game_flow` 把「前端注入开局 → 等加载 → Esc → 重试重连」串成一个命令；`civ6_bridge.py` 常驻桥（HTTP `127.0.0.1:8770`）保留给需要长时间保持连接的多步操作。另提供 `civ6_tuner_gui.py`：通过官方 FireTuner2 GUI 的 Lua Console 执行命令（GUI 自动重连），作为备用通道。
+- 环境参考记录游戏根/用户目录/选项文件的探测与还原、窗口化不改全屏、Mods.sqlite 启用语义与备份还原、日志目录与 DPI/PrintWindow 截图方式；排障参考覆盖 Tuner 单连接与断连、启动失败、Mod 报错、加载卡住、GPU/窗口与安全结束进程。官方自动化脚本与 Debug 面板的静态分析见技能内 `references/lua-api.md`、`references/official-automation.md`。
+- 已完成端到端实机验收（记录细节仅存本机 `local_notes/`，不随包）：`launch --windowed`（默认 1280×720 低画质）→ `start`（`LEADER_QIN`+`CIVILIZATION_CHINA`，自动等加载/Esc/重连）→ `probe` → `act found`（城市 0→1，首都 `LOC_CITY_NAME_XIAN`）→ `act move`（勇士坐标变化）→ `act endturn`（回合 1→2）→ `shot` → `close` 全通；Mod 启停备份/禁用/启用/还原与 SHA256 校验通过，日志扫描可读。技能登记到任务目录（`civ6_ai_play` 路由）、知识地图、检索用例与根 `AGENTS.md`。
+
+- 2026-10-26 追加：新增 Mod 测试方法 references/mod-testing.md 与测试注入助手 scripts/civ6_inject.py。实测用户自有 PlotYieldAPI DLL Mod：loader 标准 version.dll 安装未生效（游戏加载 system32 VERSION.dll；把 exe 目录 version.dll 换成无效文件后游戏仍可启动，loader 日志与目录均不生成），改用注入 workaround 后插件成功加载；ChangeYield 把地块 Food 2 改为 7，建城脚本给 36 个地块各 +5 随机产出，loader 独立主菜单面板（Civ6DllLoader_FrontEndUI）可通过 tuner 状态/Controls/DllLoader API 与截图验证。测试后已还原 Mods.sqlite 与选项并删除注入文件。
+
 ## 2026-10-13 - 主表与修改器 SQL 稀疏列导出
 
 - 主表编辑器及区域/建筑/单位/改良设施导出器跳过空的可选文本与 `None`/`NULL` 哨兵；保留 Type/主键、Name、Description 和实际数值/开关，避免连续 `NULL` 占位。

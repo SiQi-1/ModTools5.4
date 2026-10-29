@@ -6,6 +6,7 @@
 - 本机执行 `python tools/install_skills.py --target dsh --link`，把 `skills/packages/` 的 5 个技能包（civ6-ai-play、civ6-arknights-series、civ6-art-images、civ6-html-ui、civ6-landmarks）以 Junction 接入 `~/.dsh/skills/`；DSH 本地 skill 提供方扫描到后，会话技能目录即时出现这 5 项（实测目录刷新）。
 - 外置技能 civ6-model-import / civ6-mcp 已安装在 `~/.agents/skills/`（DSH 用户级 agents 根），会话原先即已识别；civ6-model-import 的 SKILL.md 与本仓库 `workspace/local_skills/` 版本 SHA-256 一致。
 - 文档：`skills/EXTERNAL_SKILLS.md` 新增「在 DSH 中使用」（扫描根、`--target dsh --link`、移除方式），本机路径由 `local_skills/` 更新为 `workspace/local_skills/`；`THIRD_PARTY_NOTICES.md` 同步。
+- 热更新实测（2026-10-29，临时技能探针）：经 Junction 新增技能即时出现在会话目录；改 `SKILL.md` description 触发目录刷新；只改正文不触发目录刷新但 `skill` 调用返回最新正文；删除 Junction 后目录移除。结论：仓库内改技能无需重装/重启 DSH。
 - 检查：`python tools/install_skills.py --list`（5 个 OK）；`python -m modgen.cli skill --check`；`python tools/doc_lint.py`；`python -m unittest tests.test_external_skills tests.test_repo_layout`。
 
 ## 2026-10-29 - 文档与仓库结构重构（P0-P5：入口瘦身 / docs 归位 / skills 分层 / 本机工作区隔离 / 守卫）

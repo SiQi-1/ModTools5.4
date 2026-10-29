@@ -71,4 +71,13 @@ DSH 的本地 skill 提供方按 rank 扫描：项目根 `.dsh/skills`、`.agent
   该命令在 `~/.dsh/skills/` 下创建指向仓库 `skills/packages/<name>/` 的 Junction，DSH 会在下一次目录刷新时出现这些技能；移除时删除对应 Junction 即可。
 - 其它 agent：`--target claude` / `--target codex` / `--target agents`，或 `--dir <目录>`；不加 `--link` 时复制文件。
 
+### 更新与移除（Junction 方式）
+
+- **更新已有技能**：Junction 指向仓库目录，直接改 `skills/packages/<name>/` 即可，无需重装或重启 DSH。`SKILL.md` 的 frontmatter（name/description）变更会触发 DSH 目录刷新；正文在每次调用 `skill` 时重新读取（2026-10-29 用临时技能实测：新增、改 description、改正文、删除均即时生效）。`references/`、`scripts/`、`assets/` 编辑不会触发目录刷新，但资源路径经 Junction 解析到仓库，按需读取时总是最新。
+- **新增技能包**：重跑 `python tools/install_skills.py --target dsh --link`；已存在的会跳过，加 `--force` 重建链接。
+- **改名/移动仓库目录**：Junction 会悬空，需删除旧链接后重跑安装器（安装器会校验 `name` 与目录名一致）。
+- **移除**：删除对应 Junction 即可（`cmd /c rmdir "%USERPROFILE%\.dsh\skills\<name>"`，不会删除仓库目录），DSH 下一步目录即移除该技能。
+
+
+
 来源与指纹另见 [第三方来源声明](../THIRD_PARTY_NOTICES.md)，整合记录见 [社区整合记录](../docs/meta/community-integration.md)。

@@ -443,6 +443,20 @@
         "local_skills"
       ],
       "read": ["EXTERNAL_SKILLS.md"]
+    },
+    {
+      "id": "external_civ6_mcp",
+      "aliases": [
+        "civ6-mcp",
+        "MCP 服务器",
+        "MCP服务器",
+        "FireTuner MCP",
+        "AI 打文明6",
+        "AI玩文明6 MCP",
+        "MCP 自动对局",
+        "lmwilki"
+      ],
+      "read": ["EXTERNAL_SKILLS.md"]
     }
   ]
 }

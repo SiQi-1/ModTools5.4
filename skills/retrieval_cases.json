@@ -308,5 +308,15 @@
     "query": "领袖3D模型 psk ueanim 导入",
     "expected": "EXTERNAL_SKILLS.md",
     "top": 3
+  },
+  {
+    "query": "civ6-mcp MCP 服务器 拉取安装",
+    "expected": "EXTERNAL_SKILLS.md",
+    "top": 3
+  },
+  {
+    "query": "让 AI 玩文明6 FireTuner MCP",
+    "expected": "EXTERNAL_SKILLS.md",
+    "top": 3
   }
 ]

@@ -36,6 +36,11 @@ class ExternalSkillRosterTest(unittest.TestCase):
             "千寻瀑",
             "local_skills/civ6-model-import",
             "不代替作者发布",
+            "civ6-mcp",
+            "https://github.com/lmwilki/civ6-mcp",
+            "Liam Wilkinson",
+            "MIT",
+            "dd2019056371b92ea4854e879ddf05a8cad95e8a",
         ):
             with self.subTest(needle=needle):
                 self.assertIn(needle, text)
@@ -68,8 +73,19 @@ class ExternalSkillRouteTest(unittest.TestCase):
             with self.subTest(alias=alias):
                 self.assertIn(alias, route["aliases"])
 
+    def test_civ6_mcp_route_keeps_url_entry_and_reads_roster(self):
+        catalog = json.loads((SKILLS / "catalog.json").read_text(encoding="utf-8"))
+        routes = {route["id"]: route for route in catalog["routes"]}
+        self.assertIn("external_civ6_mcp", routes)
+        route = routes["external_civ6_mcp"]
+        self.assertEqual(route["read"], ["EXTERNAL_SKILLS.md"])
+        self.assertIn("civ6-mcp", route["aliases"])
+
     def test_search_ranks_roster_for_package_queries(self):
-        for query in ("civ6-model-import 模型导入", "领袖3D模型 psk ueanim 导入"):
+        for query in (
+            "civ6-model-import 模型导入", "领袖3D模型 psk ueanim 导入",
+            "civ6-mcp MCP 服务器 拉取安装", "让 AI 玩文明6 FireTuner MCP",
+        ):
             with self.subTest(query=query):
                 rels = [item["rel"] for item in skills_search.search_skills(query, limit=3)]
                 self.assertIn("EXTERNAL_SKILLS.md", rels)
@@ -92,6 +108,8 @@ class ExternalSkillDistributionTest(unittest.TestCase):
         notices = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
         self.assertIn("civ6-model-import.zip", notices)
         self.assertIn("千寻瀑", notices)
+        self.assertIn("civ6-mcp", notices)
+        self.assertIn("https://github.com/lmwilki/civ6-mcp", notices)
 
     def test_git_tracks_no_local_skills_or_package_files(self):
         if shutil.which("git") is None:
@@ -121,6 +139,11 @@ class ExternalSkillDistributionTest(unittest.TestCase):
         self.assertEqual(local_paths, [], "local_skills/ 内容不得被 Git 跟踪")
         package_paths = [path for path in tracked if "civ6-model-import" in path.lower()]
         self.assertEqual(package_paths, [], "外置技能包文件不得被 Git 跟踪")
+        mcp_paths = [
+            path for path in tracked
+            if "civ6-mcp" in path.lower() or "mcp_servers" in path.replace("\\", "/").lower()
+        ]
+        self.assertEqual(mcp_paths, [], "civ6-mcp 的 clone 内容不得被 Git 跟踪")
 
 
 if __name__ == "__main__":

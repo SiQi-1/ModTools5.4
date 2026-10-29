@@ -113,3 +113,12 @@ python -m modgen.cli workshop check workshop --modinfo MyMod.modinfo --json
 - 包内文档的本机绝对路径、工程常量与实测结论不回流到 `skills/`。
 
 验证记录：zip 306 条目（10 目录 + 296 文件）无绝对路径、盘符或 `..` 越界；按包内 `MANIFEST.sha256` 逐文件复核 295 条全部一致（缺失 0、不一致 0，唯一清单外文件为清单自身）；本机安装 296 文件、34.86 MiB；`git check-ignore` 命中 `.gitignore` 的 `local_skills/`，`git status --untracked-files=all` 不含该目录；本地检索 8 条命中（top 为 `SKILL.md`），`--file SKILL.md` 读取非空（5,921 字符）。知识检查 `python -m modgen.cli skill --check` 通过（167 篇、62 个检索用例、0 个问题）；`python -m unittest tests.test_knowledge_quality tests.test_skills_search tests.test_external_skills tests.test_source_distribution` 48 项通过；`python tools/share_source.py --check` 通过。未运行包内 exe/dll/脚本，未做游戏内实机验收。
+
+## 追加 S9：lmwilki civ6-mcp（可拉取的外部 MCP 服务器，2026-10-29）
+
+- 来源与处理：https://github.com/lmwilki/civ6-mcp（作者 Liam Wilkinson / lmwilki，MIT，v1.1.11，审阅提交 `dd2019056371b92ea4854e879ddf05a8cad95e8a`）。用户确认按外置 skill 处理：可以拉取、可以记录网址、不内置；本项目只记录 URL/版本/许可与本地安装方式，不复制其代码、`AGENTS.md` playbook 或文档。
+- 名单与路由：[外置技能名单](../skills/EXTERNAL_SKILLS.md) 的 civ6-mcp 节；`external_civ6_mcp` 任务路由与 2 条检索用例；知识地图入口同步更新。名单页区分“仅名单（向作者索取）”与“公开仓库（可自行 clone）”两类。
+- 本机安装（仓库外，不进 Git）：clone 到独立目录；pip 安装 uv 0.13.6；`uv sync` 成功（CPython 3.12.16，75 包）；`--extra launcher-windows` 成功（+6 winrt 包）；`import civ_mcp` 通过；用户级 skill 包装建立于 `~/.agents/skills/civ6-mcp/`（仅说明文件，无仓库代码）；Codex `~/.codex/config.toml` 备份后追加 `[mcp_servers.civ6]`（`codex mcp list` 显示 enabled）；游戏 `AppOptions.txt` 的 `EnableTuner` 已是 1。
+- 边界与注意：MCP 服务器走 stdio，由客户端拉起；游戏同一时间只允许一个 tuner 连接（先关 SDK 的 `FireTuner.exe`），连接失败后重启游戏，不要从 WSL 运行。本项目不内置、不随源码分享其代码或文档，也不提供副本。
+- 未验证：本机未启动游戏，`scripts/test_connection.py` 返回 Connection refused（预期）；握手、对局读取与操作需启动游戏并加载对局后另行验收。MCP stdio `initialize` 冒烟已通过（serverInfo `Civilization VI`）。
+- 验证：`python -m modgen.cli skill --check`（167 篇、64 个检索用例、0 个问题）；`python -m unittest tests.test_knowledge_quality tests.test_skills_search tests.test_external_skills tests.test_source_distribution`（49 项通过）；`python tools/share_source.py --check` 通过。

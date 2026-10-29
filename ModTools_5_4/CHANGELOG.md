@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-29 - 外置 skill civ6-mcp 本机安装（可拉取、记录网址、不内置）
+
+- 用户要求按外置 skill 处理 https://github.com/lmwilki/civ6-mcp（作者 Liam Wilkinson / lmwilki，MIT，v1.1.11，审阅提交 `dd2019056371b92ea4854e879ddf05a8cad95e8a`）：可以拉取、可以记录网址、不内置进本项目 Git 与源码分享，并完成本机安装。
+- `skills/EXTERNAL_SKILLS.md` 增加 civ6-mcp 名单：来源/许可/URL/版本提交、用途与需求、拉取与运行方式、本机安装约定、端口 4318 单连接与 FireTuner 注意事项；不复制其代码或 `AGENTS.md` playbook。名单页改为区分“仅名单”与“公开仓库可拉取”两类。
+- `THIRD_PARTY_NOTICES.md` 新增“可拉取的外部 skill（公开仓库）”处理类别与 civ6-mcp 记录（URL + MIT + 提交），明确本项目只记录来源、不提供副本、不替代上游分发。
+- 检索接入：`skills/catalog.json` 新增 `external_civ6_mcp` 路由，知识地图与 2 条检索用例指向名单页；`tests/test_external_skills.py` 扩展 URL/作者/MIT/提交与 Git 跟踪边界断言。
+- 本机安装（仓库外，不进 Git）：clone + uv 0.13.6 + `uv sync`（CPython 3.12.16，75 包）+ `--extra launcher-windows`（+6 winrt 包）；import 自检通过；`scripts/test_connection.py` 因游戏未启动返回 Connection refused（预期）；MCP stdio `initialize` 冒烟正常（serverInfo `Civilization VI`）；Codex 已注册 `mcp_servers.civ6`（配置备份后仅追加 4 行）；用户级 skill 包装已建立并被会话识别；游戏 `AppOptions.txt` 中 `EnableTuner` 已是 1。本机路径、命令与原始输出记录在 Git 忽略的 `local_skills/civ6-mcp-local-setup.md`。
+- 未启动或关闭游戏，未运行仓库业务脚本，未复制上游代码进仓库。
+- 检查：`python -m modgen.cli skill --check`（167 篇 / 64 用例 / 0 问题）；`python -m unittest tests.test_knowledge_quality tests.test_skills_search tests.test_external_skills tests.test_source_distribution`（49 项 OK）；`python tools/share_source.py --check` 通过。
+
 ## 2026-10-29 - civ6-ai-play 技能去本机化与可移植性维护
 
 - 按用户要求「本机问题是本机问题，不应写入 skill」，移除技能 Markdown 中的作者本机专属数据（GPU 机型与温度阈值、原始分辨率与设备 ID、本机绝对路径、DPI 缩放、Mods.sqlite 快照、单次 Tuner 状态编号、端到端验收流水等）。改为「按机器探测、按用户/机器约定阈值、通用占位符」；本机细节归档到 Git 忽略的 `local_notes/civ6_ai_play-本机记录.md`。

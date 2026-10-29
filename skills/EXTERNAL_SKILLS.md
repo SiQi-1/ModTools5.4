@@ -1,6 +1,9 @@
 # 外置技能名单（不随仓库分发）
 
-本页登记**未纳入 Git、不随源码分享**的外置技能包。仓库只保留名单、作者署名、来源指纹与本机安装/检索方法；不内置原件、不提供下载或副本，也不代替作者发布。需要时由使用者向作者获取压缩包，自行安装到本机 `local_skills/`（已由 Git 忽略）。
+本页登记**未纳入 Git、不随源码分享**的外置技能。仓库只保留名单、作者署名、来源信息与本机安装/检索方法；不内置原件、不提供下载或副本，也不代替作者发布。名单分为两类：
+
+- **仅名单**：原件不公开，需要时向作者获取压缩包，安装到本机 `local_skills/`（已由 Git 忽略）；
+- **公开仓库**：可按本节网址自行拉取（clone）到本机仓库外目录，本项目只记录网址、版本与许可，不复制其代码或文档。
 
 ## civ6-model-import：UE 模型导入文明6领袖 3D
 
@@ -34,5 +37,24 @@
 - 包内未发现独立 LICENSE 文件；`tools/CivNexus6/` 的 Firaxis/Granny/FBX 程序集与未签名 exe 来自作者的 CivNexus6 构建产物，许可以上游为准；本项目不复制、不重新分发。
 - 包内文档的本机绝对路径、工程常量与实测结论只在该包语境有效，不自动成为本项目通用规则；需要时按本项目 [规则正文](RULES.md) 与 [统一工作流](WORKFLOW.md) 复核。
 - 本机未安装该包时检索不到属正常情况，不代表能力不存在；先按上方向作者取得。
+
+## civ6-mcp
+
+MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态与操作暴露给 LLM agent，共 76 个工具（单位、城市、地图、科技、外交、贸易、政府、宗教、伟人、世界议会、胜利进度、存读档），附带对局 playbook。
+
+| 项目 | 内容 |
+|---|---|
+| 技能名 | civ6-mcp |
+| 作者 / 许可 | Liam Wilkinson（GitHub [lmwilki](https://github.com/lmwilki)）；MIT |
+| 仓库网址 | https://github.com/lmwilki/civ6-mcp |
+| 版本 / 审阅提交 | v1.1.11；`dd2019056371b92ea4854e879ddf05a8cad95e8a`（2026-05-03） |
+| 需求 | Python 3.12+、uv、Civ6（Steam，含 Gathering Storm）、Civ6 SDK、游戏内启用 Tuner（会禁用成就）、MCP 客户端（Claude Code / Codex / Gemini CLI 或任意 MCP 客户端） |
+| 拉取与运行 | `git clone https://github.com/lmwilki/civ6-mcp` → `uv sync` → stdio 服务器 `uv run civ-mcp`；仓库自带 `.mcp.json`（Claude Code 自动识别） |
+| 本机安装 | 拉取到本项目仓库之外的独立目录（路径按本机自定），不进入本项目 Git，不随源码分享；本机实际路径、依赖与客户端配置记录在 Git 忽略的本地安装记录中 |
+| 注意 | 游戏只允许一个 tuner 连接：先关闭 SDK 的 `FireTuner.exe`，同一时间只开一个 MCP 客户端；连接失败后重启游戏；不要从 WSL 运行 |
+
+对局操作规范读仓库内 `AGENTS.md`（回合循环、外交、常见坑）；本仓库不复制、不炼化其 playbook。需要窗口/OCR 自动化时按上游 README 安装 `civ6-mcp[launcher-windows]`，并要求游戏窗口化。
+
+本项目只记录网址、版本与许可，不复制其代码或文档；本机 clone 目录与 MCP 客户端配置都在仓库之外。
 
 来源与指纹另见 [第三方来源声明](../THIRD_PARTY_NOTICES.md)，整合记录见 [社区整合记录](../docs/COMMUNITY_SKILL_INTEGRATION.md)。

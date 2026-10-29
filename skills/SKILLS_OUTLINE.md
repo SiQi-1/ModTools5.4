@@ -21,6 +21,7 @@
 ## 外置技能（仅名单，不随仓库分发）
 
 - [外置技能名单](EXTERNAL_SKILLS.md)：登记 civ6-model-import 等外部技能包的作者署名、包指纹与本机安装/检索方法；包体不随仓库分发，需向作者索取后自行安装到 `local_skills/`，本仓库不代替作者发布。
+- [civ6-mcp](EXTERNAL_SKILLS.md)：公开仓库（MIT）的 MCP 服务器，可按名单页网址自行 clone，让 agent 经 FireTuner 操作文明6对局；本项目只记录网址与版本，不内置、不随分享。
 
 ## 参考与案例
 

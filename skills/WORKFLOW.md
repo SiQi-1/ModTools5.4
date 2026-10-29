@@ -1,6 +1,6 @@
 # 统一工作流
 
-适用：做 Mod、修改 .CIV、回答效果实现问题。仅回答问题时执行步骤 1～3，附上依据；有交付任务时执行到步骤 6。行为要求见 [规则正文](RULES.md)。
+适用：做 Mod、修改 .CIV、回答效果实现问题。仅回答问题时执行步骤 1～3，附上依据；有交付任务时执行到步骤 7；实机测试（步骤 6）会启动游戏，必须先经用户同意。行为要求见 [规则正文](RULES.md)。
 
 ## 1 识别任务并读取依据
 
@@ -65,7 +65,11 @@ python -m modgen.cli build 工程.CIV --overwrite all --json
 
 按[文化美术出口检查](reference/art/civilization-art.md#生成后检查实际成员关系)核对 `ArtDefs/Cultures.artdef` 中的文明成员、`Civilizations.artdef` 目标及 Art.xml 的 consumer 引用；空文件或仅存在文件不算完成。
 
-## 6 交付与知识回流
+## 6 实机测试（需用户同意）
+
+启动游戏或改 Mod 环境前须用户同意；默认纯净环境，按需加载指定 Mod；测试后还原并读回核对。细则见 [实机测试指南](guides/testing.md) 与 [R6](RULES.md#r6-验证与交付)。
+
+## 7 交付与知识回流
 
 交付前执行 `git status --short --untracked-files=all`，确认没有新增单个 Mod 的专用文件；用 `git check-ignore -v -- <路径>` 核对规则，再用 `git ls-files -- <路径>` 检查是否早已被跟踪。忽略规则不会影响已跟踪文件：若需移出工具仓库，先核对用途和本地备份，再对明确路径执行 `git rm --cached -- <文件>`，保留本地副本；不要批量取消跟踪通用工具文件，也不要强制添加被忽略的 Mod 产物。
 

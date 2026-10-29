@@ -482,11 +482,36 @@
         "packages/civ6-ai-play/references/mod-testing.md"
       ],
       "optional": [
+        "guides/testing.md",
         "packages/civ6-ai-play/references/mod-test-workflow.md",
         "packages/civ6-ai-play/references/mod-runtime-testing.md",
         "packages/civ6-ai-play/references/auto-mod-test-workflow.md",
         "packages/civ6-ai-play/references/mcp-tools.md",
         "packages/civ6-ai-play/SKILL.md"
+      ]
+    },
+    {
+      "id": "civ6_ai_play_testing",
+      "level": "must",
+      "max_kb": 8,
+      "aliases": [
+        "实机测试",
+        "游戏内测试",
+        "兼容性测试",
+        "纯净环境",
+        "测试环境",
+        "测试前同意",
+        "测试后还原",
+        "Mod 环境一致性",
+        "测试工作流"
+      ],
+      "read": [
+        "guides/testing.md"
+      ],
+      "optional": [
+        "packages/civ6-ai-play/SKILL.md",
+        "packages/civ6-ai-play/references/mod-testing.md",
+        "packages/civ6-ai-play/references/mod-test-workflow.md"
       ]
     },
     {

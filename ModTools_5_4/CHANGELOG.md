@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-29 - 工作流补入「实机测试」阶段（用户同意门禁 + 纯净环境 + 测试后一致性）
+
+- `skills/WORKFLOW.md` 新增第 6 步「实机测试（需用户同意）」，交付顺延为第 7 步；步骤只保留门禁摘要并指向新指南，避免撑大 always_read 影响检索预算。
+- 新增 `skills/guides/testing.md`：同意门禁（启动游戏/改 `Mods.sqlite` 或显示设置前必须用户明确同意）、环境基线（备份 `Mods.sqlite`/`AppOptions.txt`/`GraphicsOptions.txt`，记录启用集）、默认纯净环境（只启用被测 Mod；用户要求时才按清单加载其他 Mod 做兼容性测试并注明「含第三方 Mod」）、验收分层、测试后还原与读回核对、技能未覆盖记录；`guides/INDEX.md` 与 `civ6_ai_play_operate` 的 optional 已登记。
+- `skills/RULES.md` R6 增加一条硬规则（同意 + 默认纯净 + 测试后还原与读回核对）；同时精简 R5 的重复链接段以控制 always_read 预算。
+- `skills/packages/civ6-ai-play/SKILL.md` 新增「工作流位置与前置同意」，明确本技能是工作流第 6 步的执行手册、默认纯净环境与兼容性测试清单要求；`references/mod-test-workflow.md` 阶段 0 增加同意门禁与默认纯净环境基线。
+- `docs/user/ai-prompt.md` 开局提示词补第 6 条测试规则；`skills/catalog.json` 操作路由增加「实机测试 / 游戏内测试 / 兼容性测试 / 纯净环境 / 测试前同意 / 测试后还原 / Mod 环境一致性」等别名。
+- 说明：civ6-ai-play 仍在完善，文档先行的门禁与还原要求不依赖具体脚本实现；缺失步骤按「技能未覆盖」记录，不绕过安全规则。
+- 检查：`python -m modgen.cli skill --check`；`python tools/doc_lint.py`；`python -m unittest tests.test_skills_search tests.test_knowledge_quality`。
 ## 2026-10-29 - civ6-ai-play 吸收 civ6-mcp 操作面（MCP 工具速查）
 
 - 新增 `skills/packages/civ6-ai-play/references/mcp-tools.md`：76 个 MCP 工具的分组速查（全局/回合、单位、城市、地图、科技/市政、外交/贸易、政府/总督/宗教/伟人/议会/间谍/胜利、存读档、`run_lua`）、常用参数、Mod 测试流程映射、`run_lua` 专属断言写法、MCP 的 end_turn/自动存档/观测行为与局限；原创整理，不复制上游代码或 playbook。

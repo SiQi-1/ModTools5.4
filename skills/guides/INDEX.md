@@ -14,6 +14,7 @@
 | [项目级扩展](project-extensions.md) | Core.sql、Lua/UI、源码清单、依赖、project-check/build |
 | [自定义文件与交付](pipeline.md) | SQL/XML/Lua 通道、动作、加载顺序、部署 |
 | [常见陷阱](civ-pitfalls.md) | 数据、挂载、语义与生成后的自检 |
+| [实机测试](testing.md) | 用户同意门禁、默认纯净环境、兼容性测试、测试后还原与验收分层 |
 
 ## 美术、文本与发布（reference/）
 

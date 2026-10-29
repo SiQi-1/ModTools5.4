@@ -44,9 +44,8 @@
 
 ## R5 按任务读取
 
-> 任务到必读资料只有一份映射：[catalog.json](catalog.json)。先运行 `python -m modgen.cli skill "任务描述" --plan`，按返回的 must 项与建议章节读取；本文件不再维护第二份清单。
+> 任务到必读只有一份映射：[catalog.json](catalog.json)。运行 `python -m modgen.cli skill "任务描述" --plan`，按返回的 must 项与建议章节读取；本文件不维护第二份清单。
 
-实体任务读 [工程入口](guides/INDEX.md) 与 [实体模板索引](reference/entities/INDEX.md)；Modifier 任务加读 [修改器指南](guides/modifiers.md) 与 [实现前清单](reference/modifiers/patterns/pre-code-checklist.md)；Lua/UI 任务读 [Lua 规范](reference/lua/code-style.md) 与 [控件参考](reference/lua/lua-xml-controls.md)；自定义内容读 [项目级扩展](guides/project-extensions.md) 与 [交付流程](guides/pipeline.md)。
 
 ## R6 验证与交付
 
@@ -54,6 +53,7 @@
 - 保存/合并前 `validate`；ERROR 必须修复，WARNING 逐项说明处理依据。
 - 扩展工程执行 `project-check` 统一检查数据、源码、依赖、预览、动作及 SQL 冲突；用 `preview` 核对具体内容。旧自定义 SQL 流程继续使用 `check-conflicts`。完整检查/预览需 PyQt，`extension check` 等纯数据命令不需要。
 - 检查引用、挂载链、文本、动作注册及输出目录。构建、部署、游戏内测试分别记录；校验通过不能宣称实机效果已验证。
+- 实机测试：启动游戏或改 Mod 环境前须用户同意；默认纯净环境（只启用被测 Mod），用户要求时才按清单加载第三方 Mod 并注明；测试后还原并读回核对，不得跳过备份/还原。细则见 [实机测试指南](guides/testing.md)。
 - 所有新增文明的 Mod 必须显式配置城市/建筑文化与单位文化，并验证生成的 `Cultures.artdef` 文明成员及 Art.xml 引用；此要求不限定题材。已有有效配置保留并核对，无新增或重映射文明的工程检查后可标不适用。步骤见[文明文化美术配置](reference/art/civilization-art.md)。
 - 无法执行某项验证时说明原因和剩余步骤，继续完成可执行的检查。交付包括变更、依据、验证结果及尚未确认的边界。
 

@@ -32,6 +32,9 @@
    走自定义文件通道：python -m modgen.cli custom-file write 工程.CIV --path Scripts/My.lua
    --content-file workspace/mods/My.lua（自动注册文件动作；AI 控制接口 project_file_write 同语义）。
    不生成图片资源、不做 3D 模型/动画/特效。
+6. 需要实机测试（启动游戏）时，必须先征得用户同意，并说明会临时改 Mod 启用集与窗口设置、测试后还原；
+   默认纯净环境（只启用被测 Mod），只有用户明确要求兼容性测试时才按清单加载其他 Mod 并记录清单；
+   测试后必须还原启用集与设置并读回核对。未经同意不要启动游戏或改 Mods.sqlite。
 ```
 
 ## 可用范围

@@ -8,6 +8,9 @@ Usage:
     python tools/install_skills.py --list
     python tools/install_skills.py --target claude            # ~/.claude/skills
     python tools/install_skills.py --target codex             # ~/.codex/skills
+    python tools/install_skills.py --target dsh               # ~/.dsh/skills (DeepSeek Harness)
+    python tools/install_skills.py --target agents            # ~/.agents/skills
+    python tools/install_skills.py --target dsh --link        # 目录联接，不复制（Windows junction）
     python tools/install_skills.py --dir <目标目录>            # explicit directory
     python tools/install_skills.py --target claude --dry-run
     python tools/install_skills.py --target claude --force    # overwrite existing
@@ -17,8 +20,10 @@ No third-party dependencies; never modifies the repository.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -29,6 +34,8 @@ SKIP_SUFFIXES = {".pyc", ".pyo"}
 TARGETS = {
     "claude": Path.home() / ".claude" / "skills",
     "codex": Path.home() / ".codex" / "skills",
+    "dsh": Path.home() / ".dsh" / "skills",
+    "agents": Path.home() / ".agents" / "skills",
 }
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 
@@ -71,14 +78,35 @@ def validate(pkg: Path) -> list[str]:
 
 def copy_package(src: Path, dest_root: Path, force: bool) -> str:
     target = dest_root / src.name
-    if target.exists():
+    if target.exists() or target.is_symlink():
         if not force:
             return f"skip (exists): {target}"
-        shutil.rmtree(target)
+        if target.is_dir() and not target.is_symlink():
+            shutil.rmtree(target)
+        else:
+            target.unlink()
     def ignore(directory: str, names: list[str]) -> set[str]:
         return {n for n in names if n in SKIP_DIRS or Path(n).suffix in SKIP_SUFFIXES}
     shutil.copytree(src, target, ignore=ignore)
     return f"installed: {src.name} -> {target}"
+
+
+def link_package(src: Path, dest_root: Path, force: bool) -> str:
+    target = dest_root / src.name
+    if target.exists() or target.is_symlink():
+        if not force:
+            return f"skip (exists): {target}"
+        if target.is_dir() and not target.is_symlink():
+            shutil.rmtree(target)
+        else:
+            target.unlink()
+    if os.name == "nt":
+        result = subprocess.run(["cmd", "/c", "mklink", "/J", str(target), str(src)], capture_output=True, text=True)
+        if result.returncode != 0:
+            return f"link failed: {target} :: {(result.stderr or result.stdout).strip()}"
+    else:
+        os.symlink(src, target, target_is_directory=True)
+    return f"linked: {src.name} -> {target}"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -90,6 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--package", action="append", default=[], help="install only this package (repeatable)")
     parser.add_argument("--dry-run", action="store_true", help="validate and print actions without copying")
     parser.add_argument("--force", action="store_true", help="overwrite an existing installed copy")
+    parser.add_argument("--link", action="store_true", help="create a directory link instead of copying (Windows junction / symlink)")
     args = parser.parse_args(argv)
 
     available = packages()
@@ -125,9 +154,10 @@ def main(argv: list[str] | None = None) -> int:
         dest_root.mkdir(parents=True, exist_ok=True)
     for pkg in selected:
         if args.dry_run:
-            print(f"would install: {pkg.name} -> {dest_root / pkg.name}")
+            action = "link" if args.link else "install"
+            print(f"would {action}: {pkg.name} -> {dest_root / pkg.name}")
         else:
-            print(copy_package(pkg, dest_root, args.force))
+            print(link_package(pkg, dest_root, args.force) if args.link else copy_package(pkg, dest_root, args.force))
     return 0
 
 

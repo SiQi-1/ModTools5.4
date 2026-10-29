@@ -2,7 +2,7 @@
 
 本页登记**未纳入 Git、不随源码分享**的外置技能。仓库只保留名单、作者署名、来源信息与本机安装/检索方法；不内置原件、不提供下载或副本，也不代替作者发布。名单分为两类：
 
-- **仅名单**：原件不公开，需要时向作者获取压缩包，安装到本机 `local_skills/`（已由 Git 忽略）；
+- **仅名单**：原件不公开，需要时向作者获取压缩包，安装到本机 `workspace/local_skills/`（已由 Git 忽略）；
 - **公开仓库**：可按本节网址自行拉取（clone）到本机仓库外目录，本项目只记录网址、版本与许可，不复制其代码或文档。
 
 ## civ6-model-import：UE 模型导入文明6领袖 3D
@@ -16,17 +16,17 @@
 | 内容 | `SKILL.md`、7 篇 `references/` 文档、`scripts/` 转换与采样脚本、C# 读数工具源码、`patches/UAnimSequence.cs`，以及 `tools/CivNexus6/` 转换工具链（含未签名 exe 与 Firaxis/Granny/FBX 程序集） |
 | 适用 | 把 UE 工程（鸣潮等）的 psk 模型与 ueanim 动画导入文明6，作为领袖 3D 模型；含十步流程、四条采信判据、朝向/口型/眨眼处理与跨会话交接模板 |
 | 不适用 | 引用原版模型素材、Blender 通用 fgx/ast 导出、纯 UI/音频任务；这些仍走本项目既有指南 |
-| 本机安装 | `local_skills/civ6-model-import/`（Git 忽略；换机器重新向作者取得后解压） |
+| 本机安装 | `workspace/local_skills/civ6-model-import/`（Git 忽略；换机器重新向作者取得后解压） |
 | 取得方式 | 向作者 **千寻瀑** 索取压缩包；本仓库不提供下载、不内置原件、不代替作者发布 |
 
 ### 本机安装与检索
 
-1. 从作者处取得 `civ6-model-import.zip`，解压到仓库根目录，得到 `local_skills/civ6-model-import/SKILL.md`。
+1. 从作者处取得 `civ6-model-import.zip`，解压到仓库的 `workspace/local_skills/`，得到 `workspace/local_skills/civ6-model-import/SKILL.md`。
 2. 外置技能不并入默认 `skills/` 索引，按目录检索与读取：
 
    ```powershell
-   python -m modgen.cli skill "领袖3D模型 psk ueanim 导入" --skills-dir local_skills/civ6-model-import
-   python -m modgen.cli skill --file SKILL.md --skills-dir local_skills/civ6-model-import
+   python -m modgen.cli skill "领袖3D模型 psk ueanim 导入" --skills-dir workspace/local_skills/civ6-model-import
+   python -m modgen.cli skill --file SKILL.md --skills-dir workspace/local_skills/civ6-model-import
    ```
 
 3. 按包内 `SKILL.md` 的开工自检与参数槽位执行；工具链部署位置以包内 `references/upstream.md` 为准，部署到工程树外。
@@ -56,5 +56,19 @@ MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态
 对局操作规范读仓库内 `AGENTS.md`（回合循环、外交、常见坑）；本仓库不复制、不炼化其 playbook。需要窗口/OCR 自动化时按上游 README 安装 `civ6-mcp[launcher-windows]`，并要求游戏窗口化。
 
 本项目只记录网址、版本与许可，不复制其代码或文档；本机 clone 目录与 MCP 客户端配置都在仓库之外。
+
+### 在 DSH（DeepSeek Harness）中使用
+
+DSH 的本地 skill 提供方按 rank 扫描：项目根 `.dsh/skills`、`.agents/skills`、自定义目录、`~/.dsh/skills`、`~/.agents/skills`；只识别根目录下 `<name>/SKILL.md`（目录 bundle）或 `<name>.md`，不递归。
+
+- 上面两个外置技能已安装在本机 `~/.agents/skills/`，DSH 会话会自动识别，无需额外配置。
+- 本仓库 `skills/packages/` 的 5 个可分享技能包可用安装器接入 DSH（Windows 目录联接，零拷贝、不占额外空间）：
+
+  ```powershell
+  python tools/install_skills.py --target dsh --link
+  ```
+
+  该命令在 `~/.dsh/skills/` 下创建指向仓库 `skills/packages/<name>/` 的 Junction，DSH 会在下一次目录刷新时出现这些技能；移除时删除对应 Junction 即可。
+- 其它 agent：`--target claude` / `--target codex` / `--target agents`，或 `--dir <目录>`；不加 `--link` 时复制文件。
 
 来源与指纹另见 [第三方来源声明](../THIRD_PARTY_NOTICES.md)，整合记录见 [社区整合记录](../docs/meta/community-integration.md)。

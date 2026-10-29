@@ -796,7 +796,7 @@
     {
       "id": "external_model_import",
       "level": "must",
-      "max_kb": 5,
+      "max_kb": 7,
       "aliases": [
         "civ6-model-import",
         "模型导入",
@@ -818,7 +818,7 @@
     {
       "id": "external_civ6_mcp",
       "level": "must",
-      "max_kb": 5,
+      "max_kb": 7,
       "aliases": [
         "civ6-mcp",
         "MCP 服务器",

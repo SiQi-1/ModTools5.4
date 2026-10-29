@@ -1,6 +1,6 @@
 # MCP 通道：civ6-mcp 工具速查与 Mod 测试用法
 
-> 适用：客户端已注册外置 MCP 服务器 civ6-mcp（本仓库只登记、不内置，安装与许可见 [外置技能名单](../../EXTERNAL_SKILLS.md#civ6-mcp)）。工具名以客户端实际展示为准：DSH 中形如 `mcp__civ6__<工具名>`，其他客户端可能带不同前缀。本文件是对其操作面的原创整理与 Mod 测试映射，不复制上游代码或 playbook；工具清单随上游版本变化（本版按 v1.1.11 核对），换版本按实际工具列表复核。
+> 适用：客户端已注册外置 MCP 服务器 civ6-mcp（本仓库只登记、不内置，安装与许可见 [外置技能名单](../../../EXTERNAL_SKILLS.md#civ6-mcp)）。工具名以客户端实际展示为准：DSH 中形如 `mcp__civ6__<工具名>`，其他客户端可能带不同前缀。本文件是对其操作面的原创整理与 Mod 测试映射，不复制上游代码或 playbook；工具清单随上游版本变化（本版按 v1.1.11 核对），换版本按实际工具列表复核。
 
 ## 1. 定位与分工
 
@@ -37,7 +37,7 @@ MCP 负责**游戏内读状态、做操作、结束回合**；本技能脚本负
 | 用途 | 工具（关键参数） |
 |---|---|
 | 单位列表 | `get_units` |
-| 单位动作 | `unit_action(unit_id, action, target_x?, target_y?, improvement?)`；action 含 move/attack/found_city/fortify/improve/repair/promote 之外的 heal/alert/sleep/delete/trade_route/activate/spread_religion 等 |
+| 单位动作 | `unit_action(unit_id, action, target_x?, target_y?, improvement?)`；action 含 move/attack/found_city/fortify/skip/improve/repair/remove_improvement/remove_feature/build_route/automate/heal/alert/sleep/delete/trade_route/activate/sacrifice_charges/teleport/spread_religion，`improvement` 仅 improve 用 |
 | 晋升/升级 | `get_unit_promotions(unit_id)`、`promote_unit(unit_id, promotion_type)`、`upgrade_unit(unit_id)` |
 | 寻路与建城建议 | `get_pathing_estimate(unit_id, target_x, target_y)`、`get_settle_advisor(unit_id)`、`get_global_settle_advisor` |
 | 建造者任务 | `get_builder_tasks` |
@@ -142,6 +142,6 @@ print('@@mod_value=' .. (ok and tostring(v) or 'ERR'))
 |---|---|
 | MCP 工具报连接失败/超时 | 游戏已启动并加载对局、`EnableTuner 1`、4318 有监听；关闭 `FireTuner.exe`、本技能 bridge/直连后重试 |
 | 连上后工具无响应/状态错乱 | 确认只有一个 Tuner 客户端；断开其他客户端，必要时重启游戏 |
-| 工具列表里没有 civ6 工具 | 客户端未注册 MCP：见 [外置技能名单](../../EXTERNAL_SKILLS.md#civ6-mcp)；DSH 可用 `tools/install_skills.py --target dsh --link` 接入技能包 |
+| 工具列表里没有 civ6 工具 | 客户端未注册 MCP：见 [外置技能名单](../../../EXTERNAL_SKILLS.md#civ6-mcp)；DSH 可用 `tools/install_skills.py --target dsh --link` 接入技能包 |
 | 回合不推进 | 先 `get_notifications`/`dismiss_popup`/`skip_remaining_units` 处理软 blocker；Mod 面板/未知 blocker 报 hard 时截图转人工 |
 | `run_lua` 不存在 | 上游设置了 `CIV_MCP_DISABLE_LUA`；改用 `tuner_eval.py` |

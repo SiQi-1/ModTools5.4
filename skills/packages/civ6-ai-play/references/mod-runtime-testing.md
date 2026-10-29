@@ -50,6 +50,8 @@ print('value', s(Players[0]:GetProperty('<Mod 属性键>')))
 
 ## 4. 可复现的测试夹具
 
+常规动作可用 MCP 工具完成（`unit_action`/`set_city_production`/政策/总督/宗教/外交等，见 [MCP 工具速查](mcp-tools.md)）；需要 WorldBuilder 造物、属性/参数注入或自定义 UI 状态时仍用下面的 tuner Lua。
+
 ### 4.1 建城、授予科技/市政
 
 ```lua
@@ -106,8 +108,8 @@ CityManager.RequestCommand(city, CityCommandTypes.PURCHASE, params)
 
 ## 6. 连接与回合
 
-- Tuner 单连接：桥运行时不要 `civ6ctl` 直连；`act endturn` 前先 `civ6_bridge.py stop`，回合后再 `serve`。
-- Tuner 没有 `EndTurn` API，回合只能走 `civ6ctl act endturn`。
+- Tuner 单连接：桥/MCP/直连三者只开一个；用 MCP 前先 `civ6_bridge.py stop`，回合交接后再恢复。
+- 回合：可用 MCP `end_turn`（带 blocker 处理与快照，需写 5 个反思字段）或 `civ6ctl act endturn`；Tuner 本身没有 EndTurn API。
 - 回合推进后注意“同回合不重算”的产出：百分比产出建议跨回合对比。
 
 ## 7. 构建/部署常见坑

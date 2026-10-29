@@ -40,7 +40,7 @@
 
 ## civ6-mcp
 
-MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态与操作暴露给 LLM agent，共 76 个工具（单位、城市、地图、科技、外交、贸易、政府、宗教、伟人、世界议会、胜利进度、存读档），附带对局 playbook。
+MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态与操作暴露给 LLM agent，共 76 个工具（单位、城市、地图、科技、外交、贸易、政府、宗教、伟人、世界议会、胜利进度、存读档），附带对局 playbook。常见检索词：让 AI 玩文明6、FireTuner MCP、MCP 自动对局、MCP 控制文明6。
 
 | 项目 | 内容 |
 |---|---|
@@ -54,6 +54,8 @@ MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态
 | 注意 | 游戏只允许一个 tuner 连接：先关闭 SDK 的 `FireTuner.exe`，同一时间只开一个 MCP 客户端；连接失败后重启游戏；不要从 WSL 运行 |
 
 对局操作规范读仓库内 `AGENTS.md`（回合循环、外交、常见坑）；本仓库不复制、不炼化其 playbook。需要窗口/OCR 自动化时按上游 README 安装 `civ6-mcp[launcher-windows]`，并要求游戏窗口化。
+
+操作面已按本仓库写法原创整理为 [civ6-ai-play · MCP 工具速查](packages/civ6-ai-play/references/mcp-tools.md)（工具名/参数速查、Mod 测试步骤映射、`run_lua` 断言与单连接交接）；只做接口事实与用法映射，不复制上游代码、文档或 playbook 正文。
 
 本项目只记录网址、版本与许可，不复制其代码或文档；本机 clone 目录与 MCP 客户端配置都在仓库之外。
 

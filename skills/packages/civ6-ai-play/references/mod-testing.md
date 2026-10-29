@@ -20,12 +20,14 @@
 6. **查表现层**：窗口截图（操作前后各一张）；UI Mod 要打开/点击/关闭并截图。
 7. **收尾**：关闭游戏、还原 Mods.sqlite 与选项、清理临时注入文件，再写结论。
 
+**操作驱动**：客户端已注册 civ6-mcp 时，常规单位/城市/外交/宗教/政策等操作优先用其工具（[MCP 工具速查](mcp-tools.md)），不必现场手写 Lua；断言仍按本文与 [真实 Mod 运行时验证](mod-runtime-testing.md) 记录。自定义 UI 状态、DLL loader、WorldBuilder 造物等 MCP 不做，继续用 tuner/脚本。
+
 ## 案例 A：玩法 Lua Mod（数据 + 游戏事件脚本）
 
 以「建城时给城市 3 环地块加产出」的测试脚本为例（Mod 自带一段测试 Lua）：
 
 1. 启用 Mod 后开局，读 Lua.log 应出现 Mod 的 loaded 行（示例格式：`<Mod 名>: [<标记>] loaded`）。
-2. 用 act found 建城（本技能会把 RequestOperation(FOUND_CITY) 发到 InGame 状态）。
+2. 用 act found 或 MCP `unit_action(action="found_city")` 建城（本技能的 `act found` 会把 RequestOperation(FOUND_CITY) 发到 InGame 状态）。
 3. 等待 2 到 3 秒后查 Lua.log，应出现 CityBuilt 与逐地块的 before -> after 行；触发范围内地块的增量与测试脚本设定一致（示例 +5，随机产出类型）。
 4. 用 tuner 在 InGame 状态读同一批地块的 GetYield 值，与建城前基线对比，确认 +5 落在预期地块（距离 1..3）。
 5. 截图记录城市与地块产出画面。

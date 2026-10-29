@@ -348,5 +348,15 @@
     "query": "新增一个单位 条目键",
     "expected": "reference/entities/unit.md",
     "top": 3
+  },
+  {
+    "query": "MCP 工具 控制文明6 单位移动 城市生产",
+    "expected": "packages/civ6-ai-play/references/mcp-tools.md",
+    "top": 3
+  },
+  {
+    "query": "civ6-mcp run_lua 断言 Mod 属性",
+    "expected": "packages/civ6-ai-play/references/mcp-tools.md",
+    "top": 3
   }
 ]

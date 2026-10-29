@@ -32,7 +32,7 @@
 - [HTML → 文明6原生 UI](packages/civ6-html-ui/SKILL.md)：HTML/CSS 设计、四态纹理、XML/Lua 接入；包含独立脚本、示例和跨 agent 使用说明。
 - [地标与 AST 组合](packages/civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；配套 `landmark catalog/compose/import/verify/cook`。
 - [明日方舟系列](packages/civ6-arknights-series/SKILL.md)：该题材的系列命名、地名和发布准备；附封面 PSD 与排版脚本。
-- [AI 控制文明6](packages/civ6-ai-play/SKILL.md)：窗口化启动、FireTuner Lua、Mod 启停、开局、单位移动/建城、截图与日志取证。
+- [AI 控制文明6](packages/civ6-ai-play/SKILL.md)：窗口化启动、FireTuner Lua、civ6-mcp MCP 通道（76 工具速查）、Mod 启停、开局、单位/城市操作、截图与日志取证。
 - [头像/图标/历史时刻模板](packages/civ6-art-images/SKILL.md)：PSD 图层提取、PNG 配方、像素检查与模板素材。
 
 ## 外置技能（仅名单，不随仓库分发）

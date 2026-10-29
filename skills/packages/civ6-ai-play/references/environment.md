@@ -72,7 +72,7 @@ UIUpscale 0.000000
 ## Tuner 连接
 
 - `[Debug] EnableTuner 1` 让游戏在 `127.0.0.1:4318` 监听；只绑定本机回环，一般不需要防火墙放行。
-- **单连接**：同一时刻只接受一个客户端；外部脚本与 FireTuner 面板不要同时连。
+- **单连接**：同一时刻只接受一个客户端；MCP 客户端、外部脚本与 FireTuner 面板不要同时连。MCP 接管前先停 bridge/直连，交接顺序见 [MCP 工具速查](mcp-tools.md#1-定位与分工)。
 - **连接生命周期（真机实测，换版本重测）**：主菜单可直连；地图加载中/领袖介绍未跳过时 4318 无监听或 connect 超时；**`LoadScreen: OnLoadGameViewStateDone` 出现并用 Esc 跳过领袖介绍后，4318 恢复监听，可重连**；对局稳定后可反复断开/重连。加载期间不要抢连。
 - **直连 vs 常驻桥**：短命令默认直连（`civ6_ops.connect_tuner_retry` 内置重试）；需要跨多步长时间持有时再 `civ6ctl.py serve`（HTTP `127.0.0.1:8770`，`/eval` 转发 Lua、`/shutdown` 关闭）。`civ6_bridge.py health|states|eval|run|stop` 可直接操作桥；`civ6ctl.py close --stop-bridge` 退出游戏后一并关闭桥。
 - **备用 GUI 通道**：`civ6_tuner_gui.py` 用 Win32 自动化官方 `FireTuner2.exe` 的 Lua Console（选中状态、写入代码、回车、读输出）；FireTuner2 自带重连，适合直连反复失败时排障。

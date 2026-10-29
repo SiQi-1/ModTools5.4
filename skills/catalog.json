@@ -485,6 +485,7 @@
         "packages/civ6-ai-play/references/mod-test-workflow.md",
         "packages/civ6-ai-play/references/mod-runtime-testing.md",
         "packages/civ6-ai-play/references/auto-mod-test-workflow.md",
+        "packages/civ6-ai-play/references/mcp-tools.md",
         "packages/civ6-ai-play/SKILL.md"
       ]
     },
@@ -510,6 +511,31 @@
         "packages/civ6-ai-play/references/official-automation.md",
         "packages/civ6-ai-play/references/lua-api.md",
         "packages/civ6-ai-play/SKILL.md"
+      ]
+    },
+    {
+      "id": "civ6_ai_play_mcp",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "MCP 控制文明6",
+        "civ6-mcp 工具",
+        "MCP 工具速查",
+        "MCP 工具",
+        "MCP 工具控制文明6",
+        "MCP 控制对局",
+        "run_lua",
+        "MCP 自动对局",
+        "用 MCP 测试 Mod",
+        "MCP 操作对局",
+        "civ6 MCP 工具"
+      ],
+      "read": [
+        "packages/civ6-ai-play/references/mcp-tools.md"
+      ],
+      "optional": [
+        "packages/civ6-ai-play/SKILL.md",
+        "EXTERNAL_SKILLS.md"
       ]
     },
     {
@@ -796,7 +822,7 @@
     {
       "id": "external_model_import",
       "level": "must",
-      "max_kb": 7,
+      "max_kb": 8,
       "aliases": [
         "civ6-model-import",
         "模型导入",
@@ -818,7 +844,7 @@
     {
       "id": "external_civ6_mcp",
       "level": "must",
-      "max_kb": 7,
+      "max_kb": 8,
       "aliases": [
         "civ6-mcp",
         "MCP 服务器",

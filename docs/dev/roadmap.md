@@ -14,6 +14,10 @@
 - 文本库：`local_text_New.sqlite` 重新生成（84,467 → 32,268 行，仅官方 zh_Hans，Mod 词条 0）。
 - 守卫：`tools/doc_lint.py` + `tests/test_repo_layout.py` + CI 两步 + `tools/install_skills.py`。
 
+### 0b) 2026-10-29 civ6-ai-play 吸收 civ6-mcp 操作面（已完成）
+- 新增 `references/mcp-tools.md`：76 个 MCP 工具分组速查、参数要点、Mod 测试步骤映射、`run_lua` 断言、单连接交接与局限；SKILL 增「通道选择」，Mod 测试/运行时/环境/排障/自动工作流补 MCP 分工。
+- 注册 `civ6_ai_play_mcp` 路由与 2 条检索用例；外置名单与整合记录标注「原创整理、不复制上游」。MCP 负责游戏内读/操作，Mods.sqlite、日志、截图、自定义 UI 与 DLL 仍由脚本负责。
+
 ### 1) 工程与工作区框架
 - `.CIV` 工程结构（schema 0.1.0）、序列化与加载流程；按 `CIV_SECTION_ORDER` **18 节**归一化（基础信息/美术/文本/修改器 4 节存 dict，「UI图标」等其余分节存列表；旧工程缺节点自动补空）。
 - 主窗口 **3 页**（主页 / 工作区 / 设置）；**小工具是独立窗口**（窗口菜单或主页按钮打开，可与主窗口并排）；新建/打开/保存/删除工程、多会话 tab、双击 `.CIV` 打开。

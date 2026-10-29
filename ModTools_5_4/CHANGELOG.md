@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-29 - civ6-ai-play 吸收 civ6-mcp 操作面（MCP 工具速查）
+
+- 新增 `skills/packages/civ6-ai-play/references/mcp-tools.md`：76 个 MCP 工具的分组速查（全局/回合、单位、城市、地图、科技/市政、外交/贸易、政府/总督/宗教/伟人/议会/间谍/胜利、存读档、`run_lua`）、常用参数、Mod 测试流程映射、`run_lua` 专属断言写法、MCP 的 end_turn/自动存档/观测行为与局限；原创整理，不复制上游代码或 playbook。
+- `SKILL.md` 增「通道选择（MCP / 脚本）」与四类 Tuner 客户端单连接交接规则；标准流程第 6/7 步、按阶段读取、验收分层同步为「有 MCP 用 MCP，无 MCP 用脚本」。
+- `mod-testing.md`、`mod-runtime-testing.md`、`environment.md`、`troubleshooting.md`、`auto-mod-test-workflow.md` 各补 MCP 分工/排障入口；自定义 UI、DLL loader、WorldBuilder 夹具仍明确归脚本侧。
+- 注册：`skills/catalog.json` 新增 `civ6_ai_play_mcp` 路由（must，max_kb 13），`civ6_ai_play_operate` 的 optional 增加新文档，外置路由预算 7→8 KB；`skills/retrieval_cases.json` 新增 2 条；`skills/EXTERNAL_SKILLS.md` 与 `docs/meta/community-integration.md` 记录吸收边界；知识地图更新。
+- 检查：`python -m modgen.cli skill --check`（243 篇、72 个检索用例、0 个问题）；`python tools/doc_lint.py` OK；`python -m unittest tests.test_skills_search tests.test_knowledge_quality tests.test_external_skills tests.test_repo_layout`（64 项 OK）；`python -S tools/share_source.py --check` 通过。
+- 未改：`scripts/` 代码、Mod 制作规则与上游 civ6-mcp 的任何代码/文档；MCP 工具随上游版本变化，换版本需复核工具表。
+
 ## 2026-10-29 - 技能接入 DSH：install_skills 支持 dsh/agents 与 --link；本项目 5 个技能包已接入
 
 - `tools/install_skills.py` 新增 `--target dsh`（`~/.dsh/skills`）、`--target agents`（`~/.agents/skills`）与 `--link`（Windows 目录联接 / 符号链接，零拷贝）；安装前仍校验 SKILL.md frontmatter（name 与目录一致、description ≤1024）。

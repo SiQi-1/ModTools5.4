@@ -1,6 +1,6 @@
 ---
 name: civ6-ai-play
-description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本控制文明6实际对局：探测游戏与用户目录、启停 Mod 启用集、选择文明与领袖开局、移动单位、建城、结束回合、截图取证，并读取 Lua/Database/Modding 日志验收。适用于 Mod 自动测试、问题复现和无人值守检查；不替代 Mod 制作规则，也不修改游戏安装目录或绕过 Steam 校验。
+description: 用 FireTuner（127.0.0.1:4318）、外置 civ6-mcp MCP 通道与窗口化启动让 AI 或脚本控制文明6实际对局：探测游戏与用户目录、启停 Mod 启用集、选择文明与领袖开局、操作单位/城市/外交、结束回合、截图取证，并读取 Lua/Database/Modding 日志验收。适用于 Mod 自动测试、问题复现和无人值守检查；不替代 Mod 制作规则，也不修改游戏安装目录或绕过 Steam 校验。
 ---
 
 # AI 控制文明6（窗口化 + FireTuner）
@@ -10,6 +10,12 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 本技能随 ModTools 5.4 仓库使用，技能目录可整包复制（复制前删除 `scripts\__pycache__\` 等本地缓存）。运行时只依赖 Windows、Python 标准库和本机已安装的文明6；脚本不需要 PyQt，也不需要启动 ModTools GUI。
 
 **关键架构（实机验证整理；换游戏版本或 Mod 组合需重测）。** FireTuner 是单连接 TCP：主菜单可直连；地图加载中或领袖介绍未跳过时连接不可用；**等 `LoadScreen: OnLoadGameViewStateDone` 出现并用 Esc 跳过领袖介绍后，4318 会恢复监听，可以重连**（对局稳定后可反复断开/重连）。`civ6ctl start` 已把「前端选文明/领袖 → `Network.HostGame` → 等加载 → Esc 跳过介绍 → 带重试重连」封装成一个命令。常驻桥 `civ6_bridge.py`（HTTP `127.0.0.1:8770`）只在需要长时间多步操作时使用；`civ6_tuner_gui.py`（自动化官方 FireTuner2 的 Lua Console）是备用通道。
+
+## 通道选择（MCP / 脚本）
+
+若 MCP 客户端已注册外置 civ6-mcp（DSH、Codex 等），**游戏内读状态与操作优先用 MCP 工具**：76 个工具覆盖单位、城市、地图、科技/市政、外交/贸易、政府/政策、总督、宗教/城邦、伟人、世界议会、胜利、存读档与 `run_lua`（工具名带客户端前缀，DSH 形如 `mcp__civ6__*`）。本技能脚本仍负责 Mod 启停/备份还原、窗口化启动/关闭、截图与日志验收，以及 MCP 没有的自定义 UI 状态、DLL loader、WorldBuilder 夹具。
+
+MCP 服务器、脚本直连、常驻桥、FireTuner GUI **同一时刻只能有一个**占用 Tuner 4318；交接顺序、完整工具表与 `run_lua` 断言写法见 [MCP 工具速查](references/mcp-tools.md#1-定位与分工)。MCP 的 diary/日志只作补充证据，Mod 层验收仍以本技能日志 + 截图 + Lua 断言为准。
 
 ## 适用场景
 
@@ -27,7 +33,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 1. **必须窗口化**，不使用独占全屏。窗口可枚举 rect、可截图、可聚焦；独占全屏会破坏截图与后台操作，所以自动测试一律窗口化。分辨率与画质按目标机器能力选：脚本默认 1280×720 + 低画质档，运行吃力时继续降低窗口尺寸或画质，不要把某台机器的取值当成通用常量。测试前后查显卡温度与负载（NVIDIA 用 `nvidia-smi`，其他显卡用厂商工具），上限先与用户/机器约定；**接近上限就缩短单次测试或先退出降温，超过上限立即停止**，不要长时间挂机。改 `AppOptions.txt` 的 `[Video]` 段前先备份，结束时还原。
 2. **先备份再改动**：`AppOptions.txt`、`GraphicsOptions.txt`（仅在必要时）和 `Mods.sqlite`。备份名带时间戳，恢复后读回核对；不要拿备份整文件覆盖用户期间手工改过的其他设置而不说明。
 3. **不破坏用户启用集**：Mod 启停只改 `Selected=1` 组内 `ModGroupItems.Disabled`，不改组本身；游戏进程运行时拒绝写 `Mods.sqlite`；测试结束恢复测试前状态，或明确告知用户保留了哪些改动。
-4. **同一时刻只允许一个 Tuner 客户端**：直连与常驻桥二选一，不要同时开（脚本直连、FireTuner 面板都算）。默认直连流程在「加载完成 + Esc 跳过介绍」后带重试重连；只有需要跨多步长时间保持连接时才 `civ6ctl.py serve` 起桥（HTTP `127.0.0.1:8770`）。关闭时用 `close`（需要时加 `--stop-bridge`）。
+4. **同一时刻只允许一个 Tuner 客户端**：MCP 服务器、脚本直连、常驻桥、FireTuner 面板四者只能开一个；MCP 接管前先关脚本侧 bridge/直连与 FireTuner GUI（交接顺序见 [MCP 工具速查](references/mcp-tools.md#1-定位与分工)）。默认直连流程在「加载完成 + Esc 跳过介绍」后带重试重连；只有需要跨多步长时间保持连接时才 `civ6ctl.py serve` 起桥（HTTP `127.0.0.1:8770`）。关闭时用 `close`（需要时加 `--stop-bridge`）。
 5. **测试后关闭游戏**：不留下后台游戏进程占用 `Mods.sqlite`、日志和显卡资源。关闭前先保存日志与截图；结束进程的方式见 [安全结束进程](references/troubleshooting.md#安全结束进程)，不结束 Steam。
 6. **不猜状态名和 API**：Tuner Lua 状态分前端与对局，主菜单里没有 `GameCore_Tuner`；调用签名以 [Lua API 速查](references/lua-api.md) 或本机官方文件核对为准，未验证的点标「待验证」。
 7. **产物留在工作目录**：截图、日志副本、Lua 脚本放 `workspace/scratch/<任务名>/` 或仓库外目录，不把单次测试产物写进工具仓库。
@@ -37,6 +43,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 - **游戏根与程序**：游戏安装根由 [环境与路径](references/environment.md) 的「路径探测」从 Steam 注册表/库配置解析，不要写死盘符或用户名；主程序为 `Base\Binaries\Win64Steam\CivilizationVI.exe`（DX11）与 `CivilizationVI_DX12.exe`（DX12），记录本次使用哪个。
 - **用户目录**：`%LOCALAPPDATA%\Firaxis Games\Sid Meier's Civilization VI\`，含 `AppOptions.txt`、`GraphicsOptions.txt`、`Mods.sqlite`、`Logs\`。
 - **Tuner**：`AppOptions.txt` 的 `[Debug]` 段 `EnableTuner 1`；游戏在 `127.0.0.1:4318` 提供单连接 Tuner。主菜单可直连；开局后等加载完成 + Esc 跳过领袖介绍再重连（`civ6_ops.py` 已封装重试）。常驻桥 `civ6ctl.py serve`（HTTP 8770）仅在需要长时间保持连接时启用。主菜单与对局中的 Lua 状态表不同，进局后优先用 `InGame` 状态。
+- **MCP（可选）**：客户端已注册 civ6-mcp 时可直接用其工具读状态/操作（DSH 中工具名前缀 `mcp__civ6__`）；安装、许可与版本见 [外置技能名单](../../EXTERNAL_SKILLS.md#civ6-mcp)，工具表与交接顺序见 [MCP 工具速查](references/mcp-tools.md)。MCP 与脚本不能同时占用 Tuner。
 - **日志**：`Logs\Lua.log`、`Database.log`、`Modding.log`（另有 `Startup.log`、`Engine.log`、`Renderer.log`、`UserInterface.log`、`UIWarnings.csv`）。
 - **Python**：优先仓库 `.venv\Scripts\python.exe`（3.13）；脚本只用标准库，截图在缺 Pillow 时降级 BMP。
 - **备份与状态**：`civ6_game.py windowed` 把 `AppOptions.txt`/`GraphicsOptions.txt` 备份到 `%LOCALAPPDATA%\civ6_ai_play\`（`CIV6_AI_PLAY_STATE` 可覆盖）；`Mods.sqlite` 由 Mods 脚本另行备份。删除或清空这些目录前先确认已还原。
@@ -52,8 +59,8 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 3. **窗口化启动**：`launch --windowed` 备份选项、改窗口化（默认 1280×720 低画质）并启动；命令会等游戏窗口出现并等到主菜单 Tuner 就绪。
 4. **选择文明/领袖/地图开局**：`start --leader LEADER_QIN --civ CIVILIZATION_CHINA ...` 自动完成前端注入、`Network.HostGame`、等待 `LoadScreen: OnLoadGameViewStateDone`、Esc 跳过领袖介绍、带重试重连，并返回 `GameCore_Tuner`/`InGame` 状态与首轮 `probe`；精确 Lua 签名见 [Lua API 速查](references/lua-api.md)。
 5. **需要长时间多步操作时再起桥**：`civ6ctl.py serve`（HTTP `127.0.0.1:8770`）持有连接，后续命令会自动经桥；只做一次短流程不用起桥。
-6. **读取状态与日志**：`probe` 读回合/玩家/单位/城市，同时 tail `Database.log`/`Lua.log`；加载卡住转 [加载卡住](references/troubleshooting.md#加载卡住)。
-7. **操作对局**：`act move --x .. --y ..`、`act found`、`act endturn`；每次操作后 `probe` 复查状态变化。
+6. **读取状态与日志**：有 MCP 时优先 `get_game_overview`/`get_units`/`get_cities` 等读工具，无 MCP 时用 `probe`；同时 tail `Database.log`/`Lua.log`；加载卡住转 [加载卡住](references/troubleshooting.md#加载卡住)。
+7. **操作对局**：有 MCP 时用 `unit_action`/`set_city_production`/`end_turn` 与外交、宗教、政策等工具（[MCP 工具速查](references/mcp-tools.md)）；无 MCP 时用 `act move/found/endturn`。每次操作后用对应读工具或 `probe` 复查状态变化。
 8. **截图取证**：`shot --out ...` 在操作前后各截一次，保存窗口 rect、时间戳与操作说明；判读方式见 [截图与日志定位](references/troubleshooting.md#截图与日志定位)。
 9. **Mod 与日志验收**：`logs enabled-mods`、`logs errors`、`logs tail --file Lua.log` 核对启用集与报错，再对照游戏内可观测效果。
 10. **关闭与还原**：`close --stop-bridge` 退出游戏并结束桥；`restore-config` 还原选项；必要时 `mods restore` 还原启用集，记录最终状态。
@@ -62,7 +69,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 
 ## 测试 Mod（Lua / DLL / 自定义 UI）
 
-启用 Mod、开一局，按 [验收分层](#验收分层) 分层取证（命令 → 连接 → 开局 → 操作 → Mod → 环境）；完整方法见 [Mod 测试方法](references/mod-testing.md)；需要对每条能力做属性/建筑/单位断言与面板截图时，用 [真实 Mod 运行时验证](references/mod-runtime-testing.md) 的模板与夹具（含 `tuner_eval.py` 与 DPI 点击脚本）。
+启用 Mod、开一局，按 [验收分层](#验收分层) 分层取证（命令 → 连接 → 开局 → 操作 → Mod → 环境）；完整方法见 [Mod 测试方法](references/mod-testing.md)；需要对每条能力做属性/建筑/单位断言与面板截图时，用 [真实 Mod 运行时验证](references/mod-runtime-testing.md) 的模板与夹具（含 `tuner_eval.py` 与 DPI 点击脚本）。操作驱动优先用 MCP 工具（若客户端已注册）；Mod 专属断言用 `run_lua` 或 `tuner_eval.py`，自定义 UI 与 DLL 场景仍走本技能 tuner/loader 方法。
 
 - 玩法 Lua Mod：看 Lua.log 中 Mod 自己的打印与 Database.log 报错，用 tuner 对比修改前后状态。
 - DLL Loader 插件 Mod：先确认 loader 日志与插件 OnLoad；若 loader 日志不生成且进程加载的 VERSION.dll 来自 `C:\WINDOWS\SYSTEM32`，可能是 Windows 兼容性库抢先加载了系统 VERSION.dll，用 `scripts/civ6_sdb_fix.py status/apply/verify` 诊断修复（apply 会改 sysMerge.sdb，需管理员，自动备份/可 restore；Windows 更新后重新 apply）。无法改系统时用 `scripts/civ6_inject.py` 注入（测试后删除注入文件与目录）。
@@ -74,6 +81,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 - **建立可靠、可重复、防漏判的大型 Mod 测试工作流（能力组、判定标准、覆盖矩阵、Modifier/Requirement 知识库）** → [Mod 测试工作流](references/mod-test-workflow.md)
 - **对已完成审查/修复的 Mod 做逐能力运行时断言、UI 截图与构建坑排查** → [真实 Mod 运行时验证](references/mod-runtime-testing.md)（含断言模板、测试夹具、DPI/弹窗/构建大小坑；含**看海 AI 自动对局**与**数据驱动 UI 动态测试**——看海需要外部工坊 Mod「上帝视角」，本项目不内置，未安装时提示用户订阅）
 - **全自动执行：启动→夹具/断言→UI 截图→归档→关闭→图文报告** → [全自动测试工作流](references/auto-mod-test-workflow.md)（架构与 Harness API 契约；作者本地实现脚本未随包，可按文中架构自建，含夹具 Cookbook 与反模式）
+- **用 MCP 工具控制对局（76 工具速查、`run_lua` 断言、单连接交接）** → [MCP 工具速查](references/mcp-tools.md)
 
 - **环境、路径、窗口化、截图、还原** → [环境与路径](references/environment.md)
 - **Tuner 连不上、启动失败、Mod 报错、加载卡住、GPU/窗口异常、日志定位、安全结束进程** → [排障](references/troubleshooting.md)
@@ -85,7 +93,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 ## 验收分层
 
 1. **命令层**：脚本退出码、`--help`、状态查询 JSON 正常。
-2. **连接层**：常驻桥 `/health` 返回 `connected: true`（或直连 Tuner 握手成功），状态表可解析目标状态。
+2. **连接层**：常驻桥 `/health` 返回 `connected: true`（或直连 Tuner 握手成功，或 MCP `get_game_overview` 正常返回），状态表可解析目标状态。
 3. **开局层**：`Game`/`Players` 能读到目标文明、领袖、回合数和地图信息。
 4. **操作层**：请求返回后复查状态变化（单位坐标、城市数量、生产项、回合数）。
 5. **Mod 层**：`Modding.log` 启用集合符合预期、`Database.log` 无加载错误、`Lua.log` 无栈回溯，且游戏内能观察到目标效果。
@@ -95,7 +103,7 @@ description: 用 FireTuner（127.0.0.1:4318）与窗口化启动让 AI 或脚本
 
 ## 命令速查
 
-统一入口 `skills\civ6-ai-play\scripts\civ6ctl.py` 覆盖整条流程；需要单独调试时再调用下面的模块脚本。子命令与参数以 `--help` 为准。
+统一入口 `skills\civ6-ai-play\scripts\civ6ctl.py` 覆盖整条流程；需要单独调试时再调用下面的模块脚本。子命令与参数以 `--help` 为准。MCP 工具不是本技能脚本，用法见 [MCP 工具速查](references/mcp-tools.md)。
 
 ```powershell
 # 环境自检：安装路径、用户目录、日志、Mods.sqlite、Tuner 可达性、运行状态

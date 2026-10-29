@@ -3,6 +3,7 @@
 > 本流程由一次真实项目的自动化落地整理：一条命令完成「启动 → 开局 → 自动夹具/断言 → UI 截图 → 归档 → 关闭」，并生成图文测试报告。换游戏版本、Mod 组合或机器都需重测。
 > 本文件是 [mod-test-workflow.md](mod-test-workflow.md)（策略/判定/覆盖）与 [mod-runtime-testing.md](mod-runtime-testing.md)（运行时断言/夹具）的**自动化执行层**；三者配合使用。
 > **脚本未随包**：本文的编排脚本与 harness 属作者本地历史工作流，本技能 `scripts/` 只有 `civ6*.py`、`click_dpi.ps1`、`tuner_eval.py`。可按 §2 架构自建等价 harness；示例中的 `workspace/scratch/<任务名>/...` 均为占位路径（`workspace/mods/` 已 gitignore，只在本机存档，不随包）。
+> **可选 MCP 执行层**：客户端已注册 civ6-mcp 时，可用其工具替代部分自建操作用具（工具面见 [MCP 工具速查](mcp-tools.md)）；断言、报告与 Mod 生命周期仍由本工作流/脚本负责。
 
 ## 1. 适用与前置
 

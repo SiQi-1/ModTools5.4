@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29 - 修复双击 ModTools5.4.py 无反应（自动改用仓库 .venv）
+
+- 现象：Windows 的 `.py` 默认关联 `py.exe` → 系统 Python 3.13 没有 PyQt6，`ModTools5.4.py` 在导入阶段即 `ModuleNotFoundError`；用无控制台的 `pythonw`/快捷方式启动时表现为「点了没反应」。桌面快捷方式本身指向 `.venv\Scripts\pythonw.exe`，是正常的；应用与代码无回归（`--headless --ai-exec` 与 64 项测试均通过，无 crash.log）。
+- 修复：`ModTools5.4.py` 启动前检测 PyQt6；缺失且仓库存在 `.venv/Scripts/python.exe` 时用 `os.execv` 切到该解释器并透传命令行参数。已是 venv 解释器、frozen 或 venv 不存在时不做重定向，避免递归与掩盖真实错误。
+- 文档：`docs/user/quickstart.md` 说明双击 `.py` 与快捷方式均可；验证：`py.exe ModTools5.4.py` 约 8.9 秒出现「ModTools 5.4」窗口，桌面快捷方式约 8.4 秒（正常启动耗时）。
+
 ## 2026-10-29 - 工作流补入「实机测试」阶段（用户同意门禁 + 纯净环境 + 测试后一致性）
 
 - `skills/WORKFLOW.md` 新增第 6 步「实机测试（需用户同意）」，交付顺延为第 7 步；步骤只保留门禁摘要并指向新指南，避免撑大 always_read 影响检索预算。

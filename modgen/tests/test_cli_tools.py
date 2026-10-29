@@ -493,7 +493,7 @@ class SkillCommandTestCase(unittest.TestCase):
             self.skipTest("仓库根 skills/ 不存在")
         results = search_skills("Modifier")
         self.assertTrue(results, "真实技能库应能搜到 Modifier 相关文件")
-        index = read_skill_file("05-modtools-civ/INDEX.md")
+        index = read_skill_file("guides/INDEX.md")
         self.assertIsNotNone(index)
         self.assertIn("ModTools", index)
 

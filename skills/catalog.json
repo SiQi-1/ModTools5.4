@@ -6,66 +6,400 @@
   ],
   "routes": [
     {
-      "id": "arknights_series",
-      "aliases": ["明日方舟", "Arknights", "civ6-arknights-series"],
-      "read": ["civ6-arknights-series/SKILL.md", "civ6-arknights-series/references/release-preparation.md"]
-    },
-    {
-      "id": "civilization_art",
+      "id": "new_unit",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "文明美术",
-        "文化美术",
-        "文化映射",
-        "城市建筑文化",
-        "单位文化",
-        "Cultures.artdef",
-        "Culture.artdef",
-        "UnitCulture"
+        "新增单位",
+        "新增一个单位",
+        "加一个单位",
+        "做一个单位",
+        "新单位",
+        "单位条目",
+        "自定义单位",
+        "添加单位"
       ],
       "read": [
-        "05-modtools-civ/civilization-art.md",
-        "05-modtools-civ/entity-templates/civilization.md",
-        "05-modtools-civ/art-cook-validation.md"
+        "reference/entities/INDEX.md",
+        "reference/entities/unit.md",
+        "reference/entities/naming.md"
+      ],
+      "optional": [
+        "guides/civ-pitfalls.md",
+        "reference/sql/INDEX.md",
+        "reference/sql/unit.md",
+        "reference/modifiers/INDEX.md",
+        "reference/modifiers/patterns/pre-code-checklist.md"
+      ]
+    },
+    {
+      "id": "new_civilization",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "新增文明",
+        "做一个新文明",
+        "新文明",
+        "文明条目",
+        "自定义文明",
+        "新增一个文明",
+        "添加文明"
+      ],
+      "read": [
+        "reference/entities/INDEX.md",
+        "reference/entities/civilization.md"
+      ],
+      "optional": [
+        "reference/entities/naming.md",
+        "reference/entities/leader.md",
+        "reference/config/configs.md",
+        "reference/config/colors.md",
+        "reference/config/diplo-text.md",
+        "reference/art/civilization-art.md"
+      ]
+    },
+    {
+      "id": "new_building",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "新增建筑",
+        "做一个建筑",
+        "新建筑",
+        "建筑条目",
+        "自定义建筑",
+        "添加建筑"
+      ],
+      "read": [
+        "reference/entities/INDEX.md",
+        "reference/entities/building.md",
+        "reference/entities/naming.md"
+      ],
+      "optional": [
+        "reference/sql/INDEX.md",
+        "reference/sql/building.md",
+        "reference/modifiers/INDEX.md"
+      ]
+    },
+    {
+      "id": "ui",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "UI",
+        "界面",
+        "按钮",
+        "控件",
+        "纹理",
+        "图标",
+        "ui_textures",
+        "custom_entries",
+        "精灵表",
+        "按钮背景",
+        "独立UI纹理",
+        "自定义UI图标",
+        "Image",
+        "Button",
+        "DDS",
+        "TEX",
+        "XLP"
+      ],
+      "read": [
+        "reference/art/ui-assets.md"
+      ],
+      "optional": [
+        "guides/project-extensions.md",
+        "reference/config/text.md",
+        "reference/config/icons.md",
+        "reference/lua/code-style.md",
+        "reference/lua/lua-xml-controls.md",
+        "reference/art/INDEX.md",
+        "reference/config/INDEX.md"
+      ]
+    },
+    {
+      "id": "text",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "文本",
+        "修改文本",
+        "本地化",
+        "LOC",
+        "描述文本",
+        "名称文本",
+        "中文文本",
+        "text-icons",
+        "图标嵌入",
+        "产出图标",
+        "外交文本"
+      ],
+      "read": [
+        "reference/config/text.md"
+      ],
+      "optional": [
+        "reference/entities/naming.md",
+        "reference/config/diplo-text.md",
+        "reference/config/INDEX.md"
+      ]
+    },
+    {
+      "id": "civ",
+      "level": "optional",
+      "max_kb": 5,
+      "aliases": [
+        ".CIV",
+        "工程",
+        "实体",
+        "区域",
+        "建筑",
+        "单位",
+        "领袖",
+        "文明",
+        "条目"
+      ],
+      "read": [
+        "guides/INDEX.md"
+      ],
+      "optional": [
+        "reference/entities/INDEX.md",
+        "guides/civ-project-format.md",
+        "guides/modifiers.md",
+        "reference/art/INDEX.md"
+      ]
+    },
+    {
+      "id": "entity_templates",
+      "level": "optional",
+      "max_kb": 5,
+      "aliases": [
+        "实体模板",
+        "条目键",
+        "实体字段",
+        "区域条目",
+        "领袖条目",
+        "总督",
+        "伟人",
+        "晋升",
+        "政策卡",
+        "项目",
+        "信仰",
+        "议程",
+        "改良设施"
+      ],
+      "read": [
+        "reference/entities/INDEX.md"
+      ],
+      "optional": [
+        "reference/entities/basic-info.md",
+        "reference/entities/leader.md",
+        "reference/entities/district.md",
+        "reference/entities/governor.md",
+        "reference/entities/greatperson.md",
+        "reference/entities/improvement.md",
+        "reference/entities/promotion.md",
+        "reference/entities/policy-project.md",
+        "reference/entities/religion-agenda.md",
+        "reference/art/INDEX.md"
+      ]
+    },
+    {
+      "id": "entity_naming",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "命名",
+        "Type 命名",
+        "abbr",
+        "简称",
+        "ModifierId",
+        "RequirementId",
+        "REQSET_"
+      ],
+      "read": [
+        "reference/entities/naming.md"
+      ],
+      "optional": [
+        "reference/entities/INDEX.md",
+        "reference/config/text.md"
+      ]
+    },
+    {
+      "id": "modifiers",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "Modifier",
+        "ModifierType",
+        "EffectType",
+        "Requirement",
+        "CollectionType",
+        "修改器",
+        "条件",
+        "效果",
+        "战斗力",
+        "奇观",
+        "MODIFIER_",
+        "REQUIREMENT_",
+        "EFFECT_",
+        "COLLECTION_",
+        "原版类型",
+        "modifier_type_source",
+        "vanilla_modifier_types",
+        "preview_text",
+        "ModifierStrings"
+      ],
+      "read": [
+        "guides/modifiers.md",
+        "reference/modifiers/patterns/pre-code-checklist.md"
+      ],
+      "optional": [
+        "reference/modifiers/INDEX.md",
+        "reference/modifiers/techniques.md",
+        "reference/modifiers/effect-index.md",
+        "reference/modifiers/cases/INDEX.md",
+        "reference/modifiers/patterns/INDEX.md"
+      ]
+    },
+    {
+      "id": "lua",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "Lua",
+        "脚本",
+        "事件",
+        "GameEvents",
+        "LuaEvents",
+        "技能冷却",
+        "UI 按钮",
+        "按钮面板"
+      ],
+      "read": [
+        "reference/lua/INDEX.md",
+        {
+          "path": "reference/lua/code-style.md",
+          "section": "事件环境与运行时核验"
+        }
+      ],
+      "optional": [
+        "reference/lua/code-style.md",
+        "reference/lua/lua-xml-controls.md",
+        "reference/lua/lua-gp-combat.md",
+        "reference/lua/lua-gp-resource.md",
+        "reference/lua/lua-binary.md",
+        "reference/lua/lua-ui-button.md"
+      ]
+    },
+    {
+      "id": "lua_events",
+      "level": "must",
+      "max_kb": 5,
+      "aliases": [
+        "事件环境",
+        "运行时核验",
+        "GP 与 UI",
+        "ExposedMembers",
+        "RequestPlayerOperation"
+      ],
+      "read": [
+        {
+          "path": "reference/lua/code-style.md",
+          "section": "事件环境与运行时核验"
+        },
+        {
+          "path": "reference/lua/code-style.md",
+          "section": "三、GP 与 UI — 两个完全隔离的运行环境"
+        }
+      ],
+      "optional": [
+        "reference/lua/code-style.md",
+        "reference/lua/INDEX.md"
       ]
     },
     {
       "id": "ui_replacement",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
         "ui_replace",
         "lua_context",
         "ReplaceUIScript",
         "CityPanel",
         "ViewMain",
-        "产出来源拆分"
+        "产出来源拆分",
+        "UI文件替换"
       ],
       "read": [
-        "05-modtools-civ/project-extensions.md",
-        "04-lua/lua-0035-ui-file-replacement.md",
-        "05-modtools-civ/ui-assets.md",
-        "04-lua/code-style.md"
+        "guides/project-extensions.md"
+      ],
+      "optional": [
+        "reference/lua/lua-0035-ui-file-replacement.md",
+        "reference/lua/code-style.md",
+        "reference/art/ui-assets.md"
       ]
     },
     {
-      "id": "art_images",
+      "id": "html_ui",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "领袖头像",
-        "文明图标",
-        "区域图标",
-        "改良图标",
-        "历史时刻",
-        "PSD",
-        "白色透明",
-        "image render",
-        "civ6-art-images"
+        "HTML",
+        "CSS",
+        "网页原型",
+        "HTML转UI",
+        "界面美化",
+        "DPR",
+        "civ6-html-ui",
+        "import-manifest",
+        "texture render"
       ],
       "read": [
-        "civ6-art-images/SKILL.md",
-        "civ6-art-images/references/templates.md",
-        "05-modtools-civ/ui-assets.md"
+        "packages/civ6-html-ui/SKILL.md"
+      ],
+      "optional": [
+        "packages/civ6-html-ui/references/native-ui.md",
+        "packages/civ6-html-ui/references/html-textures.md",
+        "packages/civ6-html-ui/references/portable-use.md",
+        "packages/civ6-html-ui/references/integration-validation.md",
+        "packages/civ6-html-ui/references/standalone-integration.md",
+        "reference/art/ui-assets.md"
+      ]
+    },
+    {
+      "id": "binary-yields",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "二进制",
+        "Property产出",
+        "固定产出",
+        "AttachModifierByID",
+        "二进制上限",
+        "最高位",
+        "2047",
+        "1024"
+      ],
+      "read": [
+        {
+          "path": "reference/lua/lua-binary.md",
+          "section": "二进制产出方案选择"
+        },
+        {
+          "path": "reference/lua/lua-binary.md",
+          "section": "上限按效果设定，不按机器整数位数设定"
+        },
+        "guides/modifiers.md"
+      ],
+      "optional": [
+        "reference/lua/lua-binary.md",
+        "reference/lua/code-style.md"
       ]
     },
     {
       "id": "native_adjacency",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
         "相邻加成",
         "区域相邻",
@@ -81,120 +415,275 @@
         "放置预览"
       ],
       "read": [
-        "district-adjacency.md",
-        "05-modtools-civ/entity-templates/district.md",
-        "05-modtools-civ/entity-templates/improvement.md"
+        {
+          "path": "reference/config/district-adjacency.md",
+          "section": "离线快照、继承与实现选择"
+        },
+        {
+          "path": "reference/config/district-adjacency.md",
+          "section": "一、District_Adjacencies"
+        },
+        "reference/entities/INDEX.md"
+      ],
+      "optional": [
+        "reference/config/district-adjacency.md",
+        "reference/entities/district.md",
+        "reference/entities/improvement.md",
+        "reference/sql/INDEX.md"
       ]
     },
     {
-      "id": "civ",
+      "id": "civ6_ai_play_start",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        ".CIV",
-        "工程",
-        "文明",
-        "领袖",
-        "区域",
-        "建筑",
-        "单位",
-        "实体"
+        "AI玩文明6",
+        "AI 控制文明6",
+        "控制文明6",
+        "文明6自动化",
+        "启动文明6",
+        "窗口化",
+        "分辨率",
+        "全屏",
+        "FireTuner",
+        "Tuner",
+        "4318",
+        "Mods.sqlite",
+        "启用Mod",
+        "Mod 启停",
+        "civ6-ai-play"
       ],
       "read": [
-        "05-modtools-civ/INDEX.md",
-        "05-modtools-civ/entity-templates/INDEX.md"
+        "packages/civ6-ai-play/references/environment.md"
+      ],
+      "optional": [
+        "packages/civ6-ai-play/SKILL.md",
+        "packages/civ6-ai-play/references/troubleshooting.md"
       ]
     },
     {
-      "id": "modifiers",
+      "id": "civ6_ai_play_operate",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "Modifier",
-        "ModifierType",
-        "ModifierStrings",
-        "preview_text",
-        "Requirement",
-        "EffectType",
-        "modifier_type_source",
-        "vanilla_modifier_types",
-        "修改器",
-        "条件",
-        "战斗力",
-        "奇观",
-        "原版类型",
-        "EFFECT_",
-        "MODIFIER_",
-        "REQUIREMENT_",
-        "COLLECTION_"
+        "自动测试mod",
+        "自动测试 Mod",
+        "DLL Mod 测试",
+        "自定义 UI 测试",
+        "全自动测试",
+        "自动测试工作流",
+        "auto_harness",
+        "测试报告",
+        "UI 截图",
+        "Mod 测试",
+        "测试 Mod"
       ],
       "read": [
-        "05-modtools-civ/modifiers.md",
-        "07-techniques/modifiers/patterns/pre-code-checklist.md",
-        "07-techniques/modifier-techniques.md"
+        "packages/civ6-ai-play/references/mod-testing.md"
+      ],
+      "optional": [
+        "packages/civ6-ai-play/references/mod-test-workflow.md",
+        "packages/civ6-ai-play/references/mod-runtime-testing.md",
+        "packages/civ6-ai-play/references/auto-mod-test-workflow.md",
+        "packages/civ6-ai-play/SKILL.md"
       ]
     },
     {
-      "id": "lua",
+      "id": "civ6_ai_play_verify",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "Lua",
-        "事件",
-        "脚本",
-        "GP"
+        "验收",
+        "排障",
+        "截图与日志",
+        "加载卡住",
+        "截屏",
+        "日志取证",
+        "连不上",
+        "官方自动化",
+        "Debug 面板"
       ],
       "read": [
-        "05-modtools-civ/project-extensions.md",
-        "04-lua/code-style.md",
-        "04-lua/INDEX.md"
+        "packages/civ6-ai-play/references/troubleshooting.md"
+      ],
+      "optional": [
+        "packages/civ6-ai-play/references/official-automation.md",
+        "packages/civ6-ai-play/references/lua-api.md",
+        "packages/civ6-ai-play/SKILL.md"
       ]
     },
     {
-      "id": "ui",
+      "id": "art_images",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "UI",
-        "界面",
-        "按钮",
-        "控件",
-        "纹理",
-        "图标",
-        "ui_textures",
-        "custom_entries",
-        "LOC",
-        "精灵表",
-        "文本",
-        "Texture",
-        "Button",
-        "Image",
-        "DDS",
-        "TEX",
-        "XLP"
+        "领袖头像",
+        "文明图标",
+        "区域图标",
+        "改良图标",
+        "历史时刻",
+        "PSD",
+        "白色透明",
+        "image render",
+        "civ6-art-images"
       ],
       "read": [
-        "05-modtools-civ/project-extensions.md",
-        "05-modtools-civ/ui-assets.md",
-        "04-lua/code-style.md",
-        "04-lua/lua-xml-controls.md",
-        "02-config-files/text.md"
+        "packages/civ6-art-images/SKILL.md"
+      ],
+      "optional": [
+        "packages/civ6-art-images/references/templates.md",
+        "reference/art/ui-assets.md"
       ]
     },
     {
-      "id": "html_ui",
+      "id": "civilization_art",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "HTML",
-        "CSS",
-        "网页原型",
-        "HTML转UI",
-        "界面美化",
-        "DPR",
-        "civ6-html-ui",
-        "import-manifest"
+        "文明美术",
+        "文化美术",
+        "文化映射",
+        "城市建筑文化",
+        "单位文化",
+        "Cultures.artdef",
+        "Culture.artdef",
+        "UnitCulture"
       ],
       "read": [
-        "civ6-html-ui/SKILL.md",
-        "05-modtools-civ/ui-assets.md",
-        "05-modtools-civ/project-extensions.md",
-        "04-lua/code-style.md",
-        "04-lua/lua-xml-controls.md"
+        "reference/art/civilization-art.md"
+      ],
+      "optional": [
+        "reference/art/art-cook-validation.md",
+        "reference/entities/civilization.md"
+      ]
+    },
+    {
+      "id": "leader_art",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "领袖差分",
+        "外交表情",
+        "纸片领袖",
+        "纸片人",
+        "LeaderFallback",
+        "fallback_images",
+        "Leader_Matte"
+      ],
+      "read": [
+        "reference/art/leader-art.md"
+      ],
+      "optional": [
+        "reference/art/art-cook-validation.md"
+      ]
+    },
+    {
+      "id": "audio",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "音频",
+        "音乐",
+        "语音",
+        "Wwise",
+        "BNK",
+        "WEM",
+        "Banks.ini",
+        "UpdateAudio",
+        "soundbank"
+      ],
+      "read": [
+        "reference/art/audio-pipeline.md"
+      ],
+      "optional": [
+        "reference/art/workshop-release.md"
+      ]
+    },
+    {
+      "id": "blender",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "Blender",
+        "CivNexus6",
+        "CN6",
+        "NA2",
+        "FGX",
+        "骨骼"
+      ],
+      "read": [
+        "reference/art/blender-civnexus.md"
+      ],
+      "optional": [
+        "reference/art/art-cook-validation.md",
+        "packages/civ6-landmarks/references/custom-model-prototype.md"
+      ]
+    },
+    {
+      "id": "art_cook",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "Cooker",
+        "cook",
+        "ArtDef",
+        "MissingArt",
+        "美术引用",
+        "assets check",
+        "art compare"
+      ],
+      "read": [
+        "reference/art/art-cook-validation.md"
+      ],
+      "optional": [
+        "reference/art/art-unpack.md"
+      ]
+    },
+    {
+      "id": "art_unpack",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "BLP解包",
+        "美术解包",
+        "资源复原",
+        "blpkit",
+        "Civ6ArtUnpack",
+        "CIVBIG",
+        "SHARED_DATA",
+        "pantry遮蔽",
+        "蒙皮复原",
+        "cooker-config"
+      ],
+      "read": [
+        "reference/art/art-unpack.md"
+      ],
+      "optional": [
+        "reference/art/art-cook-validation.md"
+      ]
+    },
+    {
+      "id": "workshop",
+      "level": "must",
+      "max_kb": 13,
+      "aliases": [
+        "工坊发布",
+        "创意工坊上传",
+        "上传器",
+        "workshop",
+        "mod_id.txt"
+      ],
+      "read": [
+        "reference/art/workshop-release.md"
+      ],
+      "optional": [
+        "reference/art/art-cook-validation.md"
       ]
     },
     {
       "id": "custom_files",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
         "自定义文件",
         "自定义 SQL",
@@ -212,12 +701,20 @@
         "工作流"
       ],
       "read": [
-        "05-modtools-civ/project-extensions.md",
-        "05-modtools-civ/pipeline.md"
+        "guides/project-extensions.md",
+        "guides/pipeline.md"
+      ],
+      "optional": [
+        "guides/civ-project-format.md",
+        "reference/project/INDEX.md",
+        "reference/project/civ6proj.md",
+        "guides/INDEX.md"
       ]
     },
     {
       "id": "sources",
+      "level": "must",
+      "max_kb": 5,
       "aliases": [
         "类型",
         "枚举",
@@ -229,95 +726,15 @@
       ],
       "read": [
         "SOURCES.md"
-      ]
-    },
-    {
-      "id": "leader_art",
-      "aliases": [
-        "领袖差分",
-        "外交表情",
-        "纸片领袖",
-        "纸片人",
-        "LeaderFallback",
-        "fallback_images",
-        "Leader_Matte"
       ],
-      "read": [
-        "05-modtools-civ/leader-art.md"
-      ]
-    },
-    {
-      "id": "audio",
-      "aliases": [
-        "音频",
-        "音乐",
-        "语音",
-        "Wwise",
-        "BNK",
-        "WEM",
-        "Banks.ini",
-        "UpdateAudio",
-        "soundbank"
-      ],
-      "read": [
-        "05-modtools-civ/audio-pipeline.md"
-      ]
-    },
-    {
-      "id": "blender",
-      "aliases": [
-        "Blender",
-        "CivNexus6",
-        "CN6",
-        "NA2",
-        "FGX",
-        "骨骼"
-      ],
-      "read": [
-        "05-modtools-civ/blender-civnexus.md"
-      ]
-    },
-    {
-      "id": "art_cook",
-      "aliases": [
-        "Cooker",
-        "cook",
-        "ArtDef",
-        "MissingArt",
-        "美术引用",
-        "assets check",
-        "art compare"
-      ],
-      "read": [
-        "05-modtools-civ/art-cook-validation.md"
-      ]
-    },
-    {
-      "id": "workshop",
-      "aliases": [
-        "工坊发布",
-        "创意工坊上传",
-        "上传器",
-        "workshop",
-        "mod_id.txt"
-      ],
-      "read": [
-        "05-modtools-civ/workshop-release.md"
-      ]
-    },
-    {
-      "id": "lua_events",
-      "aliases": [
-        "LuaEvents",
-        "GameEvents",
-        "事件环境"
-      ],
-      "read": [
-        "04-lua/code-style.md"
+      "optional": [
+        "reference/sql/INDEX.md"
       ]
     },
     {
       "id": "landmarks",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
         "Landmarks.artdef",
         "TileBase",
@@ -329,49 +746,19 @@
         "区域模型"
       ],
       "read": [
-        "civ6-landmarks/SKILL.md"
-      ]
-    },
-    {
-      "id": "art_unpack",
-      "aliases": [
-        "BLP解包",
-        "美术解包",
-        "资源复原",
-        "blpkit",
-        "Civ6ArtUnpack",
-        "CIVBIG",
-        "SHARED_DATA",
-        "pantry遮蔽",
-        "蒙皮复原",
-        "cooker-config"
+        "packages/civ6-landmarks/SKILL.md"
       ],
-      "read": [
-        "05-modtools-civ/art-unpack.md",
-        "05-modtools-civ/art-cook-validation.md"
-      ]
-    },
-    {
-      "id": "binary-yields",
-      "aliases": [
-        "二进制",
-        "Property产出",
-        "固定产出",
-        "AttachModifierByID",
-        "SetPlotTwo",
-        "二进制上限",
-        "最高位",
-        "2047",
-        "1024"
-      ],
-      "read": [
-        "04-lua/lua-binary.md",
-        "05-modtools-civ/modifiers.md",
-        "04-lua/code-style.md"
+      "optional": [
+        "packages/civ6-landmarks/references/workflow.md",
+        "packages/civ6-landmarks/references/landmarks.md",
+        "packages/civ6-landmarks/references/composition.md",
+        "packages/civ6-landmarks/references/custom-model-prototype.md"
       ]
     },
     {
       "id": "spatial-attach",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
         "范围计数",
         "距离计数",
@@ -383,52 +770,33 @@
         "Property滥用"
       ],
       "read": [
-        "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
-        "07-techniques/modifiers/modifier-attach.md",
-        "07-techniques/modifiers/patterns/pre-code-checklist.md"
+        "reference/modifiers/patterns/pattern-spatial-attach-count.md"
+      ],
+      "optional": [
+        "reference/modifiers/modifier-attach.md",
+        "reference/modifiers/patterns/pre-code-checklist.md"
       ]
     },
     {
-      "id": "civ6_ai_play",
+      "id": "arknights_series",
+      "level": "must",
+      "max_kb": 13,
       "aliases": [
-        "AI玩文明6",
-        "AI 控制文明6",
-        "控制文明6",
-        "文明6自动化",
-        "文明6自动测试",
-        "自动测试mod",
-        "自动测试 Mod",
-        "启动文明6",
-        "FireTuner",
-        "Tuner",
-        "4318",
-        "Mods.sqlite",
-        "启用Mod",
-        "Mod 启停",
-        "窗口化",
-        "DLL Mod 测试",
-        "自定义 UI 测试",
-        "全自动测试",
-        "自动测试工作流",
-        "auto_harness",
-        "测试报告",
-        "UI 截图",
-        "civ6-ai-play"
+        "明日方舟",
+        "Arknights",
+        "civ6-arknights-series"
       ],
       "read": [
-        "civ6-ai-play/SKILL.md",
-        "civ6-ai-play/references/environment.md",
-        "civ6-ai-play/references/troubleshooting.md",
-        "civ6-ai-play/references/lua-api.md",
-        "civ6-ai-play/references/official-automation.md",
-        "civ6-ai-play/references/mod-testing.md",
-        "civ6-ai-play/references/mod-test-workflow.md",
-        "civ6-ai-play/references/mod-runtime-testing.md",
-        "civ6-ai-play/references/auto-mod-test-workflow.md"
+        "packages/civ6-arknights-series/SKILL.md"
+      ],
+      "optional": [
+        "packages/civ6-arknights-series/references/release-preparation.md"
       ]
     },
     {
       "id": "external_model_import",
+      "level": "must",
+      "max_kb": 5,
       "aliases": [
         "civ6-model-import",
         "模型导入",
@@ -442,10 +810,15 @@
         "千寻瀑",
         "local_skills"
       ],
-      "read": ["EXTERNAL_SKILLS.md"]
+      "read": [
+        "EXTERNAL_SKILLS.md"
+      ],
+      "optional": []
     },
     {
       "id": "external_civ6_mcp",
+      "level": "must",
+      "max_kb": 5,
       "aliases": [
         "civ6-mcp",
         "MCP 服务器",
@@ -456,7 +829,10 @@
         "MCP 自动对局",
         "lmwilki"
       ],
-      "read": ["EXTERNAL_SKILLS.md"]
+      "read": [
+        "EXTERNAL_SKILLS.md"
+      ],
+      "optional": []
     }
   ]
 }

@@ -57,4 +57,4 @@ MCP 服务器：通过 FireTuner（TCP 4318，单连接）把文明6对局状态
 
 本项目只记录网址、版本与许可，不复制其代码或文档；本机 clone 目录与 MCP 客户端配置都在仓库之外。
 
-来源与指纹另见 [第三方来源声明](../THIRD_PARTY_NOTICES.md)，整合记录见 [社区整合记录](../docs/COMMUNITY_SKILL_INTEGRATION.md)。
+来源与指纹另见 [第三方来源声明](../THIRD_PARTY_NOTICES.md)，整合记录见 [社区整合记录](../docs/meta/community-integration.md)。

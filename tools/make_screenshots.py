@@ -4,7 +4,7 @@ Usage:
     python tools/make_screenshots.py
 
 Renders the real UI (a window will flash briefly), loads a small demo
-project, navigates each page and saves PNGs to ModTools_5_4/docs/screenshots/.
+project, navigates each page and saves PNGs to workspace/screenshots/ (gitignored).
 
 For headless environments you can force offscreen rendering:
     QT_QPA_PLATFORM=offscreen python tools/make_screenshots.py
@@ -28,7 +28,7 @@ from ModTools_5_4.ui.main_window import MainWindow  # noqa: E402
 from ModTools_5_4.project.civ_project import save_civ_project  # noqa: E402
 from tests.sample_project import build_sample_project  # noqa: E402
 
-OUT_DIR = REPO_ROOT / "ModTools_5_4" / "docs" / "screenshots"
+OUT_DIR = REPO_ROOT / "workspace" / "screenshots"
 WINDOW_SIZE = (1280, 820)
 
 

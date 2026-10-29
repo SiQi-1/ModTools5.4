@@ -15,13 +15,13 @@ import sys
 
 
 def skill_root() -> Path:
-    return Path(__file__).resolve().parent.parent / "skills" / "civ6-html-ui"
+    return Path(__file__).resolve().parent.parent / "skills" / "packages" / "civ6-html-ui"
 
 
 def script_path(name: str) -> Path:
     path = skill_root() / "scripts" / name
     if not path.is_file():
-        raise ValueError(f"缺少随包 HTML UI 工具，请保留完整 skills/civ6-html-ui 目录：{path}")
+        raise ValueError(f"缺少随包 HTML UI 工具，请保留完整 skills/packages/civ6-html-ui 目录：{path}")
     return path
 
 

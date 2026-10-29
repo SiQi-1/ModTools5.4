@@ -212,7 +212,7 @@ class AiControlTestCase(unittest.TestCase):
 
     def test_skill_action_plan_and_section_read(self) -> None:
         plan = self.context.execute("skill", {"keyword": "UI 按钮", "plan": True})
-        self.assertIn("05-modtools-civ/ui-assets.md", plan["reading_plan"]["required"])
+        self.assertIn("reference/art/ui-assets.md", plan["reading_plan"]["required"])
         result = self.context.execute("skill", {"keyword": "独立UI纹理", "limit": 1})
         item = result["results"][0]
         self.assertIn("start_line", item)

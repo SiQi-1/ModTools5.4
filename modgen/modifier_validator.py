@@ -270,7 +270,7 @@ def check_binary_yield_limits(data: dict[str, Any]) -> list[str]:
             warnings.append(
                 f'二进制产出上限过高：{prefix} ({effect}, {yield_type}) 最高档 Amount={highest:.15g}，'
                 f'常规建议不超过 {limit}；按实际效果单独限位并明确超限处理，'
-                '不要默认铺到 16/31 位。特殊更高需求须说明数值依据（见 skills/04-lua/lua-binary.md）。'
+                '不要默认铺到 16/31 位。特殊更高需求须说明数值依据（见 skills/reference/lua/lua-binary.md）。'
             )
     return warnings
 

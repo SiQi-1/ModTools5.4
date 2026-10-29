@@ -2,7 +2,7 @@
  "format": "MODTOOLS54_VANILLA_MODIFIER_TYPES",
  "version": 1,
  "source": "Civ6 官方 XML（Base/DLC/CTP/Debug/LaunchPad 的 <DynamicModifiers><Row>）",
- "game_dir": "E:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization VI",
+ "game_dir": "",
  "generated_at": "2026-09-17T09:29:47Z",
  "count": 989,
  "modifier_types": {

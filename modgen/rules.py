@@ -3,7 +3,7 @@
 命名规则来源：
 - ModTools_5_4/ui/pages/group_workspace.py:_build_entity_type
 - ModTools_5_4/ui/pages/great_people_editor.py:_build_type
-- 知识库 skills/06-naming.md（核对一致）
+- 知识库 skills/reference/entities/naming.md（核对一致）
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """修改器相关条目生成：Modifier / Requirement / RequirementSet / UnitAbility。
 
-命名约定（与知识库 skills/06-naming.md 一致）：
+命名约定（与知识库 skills/reference/entities/naming.md 一致）：
 - ModifierId: MODIFIER_{前缀}_{项目号}_{描述}（如 MODIFIER_SIQI_0040_PLOT_YIELD_SCIENCE）
 - RequirementId: REQUIREMENT_{前缀}_{项目号}_{描述}
 - RequirementSetId: REQSET_{前缀}_{项目号}_{描述}

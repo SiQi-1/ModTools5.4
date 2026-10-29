@@ -1,6 +1,8 @@
 # 制作规则（任务开始时必读）
 
-本文件是制作 Mod、编写 .CIV、回答游戏实现问题的统一行为规范。命令参数以 [modgen 契约](../modgen/AGENTS.md) 为准；具体游戏知识按 [资料依据](SOURCES.md) 验证。维护工具代码另读 [开发约定](../CLAUDE.md)。
+本文件是制作 Mod、编写 .CIV、回答游戏实现问题的统一行为规范。命令参数以 [modgen 契约](../modgen/AGENTS.md) 为准；具体游戏知识按 [资料依据](SOURCES.md) 验证。维护工具代码另读 [开发约定](../docs/dev/architecture.md)。
+
+> **60 秒版**：① 先 `skill "任务" --plan` 再动手；② Type 由工具生成，Modifier/Effect/Requirement 优先复用原版；③ JSON 禁空字符串，参数与枚举必须查证；④ 主内容不写 SQL/XML/Lua，自定义走 extension 通道；⑤ 单个 Mod 的东西只进 `workspace/`；⑥ 交付前跑 `validate` 与 `project-check`，并说明验证到哪一层。
 
 ## R1 查证先于实现
 
@@ -18,15 +20,15 @@
 
 ## R3 类型与参数
 
-- 先检查实体原生表能否直接表达效果，再考虑 Modifier，最后才是 Lua。区域与改良相邻都使用原生桥接表；不能因为熟悉 Modifier 就绕过已支持的实体字段。具体字段及继承检查见 [相邻加成](district-adjacency.md)。
+- 先检查实体原生表能否直接表达效果，再考虑 Modifier，最后才是 Lua。区域与改良相邻都使用原生桥接表；不能因为熟悉 Modifier 就绕过已支持的实体字段。具体字段及继承检查见 [相邻加成](reference/config/district-adjacency.md)。
 - 特色替代实体从原对象完整子表出发，逐项区分“复用、改写、移除、新增”。只复制主表不等于继承；改写一项不代表清空其余项。未改变的相邻规则优先引用原 ID，不重定义等价规则。
 - 区域自身固定产出用 `Self` 原生相邻，让放置预览读到；`Self` 不是同类相邻。比较实现时同时核对实际效果和玩家可见预览，不能只以结算数值相同判定等价。
 - ModifierType 优先复用符合语义的原版类型。EffectType、RequirementType、CollectionType 必须有真实定义，不能按名字猜。
 - 确需自定义 ModifierType 时使用项目命名，填写合法 CollectionType/EffectType，由工具生成 Types 与 DynamicModifiers 注册。外部 Mod 用过不等于原版存在。
-- 确认 owner/subject、挂载对象、参数和条件链；字段存在不代表语义成立。读 [修改器操作指南](05-modtools-civ/modifiers.md) 与 [通用技巧](07-techniques/modifier-techniques.md)。
+- 确认 owner/subject、挂载对象、参数和条件链；字段存在不代表语义成立。读 [修改器操作指南](guides/modifiers.md) 与 [通用技巧](reference/modifiers/techniques.md)。
 - 区域、建筑、改良、单位自身的能力挂在实体上，通常随实体归属生效，不额外绑定文明或领袖；特色实体的解锁归属不等于其能力的生效条件。只有效果属于文明/领袖能力，或设计明确限定使用者时，才添加相应条件。不能仅因实体是某文明特色内容就添加文明/领袖检查。
-- “每个合格来源贡献固定效果”先用 [逐对象范围挂载](07-techniques/modifiers/patterns/pattern-spatial-attach-count.md) 自然叠加；原生类型、距离、存在性条件不先转成 req property。只有原生表/条件/挂载确实不能表达的动态换算才使用 Property。
-- 二进制按具体效果设最高位和总上限，不默认铺 16/31 位。常规城市/区域最高位不超过 1024（总值 2047），地块和负数通常更低；参考 [Core 档位与超限处理](04-lua/lua-binary.md#上限按效果设定不按机器整数位数设定)，特殊更高需求须说明依据。
+- “每个合格来源贡献固定效果”先用 [逐对象范围挂载](reference/modifiers/patterns/pattern-spatial-attach-count.md) 自然叠加；原生类型、距离、存在性条件不先转成 req property。只有原生表/条件/挂载确实不能表达的动态换算才使用 Property。
+- 二进制按具体效果设最高位和总上限，不默认铺 16/31 位。常规城市/区域最高位不超过 1024（总值 2047），地块和负数通常更低；参考 [Core 档位与超限处理](reference/lua/lua-binary.md#上限按效果设定不按机器整数位数设定)，特殊更高需求须说明依据。
 - `EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER` 必须填写 `preview_text`；不可把该规则推广到所有 EffectType。
 
 ## R4 数据与写入边界
@@ -35,29 +37,24 @@
 - AI 编写的 JSON 值禁止空字符串：省略字段或写 `null`，不要写字符串 `"null"`、通用占位 `"NONE"`。参数名和枚举需查证，图片路径必须真实。
 - 主表 SQL 使用稀疏列清单：Type/主键、Name、Description 和确有值的字段才进入 `INSERT`；空的可选文本、`None`/`NULL` 哨兵不以 `NULL` 占位。多行记录按实际列集合分组，避免为其他记录补无意义的 `NULL`。Name/Description 若在主表 schema 中是语义必需列，保留其列位并由必填校验报告缺失值。
 - 新建 `ModifierType` 注册必须同时有 `EffectType` 与 `CollectionType`；缺失时应由 validate/project-check 报错，不得用 `NULL` 补齐 `DynamicModifiers`。
-- 主内容不手写 SQL/XML，不把 Lua 塞进条目。确需特殊 SQL、UI XML 或 Lua，内容临时文件放 `modgen_work/`，先启用 [项目级扩展](05-modtools-civ/project-extensions.md)，通过 `extension write` / `custom-file write` / AI `extension` 写入源码并按清单注册；工具是工程文件的唯一写入者。
+- 主内容不手写 SQL/XML，不把 Lua 塞进条目。确需特殊 SQL、UI XML 或 Lua，内容临时文件放 `workspace/scratch/`，先启用 [项目级扩展](guides/project-extensions.md)，通过 `extension write` / `custom-file write` / AI `extension` 写入源码并按清单注册；工具是工程文件的唯一写入者。
 - 默认将未被 .CIV 支持的 Gameplay SQL 集中到 Core.sql；不同数据库作用域或前后阶段有明确需求时再分文件。一次规划完整功能的数据、GP、UI、文本与资源，登记功能归属和依赖。源码和 ModBuddy 输出分离，缺失源码不得用输出副本替代。
 - 修改生成内容应回到 .CIV；自定义 SQL 不得与生成数据同主键双写，不得为消除告警随意改成 REPLACE。
-- **仓库边界**：ModTools 仓库只版本管理通用工具代码、文档、参考数据和可复用测试。单个 Mod 的 `.CIV`、`*.extensions/`、专用脚本/测试、交接报告、日志、预览、美术与构建包保存在本地，不提交到工具仓库；新项目及其工作资料默认集中到 `modgen_work/<工程名>/`，或用户指定的仓库外目录。已有工程保持路径并补齐忽略规则；正式源码必须保留和备份，不能当作缓存删除。只有独立的 Mod 源码仓库才将 `.CIV` 与扩展源码一起纳入版本管理。
+- **仓库边界**：ModTools 仓库只版本管理通用工具代码、文档、参考数据和可复用测试。单个 Mod 的 `.CIV`、`*.extensions/`、专用脚本/测试、交接报告、日志、预览、美术与构建包保存在本地，不提交到工具仓库；新项目及其工作资料默认集中到 `workspace/mods/<工程名>/`，或用户指定的仓库外目录。已有工程保持路径并补齐忽略规则；正式源码必须保留和备份，不能当作缓存删除。只有独立的 Mod 源码仓库才将 `.CIV` 与扩展源码一起纳入版本管理。
 
 ## R5 按任务读取
 
-| 涉及内容 | 额外必读 |
-|---|---|
-| 工程/实体 | [工程入口](05-modtools-civ/INDEX.md)、对应实体模板 |
-| Modifier/条件/能力 | [修改器指南](05-modtools-civ/modifiers.md)、[实现前清单](07-techniques/modifiers/patterns/pre-code-checklist.md) |
-| Lua/事件 | [Lua 规范](04-lua/code-style.md)、[Lua 索引](04-lua/INDEX.md) 中对应模式 |
-| UI/按钮/控件 | [控件参考](04-lua/lua-xml-controls.md)、[美术与文本指南](05-modtools-civ/ui-assets.md) |
-| 图标/背景/纹理/LOC | [美术与文本指南](05-modtools-civ/ui-assets.md)，区分实体图标、UI图标、独立纹理与自定义文本 |
-| 自定义 SQL/XML/Lua | [项目级扩展](05-modtools-civ/project-extensions.md)、[自定义文件与交付](05-modtools-civ/pipeline.md) |
+> 任务到必读资料只有一份映射：[catalog.json](catalog.json)。先运行 `python -m modgen.cli skill "任务描述" --plan`，按返回的 must 项与建议章节读取；本文件不再维护第二份清单。
+
+实体任务读 [工程入口](guides/INDEX.md) 与 [实体模板索引](reference/entities/INDEX.md)；Modifier 任务加读 [修改器指南](guides/modifiers.md) 与 [实现前清单](reference/modifiers/patterns/pre-code-checklist.md)；Lua/UI 任务读 [Lua 规范](reference/lua/code-style.md) 与 [控件参考](reference/lua/lua-xml-controls.md)；自定义内容读 [项目级扩展](guides/project-extensions.md) 与 [交付流程](guides/pipeline.md)。
 
 ## R6 验证与交付
 
-- 用户给出的纯文本设计稿进入游戏前，按文本角色补齐产出/属性图标；Name 保持名称，Description 按语义加图标，保留用户措辞与数值。不能把用户未写代码标记视为不需要图标；方法与检查见 [文本规范](02-config-files/text.md)。
+- 用户给出的纯文本设计稿进入游戏前，按文本角色补齐产出/属性图标；Name 保持名称，Description 按语义加图标，保留用户措辞与数值。不能把用户未写代码标记视为不需要图标；方法与检查见 [文本规范](reference/config/text.md)。
 - 保存/合并前 `validate`；ERROR 必须修复，WARNING 逐项说明处理依据。
 - 扩展工程执行 `project-check` 统一检查数据、源码、依赖、预览、动作及 SQL 冲突；用 `preview` 核对具体内容。旧自定义 SQL 流程继续使用 `check-conflicts`。完整检查/预览需 PyQt，`extension check` 等纯数据命令不需要。
 - 检查引用、挂载链、文本、动作注册及输出目录。构建、部署、游戏内测试分别记录；校验通过不能宣称实机效果已验证。
-- 所有新增文明的 Mod 必须显式配置城市/建筑文化与单位文化，并验证生成的 `Cultures.artdef` 文明成员及 Art.xml 引用；此要求不限定题材。已有有效配置保留并核对，无新增或重映射文明的工程检查后可标不适用。步骤见[文明文化美术配置](05-modtools-civ/civilization-art.md)。
+- 所有新增文明的 Mod 必须显式配置城市/建筑文化与单位文化，并验证生成的 `Cultures.artdef` 文明成员及 Art.xml 引用；此要求不限定题材。已有有效配置保留并核对，无新增或重映射文明的工程检查后可标不适用。步骤见[文明文化美术配置](reference/art/civilization-art.md)。
 - 无法执行某项验证时说明原因和剩余步骤，继续完成可执行的检查。交付包括变更、依据、验证结果及尚未确认的边界。
 
 ## R7 知识维护

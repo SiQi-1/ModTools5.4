@@ -1,0 +1,248 @@
+# UI 文件替换技术（来源：18.0 BoostUnlockedPopup）
+
+## 做什么
+通过 `include()` 链覆盖游戏原生 UI 文件中的函数，实现核心 UI 行为的定制化替换——不是通过 Hook 或 Patch，而是利用 Lua 的 `include()` 加载机制，先加载原文件，再重定义目标函数。这是 Civ 6 Mod UI 修改中最常用的"文件替换"模式之一。
+
+## 涉及文件
+
+| 文件 | 角色 |
+|------|------|
+| `18.0/UI/Replacement/BoostUnlockedPopup_Core.lua` | 替换实现（200 行） |
+| 游戏原生 `BoostUnlockedPopup.lua` | 被替换的源文件 |
+| `18.0/UI/Arknights_Cute_Leaders_18_UI.lua` | WorldTracker UI（同模组，不同系统） |
+
+## 技术原理
+
+### include() 覆盖机制
+
+游戏加载 UI 文件时，实际加载的是 `Replacements/` 下的同名文件。替换文件必须：
+1. 先 `include("原始文件名")` — 加载游戏原版文件（所有原始函数定义）
+2. 保存原始函数引用：`local BASE_ShowTechBoost = ShowTechBoost`
+3. 重定义同名函数：`function ShowTechBoost(...) ... end`
+4. 在自定义逻辑中调用 `BASE_ShowTechBoost(...)` 保留原有的部分行为
+
+### 文件替换配置
+
+ModTools 使用受管扩展，由工具生成动作，避免手改产物在重建时丢失：
+
+```powershell
+python -m modgen.cli extension write 工程.CIV --path UI/Replacement/BoostUnlockedPopup_Core.lua --role ui_replace --lua-context BoostUnlockedPopup --content-file workspace/mods/BoostUnlockedPopup_Core.lua
+```
+
+实际 `.civ6proj` ActionData / `.modinfo` 中的属性格式：
+```xml
+<ReplaceUIScript id="CustomPopup">
+    <Properties>
+        <LoadOrder>20001</LoadOrder>
+        <LuaContext>BoostUnlockedPopup</LuaContext>
+        <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+    </Properties>
+</ReplaceUIScript>
+```
+
+## 实现详解
+
+### 原始函数保存
+
+```lua
+include("BoostUnlockedPopup");  -- 先加载原版，获得所有原始函数和变量
+
+local BASE_ShowTechBoost = ShowTechBoost  -- 保存原始 ShowTechBoost
+local BASE_ShowCivicBoost = ShowCivicBoost  -- 保存原始 ShowCivicBoost
+```
+
+### 条件路由
+
+替换函数的第一层逻辑是**条件路由**——判断是否属于自定义触发源，不是则回退到原始行为：
+
+```lua
+function ShowTechBoost(techIndex, iTechProgress, eSource)
+    -- 条件 1：本地玩家必须有 PROPERTY_SIQI_ASTGENNE
+    if not Siqi_HasTraitProperty(Game.GetLocalPlayer(), PROPERTY_SIQI_ASTGENNE) then
+        BASE_ShowTechBoost(techIndex, iTechProgress, eSource)
+        return
+    end
+    -- 条件 2：只在 GoodyHut 来源时覆盖
+    if eSource ~= BoostSources.BOOST_SOURCE_GOODYHUT then
+        BASE_ShowTechBoost(techIndex, iTechProgress, eSource)
+        return
+    end
+    -- 自定义逻辑...
+end
+```
+
+### 自定义行为修改
+
+当条件满足时，执行与原版相似的逻辑但做定制修改：
+
+**1. 修改来源文本：**
+```lua
+-- 原版只显示 "LOC_TECH_BOOST_GOODYHUT"
+-- 替换版判断 GoodyHut 标记区分来源
+local XINGSHU = localPlayer:GetProperty("PROPERTY_SIQI_ASTGENNE_GRANT_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT_USED")
+if XINGSHU then
+    msgString = Locale.Lookup("LOC_SIQI_UI_TEXT_00180021")  -- 自定义来源文本
+else
+    msgString = Locale.Lookup("LOC_TECH_BOOST_GOODYHUT")    -- 系统原版文本
+end
+```
+
+**2. 弹窗后清理标记：**
+```lua
+-- 弹窗显示完毕后，重置 GoodyHut 标记为 false
+OnSetProperty_FalseXingShu(Game.GetLocalPlayer())
+-- → UI.RequestPlayerOperation → GameEvents.SiqiUbikaPropertyFalse
+-- → GP: pPlayer:SetProperty('PROPERTY_SIQI_ASTGENNE_GRANT_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT_USED', false)
+```
+
+## ShowTechBoost vs ShowCivicBoost 对称实现
+
+两者完全对称，仅差异：
+
+| 项目 | ShowTechBoost | ShowCivicBoost |
+|------|--------------|----------------|
+| 领袖检查 | `PROPERTY_SIQI_ASTGENNE` | `PROPERTY_SIQI_ASTESIA` |
+| 来源标记 | `XINGSHU` → `PROPERTY_SIQI_ASTGENNE_GRANT_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT_USED` | `XINGHUI` → `PROPERTY_SIQI_ASTESIA_GRANT_RANDOM_CIVIC_BOOST_GOODY_HUT_USED` |
+| 纹理主题 | `BoostPopup_GlowTech` / `ResearchPanel_*` | `BoostPopup_GlowCivic` / `CivicPanel_*` |
+| 图标 | `[ICON_TechBoosted]` | `[ICON_CivicBoosted]` |
+| 进度对象 | `playerTechs:GetResearchCost/Progress` | `playerCulture:GetCultureCost/Progress` |
+| 音效 | `Receive_Tech_Boost` | `Receive_Culture_Boost` |
+| 清理函数 | `OnSetProperty_FalseXingShu` | `OnSetProperty_FalseXingHui` |
+
+## 模式总结
+
+### 标准 UI 文件替换模板
+
+```lua
+-- 1. 加载原始文件
+include("TargetGameUIFile")
+
+-- 2. 加载自定义支持
+include("MyMod_Supports.lua")
+
+-- 3. 保存需要覆盖的原始函数
+local BASE_TargetFunction = TargetFunction
+
+-- 4. 重新定义
+function TargetFunction(...)
+    -- 条件路由
+    if not ShouldCustomize() then
+        BASE_TargetFunction(...)
+        return
+    end
+    -- 自定义逻辑（可复用原版的大部分代码结构）
+    -- ...
+end
+```
+
+### 常见替换目标
+
+| 游戏 UI 文件 | 常见替换目的 |
+|-------------|------------|
+| `BoostUnlockedPopup` | 自定义尤里卡/鼓舞来源显示 |
+| `EndGameMenu` | 自定义胜利/失败界面 |
+| `TopPanel` | 顶部栏资源显示修改 |
+| `LaunchBar` | 单位命令条修改 |
+| `ProductionPanel` | 生产面板修改 |
+| `GreatWorksOverview` | 巨作界面修改 |
+
+## XML 配合
+
+### 文件路径
+
+| 文件 | 用途 |
+|------|------|
+| `UI/Replacement/BoostUnlockedPopup_Core.lua` | 替换实现（本身无 XML，纯 Lua include 覆盖） |
+| 游戏原生 `BoostUnlockedPopup.xml` | 被替换的目标 UI 文件（无需自己提供，游戏自带） |
+| `.modinfo` 的 `<InGameActions>` | 注册 ReplaceUIScript 映射关系 |
+| `Arknights_Cute_Leaders_18_Configs.sql` | GameCapabilities 属性注册 |
+| `Arknights_Cute_Leaders_18_Modifiers.sql` | 尤里卡/鼓舞触发相关 Modifier 链 |
+
+### .modinfo 配置（核心）
+
+```xml
+<InGameActions>
+    <UpdateDatabase id="Configs">
+        <File>Arknights_Cute_Leaders_18_Configs.sql</File>
+    </UpdateDatabase>
+    <ReplaceUIScript id="BoostUnlockedPopup">
+        <Properties>
+            <LoadOrder>20001</LoadOrder>
+            <LuaContext>BoostUnlockedPopup</LuaContext>
+            <LuaReplace>UI/Replacement/BoostUnlockedPopup_Core.lua</LuaReplace>
+        </Properties>
+    </ReplaceUIScript>
+</InGameActions>
+```
+
+**关键说明：** `LuaContext` 必须与游戏原生 UI 文件名**完全一致**（不含路径和扩展名）。`LuaReplace` 指向替换文件的自有路径。
+
+### 替换配置对照表
+
+| 配置字段 | 值 | 说明 |
+|---------|-----|------|
+| `LuaContext` | `BoostUnlockedPopup` | 游戏原生 UI 文件（位于游戏安装目录 UI/ 下） |
+| `LuaReplace` | `UI/Replacement/BoostUnlockedPopup_Core.lua` | 替换文件路径（相对于 Mod 根目录） |
+| `id` | `BoostUnlockedPopup` | 自定义标识，同项目内唯一 |
+
+### SQL 配合 — 需要的 Property 定义
+
+替换逻辑依赖以下 Player Property（由 SQL Modifier 写入）：
+
+```sql
+-- Configs.sql / Modifiers.sql 中定义
+PROPERTY_SIQI_ASTGENNE             -- Astgenne 领袖标记（控制 ShowTechBoost 路由）
+PROPERTY_SIQI_ASTESIA              -- Astesia 领袖标记（控制 ShowCivicBoost 路由）
+PROPERTY_SIQI_ASTGENNE_GRANT_RANDOM_TECHNOLOGY_BOOST_GOODY_HUT_USED  -- 尤里卡来源标记
+PROPERTY_SIQI_ASTESIA_GRANT_RANDOM_CIVIC_BOOST_GOODY_HUT_USED        -- 鼓舞来源标记
+```
+
+### 文件依赖关系
+
+```
+.modinfo (ReplaceUIScript 注册)
+    │
+    ▼
+UI/Replacement/BoostUnlockedPopup_Core.lua
+    │  include("BoostUnlockedPopup")     ← 游戏原生（Mod 不提供）
+    │  include("Arknights_Cute_Leaders_18_Support.lua")
+    │
+    ├── 覆盖 ShowTechBoost()
+    │     └── 检查 PROPERTY_SIQI_ASTGENNE → 自定义来源文本 → 清理标记
+    │
+    └── 覆盖 ShowCivicBoost()
+          └── 检查 PROPERTY_SIQI_ASTESIA → 自定义来源文本 → 清理标记
+```
+
+### 注意事项
+
+1. **不需要提供 XML 文件**：被替换的是游戏原生的 BoostUnlockedPopup.xml，Mod 只替换 .lua
+2. **Include 必须在替换文件中**：它加载原有 Lua 函数；控件由既有上下文 XML 提供。使用目标规则集的原版脚本，例如《风云变幻》的 CityPanel_Expansion2，避免丢失资料片行为。
+3. **区分加载阶段**：ReplaceUIScript 的 LoadOrder 排序不等同于 GP 状态初始化顺序；UI 读取 Property 仍处理尚未设置的情况。
+4. **多 Mod 冲突**：如果多个 Mod 替换同一 UI 文件，最后加载的胜出。建议检查兼容性
+
+## 设计要点
+
+1. **保留原始行为**：非目标玩家/非目标场景 必须调用 `BASE_` 回退，否则破坏其他文明体验
+2. **BASE_ 命名约定**：原始函数引用使用 `BASE_` 前缀，清晰区分
+3. **双条件守卫**：玩家检查 + 来源检查，两层过滤
+4. **GP 交互通过 EXECUTE_SCRIPT**：弹窗关闭后需要通知 GP 端清理标记
+5. **只包装必要函数**：include 原脚本后保留原函数引用，修改必要输入再调用原函数；不为改一个提示而复制整个城市面板。
+6. **注意全局变量污染**：原文件的全局变量会保留，注意命名冲突
+
+## 城市产出来源拆分（CityPanel / ViewMain）
+
+适用：Lua 通过 Property 二进制实现文化转生产力等动态换算，实际产出已由 Modifier 给出，但城市提示只显示“来自修正值”。这属于 UI 来源说明，不能再次增加产出。
+
+用户示范“宜居度转科技产出”的 CityPanel_Siqi_Mod2.lua 在 ViewMain 调用前修改 SciencePerTurnToolTip；同理可处理 ProductionPerTurnToolTip。官方 Base/Assets/UI/Panels/CityPanel.lua 的 Refresh 顺序是 GetCityData → ViewMain → CityPanel_LiveCityDataChanged，因此对同一个 data 的修改也可传给城市详情页。实际原生控件显示及 UI Mod 兼容性仍需游戏验证。
+
+- 从市中心现有二进制 Property 还原已经生效的量，位数/最高位与 GP 一致；不在 UI 用当前文化重新估算、不新增 Property、不写游戏状态。原生 GetProperty 可能零返回，先赋给局部变量再转数值。
+- 使用原版 `LOC_CITY_YIELD_FROM_GAMEEFFECTS_TOOLTIP` 的本地化格式识别**固定值**修正行，减去转化量后单独追加“来自文化值转化”；不要误改同名的百分比修正行。
+- 该原版文本的参数是命名参数 `{Value : number +#.#;-#.#}`。Lua 必须使用 `Locale.Lookup(tag, {Name="Value", Value=amount})`，识别原行和格式化剩余数值两处都如此。普通 `Locale.Lookup(tag, amount)` 是位置参数，不能当作等价调用。官方命名参数用法见 `DLC/Expansion1/UI/Replacements/ActionPanel_Expansion1.lua` 第 63 行等；先读实际 LOC 格式再决定参数形式。
+- 验证剩余为零、负数、小数及源行位于开头/末尾；不能只用匹配正整数的正则。用 Locale.Lookup 对候选数值做整行往返匹配，可避免硬编码中英文后缀。
+- data 可能重复传入，需保存本模块修改前后的文本，只在仍等于本模块上次结果时恢复原文再处理，防止重复扣减或追加。其他 Mod 更新过文本时不恢复过期快照。
+- 非目标领袖、没有城市、转化量为零时保持原生显示。未知/多重匹配格式不盲目扣数，可保留原文并用“其中…”说明已含的转化量，避免看成额外奖励。
+
+依据：用户提供的宜居度转科技示范；官方 CityPanel.lua、CitySupport.lua 和 InGameText.xml。2026-09-28 已验证导出动作和 Lua 提示文本的测试桩；未以测试桩替代真实 UI、联机或第三方面板兼容性。
+
+2026-09-29 用户反馈整段说明消失后发现上述命名/位置参数混用。旧测试桩将任意数字直接格式化，掩盖了错误；回归必须使用真实 LOC 的参数名，分别检查命名参数和位置参数，先证明旧代码失败。日志中的替换动作注册成功不代表 ViewMain 文本匹配成功。

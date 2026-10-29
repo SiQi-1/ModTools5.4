@@ -2,11 +2,11 @@
 
 本项目在完善文明 6 制作知识和工具时参考了下列作者的成果。致谢不改变上游许可，也不将游戏素材、第三方二进制或社区模板自动纳入本项目的 MIT 许可证。
 
-核对日期：2026-09-25；2026-10-26 复核来源治理与分发边界；2026-10-29 登记外置技能 civ6-model-import（仅名单，原件不内置、不随源码分享）与可拉取的外部 MCP 服务器 civ6-mcp（仅记录网址、版本与许可）。已落地社区制作指南、领袖外交表情差分、四类只读检查命令及知识检索路由；具体采用与验收边界见[整合记录](docs/COMMUNITY_SKILL_INTEGRATION.md)。指南按来源编号署名；工具代码为本项目独立实现，不含上传器、Blender 插件、音频脚本或模板原件。
+核对日期：2026-09-25；2026-10-26 复核来源治理与分发边界；2026-10-29 登记外置技能 civ6-model-import（仅名单，原件不内置、不随源码分享）与可拉取的外部 MCP 服务器 civ6-mcp（仅记录网址、版本与许可）。已落地社区制作指南、领袖外交表情差分、四类只读检查命令及知识检索路由；具体采用与验收边界见[整合记录](docs/meta/community-integration.md)。指南按来源编号署名；工具代码为本项目独立实现，不含上传器、Blender 插件、音频脚本或模板原件。
 
 ## 直接参考来源
 
-2026-09-28 新增共享资源；2026-10-26 用户再次确认：区域、领袖头像及历史时刻 PSD 模板允许作为来源随 `skills/civ6-art-images/assets/templates/` 分发。模板来自用户提供的社区压缩包，作者暂未确认，文件未附具体许可证；保留原文件而不虚构署名或重新标记 MIT。原始名称、文件大小、SHA-256 与分享依据见 [模板清单](skills/civ6-art-images/assets/templates/manifest.json)。原《如何使用.docx》随包保留。
+2026-09-28 新增共享资源；2026-10-26 用户再次确认：区域、领袖头像及历史时刻 PSD 模板允许作为来源随 `skills/civ6-art-images/assets/templates/` 分发。模板来自用户提供的社区压缩包，作者暂未确认，文件未附具体许可证；保留原文件而不虚构署名或重新标记 MIT。原始名称、文件大小、SHA-256 与分享依据见 [模板清单](skills/packages/civ6-art-images/assets/templates/manifest.json)。原《如何使用.docx》（45,621,258 B）于 2026-10-29 转为 [使用说明](skills/packages/civ6-art-images/assets/templates/moments/usage.md) 与压缩截图，Word 原件不再随仓库分发。
 
 | 编号 | 资料 | 作者 / 署名 | 本轮参考内容 | 许可核对 |
 |---|---|---|---|---|
@@ -21,9 +21,9 @@
 
 S4 的线上仓库页面本次未成功读取；采用的是用户提供的本地包，而不是未经核实的线上最新版。2026-10-26 复核：线上 `nuanyuqingfeng/civ6-modding-skills` 现为约 9 个 skill 的 monorepo，仓库 LICENSE 为 PolyForm Noncommercial 1.0.0；本项目仅按旧 zip 的 MIT 版本采用已炼化部分并保留署名，不再从线上版本吸收内容，也不分发其文件。S1 的审阅提交为 `0a39dfbecdf23971f3df146765858a1f0e15505f`。S5 的元数据类型与更新行为补充核对 [ModConfig.cs](https://github.com/Jianbao233/Civ6WorkshopUploader/blob/17b32062e5663c3e0eedb390ec921f37f9a97ba5/src/ModConfig.cs) 和同提交 UploadCommand.cs；本地 1.0.0 包与该线上提交分别记录，不声称版本一致。
 
-S7 的本地包标记生成于 2026-09-17；未读取或执行随包 .git 历史、解码器 EXE。移交 README、旧库说明与会话状态存在已记录的冲突，实际采用范围以 [美术解包指南](skills/05-modtools-civ/art-unpack.md) 为准。本项目以用户明确给出的“千川白浪”署名，不据包内个人路径推断作者身份。
+S7 的本地包标记生成于 2026-09-17；未读取或执行随包 .git 历史、解码器 EXE。移交 README、旧库说明与会话状态存在已记录的冲突，实际采用范围以 [美术解包指南](skills/reference/art/art-unpack.md) 为准。本项目以用户明确给出的“千川白浪”署名，不据包内个人路径推断作者身份。
 
-S8 的压缩包由用户提供，作者署名千寻瀑（用户确认），包内版本 2026-10-27，包内 `MANIFEST.sha256` 记录全包文件散列。本项目不把该包纳入 Git 或源码分享，也不代替作者发布；本机安装到 Git 忽略的 `local_skills/civ6-model-import/`，名单、安装方法与检索命令见 [外置技能名单](skills/EXTERNAL_SKILLS.md)。包内文档的工程常量、本机绝对路径与实测结论不被吸收为本项目通用规则。
+S8 的压缩包由用户提供，作者署名千寻瀑（用户确认），包内版本 2026-10-27，包内 `MANIFEST.sha256` 记录全包文件散列。本项目不把该包纳入 Git 或源码分享，也不代替作者发布；本机安装到 Git 忽略的 `workspace/local_skills/civ6-model-import/`，名单、安装方法与检索命令见 [外置技能名单](skills/EXTERNAL_SKILLS.md)。包内文档的工程常量、本机绝对路径与实测结论不被吸收为本项目通用规则。
 
 ## 来源治理与分发边界（2026-10-26）
 
@@ -44,6 +44,14 @@ S8 的压缩包由用户提供，作者署名千寻瀑（用户确认），包�
 `skills/04-lua/` 原有 92 篇 Lua/UI 资料提炼自他人 Steam 创意工坊 Mod（作者、Mod 名与 ID 见各文件原头部，例如 MoreLenses、MonopolyPlus、Better Religion Screen、Sukritact's Tourism Overview 等）。2026-10-26 起这些资料移出 Git 与源码分享，仅维护者本机保留在 `local_notes/04-lua-workshop/`（含本地索引；可用 `modgen skill --skills-dir local_notes/04-lua-workshop "关键词"` 检索）。本页不复制这些资料，也不主张其再分发许可；若未来重新纳入，必须逐篇补充作者/来源并确认许可。
 
 仓库内 `skills/04-lua/` 继续保留自有 Mod 子系统、通用规范，以及对官方游戏 UI 文件的分析（17 篇，分析性质，不随包分发游戏文件）。官方游戏文件与 SDK 仍属 Firaxis Games / 2K。
+
+## 文本库来源（`local_text_New.sqlite`，2026-10-29）
+
+根目录 `local_text_New.sqlite` 是供工具查询的官方中文文本库（表 `LocalizedText`，仅 `zh_Hans_CN`）。2026-10-29 从本机《文明 VI》官方安装重新抓取生成，**不含任何 Mod / 工坊 / 自有工程词条**：
+
+- 来源：`Base/Assets/Text/Vanilla_zh_Hans_CN.xml` 与 `DLC/*/Text/**` 中含 `Language="zh_Hans_CN"` 的多语言翻译文件（纯英文 `en_US/` 目录已排除）；文本版权归 Firaxis Games / 2K，本库仅为查询用派生数据。
+- 生成方法：`ModTools_5_4/db/text_database.py` 的解析/导入函数（纯标准库），同一 Tag 后导入覆盖；一次性重建脚本与全部校验见 `workspace/review_notes/restructure/2026-10-29/text/build_clean_text_db.py` 与同目录 `clean_text_db_report.md`（该目录被 Git 忽略）。
+- 规模与边界：32,268 行 / 约 8.3 MB。旧库（84,467 行，混有 52,208 条自有 Mod 词条）已备份为同目录 `old-local_text_New.sqlite`，不进入 Git。本库随源码分享工具列入分发范围，但只承载官方文本的查询副本，不代表本项目授予游戏文本的再分发许可；游戏素材与官方数据库权利仍属 Firaxis Games / 2K。
 
 ## 间接来源
 

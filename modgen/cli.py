@@ -386,7 +386,7 @@ def _cmd_preview(args: argparse.Namespace) -> int:
     except PreviewError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
-    out_dir = Path(args.out) if args.out else Path("modgen_work") / f"preview_{safe_out_dir_name(civ_path.stem)}"
+    out_dir = Path(args.out) if args.out else Path("workspace") / "preview" / f"preview_{safe_out_dir_name(civ_path.stem)}"
     if args.dry_run:
         print(f"预览清单（{len(files)} 个文件，未落盘）：")
         for rel in sorted(files):
@@ -679,7 +679,7 @@ def build_parser() -> argparse.ArgumentParser:
     prev.add_argument("civ", help="工程 .CIV 路径")
     prev.add_argument("--section", default="", help="只预览单个分类（内容分类 / UI图标 / 修改器）")
     prev.add_argument("--format", default="sql", choices=["sql", "xml"], help="单分类预览格式")
-    prev.add_argument("--out", default="", help="预览输出目录（默认 modgen_work/preview_<工程名>/）")
+    prev.add_argument("--out", default="", help="预览输出目录（默认 workspace/preview/preview_<工程名>/）")
     prev.add_argument("--dry-run", action="store_true", help="只打印文件清单，不落盘")
     prev.set_defaults(func=_cmd_preview)
 

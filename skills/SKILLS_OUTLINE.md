@@ -1,39 +1,55 @@
 # 知识地图
 
+> 受众：AI 与维护者 ｜ 何时读：`skill --plan` 未命中，或需要了解知识库全貌时 ｜ 适用版本：ModTools 5.4
+
 ## 常驻入口
 
 [规则正文](RULES.md) → [统一工作流](WORKFLOW.md) → [任务必读映射](catalog.json)。资料冲突或旧来源不可用时读 [SOURCES](SOURCES.md)。维护方法见 [AGENTS](AGENTS.md)。
 
-## 操作指南
+## 分层
 
-[.CIV 指南](05-modtools-civ/INDEX.md) 包含实体、修改器、UI图标、独立纹理、LOC、自定义文件和交付。操作指南优先于历史案例；完整命令契约在 [modgen](../modgen/AGENTS.md)。
+| 目录 | 内容 | 何时读 |
+|---|---|---|
+| `skills/` 根 | 规则、流程、导航、来源、外置名单 | 每次任务开始 |
+| `guides/` | 当前工具的操作指南：.CIV 工程格式、修改器、扩展、文件与交付、常见陷阱 | 动手操作前 |
+| `reference/entities/` | 实体条目键模板 + Type/Modifier/Requirement 命名 | 新建/修改实体 |
+| `reference/sql/` | 生成 SQL 的列含义（**只用于核对**，禁止手写） | 核对导出结果时 |
+| `reference/config/` | 文本/LOC、配色、图标、Configs 注册、原生相邻 | 配置与文本 |
+| `reference/project/` | .civ6proj 模板、动作顺序、输出目录 | 工程文件与交付 |
+| `reference/lua/` | Lua 规范、控件、事件/API 模式、历史案例 | 写 Lua/UI 脚本 |
+| `reference/modifiers/` | Modifier 方法 + EffectType 分册 + 模式与案例 | 选效果、查参数 |
+| `reference/art/` | 领袖/文明美术、音频、Blender、解包、Cooker、工坊 | 美术与发布 |
+| `packages/` | 5 个可分享技能包（HTML UI、地标、明日方舟、AI 对局、图像模板） | 对应专题 |
+| `_archive/` | 下划线前缀不索引；旧草稿/待删资料 | 维护 |
 
-社区制作资料已接入 [.CIV 指南](05-modtools-civ/INDEX.md)：领袖差分与纸片、音频、Blender、Cooker 和工坊发布。作者、版本和采用范围见 [来源声明](../THIRD_PARTY_NOTICES.md)。
+## 指南与实体
+
+- [.CIV 指南入口](guides/INDEX.md)：工程、修改器、扩展、文件、交付与常见陷阱。
+- [实体模板索引](reference/entities/INDEX.md)：按实体选条目键；[命名参考](reference/entities/naming.md)。
 
 ## 可分享的技能包
 
-- [HTML → 文明6原生 UI](civ6-html-ui/SKILL.md)：HTML/CSS 设计、四态纹理、XML/Lua 接入；包含独立脚本、示例和跨 agent 使用说明。整目录可复制分享，仓库提供 `texture render/import-manifest/verify`。
-
-- [地标与 AST 组合](civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；附配方示例，配套 `landmark catalog/compose/import/verify/cook`。
-- [明日方舟系列](civ6-arknights-series/SKILL.md)：仅该题材的系列命名、地名和发布准备；附封面 PSD 与排版脚本，玩法定稿后补英文并生成中英文工坊描述，不执行上传。
-- [AI 控制文明6](civ6-ai-play/SKILL.md)：窗口化启动、FireTuner Lua、Mod 启停、选文明领袖开局、单位移动/建城、截图与日志取证；附环境与排障参考及 Windows 脚本。测试后关闭游戏并还原选项与 Mods.sqlite。
+- [HTML → 文明6原生 UI](packages/civ6-html-ui/SKILL.md)：HTML/CSS 设计、四态纹理、XML/Lua 接入；包含独立脚本、示例和跨 agent 使用说明。
+- [地标与 AST 组合](packages/civ6-landmarks/SKILL.md)：改良、区域、建筑差分与 TileBase 注册；配套 `landmark catalog/compose/import/verify/cook`。
+- [明日方舟系列](packages/civ6-arknights-series/SKILL.md)：该题材的系列命名、地名和发布准备；附封面 PSD 与排版脚本。
+- [AI 控制文明6](packages/civ6-ai-play/SKILL.md)：窗口化启动、FireTuner Lua、Mod 启停、开局、单位移动/建城、截图与日志取证。
+- [头像/图标/历史时刻模板](packages/civ6-art-images/SKILL.md)：PSD 图层提取、PNG 配方、像素检查与模板素材。
 
 ## 外置技能（仅名单，不随仓库分发）
 
-- [外置技能名单](EXTERNAL_SKILLS.md)：登记 civ6-model-import 等外部技能包的作者署名、包指纹与本机安装/检索方法；包体不随仓库分发，需向作者索取后自行安装到 `local_skills/`，本仓库不代替作者发布。
-- [civ6-mcp](EXTERNAL_SKILLS.md)：公开仓库（MIT）的 MCP 服务器，可按名单页网址自行 clone，让 agent 经 FireTuner 操作文明6对局；本项目只记录网址与版本，不内置、不随分享。
+- [外置技能名单](EXTERNAL_SKILLS.md)：登记 civ6-model-import、civ6-mcp 等外部技能包的作者署名、包指纹与本机安装/检索方法；包体不随仓库分发。
 
-## 参考与案例
+## 参考入口
 
-- [核心表目录](01-core-tables/INDEX.md)：实体 SQL 结构，主内容仍经工具生成。
-- [配置文件目录](02-config-files/INDEX.md)：配色、文本、图标等参考。
-- [工程注册目录](03-project-file/INDEX.md)：工程文件与动作参考。
-- [Lua 目录](04-lua/INDEX.md)：规范、控件、事件/API 模式及历史案例。
-- [技巧目录](07-techniques/INDEX.md)：Modifier 通用语义、参数、实现模式和案例。
-- [命名参考](06-naming.md)、[相邻加成](district-adjacency.md)：专题参考。
+- [表参考目录](reference/sql/INDEX.md)：生成 SQL 的列含义（仅核对）。
+- [配置参考目录](reference/config/INDEX.md)：配色、文本、图标、Configs、相邻加成。
+- [工程参考目录](reference/project/INDEX.md)：.civ6proj 与动作顺序。
+- [Lua 目录](reference/lua/INDEX.md)：规范、控件、事件/API 模式及历史案例。
+- [Modifier 目录](reference/modifiers/INDEX.md)：通用语义、EffectType 分册、实现模式和案例。
+- [美术与发布目录](reference/art/INDEX.md)：领袖/文明美术、音频、Blender、解包、Cooker、工坊。
 
 ## 渐进读取
 
-`skill "任务" --plan` 返回必读文件；搜索返回命中的章节和行号；`--file 路径 --section 章节名` 读取该章节及其子节，省略 --section 仍可读全文。不要为小任务一次加载全部参数参考。
+`skill "任务" --plan` 返回必读文件（must 级）与可选参考；搜索返回命中章节和行号；`--file 路径 --section 章节名` 读取该章节及其子节。`--plan` 会给出字节数与 max_kb 告警；不要为小任务一次加载全部参数参考。
 
-维护脚本与重复草稿已移出知识库，归档不参与检索。新增文件要能从上述目录通过链接到达，检查命令为 `python -m modgen.cli skill --check`。
+维护脚本与重复草稿在 `_archive/`（不索引）。新增文件要能从上述目录通过链接到达，检查命令为 `python -m modgen.cli skill --check`。

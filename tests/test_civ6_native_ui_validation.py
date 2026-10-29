@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 
-SCRIPTS=Path(__file__).resolve().parents[1]/'skills/civ6-html-ui/scripts'
+SCRIPTS=Path(__file__).resolve().parents[1]/'skills/packages/civ6-html-ui/scripts'
 sys.path.insert(0,str(SCRIPTS))
 spec=importlib.util.spec_from_file_location('civ6_native_check',SCRIPTS/'check-native-ui.py')
 checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)

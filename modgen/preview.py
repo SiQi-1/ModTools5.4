@@ -2,7 +2,7 @@
 
 原理：与 tests/test_sql_previews.py 相同——QT_QPA_PLATFORM=offscreen 下实例化
 WorkspacePage、加载工程、调用 `_project_root_manifest()` 得到全部将生成的文件内容，
-然后**写入 --out 目录（默认 modgen_work/preview_*）**，绝不写入 .civ6proj 目录。
+然后**写入 --out 目录（默认 workspace/preview/preview_*）**，绝不写入 .civ6proj 目录。
 
 - 需要 PyQt6 + ModTools 源码（GUI 同环境）；缺失时给出明确报错；
 - 生成"工程总览"所见即所得的 SQL/XML/Icons/ArtDef/XLP/Text 等文件；

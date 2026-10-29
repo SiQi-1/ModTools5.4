@@ -14,6 +14,14 @@ from ModTools_5_4 import skills_search as search
 from ModTools_5_4.knowledge_check import check_knowledge, markdown_links
 from modgen.cli import main
 
+BASIC_TASKS = {
+    "新增一个单位": "reference/entities/unit.md",
+    "新增文明": "reference/entities/civilization.md",
+    "做一个建筑": "reference/entities/building.md",
+    "改 UI 面板": "reference/art/ui-assets.md",
+    "修改文本": "reference/config/text.md",
+}
+
 
 class RetrievalBehaviourTest(unittest.TestCase):
     def setUp(self):
@@ -103,7 +111,7 @@ class KnowledgeStructureTest(unittest.TestCase):
         self.put('RULES.md','# 规则')
         self.put('WORKFLOW.md','# 流程')
         self.put('guide.md','# 指南\n## 实现\n正文')
-        self.put('catalog.json',json.dumps({'version':1,'always_read':['RULES.md','WORKFLOW.md'],'routes':[{'id':'ui','aliases':['UI'],'read':['guide.md']}]},ensure_ascii=False))
+        self.put('catalog.json',json.dumps({'version':1,'always_read':['RULES.md','WORKFLOW.md'],'routes':[{'id':'ui','level':'must','max_kb':13,'aliases':['UI'],'read':['guide.md']}]},ensure_ascii=False))
         self.put('retrieval_cases.json','[]')
 
     def put(self,name,text):
@@ -114,6 +122,14 @@ class KnowledgeStructureTest(unittest.TestCase):
 
     def test_valid_small_knowledge_graph(self):
         self.assertEqual(self.codes(),set())
+
+    def test_catalog_requires_level_and_max_kb(self):
+        self.put('catalog.json',json.dumps({'version':1,'always_read':['RULES.md'],'routes':[{'id':'ui','aliases':['UI'],'read':['guide.md']}]},ensure_ascii=False))
+        self.assertIn('catalog_meta', self.codes())
+
+    def test_catalog_coverage_is_checked(self):
+        self.put('extra.md','# 未被引用的主要文件')
+        self.assertIn('catalog_coverage', self.codes())
 
     def test_links_anchors_orphans_and_old_workflows_are_rejected(self):
         self.put('guide.md','# 指南\n[坏链接](missing.md)\n[坏标题](RULES.md#none)\nAGENTS.md §5\npython export_modtools.py\npython -m modgen.cli missing-command\n')
@@ -129,9 +145,13 @@ class KnowledgeStructureTest(unittest.TestCase):
         self.assertIn('missing_required',self.codes())
 
     def test_malformed_and_escaping_catalog_are_reported(self):
-        for data in [{'version':1,'always_read':None,'routes':[]},{'version':1,'always_read':['../outside.md'],'routes':[]}]:
+        for data in [{'version':1,'always_read':None,'routes':[]},{'version':1,'always_read':['../outside.md'],'routes':[]},{'version':1,'always_read':['RULES.md'],'routes':[{'id':'x','level':'有时','max_kb':1,'aliases':['X'],'read':['guide.md']}]}]:
             self.put('catalog.json',json.dumps(data))
             self.assertIn('catalog',self.codes())
+
+    def test_catalog_section_must_exist(self):
+        self.put('catalog.json',json.dumps({'version':1,'always_read':['RULES.md'],'routes':[{'id':'ui','level':'must','max_kb':13,'aliases':['UI'],'read':[{'path':'guide.md','section':'不存在的章节'}]}]},ensure_ascii=False))
+        self.assertIn('catalog',self.codes())
 
     def test_duplicate_documents_are_reported(self):
         self.put('copy.md',(self.root/'guide.md').read_text(encoding='utf-8'))
@@ -142,6 +162,10 @@ class KnowledgeStructureTest(unittest.TestCase):
         self.put('guide.md', original)
         self.put('variant.md', original.replace('条目 200', '条目 200 已改写'))
         self.assertIn('near_duplicate', self.codes())
+
+    def test_oversize_document_is_reported(self):
+        self.put('guide.md', '# 指南\n' + '内容 ' * 12000)
+        self.assertIn('oversize', self.codes())
 
     def test_ranking_failure_fails_the_quality_gate(self):
         self.put('retrieval_cases.json',json.dumps([{'query':'no-such-needle','expected':'guide.md','top':1}]))
@@ -155,6 +179,29 @@ class PublishedKnowledgeTest(unittest.TestCase):
         result=check_knowledge()
         self.assertTrue(result['ok'],json.dumps(result['errors'],ensure_ascii=False,indent=2))
         self.assertGreaterEqual(result['retrieval_cases'],15)
+
+    def test_five_basic_tasks_hit_routes_within_30kb(self):
+        for query, expected in BASIC_TASKS.items():
+            with self.subTest(query=query):
+                plan=search.reading_plan(query)
+                self.assertTrue(plan['matched'])
+                self.assertIn(expected, plan['required'])
+                self.assertLessEqual(plan['must_kb'], 30.0)
+                self.assertTrue(plan['budget']['ok'])
+                self.assertTrue(any(i['level']=='must' and i['bytes']>0 for i in plan['items']))
+
+    def test_plan_reports_levels_bytes_and_warnings(self):
+        plan=search.reading_plan('二进制上限')
+        self.assertTrue(plan['items'])
+        for item in plan['items']:
+            self.assertIn(item['level'], {'must','optional'})
+            self.assertIsInstance(item['bytes'], int)
+        self.assertIn('max_kb', plan['budget'])
+
+    def test_catalog_covers_main_files(self):
+        result=check_knowledge(retrieval=False)
+        coverage=[e for e in result['errors'] if e['code']=='catalog_coverage']
+        self.assertEqual(coverage, [], coverage)
 
     def test_combined_task_requires_lua_ui_and_modifiers(self):
         plan=search.reading_plan('Lua UI 与 EFFECT_ADJUST_PLAYER_STRENGTH_MODIFIER')
@@ -177,12 +224,12 @@ class PublishedKnowledgeTest(unittest.TestCase):
     def test_cli_plan_search_and_section_json(self):
         code,out,_=self.call_cli('UI','--plan','--json')
         self.assertEqual(code,0)
-        self.assertIn('05-modtools-civ/ui-assets.md',json.loads(out)['reading_plan']['required'])
+        self.assertIn('reference/art/ui-assets.md',json.loads(out)['reading_plan']['required'])
         code,out,_=self.call_cli('独立UI纹理','--json','--limit','1')
         result=json.loads(out)
         self.assertEqual(result['count'],1)
         item=result['results'][0]
-        self.assertEqual(item['rel'],'05-modtools-civ/ui-assets.md')
+        self.assertEqual(item['rel'],'reference/art/ui-assets.md')
         code,out,_=self.call_cli('--file',item['rel'],'--section',item['section'],'--json')
         self.assertEqual(code,0)
         self.assertTrue(json.loads(out)['content'])

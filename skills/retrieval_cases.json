@@ -1,302 +1,302 @@
 [
   {
     "query": "Culture.artdef 文明文化映射 UnitCulture",
-    "expected": "05-modtools-civ/civilization-art.md",
+    "expected": "reference/art/civilization-art.md",
     "top": 3
   },
   {
     "query": "新增文明 城市建筑文化 Cultures.artdef",
-    "expected": "05-modtools-civ/civilization-art.md",
+    "expected": "reference/art/civilization-art.md",
     "top": 3
   },
   {
     "query": "领袖头像 PSD 模板 多模态",
-    "expected": "civ6-art-images/SKILL.md",
+    "expected": "packages/civ6-art-images/SKILL.md",
     "top": 3
   },
   {
     "query": "历史时刻 黑色背景 蒙版",
-    "expected": "civ6-art-images/references/templates.md",
+    "expected": "packages/civ6-art-images/references/templates.md",
     "top": 3
   },
   {
     "query": "文明图标 纯白 透明 区域核心",
-    "expected": "civ6-art-images/SKILL.md",
+    "expected": "packages/civ6-art-images/SKILL.md",
     "top": 3
   },
   {
     "query": "独立UI纹理",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 1
   },
   {
     "query": "独立 UI 纹理",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 1
   },
   {
     "query": "按钮背景",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 3
   },
   {
     "query": "ui_textures",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 1
   },
   {
     "query": "自定义UI图标",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 3
   },
   {
     "query": "custom_entries",
-    "expected": "05-modtools-civ/ui-assets.md",
+    "expected": "reference/art/ui-assets.md",
     "top": 1
   },
   {
     "query": "ModifierType 原版",
-    "expected": "05-modtools-civ/modifiers.md",
+    "expected": "guides/modifiers.md",
     "top": 3
   },
   {
     "query": "vanilla_modifier_types",
-    "expected": "05-modtools-civ/modifiers.md",
+    "expected": "guides/modifiers.md",
     "top": 3
   },
   {
     "query": "modifier_type_source",
-    "expected": "05-modtools-civ/modifiers.md",
+    "expected": "guides/modifiers.md",
     "top": 1
   },
   {
     "query": "ModifierStrings",
-    "expected": "07-techniques/modifier-techniques.md",
+    "expected": "reference/modifiers/techniques.md",
     "top": 3
   },
   {
     "query": "preview_text 预览文本",
-    "expected": "07-techniques/modifier-techniques.md",
+    "expected": "reference/modifiers/techniques.md",
     "top": 3
   },
   {
     "query": "城市奇观相邻加成",
-    "expected": "07-techniques/modifier-techniques.md",
+    "expected": "reference/config/district-adjacency.md",
     "top": 1
   },
   {
     "query": "需求上下文",
-    "expected": "07-techniques/modifier-techniques.md",
+    "expected": "reference/modifiers/techniques.md",
     "top": 3
   },
   {
     "query": "按钮精灵表方向",
-    "expected": "04-lua/lua-xml-controls.md",
+    "expected": "reference/lua/lua-xml-controls-layout.md",
     "top": 3
   },
   {
     "query": "自定义文件加载顺序",
-    "expected": "05-modtools-civ/pipeline.md",
+    "expected": "guides/pipeline.md",
     "top": 3
   },
   {
     "query": "Core.sql",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "项目级扩展",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "源码与输出",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "project-check",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "扩展依赖",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "HTML 转文明6 UI",
-    "expected": "civ6-html-ui/SKILL.md",
+    "expected": "packages/civ6-html-ui/SKILL.md",
     "top": 3
   },
   {
     "query": "HTML 精确纹理导出",
-    "expected": "civ6-html-ui/references/html-textures.md",
+    "expected": "packages/civ6-html-ui/references/html-textures.md",
     "top": 3
   },
   {
     "query": "texture import-manifest 批量登记",
-    "expected": "civ6-html-ui/references/portable-use.md",
+    "expected": "packages/civ6-html-ui/references/portable-use.md",
     "top": 3
   },
   {
     "query": "HTML 九宫格 XML",
-    "expected": "civ6-html-ui/references/native-ui.md",
+    "expected": "packages/civ6-html-ui/references/native-ui.md",
     "top": 3
   },
   {
     "query": "领袖外交表情差分 fallback_images",
-    "expected": "05-modtools-civ/leader-art.md",
+    "expected": "reference/art/leader-art.md",
     "top": 3
   },
   {
     "query": "纸片领袖 Leader_Matte",
-    "expected": "05-modtools-civ/leader-art.md",
+    "expected": "reference/art/leader-art.md",
     "top": 3
   },
   {
     "query": "Wwise 音频 Banks.ini",
-    "expected": "05-modtools-civ/audio-pipeline.md",
+    "expected": "reference/art/audio-pipeline.md",
     "top": 3
   },
   {
     "query": "Blender CN6 NA2",
-    "expected": "05-modtools-civ/blender-civnexus.md",
+    "expected": "reference/art/blender-civnexus.md",
     "top": 3
   },
   {
     "query": "Cooker 产物语义差异",
-    "expected": "05-modtools-civ/art-cook-validation.md",
+    "expected": "reference/art/art-cook-validation.md",
     "top": 3
   },
   {
     "query": "创意工坊发布上传器",
-    "expected": "05-modtools-civ/workshop-release.md",
+    "expected": "reference/art/workshop-release.md",
     "top": 3
   },
   {
     "query": "LuaEvents GP 同环境",
-    "expected": "04-lua/code-style.md",
+    "expected": "reference/lua/code-style.md",
     "top": 3
   },
   {
     "query": "Landmarks.artdef AST TileBase",
-    "expected": "civ6-landmarks/SKILL.md",
+    "expected": "packages/civ6-landmarks/SKILL.md",
     "top": 3
   },
   {
     "query": "区域模型 建筑差分 BuildingSets",
-    "expected": "civ6-landmarks/references/landmarks.md",
+    "expected": "packages/civ6-landmarks/references/landmarks.md",
     "top": 3
   },
   {
     "query": "BLP解包 资源复原 blpkit",
-    "expected": "05-modtools-civ/art-unpack.md",
+    "expected": "reference/art/art-unpack.md",
     "top": 3
   },
   {
     "query": "pantry 同名遮蔽 假成功",
-    "expected": "05-modtools-civ/art-unpack.md",
+    "expected": "reference/art/art-unpack.md",
     "top": 3
   },
   {
     "query": "预乘纹理 回打包 载荷覆盖率",
-    "expected": "05-modtools-civ/art-unpack.md",
+    "expected": "reference/art/art-unpack.md",
     "top": 3
   },
   {
     "query": "二进制产出方案选择",
-    "expected": "04-lua/lua-binary.md",
+    "expected": "reference/lua/lua-binary.md",
     "top": 3
   },
   {
     "query": "AttachModifierByID 永久产出",
-    "expected": "04-lua/lua-binary.md",
+    "expected": "reference/lua/lua-binary.md",
     "top": 3
   },
   {
     "query": "改良设施原生相邻 Improvement_Adjacencies",
-    "expected": "district-adjacency.md",
+    "expected": "reference/config/district-adjacency.md",
     "top": 3
   },
   {
     "query": "学院替代区域相邻继承快照",
-    "expected": "district-adjacency.md",
+    "expected": "reference/config/district-adjacency.md",
     "top": 3
   },
   {
     "query": "纯文本能力描述补充图标 text-icons",
-    "expected": "02-config-files/text.md",
+    "expected": "reference/config/text.md",
     "top": 3
   },
   {
     "query": "范围挂载 每个来源对象 计数",
-    "expected": "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
+    "expected": "reference/modifiers/patterns/pattern-spatial-attach-count.md",
     "top": 3
   },
   {
     "query": "二进制上限 最高位1024 2047",
-    "expected": "04-lua/lua-binary.md",
+    "expected": "reference/lua/lua-binary.md",
     "top": 3
   },
   {
     "query": "Property滥用 区域距离 attach modifier",
-    "expected": "07-techniques/modifiers/patterns/pattern-spatial-attach-count.md",
+    "expected": "reference/modifiers/patterns/pattern-spatial-attach-count.md",
     "top": 3
   },
   {
     "query": "Self 区域固定产出 放置预览",
-    "expected": "district-adjacency.md",
+    "expected": "reference/config/district-adjacency.md",
     "top": 3
   },
   {
     "query": "CityPanel ViewMain 城市产出来源拆分 文化转生产力",
-    "expected": "04-lua/lua-0035-ui-file-replacement.md",
+    "expected": "reference/lua/lua-0035-ui-file-replacement.md",
     "top": 3
   },
   {
     "query": "ui_replace lua_context ReplaceUIScript 扩展",
-    "expected": "05-modtools-civ/project-extensions.md",
+    "expected": "guides/project-extensions.md",
     "top": 3
   },
   {
     "query": "FireTuner 控制文明6 单位移动 建城",
-    "expected": "civ6-ai-play/SKILL.md",
+    "expected": "packages/civ6-ai-play/SKILL.md",
     "top": 3
   },
   {
     "query": "文明6 窗口化启动 分辨率 全屏",
-    "expected": "civ6-ai-play/references/environment.md",
+    "expected": "packages/civ6-ai-play/references/environment.md",
     "top": 3
   },
   {
     "query": "Mods.sqlite 启用 Mod 备份",
-    "expected": "civ6-ai-play/references/environment.md",
+    "expected": "packages/civ6-ai-play/references/environment.md",
     "top": 3
   },
   {
     "query": "Tuner 连不上 4318 排障",
-    "expected": "civ6-ai-play/references/troubleshooting.md",
+    "expected": "packages/civ6-ai-play/references/troubleshooting.md",
     "top": 3
   },
   {
     "query": "FireTuner 新建对局 PlayerConfigurations HostGame",
-    "expected": "civ6-ai-play/references/lua-api.md",
+    "expected": "packages/civ6-ai-play/references/lua-api-context-frontend.md",
     "top": 3
   },
   {
     "query": "DLL Mod 测试 loader 注入 插件 OnLoad",
-    "expected": "civ6-ai-play/references/mod-testing.md",
+    "expected": "packages/civ6-ai-play/references/mod-testing.md",
     "top": 3
   },
   {
     "query": "自定义 UI mod 按钮 Controls 测试",
-    "expected": "civ6-ai-play/references/mod-testing.md",
+    "expected": "packages/civ6-ai-play/references/mod-testing.md",
     "top": 3
   },
   {
     "query": "地块产出 ChangeYield 建城 测试",
-    "expected": "civ6-ai-play/references/mod-testing.md",
+    "expected": "packages/civ6-ai-play/references/mod-testing.md",
     "top": 3
   },
   {
@@ -317,6 +317,36 @@
   {
     "query": "让 AI 玩文明6 FireTuner MCP",
     "expected": "EXTERNAL_SKILLS.md",
+    "top": 3
+  },
+  {
+    "query": "新增一个单位",
+    "expected": "reference/entities/INDEX.md",
+    "top": 3
+  },
+  {
+    "query": "新增文明 领袖",
+    "expected": "reference/entities/civilization.md",
+    "top": 3
+  },
+  {
+    "query": "做一个建筑 条目键",
+    "expected": "reference/entities/building.md",
+    "top": 3
+  },
+  {
+    "query": "改UI面板按钮背景",
+    "expected": "reference/art/ui-assets.md",
+    "top": 3
+  },
+  {
+    "query": "修改文本 描述图标",
+    "expected": "reference/config/text.md",
+    "top": 3
+  },
+  {
+    "query": "新增一个单位 条目键",
+    "expected": "reference/entities/unit.md",
     "top": 3
   }
 ]

@@ -21,6 +21,10 @@ jobs:
           python-version: "3.13"
       - name: Check tracked distribution files
         run: python -S tools/share_source.py --check
+      - name: Lint docs and repository layout
+        run: python -S tools/doc_lint.py
+      - name: Test repository layout guards
+        run: python -S -m unittest tests.test_repo_layout -v
       - name: Test source sharing
         run: python -S -m unittest discover -s tests -p test_source_distribution.py -v
       - name: Test knowledge retrieval and quality gates

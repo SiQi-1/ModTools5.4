@@ -18,32 +18,32 @@ python -m modgen.cli query "SELECT ModifierType, CollectionType, EffectType FROM
 python -m modgen.cli search "城市产出"
 ```
 
-`DebugGameplay.sqlite` 是目标环境的运行缓存，包含其他 Mod；查得到只说明当前环境有记录。原版 ModifierType 来源查 [原版快照](../ModTools_5_4/data/vanilla_modifier_types.json)，需要注册的自定义类型见 [修改器指南](05-modtools-civ/modifiers.md)。其他枚举可查官方定义与对应表；数据库未配置时明确缺少验证来源。
+`DebugGameplay.sqlite` 是目标环境的运行缓存，包含其他 Mod；查得到只说明当前环境有记录。原版 ModifierType 来源查 [原版快照](../ModTools_5_4/data/vanilla_modifier_types.json)，需要注册的自定义类型见 [修改器指南](guides/modifiers.md)。其他枚举可查官方定义与对应表；数据库未配置时明确缺少验证来源。
 
 ## 文本与图标
 
-原版相邻离线快照：[vanilla_adjacencies.json](../ModTools_5_4/data/vanilla_adjacencies.json)。查询用 `modgen adjacency list/show`；重提取用 `python -m modgen.tools.extract_vanilla_adjacencies --game-dir "游戏目录"`，默认输出随包数据。数据来自官方 XML，按本体/资料片核心规则集分开，不含可选模式和其他 Mod 的动态追加；详情见 [相邻指南](district-adjacency.md)。
+原版相邻离线快照：[vanilla_adjacencies.json](../ModTools_5_4/data/vanilla_adjacencies.json)。查询用 `modgen adjacency list/show`；重提取用 `python -m modgen.tools.extract_vanilla_adjacencies --game-dir "游戏目录"`，默认输出随包数据。数据来自官方 XML，按本体/资料片核心规则集分开，不含可选模式和其他 Mod 的动态追加；详情见 [相邻指南](reference/config/district-adjacency.md)。
 
 - LOC：`python -m modgen.cli loc LOC_UNIT_WARRIOR_NAME`，读取已配置文本库，解析引用链。
 - 字体图标：[注册表](../ModTools_5_4/data/font_icons_registry.json)；配色：[标准色](../ModTools_5_4/data/standard_colors.json)。图标不靠猜数据库表。
-- 自定义 LOC、UI图标、背景纹理见 [美术与文本指南](05-modtools-civ/ui-assets.md)。
+- 自定义 LOC、UI图标、背景纹理见 [美术与文本指南](reference/art/ui-assets.md)。
 
 ## Lua 与控件
 
-先读 [Lua 规范](04-lua/code-style.md) 和 [控件参考](04-lua/lua-xml-controls.md)，再从 [Lua 索引](04-lua/INDEX.md) 找接近的已记录模式。API/事件需对照目标版本官方 Lua/XML 调用点；区分 GP/UI 环境。没有证据时标为待验证并做最小测试，不能虚构接口。
+先读 [Lua 规范](reference/lua/code-style.md) 和 [控件参考](reference/lua/lua-xml-controls.md)，再从 [Lua 索引](reference/lua/INDEX.md) 找接近的已记录模式。API/事件需对照目标版本官方 Lua/XML 调用点；区分 GP/UI 环境。没有证据时标为待验证并做最小测试，不能虚构接口。
 
 ## 历史资料
 
 资料中的个人 Mod 编号、工坊 ID、旧外部目录是溯源说明，不是本仓库可执行依赖。旧导出快照、DLL 类型清单、查询脚本未随包提供，不能根据这些路径调用不存在的工具。当前可用入口为上面的 CLI、随包数据及本地已配置游戏文件。
 
-历史生成器与重复草稿隔离在 [维护归档](../tools/legacy_skill_builders/README.md)，不参与知识检索；它们可能包含旧绝对路径，禁止直接运行来覆盖现行资料。需要再生成时，应先迁移脚本并加入输出差异校验。
+历史生成器与重复草稿已移出仓库（维护归档不随发布包分发），不参与知识检索；其中可能含旧绝对路径，禁止直接运行来覆盖现行资料。需要再生成时，应先迁移脚本并加入输出差异校验。
 
 ## 社区资料与运行时证据
 
 [第三方来源声明](../THIRD_PARTY_NOTICES.md) 记录作者、版本、许可与采用范围。外部技能冲突按本项目原要求处理，不整包覆盖规则或数据库。
 
-BLP/FGX 复原另读 [美术解包与验收](05-modtools-civ/art-unpack.md)：参考千川白浪的移交包，区分记录定位、解码、重建、编译和实机证据。包内历史结论冲突不直接升级为规则；本地 Civ6.cfg 是类注册核对依据。
+BLP/FGX 复原另读 [美术解包与验收](reference/art/art-unpack.md)：参考千川白浪的移交包，区分记录定位、解码、重建、编译和实机证据。包内历史结论冲突不直接升级为规则；本地 Civ6.cfg 是类注册核对依据。
 
-Lua 事件环境以 [事件环境表](04-lua/code-style.md#事件环境与运行时核验) 为准；记录 API 所在 UI / GP 环境、对象层级、签名及游戏版本。FireTuner 的 gamecore / ingame 上下文不自动等于 Mod 自有环境；查不到 Mod 全局变量不能直接证明接口不可用。官方调用、社区实测与本项目复验分开记录。
+Lua 事件环境以 [事件环境表](reference/lua/code-style.md#事件环境与运行时核验) 为准；记录 API 所在 UI / GP 环境、对象层级、签名及游戏版本。FireTuner 的 gamecore / ingame 上下文不自动等于 Mod 自有环境；查不到 Mod 全局变量不能直接证明接口不可用。官方调用、社区实测与本项目复验分开记录。
 
-2026-10-26 起，[Lua 索引](04-lua/INDEX.md) 中从他人 Steam 工坊 Mod 提炼的 92 篇资料已移出 Git 仓库，只保留在维护者本机 `local_notes/04-lua-workshop/`，不随源码分享、不主张再分发；用户自有 Mod 资料继续随仓库分享，官方游戏 UI 分析保留在仓库。
+2026-10-26 起，[Lua 索引](reference/lua/INDEX.md) 中从他人 Steam 工坊 Mod 提炼的 92 篇资料已移出 Git 仓库，只保留在维护者本机 `local_notes/04-lua-workshop/`，不随源码分享、不主张再分发；用户自有 Mod 资料继续随仓库分享，官方游戏 UI 分析保留在仓库。

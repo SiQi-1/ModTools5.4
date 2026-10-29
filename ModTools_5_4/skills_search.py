@@ -1,4 +1,4 @@
-"""Shared, Qt-free retrieval: task routes, section BM25, Chinese bigrams."""
+"""Shared, Qt-free retrieval: task routes with must/optional levels and section reads."""
 from __future__ import annotations
 from collections import Counter
 import json
@@ -10,6 +10,8 @@ from typing import Any
 
 SEARCH_EXTS = {".md"}
 MAX_SNIPPET_CHARS = 160
+PLAN_MAX_KB = 30
+DEFAULT_ROUTE_MAX_KB = 13
 _index_cache: dict[str, Any] = {}
 
 
@@ -87,6 +89,15 @@ def markdown_sections(text: str) -> list[dict[str, Any]]:
     return result
 
 
+def _read_item(item: Any) -> tuple[str, str | None]:
+    if isinstance(item, str):
+        return item, None
+    if isinstance(item, dict) and isinstance(item.get("path"), str):
+        section = item.get("section")
+        return item["path"], None if section is None else str(section)
+    raise ValueError("catalog 的 read 项必须是路径或 {path, section}")
+
+
 def load_catalog(root: Path) -> dict[str, Any]:
     path = root / "catalog.json"
     if not path.exists():
@@ -94,16 +105,35 @@ def load_catalog(root: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("version") != 1:
         raise ValueError("skills/catalog.json 版本或结构无效")
+
     def strings(value):
         return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
+
     if not strings(data.get("always_read")) or not isinstance(data.get("routes"), list):
         raise ValueError("catalog 的 always_read/routes 必须是列表")
     for route in data["routes"]:
         if (not isinstance(route, dict) or not isinstance(route.get("id"), str)
                 or not route["id"].strip() or not strings(route.get("aliases"))
-                or not route["aliases"] or not strings(route.get("read")) or not route["read"]):
+                or not route["aliases"] or not isinstance(route.get("read"), list) or not route["read"]):
             raise ValueError("catalog 的每个任务需要 id、aliases、read")
-    for rel in data["always_read"] + [p for r in data["routes"] for p in r["read"]]:
+        level = route.get("level", "must")
+        if level not in {"must", "optional"}:
+            raise ValueError(f"catalog 任务 {route['id']} 的 level 必须是 must/optional")
+        max_kb = route.get("max_kb", DEFAULT_ROUTE_MAX_KB)
+        if not isinstance(max_kb, (int, float)) or max_kb <= 0:
+            raise ValueError(f"catalog 任务 {route['id']} 的 max_kb 必须是正数")
+        if not strings(route.get("optional", [])):
+            raise ValueError(f"catalog 任务 {route['id']} 的 optional 必须是路径列表")
+        for item in route["read"]:
+            rel, section = _read_item(item)
+            path = _safe_path(root, rel)
+            if path is None or path.suffix != ".md":
+                raise ValueError(f"catalog 必读路径非法：{rel}")
+            if section is not None:
+                found = any(s["section"].casefold() == section.casefold() for s in markdown_sections(_load_text(path)))
+                if not found:
+                    raise ValueError(f"catalog 章节不存在：{rel} -> {section}")
+    for rel in data["always_read"]:
         path = _safe_path(root, rel)
         if path is None or path.suffix != ".md":
             raise ValueError(f"catalog 必读路径非法：{rel}")
@@ -117,24 +147,94 @@ def _alias_matches(alias: str, query: str) -> bool:
     return bool(re.search(r"(?<![A-Za-z0-9_])" + re.escape(alias) + suffix, query, re.I))
 
 
+def _item_bytes(path: str, section: str | None, root: Path) -> int:
+    content = read_skill_file(path, root=root, section=section)
+    return len(content.encode()) if content is not None else 0
+
+
 def reading_plan(keyword: str, *, root: Path | None = None) -> dict[str, Any]:
-    catalog = load_catalog(root or default_skills_root())
+    """Match task routes and return a must/optional reading plan under a hard budget."""
+    skills_root = root or default_skills_root()
+    catalog = load_catalog(skills_root)
     routes = [r for r in catalog["routes"] if any(_alias_matches(a, keyword) for a in r["aliases"])]
-    required = list(dict.fromkeys(catalog["always_read"] + [p for r in routes for p in r["read"]]))
-    return {"matched": bool(routes), "topics": [r["id"] for r in routes], "required": required,
-            "hint": "RULES/WORKFLOW 全文读取；专题读导读与命中章节，参数表和案例按需。未匹配时补充实体、效果、Lua 或 UI 关键词。"}
+    items: list[dict[str, Any]] = []
+    required: list[str] = []
+    optional: list[str] = []
+    seen: set[tuple[str, str | None]] = set()
+    warnings: list[str] = []
+
+    def add(path: str, section: str | None, level: str, size: int) -> None:
+        key = (path, section)
+        if key in seen:
+            return
+        seen.add(key)
+        items.append({"path": path, "section": section, "level": level,
+                      "bytes": size, "kb": round(size / 1024, 2)})
+        if level == "must":
+            if path not in required:
+                required.append(path)
+        elif path not in required and path not in optional:
+            optional.append(path)
+
+    allocated = 0
+    for rel in catalog["always_read"]:
+        size = _item_bytes(rel, None, skills_root)
+        add(rel, None, "must", size)
+        allocated += size
+    demoted: list[str] = []
+    for route in routes:
+        route_items = []
+        for raw in route["read"]:
+            path, section = _read_item(raw)
+            route_items.append((path, section, _item_bytes(path, section, skills_root)))
+        route_bytes = sum(size for _, _, size in route_items)
+        max_kb = route.get("max_kb", DEFAULT_ROUTE_MAX_KB)
+        level = route.get("level", "must")
+        if level == "must" and route_bytes > max_kb * 1024:
+            warnings.append(f"任务 {route['id']} 必读 {route_bytes / 1024:.1f} KB 超过 max_kb={max_kb}")
+        if level == "must" and allocated + route_bytes > PLAN_MAX_KB * 1024:
+            demoted.append(route["id"])
+            warnings.append(f"任务 {route['id']} 超出总必读预算 {PLAN_MAX_KB} KB，其必读项改为可选")
+            for path, section, size in route_items:
+                add(path, section, "optional", size)
+        elif level == "must":
+            for path, section, size in route_items:
+                add(path, section, "must", size)
+            allocated += route_bytes
+        else:
+            for path, section, size in route_items:
+                add(path, section, "optional", size)
+        for rel in route.get("optional", []):
+            add(rel, None, "optional", _item_bytes(rel, None, skills_root))
+    must_kb = round(allocated / 1024, 2)
+    optional_kb = round(sum(i["bytes"] for i in items if i["level"] == "optional") / 1024, 2)
+    hint = ("必读项为 must 级，需全文读取；optional 与建议章节按需读取。"
+            "未匹配时补充实体、效果、Lua 或 UI 关键词。")
+    if demoted:
+        hint += " 本次命中任务过多，已按预算把部分任务降为可选：" + "、".join(demoted) + "。"
+    return {"matched": bool(routes), "topics": [r["id"] for r in routes],
+            "required": required, "optional": optional, "items": items,
+            "must_kb": must_kb, "optional_kb": optional_kb,
+            "budget": {"max_kb": PLAN_MAX_KB, "must_kb": must_kb, "ok": must_kb <= PLAN_MAX_KB,
+                       "demoted": demoted},
+            "warnings": warnings, "hint": hint}
 
 
 def _kind(rel: str) -> str:
     if rel in {"RULES.md", "SOURCES.md", "AGENTS.md"} or "checklist" in rel or rel.endswith("code-style.md"):
         return "rule"
-    if rel in {"WORKFLOW.md", "SKILLS_OUTLINE.md"} or rel.endswith(("INDEX.md", "pipeline.md")):
+    if (rel in {"WORKFLOW.md", "SKILLS_OUTLINE.md", "EXTERNAL_SKILLS.md"}
+            or rel.endswith(("INDEX.md", "pipeline.md"))):
         return "workflow"
-    if rel.startswith("05-modtools-civ/") or rel == "07-techniques/modifier-techniques.md":
+    if (rel.startswith("guides/") or rel.startswith("reference/entities/")
+            or (rel.startswith("packages/") and rel.endswith("SKILL.md"))):
         return "guide"
-    if "cases/" in rel or "lua-workshop-" in rel:
+    if "/cases/" in rel or "lua-workshop-" in rel or "/lua-0" in rel or "/lua-1" in rel:
         return "example"
     return "reference"
+
+
+_KIND_WEIGHTS = {"rule": 1.3, "workflow": 1.1, "guide": 1.25, "example": .85, "reference": 1}
 
 
 def build_index(root: Path) -> list[dict[str, Any]]:
@@ -186,9 +286,9 @@ def search_skills(keyword: str, *, root: Path | None = None, limit: int = 10) ->
                 score += idf * (1.5 if term in title_terms else 0)
                 score += idf * (.5 if term in path_terms else 0)
             score *= .25 + .75 * len(matches) / len(terms)
-            score *= {"rule": 1.3, "workflow": 1.1, "guide": 1.25, "example": .85, "reference": 1}[doc["kind"]]
+            score *= _KIND_WEIGHTS[doc["kind"]]
             if doc["rel"] in preferred:
-                score *= 1.35
+                score *= 2.2
             if best is None or score > best[0]:
                 best = (score, section, bool(terms & path_terms))
         if best:

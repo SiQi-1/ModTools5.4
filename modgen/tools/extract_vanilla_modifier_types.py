@@ -15,7 +15,7 @@
 
 用法：
     python -m modgen.tools.extract_vanilla_modifier_types
-    python -m modgen.tools.extract_vanilla_modifier_types --game-dir "E:/SteamLibrary/steamapps/common/Sid Meier's Civilization VI"
+    python -m modgen.tools.extract_vanilla_modifier_types --game-dir "<游戏安装目录>"
     python -m modgen.tools.extract_vanilla_modifier_types --out ModTools_5_4/data/vanilla_modifier_types.json
 """
 from __future__ import annotations
@@ -93,10 +93,11 @@ def _candidate_game_dirs() -> list[Path]:
             candidates.append(library / "steamapps" / "common" / GAME_DIR_NAME)
 
     for drive in ("C", "D", "E", "F", "G"):
-        candidates.append(Path("%s:/Program Files (x86)/Steam/steamapps/common" % drive) / GAME_DIR_NAME)
-        candidates.append(Path("%s:/Steam/steamapps/common" % drive) / GAME_DIR_NAME)
-        candidates.append(Path("%s:/SteamLibrary/steamapps/common" % drive) / GAME_DIR_NAME)
-        candidates.append(Path("%s:/Games/Steam/steamapps/common" % drive) / GAME_DIR_NAME)
+        root = drive + ":"
+        candidates.append(Path(root) / "Program Files (x86)" / "Steam" / "steamapps" / "common" / GAME_DIR_NAME)
+        candidates.append(Path(root) / "Steam" / "steamapps" / "common" / GAME_DIR_NAME)
+        candidates.append(Path(root) / "SteamLibrary" / "steamapps" / "common" / GAME_DIR_NAME)
+        candidates.append(Path(root) / "Games" / "Steam" / "steamapps" / "common" / GAME_DIR_NAME)
 
     unique: list[Path] = []
     seen: set[str] = set()
@@ -145,7 +146,7 @@ def build_payload(game_dir: Path, types: dict[str, list[str]]) -> dict[str, obje
         "format": "MODTOOLS54_VANILLA_MODIFIER_TYPES",
         "version": 1,
         "source": "Civ6 官方 XML（Base/DLC/CTP/Debug/LaunchPad 的 <DynamicModifiers><Row>）",
-        "game_dir": str(game_dir),
+        "game_dir": "",  # 不写入本机路径（快照随源码分发）
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "count": len(types),
         "modifier_types": types,

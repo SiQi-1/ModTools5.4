@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-10-29 - 文档与仓库结构重构（P0-P5：入口瘦身 / docs 归位 / skills 分层 / 本机工作区隔离 / 守卫）
+
+- 按用户批准的重构方案执行 P0-P5。先提交重构前工作树（`46f0cc8`），再分阶段落地；本条目只记结果，方案与审计证据在 `workspace/review_notes/restructure/2026-10-29/`（本机忽略）。
+- **入口瘦身**：根 `AGENTS.md` 重写为 ≤2.3 KB 的四个门路由（做 Mod / 改工具 / 新设备 / 读文档）；`CLAUDE.md` 降为 12 行兼容 shim（正文迁 `docs/dev/architecture.md`）；删除零入链的 `AGENT.md`（同步 share 白名单与 2 处代码注释）；常驻指令面 55,251 B → 约 2.8 KB，进入 `modgen/` 时再加 8 KB（原 29.6 KB）。
+- **modgen 契约拆分**：`modgen/AGENTS.md` 29,647 B → 7,997 B（硬规则/分类/本地约定/专项索引），完整命令迁 `modgen/docs/cli-reference.md`，8 个专项通道迁 `modgen/docs/channels/*.md`；`modgen/README.md` 去重复命令块。
+- **docs 归位**：新建 `docs/{README,user,dev,dev/decisions,reference,meta}`；`CIV6_MOD_TUTORIAL→docs/user/tutorial.md`、`AGENT_SETUP→docs/user/install.md`、`ROADMAP→docs/dev/roadmap.md`（逐日流水归档 `docs/dev/changelog-archive/`）、`AI_CONTROL_API→docs/reference/ai-control-api.md`、`TEX_FORMAT→docs/reference/tex-format.md`、分享与整合记录→`docs/meta/`；README 23.2 KB → 3.3 KB；新增 7 条 ADR 与 `docs/dev/conventions.md`。
+- **事实修正 15 项**：源码规模 59,007 行/61 模块、主窗口 3 页 + 小工具独立窗口、AI 控制接口 22 动作、删除不存在的 `build_release.ps1`/`release.yml`、教程第 1 章补 `new-project`、ROADMAP 标题与口径等。
+- **skills 分层**：根保留 8 个入口文件；知识迁入 `guides/`、`reference/{entities,sql,config,project,lua,modifiers,art}/`、`packages/`（5 个技能包）、`_archive/`；`06-naming.md` 拆解后删除（与 RULES R4 冲突的「填占位空列」段一并移除）；`01-core-tables` 降级为「仅核对生成 SQL」；13 个 >32 KB 巨文件拆为 75 个分册，原文件保留为索引；索引 167 篇 → 241 篇，单篇最大 30.7 KB。
+- **检索分级**：`catalog.json` 33 条 route，全部带 `level`(must/optional)、`max_kb`、`optional` 与节级 `{path,section}`；新增 5 条基础任务路由（新增单位/文明/建筑/UI/文本）；`reading_plan` 返回 must/optional 字节与 30 KB 预算告警；「新增一个单位」must 26.62 KB（原 71 KB / 9-10 跳）。
+- **本机工作区隔离**：新建整体忽略的 `workspace/`，把 `modgen_work/`（8.67 GB）、根 `.CIV/.bak/*.extensions/*.landmarks`、`refs/`、旧 `shares/`、`build/dist/release`、`local_notes/local_skills/_scripts/work/project_reports` 等 11 GB 本机物迁入；40 个根文件清零；工程内 6,408 处 `modgen_work` 绝对路径改写为 `workspace/mods` 并全部通过 JSON 校验。
+- **发布边界**：`.gitignore` 重写（`/workspace/` + 收敛历史补丁、去掉 `*.txt`/`ai_*`/`/_*` 过宽规则）；`git rm` 27 个含本机路径的 `tools/legacy_skill_builders/*`（原件归档 `workspace/archive/`）；旧 `shares/` 加 `DO-NOT-SHARE.txt`（含 92 篇已移出 Git 的工坊资料）；清洗 19 处文档/数据本机路径（`effect_type_parameters.json`、`vanilla_modifier_types.json` 等），提取器不再写入本机目录。
+- **文本库（D4）**：`local_text_New.sqlite` 从官方 `Base/Assets/Text/zh_Hans_CN` + `DLC/*` 重新生成，22.4 MB/84,467 行 → 8.3 MB/32,268 行，剔除 52,208 条自有 Mod 词条；官方 Tag 覆盖率 100%；来源写入 `THIRD_PARTY_NOTICES.md`，备份在 `workspace/review_notes/restructure/2026-10-29/text/`。
+- **守卫**：新增 `tools/doc_lint.py`（根白名单、32 KB/500 行预算、always_read 20 KB、route 30 KB、本机路径、相对链接）与 `tests/test_repo_layout.py`（10 项）；CI `source-check.yml` 增加 lint 与布局测试两步；新增 `tools/install_skills.py`（把 `skills/packages/*` 安装到 `~/.claude/skills` / `~/.codex/skills` 或指定目录）。
+- 检查：`python -m modgen.cli skill --check`（241 篇 / 70 用例 / 0 错误，ok=true）；`python tools/doc_lint.py` OK；`python tools/share_source.py --check` 通过；`python -m unittest tests.test_source_distribution`（8 项 OK）、`tests.test_repo_layout`（10 项 OK）、`tests.test_skills_search tests.test_knowledge_quality`（44 项 OK）。
+- 未做：D7（旧 shares 删除/历史 393 MiB 重写）待单独审核；`.venv` 保留在根（移动会破坏 venv 绝对路径）；`review_notes/` 已迁入 `workspace/review_notes/`。
+
 ## 2026-10-29 - 外置 skill civ6-mcp 本机安装（可拉取、记录网址、不内置）
 
 - 用户要求按外置 skill 处理 https://github.com/lmwilki/civ6-mcp（作者 Liam Wilkinson / lmwilki，MIT，v1.1.11，审阅提交 `dd2019056371b92ea4854e879ddf05a8cad95e8a`）：可以拉取、可以记录网址、不内置进本项目 Git 与源码分享，并完成本机安装。

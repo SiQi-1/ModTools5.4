@@ -21,16 +21,16 @@ ARTIFACT_SUFFIXES = {
     ".pyc", ".pyo", ".spec",
 }
 LOCAL_DIRS = {".git", ".venv", "__pycache__", "node_modules", "logs", "local_skills"}
-OUTPUT_DIRS = {"build", "dist", "release", "shares", "modgen_work", "_work"}
+OUTPUT_DIRS = {"build", "dist", "release", "shares", "workspace/mods", "_work"}
 ROOT_FILES = {
-    ".gitignore", ".gitattributes", "AGENT.md", "AGENTS.md", "AGENT_SETUP.md",
-    "CLAUDE.md", "README.md", "CIV6_MOD_TUTORIAL.md", "LICENSE",
-    "THIRD_PARTY_NOTICES.md", "ModTools5.4.py", "requirements.txt",
+    ".gitignore", ".gitattributes", "AGENTS.md", "CLAUDE.md", "README.md",
+    "LICENSE", "THIRD_PARTY_NOTICES.md", "ModTools5.4.py", "requirements.txt",
     "local_text_New.sqlite",
 }
 SOURCE_DIRS = {"ModTools_5_4", "modgen", "skills", "tools", "docs", "licenses", "tests", ".github"}
 REQUIRED = {
     "AGENTS.md", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md",
+    "docs/README.md", "docs/dev/architecture.md",
     "modgen/cli.py", "modgen/schemas/entry_schemas.json",
     "ModTools_5_4/project/civ_project.py", "skills/RULES.md", "skills/catalog.json",
     "tools/setup_env.py", "tools/share_source.py", "local_text_New.sqlite",

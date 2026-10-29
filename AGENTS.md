@@ -1,53 +1,51 @@
-# AGENTS.md — 本仓库任务路由（先读本文件）
+# AGENTS.md — 任务路由（唯一 AI 入口）
 
-> 本仓库是《文明6》Mod 编辑器 **ModTools 5.4** 的源码仓库，同时承载两种目的：
-> - **A 实际应用**：用 ModTools / modgen 制作文明6 Mod、编写/修改 `.CIV` 工程文件、回答文明6 Mod 制作问题；
-> - **B 工具优化**：开发/改进 ModTools 本身（GUI、modgen、测试、打包、文档）。
->
-> **先判断你的任务属于哪个目的，再按下方清单读对应文档**——不要把所有根目录文档都通读一遍，
-> 也不需要读与你目的无关的文件。
+> 先判断任务属于哪一类，只读该类入口；**不要通读 `docs/` 或 `skills/`**。
+> 本仓库 = 可发布的工具源码 + `workspace/`（本机工作区，已忽略、永不提交）。
 
-## 目的 A：实际应用（做 Mod / 写 .CIV / 答 Mod 问题）
+## 目录地图
 
-任务特征：出现"生成/修改 .CIV、做文明/领袖/单位/区域、某个效果怎么实现、这个 Mod 怎么做、帮我把 XX 做进游戏"等。
+| 路径 | 是什么 | 谁维护 |
+|---|---|---|
+| `docs/` | 人读文档：`user/` 使用、`dev/` 开发、`reference/` 参考、`meta/` 分享与来源 | 贡献者 |
+| `skills/` | AI 知识库：规则、流程、路由、参考、可分享技能包 | 贡献者 |
+| `modgen/` | CLI：生成/校验 `.CIV`（命令契约在 `modgen/AGENTS.md`） | 贡献者 |
+| `ModTools_5_4/` | PyQt6 编辑器与生成引擎源码 | 贡献者 |
+| `tests/`、`tools/` | 测试与维护脚本 | 贡献者 |
+| `licenses/`、`THIRD_PARTY_NOTICES.md` | 第三方许可与来源 | 贡献者 |
+| `workspace/` | 本机 Mod 工程、笔记、构建产物、外部资料（不在 Git 内） | 仅本机 |
 
-必读（按序）：
+## 目的 A：用工具做 Mod、写 `.CIV`、回答实现问题（最常见）
 
-1. **[skills/RULES.md](skills/RULES.md)** —— 唯一制作规则正文；无论是否熟悉都要读。
-2. **[skills/WORKFLOW.md](skills/WORKFLOW.md)** —— 统一流程；按 `modgen skill "任务描述" --plan` 读取任务必读资料。
-3. **[modgen/AGENTS.md](modgen/AGENTS.md)** —— 当前命令与字段契约。
+1. 读 [skills/RULES.md](skills/RULES.md) 与 [skills/WORKFLOW.md](skills/WORKFLOW.md)（合计约 14 KB，必读）。
+2. 运行 `python -m modgen.cli skill "任务描述" --plan`，只读返回的 **must** 项和建议章节；`--section` 只取需要的节。
+3. 涉及命令/字段时读 [modgen/AGENTS.md](modgen/AGENTS.md)（≤8 KB）；专项通道（地标/纹理/头像模板/资源检查等）再读 `modgen/docs/` 下对应单篇。
+4. 产出只经 modgen 写入：`generate` → `validate` → `merge` → `project-check` → `preview`。
+5. 找不到路由时看 [skills/SKILLS_OUTLINE.md](skills/SKILLS_OUTLINE.md)；资料依据见 [skills/SOURCES.md](skills/SOURCES.md)。
 
-`AGENT.md` 保留兼容入口；同会话已读且未变化的资料可复用。实现前简短注明所用文件/章节与待验证项。
+## 目的 B：改工具 / 改知识库 / 改文档
 
-涉及 HTML/CSS 设计、UI 美化或网页原型转文明6控件时，读取 **[skills/civ6-html-ui/SKILL.md](skills/civ6-html-ui/SKILL.md)**；该目录包含平台中立的技能、脚本和示例，可整包分享，不依赖个人技能安装。
+1. [docs/dev/architecture.md](docs/dev/architecture.md) —— 架构、模块地图、关键设计决策。
+2. [docs/dev/roadmap.md](docs/dev/roadmap.md) —— 当前 Done/TODO。
+3. [ModTools_5_4/CHANGELOG.md](ModTools_5_4/CHANGELOG.md) —— **只读顶部 5 条**，不要通读 260 KB。
+4. 改知识库另读 [skills/AGENTS.md](skills/AGENTS.md)；第三方来源与分发边界读 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+5. 已定型的架构决策在 [docs/dev/decisions/](docs/dev/decisions/)；改决策要新增 ADR，不要往架构文档里堆。
 
-涉及地标模型、TileBase AST 组合、Landmarks 或区域建筑差分时，读取 **[skills/civ6-landmarks/SKILL.md](skills/civ6-landmarks/SKILL.md)**，使用 `modgen landmark` 资源包通道。
+## 目的 C：新设备 / 换环境
 
-涉及用脚本或 AI 实际控制文明6对局（窗口化启动、FireTuner 调试、Mod 启停、选文明领袖开局、单位/城市操作、截图与日志取证、Mod 自动测试）时，读取 **[skills/civ6-ai-play/SKILL.md](skills/civ6-ai-play/SKILL.md)**；它附带 Windows 窗口、Mods.sqlite 与日志脚本，要求先备份配置、测试后关闭游戏并还原。
+读 [docs/user/install.md](docs/user/install.md)（一键初始化、手动配置、验证、排障）。
 
-涉及把 UE 工程（鸣潮等）的 psk 模型与 ueanim 动画导入为文明6领袖 3D 模型时，先读 **[外置技能名单](skills/EXTERNAL_SKILLS.md)**：civ6-model-import 技能包（作者千寻瀑）不随仓库分发，需向作者索取后安装到本机 `local_skills/`，再用 `modgen skill --skills-dir` 检索。
+## 红线（完整正文在 skills/RULES.md，此处不复制）
 
-其余按需：`README.md`「AI 生成 .CIV」章节（开局提示词，给人/AI 的摘要）、`CIV6_MOD_TUTORIAL.md`（全流程教程，人读为主）。
+- ModifierType / EffectType / RequirementType / CollectionType 优先复用原版；自建必须同时注册。
+- JSON 值禁止空字符串；参数与枚举必须查证；图片路径必须真实存在。
+- 主内容不写 Lua / 手写 SQL / XML；自定义内容走扩展通道，工具是唯一写入者。
+- 单个 Mod 的工程、脚本、日志、预览与构建产物只进 `workspace/`，不进 Git。
 
-## 目的 B：工具优化（改 ModTools 本身）
+## 变更纪律
 
-任务特征：出现"改工具/加功能/修 bug、modgen 命令行为、生成器、预览、测试、打包、重构、文档优化"等。
-
-必读（按序）：
-
-1. **`CLAUDE.md`**（仓库根）——代码架构、关键设计决策、开发约定（文档同步、日志、测试）。
-2. **`ModTools_5_4/docs/ROADMAP.md`** —— 当前 Done/TODO 状态（改功能前先看，避免重复/冲突）。
-3. **`ModTools_5_4/CHANGELOG.md`** —— 功能历史；**每次功能改动必须在此记录**（最新条目在顶部）。
-4. 改 `modgen/` 相关代码时，额外读 `modgen/README.md`（模块结构）与 `modgen/AGENTS.md`（**AI 使用契约**——工具行为必须服从它，改行为 = 改契约，需同步两边）。
-5. 涉及第三方来源、社区资料、PSD 模板或 `refs/` 时，读根 `THIRD_PARTY_NOTICES.md` 与 `docs/COMMUNITY_SKILL_INTEGRATION.md`；他人工坊提炼资料只在 `local_notes/04-lua-workshop/`（不入 Git、不随分享），不要把第三方 skill 仓库内容炼化进 `skills/`。
-
-## 目的 C：环境初始化（新设备）
-
-- **`AGENT_SETUP.md`**（仓库根）——一键初始化任务书（setup_env / 手动配置 / 验证 / 排障）。
-
-## 红线（无论哪个目的；涉及 .CIV 内容时一律适用）
-
-- ModifierType / EffectType / RequirementType / CollectionType **优先引用游戏库已有类型**；确需新建必须同时写 `DynamicModifiers` 行；
-- JSON 值**禁止写 `""`**（空值 → 省略字段或写 `null`）；
-- 主内容（.CIV 条目）**不写 Lua、不手写 SQL/XML**（一切输出由工具从 .CIV 生成）；确需 Lua/自定义 SQL/XML 时走**自定义文件通道**（`modgen extension` / `custom-file` / AI 动作 `extension`、`project_file_write`，工具是唯一写入者）。
-- **第三方来源**：他人工坊 Mod 提炼资料不进入 Git/源码分享（仅本机 `local_notes/04-lua-workshop/`）；外部 skill/知识仓库只记录参考链接，不内置、不拉取、不炼化；压缩包原件不内置。外置技能包只在 [名单](skills/EXTERNAL_SKILLS.md) 登记，不代替作者发布。社区 PSD 模板经用户确认可分享。
+- 不新增根目录文档；新文档进 `docs/` 或 `skills/` 对应目录。
+- 预算：普通文档 ≤32 KB，`SKILL.md` ≤500 行，`--plan` 必读总量 ≤30 KB；超限就拆。
+- 每个事实只写一处；其余位置只放链接。改命令/行为 = 改契约，同步 `modgen/AGENTS.md`、`skills/catalog.json` 与测试。
+- 新文档首行写元信息：`> 受众 … ｜ 何时读 … ｜ 适用版本 …`。
+- 校验：`python -m modgen.cli skill --check`、`python -m unittest discover -s tests`。

@@ -55,7 +55,8 @@ UIUpscale 0.000000
 ## 窗口化
 
 - **为什么窗口化**：窗口可枚举 rect、可截图、可聚焦；独占全屏下截图与后台操作不可靠，自动测试一律窗口化。
-- **修改方式**：两种等价做法，优先用脚本。脚本：`civ6_game.py windowed --width 1280 --height 720`（默认 1280×720；显卡吃力时继续减小），游戏运行时会拒绝改写；它把 `[Video]` 的 `FullScreen` 改为 `0`、`RenderWidth`/`RenderHeight` 改为指定值，同时确保 `[Debug] EnableTuner 1`，并按低配档位关闭 MSAA、阴影、泛光等选项。手工：关闭游戏后只改 `[Video]` 的三个值，`UIUpscale` 保持不变；尺寸不超过桌面分辨率。
+- **尺寸标准**：窗口尺寸不写死。启动前按主屏物理分辨率推导：取与主屏宽高比一致（允许 <1% 误差）、约占工作区 85–90% 的整数尺寸（宽度可 8 像素对齐），使比例与屏幕一致且面积尽量大；主屏分辨率或缩放变化时重新计算。设备的具体分辨率/缩放/窗口尺寸属本机数据，只写本机状态目录（示例：`%LOCALAPPDATA%\civ6_ai_play\device_profile.json`），**不写入技能文档或仓库**。
+- **修改方式**：两种等价做法，优先用脚本。脚本：`civ6_game.py windowed --width <宽> --height <高>`（尺寸由启动器按上条标准自动计算；显卡吃力时按同一比例缩小），游戏运行时会拒绝改写；它把 `[Video]` 的 `FullScreen` 改为 `0`、`RenderWidth`/`RenderHeight` 改为指定值，同时确保 `[Debug] EnableTuner 1`，并按低配档位关闭 MSAA、阴影、泛光等选项。手工：关闭游戏后只改 `[Video]` 的三个值，`UIUpscale` 保持不变；尺寸不超过桌面分辨率。
 - **备份与还原**：脚本在改写前把 `AppOptions.txt`、`GraphicsOptions.txt` 整文件复制到状态目录 `backups\`（时间戳命名），并写入 `state.json`；**重复调用 windowed/launch 时会复用最初一次的备份**，`civ6_game.py restore` 按记录整文件复制回原路径。手工操作的替代办法：备份后记录原 `RenderWidth`/`RenderHeight`/`FullScreen` 三个值，还原时只写回这三个值，避免覆盖用户期间的其他设置。两种方式都要在还原后读回确认。
 - **启动**：脚本 `launch --exe dx12|dx11` 以游戏根为工作目录直接运行 exe，也可由 Steam 启动；手工运行时工作目录设为 `Base\Binaries\Win64Steam` 或游戏根均可（记录实际方式）。同一时刻只运行一个游戏实例；不要结束 Steam。
 - **核对**：启动后用窗口脚本列出 `CivilizationVI*` 窗口并记录 rect；若窗口仍全屏或黑屏，先等 30 秒再判断，仍异常转 [排障](troubleshooting.md)。

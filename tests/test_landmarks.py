@@ -237,7 +237,7 @@ class LandmarkTests(unittest.TestCase):
         other.mkdir(parents=True)
         (other / 'Shape.geo').write_bytes((self.pantry / 'Geometries/Shape.geo').read_bytes())
         (other / 'Shape.fgx').write_bytes((self.pantry / 'Geometries/Shape.fgx').read_bytes())
-        self.assertEqual(SDKIndex(self.sdk).find('Shape', '.geo'), other / 'Shape.geo')
+        self.assertEqual(SDKIndex(self.sdk).find('Shape', '.geo').resolve(), (other / 'Shape.geo').resolve())
         (other / 'Shape.fgx').write_bytes(b'different mesh')
         with self.assertRaisesRegex(ValueError, '2 matches'):
             SDKIndex(self.sdk).find('Shape', '.geo')
@@ -250,7 +250,7 @@ class LandmarkTests(unittest.TestCase):
         (other / 'Materials').mkdir(parents=True)
         (other / 'Assets').mkdir()
         (other / 'Materials/Stone.mtl').write_bytes((self.pantry / 'Materials/Stone.mtl').read_bytes())
-        self.assertEqual(SDKIndex(self.sdk).find('Stone', '.mtl'), other / 'Materials/Stone.mtl')
+        self.assertEqual(SDKIndex(self.sdk).find('Stone', '.mtl').resolve(), (other / 'Materials/Stone.mtl').resolve())
         (other / 'Materials/Stone.mtl').write_text('<Different/>')
         with self.assertRaisesRegex(ValueError, '2 matches'):
             SDKIndex(self.sdk).find('Stone', '.mtl')

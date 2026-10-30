@@ -80,6 +80,8 @@ UI.RequestPlayerOperation(0, PlayerOperations.PROMOTE_GOVERNOR, {[PlayerOperatio
 
 总督“就职”需要若干回合，`HasEstablishedShowGovernor`/`IsEstablished` 可作为门槛断言。
 
+**注意【实测 2026-10-30】**：`PROMOTE_GOVERNOR` 在部分环境返回 true 但 `governor:HasPromotion(hash)` 始终 false（未产生晋升效果）；总督晋升相关效果不要依赖该操作，改用“城市/单位属性模拟晋升状态”或等待真实晋升流程。
+
 ### 4.4 信仰购买
 
 ```lua
@@ -98,6 +100,55 @@ CityManager.RequestCommand(city, CityCommandTypes.PURCHASE, params)
 - `WorldBuilder.MapManager():SetImprovementType(plot, improvementIndex, playerID)` 可直接放改良并渲染。
 - `UnitManager.InitUnit` 在部分环境返回成功但单位坐标 `-9999`（未落地）【实测，部分环境】；单位截图优先走正常生产路径。
 - `UI.LookAtPlot(x, y)` 聚焦相机（UI 状态）。
+
+### 4.6 奇迹/建筑落成与场景夹具（2026-10-30 实测）
+
+> 以上配方已固化为 **`scripts/civ6_fixtures.py`**（库 + CLI，契约测试在 `tests/test_civ6_fixtures.py`）。常用：
+>
+> ```powershell
+> python skills/packages/civ6-ai-play/scripts/civ6_fixtures.py states
+> python skills/packages/civ6-ai-play/scripts/civ6_fixtures.py find-plot --city-id 65536 --wonder-slot
+> python skills/packages/civ6-ai-play/scripts/civ6_fixtures.py create-wonder --city-id 65536 --wonder BUILDING_STONEHENGE --plot-index 123
+> python skills/packages/civ6-ai-play/scripts/civ6_fixtures.py simulate-combat --attacker 131073 --defender 196610
+> python skills/packages/civ6-ai-play/scripts/civ6_fixtures.py run-turns --count 10
+> ```
+>
+> 库用法：`from civ6_fixtures import connect, scripts_state, spawn_unit, found_city`。所有函数返回 `{"ok", "error", "data", "raw"}`，`data` 为 `@@CIV6AI:` 解析后的键值。
+
+**奇迹落成（关键）**：
+
+```lua
+-- GP/Scripts 上下文；wonderIndex 为 GameInfo.Buildings 行 Index，plotIndex 为合法地块
+city:GetBuildQueue():CreateIncompleteBuilding(wonderIndex, plotIndex, 100)
+-- 断言 city:GetBuildings():HasBuilding(wonderIndex) == true
+```
+
+- `CreateBuilding(wonderIndex, 100, plotIndex)` 对 Wonder **恒失败**（调用 ok 但 HasBuilding=false，日志可能只有自定义错误）；`WorldBuilder.CityManager():CreateBuilding(city, 'BUILDING_X', 100, plotIndex)` 亦返回 false。修这类“落成失败”的 Mod 逻辑时优先换 `CreateIncompleteBuilding`。
+- 普通建筑（非 Wonder）可用 `city:GetBuildQueue():CreateBuilding(index)` 直接落成；Fever 等“临时建筑”夹具常用此法（如 +6 宜居建筑）。
+
+**造第二城（无 WorldBuilder 依赖）**：
+
+```lua
+-- GP 上下文：在空地造 settler
+local u = UnitManager.InitUnit(pid, 'UNIT_SETTLER', x, y)
+-- UI 上下文：让 settler 执行建城操作
+local u2 = UnitManager.GetUnit(pid, unitID)
+UnitManager.RequestOperation(u2, UnitOperationTypes.FOUND_CITY)
+```
+
+**AI 城 / AI 奇观场景**：直接结束回合推进（AI 通常 T5+ 有城、T30–T50 出奇观），每 3–4 回合用前台 Esc 清弹窗（NaturalWonderPopup/WonderBuiltPopup 会阻塞 endTurn）；需要“奇观已被某 major 建成”的前置时用此法。
+
+**旅游数值读取**：`Players[id]:GetStats():GetTourism()` 在 **UI 上下文**可用；GP/Scripts 上下文无该方法。早期旅游为 0 时 +% 无差异，需先有旅游来源或改走“modifier 契约 + 行为证据”。
+
+**UI 侧生产夹具（建造/区域/奇观，2026-10-30 实测）**：
+
+- 生产列表：`buildQueue:CanProduce(hash, true)` 过滤 + `CityManager.CanStartOperation(city, CityOperationTypes.BUILD, {[PARAM_*_TYPE]=hash}, true)` 二次过滤；失败原因在 `results[CityCommandResults.FAILURE_REASONS]`（本地化文本，可直接当“建造条件”读）。
+- 合法地块：`CityManager.GetOperationTargets(city, CityOperationTypes.BUILD, {[PARAM_BUILDING_TYPE/PARAM_DISTRICT_TYPE]=hash})` 返回 `PLOTS`（**已自动限定 3 环内**）；逐地块再用 `CanStartOperation(..., {..., PARAM_X=x, PARAM_Y=y})` 取 `SUCCESS_CONDITIONS`（如“将移除森林”）。
+- 设置生产：`CityManager.RequestOperation(city, CityOperationTypes.BUILD, {[PARAM_*_TYPE]=hash, PARAM_X, PARAM_Y, PARAM_INSERT_MODE=VALUE_EXCLUSIVE})`；RequestOperation 是**异步**的，立即读 `GetCurrentProductionTypeHash()` 可能为 0，应等 ~1s 再读回确认。
+- **实测结果**：unit / building / district（带坐标）**可设置并读回验证**；**wonder 经该路径实测未生效**（CanStartOperation=true 但 RequestOperation 后队列仍空），奇观落成建议仍用 GP 侧 `CreateIncompleteBuilding`，或用 UI 面板真实点击流程。
+- MCP 已有对应工具（**优先用 MCP**）：`get_city_production(city_id)`、`set_city_production(city_id, item_type, item_name, target_x, target_y)`、`get_district_advisor(city_id, district_type)`、`get_wonder_advisor(city_id, wonder_name)`；脚本环境用本页 `scripts/civ6_fixtures.py` 的 `list-production` / `build-targets` / `set-production`（同上限制）。
+
+**上下文差异补充**：`Map.GetCityPlots():GetPurchasedPlots(city)` 在 Tuner 的 GP eval 里可能为 nil（但在 Mod 自身 GP 事件回调内可用）；探测城市地块用 `city:GetOwnedPlots()` 更稳。
 
 ## 5. UI 交互与截图
 
@@ -120,6 +171,16 @@ CityManager.RequestCommand(city, CityCommandTypes.PURCHASE, params)
 | 启动卡住 `CheckShaderDepotManifest` | Steam 仍跟踪上一轮游戏/BugReporter 进程 | 结束残留进程；必要时重启 Steam 再启动 |
 | 部署后哈希不一致 | 复制/生成中断或旧文件残留 | 部署脚本全量 SHA-256 对比；旧目录移出 Mods 避免同 GUID 双份 |
 | `.CIV` 被工具重新保存后字段变化 | 编辑器保存会丢弃 null/空字段并规范化子表 | 语义计数不变即可；保留 `.CIV.bak` 回溯 |
+
+### 7.1 内容热更与重启边界（2026-10-29 实测补充）
+
+判定只看 **modinfo 是否变化**（即打包文件清单是否变化）：
+
+- **仅改已有文件内容、无新增/删除文件**：modinfo 的 `<Files>`/`<Actions>` 不变。此时把安装目录内同名文件覆盖为新内容后，**不必关闭游戏**；回到主菜单**新开一局**（或重新读档）即可让改动生效。
+- **新增或删除了任何被打包的文件**（新增 UI 纹理/Lua/XML、删除文件等）：modinfo 会变化，**必须完全退出游戏再启动**；否则新文件不会被识别，表现为“资源缺失/旧资源”的假象。
+- 操作顺序：构建/导出 → 对比 modinfo 文件清单（文件数/内容哈希）→ 覆盖安装目录同名文件 → 游戏返回主菜单 → 新开一局 → 验证。测试记录里同时写清本次是**热更**还是**重启**，以及 modinfo sha256。
+- 无法确认 modinfo 是否变化时按“重启”处理。纹理类替换若新局仍显示旧图，再按重启复核。
+- **实测（2026-10-29）**：构建只改内容、文件清单不变（334 文件，新增/删除 0，modinfo 仅 `<Created>` 时间戳变化）时，在**游戏运行中**（停在主菜单）直接替换安装目录，返回主菜单开新局后新 UI/修复即生效（同 PID、未重启游戏）；替换前后安装目录 334/334 哈希一致。
 
 ## 8. 收尾
 
@@ -186,6 +247,7 @@ local row = GameInfo.GameSpeeds[speed]   -- hash 索引可用；不要用字符�
 
 用字符串比较 hash 会永远匹配不到 → 静默回退到默认值（如伤害/价格回退 1.0），表现为「UI 显示与实际扣费不一致」。**凡是“UI 显示与实扣/实际数值不一致”，优先怀疑 GP/UI 的类型与上下文差异**。
 
+- `Map.GetCityPlots():GetPurchasedPlots`：Mod 的 GP 事件回调内可用，Tuner 直连 GP eval 可能为 nil；城市地块探测优先 `city:GetOwnedPlots()`。
 其他常见差异：`GetCivilizationType()` 在 GP 可能不可用（用 `PlayerConfigurations` 或属性）；`city:GetDistricts()` 的集合方法在 GP/UI 不同（`HasDistrict/GetDistrictByType` 在 GameCore，`Members()` 在 UI 脚本常见）。遇到 nil 方法先小脚本探测，不要假设。
 
 ## 12. 最小可复现示例（看海）

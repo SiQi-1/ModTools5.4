@@ -130,8 +130,8 @@ def ensure_environment(
         )
     else:
         problem = (
-            "ModTools 5.4 尚未初始化运行环境（缺少 .venv 与 PyQt6/Pillow）。\n\n"
-            "是否现在自动初始化？将创建 .venv 并安装 PyQt6/Pillow，需要联网，约几分钟。\n"
+            "ModTools 5.4 尚未初始化运行环境（缺少 .venv 或依赖（PyQt6/Pillow/psd-tools/scipy））。\n\n"
+            "是否现在自动初始化？将创建 .venv 并安装 requirements.txt 依赖（PyQt6/Pillow/psd-tools/scipy），需要联网，约几分钟。\n"
             "选择「否」可稍后按 " + DOCS_HINT + " 手动完成。"
         )
     if interactive is None:

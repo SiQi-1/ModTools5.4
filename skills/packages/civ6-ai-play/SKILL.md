@@ -73,7 +73,7 @@ MCP 服务器、脚本直连、常驻桥、FireTuner GUI **同一时刻只能有
 
 ## 测试 Mod（Lua / DLL / 自定义 UI）
 
-启用 Mod、开一局，按 [验收分层](#验收分层) 分层取证（命令 → 连接 → 开局 → 操作 → Mod → 环境）；完整方法见 [Mod 测试方法](references/mod-testing.md)；需要对每条能力做属性/建筑/单位断言与面板截图时，用 [真实 Mod 运行时验证](references/mod-runtime-testing.md) 的模板与夹具（含 `tuner_eval.py` 与 DPI 点击脚本）。操作驱动优先用 MCP 工具（若客户端已注册）；Mod 专属断言用 `run_lua` 或 `tuner_eval.py`，自定义 UI 与 DLL 场景仍走本技能 tuner/loader 方法。
+启用 Mod、开一局，按 [验收分层](#验收分层) 分层取证（命令 → 连接 → 开局 → 操作 → Mod → 环境）；完整方法见 [Mod 测试方法](references/mod-testing.md)；需要对每条能力做属性/建筑/单位断言与面板截图时，用 [真实 Mod 运行时验证](references/mod-runtime-testing.md) 的模板与夹具（含 `tuner_eval.py` 与 DPI 点击脚本）。 造物/场景夹具已封装为 `scripts/civ6_fixtures.py`（`find-plot`/`spawn-unit`/`found-city`/`create-building`/`create-wonder`/`simulate-combat`/`tourism`/`run-turns`/`list-production`/`build-targets`/`set-production` 等，配方与限制见该参考 §4.6；MCP 已有 `get_city_production`/`set_city_production`/`get_district_advisor`/`get_wonder_advisor` 时优先用 MCP）。操作驱动优先用 MCP 工具（若客户端已注册）；Mod 专属断言用 `run_lua` 或 `tuner_eval.py`，自定义 UI 与 DLL 场景仍走本技能 tuner/loader 方法。
 
 - 玩法 Lua Mod：看 Lua.log 中 Mod 自己的打印与 Database.log 报错，用 tuner 对比修改前后状态。
 - DLL Loader 插件 Mod：先确认 loader 日志与插件 OnLoad；若 loader 日志不生成且进程加载的 VERSION.dll 来自 `C:\WINDOWS\SYSTEM32`，可能是 Windows 兼容性库抢先加载了系统 VERSION.dll，用 `scripts/civ6_sdb_fix.py status/apply/verify` 诊断修复（apply 会改 sysMerge.sdb，需管理员，自动备份/可 restore；Windows 更新后重新 apply）。无法改系统时用 `scripts/civ6_inject.py` 注入（测试后删除注入文件与目录）。

@@ -9,7 +9,7 @@
 | 你要做什么 | 需要装什么 | 怎么运行 |
 |---|---|---|
 | 只做数据 / 知识检索（AI 或命令行） | Python 3.10+（推荐 3.13），标准库即可 | `python -m modgen.cli ...` |
-| 完整生成、预览与 GUI | PyQt6 + Pillow | 直接双击 `ModTools5.4.py`（首次会弹窗引导自动建 `.venv` 并装依赖）；或 `python tools/setup_env.py` 后运行 `.venv\Scripts\python ModTools5.4.py` |
+| 完整生成、预览与 GUI | PyQt6 + Pillow（PSD/区域贴图功能另需 psd-tools + scipy） | 直接双击 `ModTools5.4.py`（首次会弹窗引导自动建 `.venv` 并装依赖）；或 `python tools/setup_env.py` 后运行 `.venv\Scripts\python ModTools5.4.py` |
 
 新设备初始化、数据库与排障见 [新设备初始化](install.md)。
 

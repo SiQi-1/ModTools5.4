@@ -4,7 +4,7 @@
 
 > 本文件给 **AI agent** 使用：在全新设备上完成 ModTools 5.4 的环境配置。
 > 目标：让本机既能**运行编辑器**，也能让 **agent 生成/校验 .CIV**、**查询游戏实现**。
-> 全程约 3-5 分钟（取决于网络）。
+> 全程约 5-10 分钟（取决于网络与是否装 PSD/scipy 依赖）。
 
 ---
 
@@ -29,6 +29,8 @@ python tools/setup_env.py --check  # 只检测，不安装（排障用）
 ```
 
 脚本会自动：创建 `.venv` → 安装 `requirements.txt` → 探测游戏库/文本库并生成便携 `settings.json` → 导入冒烟 + modgen 冒烟。
+
+> `requirements.txt` 含 GUI 依赖（PyQt6）、图像依赖（Pillow）以及 PSD/区域贴图工具依赖（psd-tools、scipy）；不做 PSD 相关功能时这几项也可后装，但一次装全可避免“功能入口报缺库”。
 
 > **新用户直接双击也可以**：双击 `ModTools5.4.py` 时，如果当前 Python 缺少 PyQt6 且仓库没有 `.venv`，启动器会弹窗询问是否自动初始化；选「是」等价于运行本节的 `setup_env.py`（需要联网，约几分钟），完成后自动用 `.venv` 打开编辑器。AI/CI 等非交互环境不会自动安装，只提示运行 `python tools/setup_env.py`。
 > 前置条件仍是先装好 **Python 3.10+**（安装时勾选 “Add python.exe to PATH”）；没有 Python 时双击 `.py` 不会执行。

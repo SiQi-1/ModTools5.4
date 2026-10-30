@@ -1,2 +1,6 @@
 PyQt6>=6.6
 Pillow>=10.0
+# PSD 图像/区域贴图工具（art_images / district_psd）使用
+psd-tools>=1.9
+numpy>=1.24
+scipy>=1.10

@@ -44,6 +44,30 @@ def _effects(layer):
     return [e for e in layer.effects if e.enabled]
 
 
+def _effect_blend(effect):
+    """Effect blend mode as the PSD descriptor enum (b'Nrml'/b'Mltp'/b'SftL').
+
+    psd-tools <=1.9 surfaced the descriptor enum through ``blend_mode``;
+    newer releases return a ``BlendMode`` whose value is the layer fourcc
+    (b'norm'/b'mul '/b'sLit'). Normalize both shapes to the descriptor enum so
+    the validation and the glow mapping below stay descriptor-shaped.
+    """
+    descriptor = getattr(effect, 'descriptor', None)
+    if descriptor is not None:
+        try:
+            marker = descriptor.get(b'Md  ')
+        except Exception:
+            marker = None
+        enum = getattr(marker, 'enum', None)
+        if enum:
+            return enum
+    mode = getattr(effect, 'blend_mode', None)
+    if isinstance(mode, bytes):
+        flat = mode.strip()
+        return {b'norm': b'Nrml', b'mul': b'Mltp', b'sLit': b'SftL'}.get(flat, flat)
+    return mode
+
+
 def _glow_mask(alpha, effect):
     """Approximate the template's smooth, linear-contour, edge glows.
 
@@ -81,7 +105,7 @@ def _apply_glow(backdrop, alpha, effect):
     solid = Image.new('RGB', backdrop.size, color)
     base = backdrop.convert('RGB')
     blend = {b'Nrml': lambda a, b: b, b'Mltp': ImageChops.multiply,
-             b'SftL': ImageChops.soft_light}[effect.blend_mode](base, solid)
+             b'SftL': ImageChops.soft_light}[_effect_blend(effect)](base, solid)
     # A blend mode only blends where the backdrop has coverage.
     blend = Image.composite(blend, solid, backdrop.getchannel('A')).convert('RGBA')
     blend.putalpha(_glow_mask(alpha, effect))
@@ -93,14 +117,14 @@ def _validate_effect(effect):
         raise ValueError(f'区域模板包含尚未支持的样式：{effect.name}；请使用原生编辑器导出')
     if effect.name in ('OuterGlow', 'InnerGlow'):
         points = [(float(p[b'Hrzn']), float(p[b'Vrtc'])) for p in effect.contour[b'Crv ']]
-        if (effect.glow_type != b'SfBL' or effect.blend_mode not in (b'Nrml', b'Mltp', b'SftL')
+        if (effect.glow_type != b'SfBL' or _effect_blend(effect) not in (b'Nrml', b'Mltp', b'SftL')
                 or points != [(0., 0.), (255., 255.)] or effect.noise or effect.quality_jitter
                 or effect.gradient is not None or not 0 < effect.quality_range <= 100
                 or not 0 <= effect.choke <= 100 or not 0 <= effect.size <= 64
                 or (effect.name == 'InnerGlow' and effect.descriptor[b'glwS'].enum != b'SrcE')):
             raise ValueError('发光样式超出已支持的平滑、线性轮廓、无噪点配置；请使用原生编辑器导出')
     else:
-        if effect.blend_mode != b'Nrml' or effect.type != b'Lnr ':
+        if _effect_blend(effect) != b'Nrml' or effect.type != b'Lnr ':
             raise ValueError('区域渐变目前只支持 Normal 混合的线性渐变')
         desc = effect.descriptor
         offset = desc.get(b'Ofst')

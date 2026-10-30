@@ -140,6 +140,23 @@ class ArtImagesTests(unittest.TestCase):
         self.assertTrue(group[1].visible)
         self.assertEqual(styles,[_plain(e.descriptor) for e in group.effects])
 
+    def test_effect_blend_normalizes_library_enum_and_bytes(self):
+        from ModTools_5_4.project.district_psd import _effect_blend
+        p, _ = self.district_template()
+        got = {e.name: _effect_blend(e) for e in p[1][0][1].effects}
+        self.assertEqual(got, {'GradientOverlay': b'Nrml', 'Stroke': b'Nrml', 'OuterGlow': b'Mltp'})
+
+        class Fake:
+            descriptor = None
+            blend_mode = b'norm'
+        self.assertEqual(_effect_blend(Fake()), b'Nrml')
+        Fake.blend_mode = b'mul '
+        self.assertEqual(_effect_blend(Fake()), b'Mltp')
+        Fake.blend_mode = b'sLit'
+        self.assertEqual(_effect_blend(Fake()), b'SftL')
+        Fake.blend_mode = b'unknown'
+        self.assertEqual(_effect_blend(Fake()), b'unknown')
+
     def test_district_refuses_missing_style_and_foreign_group(self):
         p,recipe=self.district_template()
         from psd_tools.psd.descriptor import Bool

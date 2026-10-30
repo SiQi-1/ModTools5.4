@@ -30,6 +30,9 @@ python tools/setup_env.py --check  # 只检测，不安装（排障用）
 
 脚本会自动：创建 `.venv` → 安装 `requirements.txt` → 探测游戏库/文本库并生成便携 `settings.json` → 导入冒烟 + modgen 冒烟。
 
+> **新用户直接双击也可以**：双击 `ModTools5.4.py` 时，如果当前 Python 缺少 PyQt6 且仓库没有 `.venv`，启动器会弹窗询问是否自动初始化；选「是」等价于运行本节的 `setup_env.py`（需要联网，约几分钟），完成后自动用 `.venv` 打开编辑器。AI/CI 等非交互环境不会自动安装，只提示运行 `python tools/setup_env.py`。
+> 前置条件仍是先装好 **Python 3.10+**（安装时勾选 “Add python.exe to PATH”）；没有 Python 时双击 `.py` 不会执行。
+
 ## 2. 手动配置（脚本失败/需自定义时）
 
 ### 2.1 创建虚拟环境并装依赖

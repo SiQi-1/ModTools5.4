@@ -49,9 +49,11 @@ def step_check_python() -> bool:
 
 
 def step_create_venv() -> bool:
-    if VENV_DIR.exists():
+    if VENV_DIR.exists() and _venv_python().exists():
         print(f"[2/5] venv 已存在: {VENV_DIR}")
         return True
+    if VENV_DIR.exists():
+        print(f"[2/5] venv 目录存在但缺少解释器，尝试修复: {VENV_DIR}")
     print("[2/5] 创建 venv ...")
     result = subprocess.run(
         [sys.executable, "-m", "venv", str(VENV_DIR)],

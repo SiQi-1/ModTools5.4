@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-30 - 新用户首次双击自动引导初始化（无 .venv 时一键建环境）
+
+- 现象：新设备只装了系统 Python 时，双击 `ModTools5.4.py` 会经 `py.exe` 用系统 Python 执行，缺少 PyQt6 导致窗口不出现；原启动器只在仓库已有 `.venv` 时切换解释器，新用户仍然点不开。
+- `ModTools5.4.py` 新增首次运行引导：当前解释器缺 PyQt6 且没有 `.venv` → 弹窗询问是否自动初始化（等价运行 `tools/setup_env.py`，联网安装 PyQt6/Pillow），完成后自动用 `.venv` 启动；已有 `.venv` 直接切换；`.venv` 存在但依赖损坏时提示重装。AI/CI 等非交互环境（输出为管道）只打印指引并以退出码 1 结束，不会挂起等待输入。
+- `tools/setup_env.py`：`.venv` 目录存在但解释器缺失时先尝试修复，不再误报「已存在」。
+- 测试：新增 `tests/test_launcher_bootstrap.py`（7 项：依赖已可用跳过、已有 venv 切换、无 venv 非交互退出、交互拒绝/接受、安装失败提示），不触发 GUI 与网络。
+- 文档：README「三个入口」、`docs/user/quickstart.md`、`docs/user/install.md`、`docs/user/faq.md` 补充首次双击流程与「必须先装 Python 3.10+」前置条件。
+- 验证：`py.exe ModTools5.4.py`（已有 venv 分支）仍正常打开窗口（约 9 秒）；在独立源码分享目录（579 文件、无 `.venv`）实测 `setup_env.py` 全流程通过（建 venv → 装 PyQt6/Pillow → 生成配置 → modgen 冒烟）；模拟全新目录的非交互启动以退出码 1 给出指引、不挂起；`tests.test_launcher_bootstrap` 7 项与 venv 快速套件 31 项 OK；`tools/doc_lint.py` OK。
+
 ## 2026-10-29 - 修复双击 ModTools5.4.py 无反应（自动改用仓库 .venv）
 
 - 现象：Windows 的 `.py` 默认关联 `py.exe` → 系统 Python 3.13 没有 PyQt6，`ModTools5.4.py` 在导入阶段即 `ModuleNotFoundError`；用无控制台的 `pythonw`/快捷方式启动时表现为「点了没反应」。桌面快捷方式本身指向 `.venv\Scripts\pythonw.exe`，是正常的；应用与代码无回归（`--headless --ai-exec` 与 64 项测试均通过，无 crash.log）。

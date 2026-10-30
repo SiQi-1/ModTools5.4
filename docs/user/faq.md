@@ -24,6 +24,9 @@
 
 ## 运行环境
 
+**Q: 双击 `ModTools5.4.py` 没反应 / 提示缺少 PyQt6**
+→ 新用户首次双击会弹窗询问是否自动初始化，选「是」会创建 `.venv` 并安装 PyQt6/Pillow（需联网，几分钟），完成后自动打开。若没有弹窗（例如 AI/无控制台），先在源码目录运行 `python tools/setup_env.py`。若系统里根本没有 Python，双击 `.py` 不会执行，需先安装 Python 3.10+ 并勾选 “Add python.exe to PATH”。
+
 **Q: 源码版启动报错 / 依赖问题**
 → 确认用 `.venv\Scripts\python` 运行，并已执行 `python tools/setup_env.py`；换镜像重装：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`。
 

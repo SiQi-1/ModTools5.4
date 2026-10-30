@@ -10,7 +10,7 @@
 |---|---|---|
 | **AI** | 让 AI 生成/校验/合并 `.CIV` 条目、回答「某效果怎么实现」 | 读 [AGENTS.md](AGENTS.md)，再按任务读 [skills/RULES.md](skills/RULES.md) 与 [skills/WORKFLOW.md](skills/WORKFLOW.md) |
 | **CLI（modgen）** | 无 GUI 的脚本与自动化；纯标准库 | `python -m modgen.cli new-project 工程.CIV --name 中文名 --prefix SIQI --infix 1`；命令契约 [modgen/AGENTS.md](modgen/AGENTS.md) |
-| **GUI（PyQt6，可选）** | 可视化编辑、一键生成、能力搜索、截图观察 | `python tools/setup_env.py` 后 `.venv\Scripts\python ModTools5.4.py` |
+| **GUI（PyQt6，可选）** | 可视化编辑、一键生成、能力搜索、截图观察 | 直接双击 `ModTools5.4.py`（首次缺环境会弹窗引导自动初始化）；或 `python tools/setup_env.py` 后 `.venv\Scripts\python ModTools5.4.py` |
 
 三条路径共用同一份工程与生成引擎；AI 也可经 [AI 控制接口](docs/reference/ai-control-api.md)（**22 个动作**，localhost HTTP）驱动 GUI 的一键按钮。
 
